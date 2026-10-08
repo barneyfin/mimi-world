@@ -1,6 +1,6 @@
 // Mimi World offline copy.
 // Change VERSION whenever any file below changes, so tablets pick up the new copy.
-const VERSION = 'mimi-world-v0.1.1';
+const VERSION = 'mimi-world-v0.1.2';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
