@@ -5,4 +5,5 @@
 *.png binary
 *.mp3 binary
 *.m4a binary
+*.wav binary
 *.woff2 binary

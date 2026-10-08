@@ -12,6 +12,7 @@ Maths and phonics games for Eli, set in space with his three cats: Scruffles (th
 | `docs/` | The website that GitHub Pages publishes. For now it holds the phase 0 tablet test page. |
 | `SETUP-HOSTING.md` | Step-by-step: publish `docs/` with GitHub Pages and open it on both tablets. |
 | `notes/` | Results of each phase's checks, starting with the phase 0 tablet test. |
+| `voice/` | Barney's voice recordings and the script they follow. Record them with `docs/record/` (live at /mimi-world/record/). |
 
 The plan (PRD) lives in Claude, in the "Mimi World PRD — kit and Mimi Rescue" doc. The look is defined in the Mimi World design system: https://claude.ai/artifact/7u4TCYp4hQ3ia695MpegK7
 
