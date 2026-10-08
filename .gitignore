@@ -1,0 +1,6 @@
+# Staging area for files Claude writes in; never committed
+dist/
+
+# Windows clutter
+Thumbs.db
+desktop.ini

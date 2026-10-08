@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#171A45">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mimi World · tablet test</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root {
+    --night: #171A45;
+    --night-2: #1C2052;
+    --moon: #F4EFE1;
+    --moon-dim: #E9E4D4;
+    --mint: #7FD9C4;
+    --peach: #FFB48A;
+    --ink: #0F1236;
+    --text-2: #B9BEE8;
+  }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: var(--night);
+    overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  body { position: fixed; inset: 0; touch-action: none; }
+
+  /* The stage is drawn at 1280x800 and scaled to fit the screen. */
+  #stage {
+    position: absolute; left: 0; top: 0;
+    width: 1280px; height: 800px;
+    transform-origin: 0 0;
+    background: var(--night);
+    overflow: hidden;
+  }
+  .layer { position: absolute; left: 0; top: 0; }
+
+  #circle {
+    position: absolute; left: 470px; top: 235px;
+    width: 250px; height: 250px; box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--moon-dim);
+    border: 7px dashed var(--mint);
+    transition: box-shadow 400ms ease-out, background-color 300ms;
+  }
+  #circle.has { background: var(--moon); border-style: solid; }
+  #circle.glow { box-shadow: 0 0 0 16px rgba(255,180,138,0.35); }
+
+  #count {
+    position: absolute; left: 550px; top: 505px;
+    width: 90px; height: 70px; box-sizing: border-box;
+    border-radius: 35px;
+    background: var(--moon); border: 5px solid var(--mint);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-weight: 700; line-height: 1; color: #1B1E4A;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mimi {
+    position: absolute; left: 0; top: 0;
+    width: 120px; height: 120px;          /* grab area: bigger than the drawing */
+    margin: -60px 0 0 -60px;               /* position = centre point */
+    display: flex; align-items: center; justify-content: center;
+    will-change: transform;
+    touch-action: none;
+    cursor: grab;
+  }
+  .mimi svg { width: 80px; height: 80px; pointer-events: none; transition: transform 120ms ease-out; }
+  .mimi.dragging { cursor: grabbing; z-index: 10; }
+  .mimi.dragging svg { transform: scale(1.12); filter: drop-shadow(0 12px 8px rgba(0,0,0,0.45)); }
+  .mimi.returning { transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+
+  .btn {
+    position: absolute;
+    min-width: 64px; height: 64px; box-sizing: border-box;
+    padding: 0 22px;
+    border-radius: 32px;
+    border: 4px solid var(--mint);
+    background: #262B66; color: var(--moon);
+    font: 600 22px/1 system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--ink);
+  }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
+  .btn.peach { background: var(--peach); color: #1B1E4A; border-color: var(--peach); box-shadow: 0 5px 0 #B9724E; }
+  .btn svg { width: 30px; height: 30px; }
+
+  #title {
+    position: absolute; left: 32px; top: 30px;
+    color: var(--moon); font-size: 26px; font-weight: 700;
+  }
+  #title small { display: block; margin-top: 4px; font-size: 17px; font-weight: 500; color: var(--text-2); }
+
+  /* Results panel for grown-ups */
+  #panel {
+    position: absolute; inset: 0; display: none;
+    background: rgba(15,18,54,0.94);
+    color: var(--moon);
+    padding: 34px 44px; box-sizing: border-box;
+    z-index: 100;
+  }
+  #panel.open { display: block; }
+  #panel h2 { margin: 0 0 4px; font-size: 30px; }
+  #panel .lead { margin: 0 0 18px; font-size: 18px; color: var(--text-2); }
+  #panel .cols { display: grid; grid-template-columns: 380px 1fr; gap: 40px; }
+  #panel ol { margin: 0; padding-left: 26px; font-size: 19px; line-height: 1.5; }
+  #panel ol li { margin-bottom: 8px; }
+  #results { width: 100%; border-collapse: collapse; font-size: 17px; }
+  #results td { padding: 6px 10px; border-bottom: 1px solid #2E3274; vertical-align: top; }
+  #results td:first-child { color: var(--text-2); width: 210px; }
+  #results .ok { color: var(--mint); }
+  #results .warn { color: var(--peach); }
+  #closePanel { right: 40px; top: 30px; }
+
+  /* Portrait: ask to turn the tablet */
+  #rotate {
+    position: fixed; inset: 0; display: none;
+    background: var(--night); color: var(--moon);
+    align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+    font-size: 22px;
+  }
+  @media (orientation: portrait) { #rotate { display: flex; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mimi.returning { transition-duration: 1ms; }
+    .mimi svg, #circle { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg class="layer" width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true">
+    <defs>
+      <clipPath id="bigPlanet"><circle cx="60" cy="830" r="175"></circle></clipPath>
+    </defs>
+    <path d="M820 -40 C 960 -60, 1180 -20, 1300 60 L 1300 380 C 1180 330, 1020 300, 920 220 C 840 160, 760 -20, 820 -40 Z" fill="#1C2052"></path>
+    <g transform="translate(340 120) rotate(-18)">
+      <ellipse rx="48" ry="16" fill="#8C7CD6" opacity="0.2"></ellipse>
+      <ellipse rx="31" ry="10" fill="#B9A6F2" opacity="0.35"></ellipse>
+      <ellipse rx="13" ry="5" fill="#F4EFE1" opacity="0.85"></ellipse>
+    </g>
+    <g fill="#F4EFE1">
+      <circle cx="160" cy="300" r="2.2"></circle><circle cx="250" cy="96" r="1.8"></circle>
+      <circle cx="660" cy="120" r="2.2"></circle><circle cx="720" cy="190" r="1.6"></circle>
+      <circle cx="900" cy="40" r="1.8"></circle><circle cx="1080" cy="130" r="1.8"></circle>
+      <circle cx="1240" cy="190" r="2.2"></circle><circle cx="1210" cy="520" r="1.8"></circle>
+      <circle cx="120" cy="560" r="2"></circle><circle cx="1000" cy="560" r="1.6"></circle>
+      <circle cx="420" cy="660" r="1.8"></circle><circle cx="820" cy="700" r="1.6"></circle>
+    </g>
+    <g clip-path="url(#bigPlanet)">
+      <g transform="rotate(-45 60 830)">
+        <rect x="-115" y="655" width="350" height="350" fill="#2E2A6E"></rect>
+        <rect x="-115" y="655" width="350" height="236" fill="#403C8E"></rect>
+        <rect x="-115" y="655" width="350" height="105" fill="#5450AA"></rect>
+      </g>
+    </g>
+    <!-- asteroid tray -->
+    <path transform="translate(850 420)" d="M30 120 C 20 60, 90 20, 170 28 C 250 14, 350 30, 375 90 C 398 150, 362 210, 280 214 C 200 226, 110 222, 60 200 C 30 186, 34 160, 30 120 Z" fill="#3A3474" stroke="#0F1236" stroke-width="6"></path>
+  </svg>
+
+  <div id="title">Mimi World<small>Tablet test · v0.1</small></div>
+
+  <div id="circle" aria-label="Drop circle"></div>
+  <div id="count" aria-live="polite">0</div>
+
+  <button class="btn" id="btnFull" style="left: 32px; top: 712px;" aria-label="Full screen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+    Full screen
+  </button>
+  <button class="btn peach" id="btnSound" style="left: 286px; top: 712px;" aria-label="Play sound">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7"></path></svg>
+    Sound
+  </button>
+  <button class="btn" id="btnReset" style="left: 478px; top: 712px;" aria-label="Put the Mimi back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"></path><path d="M4 4v5h5"></path></svg>
+    Again
+  </button>
+  <button class="btn" id="btnResults" style="right: 32px; top: 24px;" aria-label="Show results">Results</button>
+
+  <div id="panel" role="dialog" aria-label="Test results">
+    <button class="btn" id="closePanel" aria-label="Close results">Close</button>
+    <h2>Tablet test results</h2>
+    <p class="lead">Photograph this screen on each tablet and send it to Claude.</p>
+    <div class="cols">
+      <div>
+        <ol>
+          <li>Drag each Mimi into the circle, and one back out.</li>
+          <li>Tap <b>Sound</b>. You should hear two notes.</li>
+          <li>Tap <b>Full screen</b>.</li>
+          <li>Add the page to the home screen, if the tablet offers it, and open it from there.</li>
+          <li>Turn Wi-Fi off, close the page and open it again.</li>
+          <li>Open this panel and take the photo.</li>
+        </ol>
+      </div>
+      <table id="results"><tbody></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div id="rotate" aria-label="Turn the tablet sideways">
+  <svg width="220" height="160" viewBox="0 0 220 160" aria-hidden="true">
+    <rect x="20" y="20" width="80" height="120" rx="12" fill="none" stroke="#7FD9C4" stroke-width="6"></rect>
+    <rect x="110" y="50" width="100" height="70" rx="12" fill="none" stroke="#FFB48A" stroke-width="6" transform="translate(-6 0)"></rect>
+    <path d="M70 12 C 120 -2, 160 20, 168 42" fill="none" stroke="#F4EFE1" stroke-width="5" stroke-linecap="round"></path>
+    <path d="M156 38 L168 44 L172 30" fill="none" stroke="#F4EFE1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+  </svg>
+  <div>Turn me sideways</div>
+</div>
+
+<template id="mimiArt">
+  <svg viewBox="0 0 80 80" aria-hidden="true"><path d="M14 32 L12 6 L33 21 Z" fill="#8C7CD6" stroke="#3E3380" stroke-width="4" stroke-linejoin="round"></path><path d="M66 32 L68 6 L47 21 Z" fill="#8C7CD6" stroke="#3E3380" stroke-width="4" stroke-linejoin="round"></path><ellipse cx="40" cy="45" rx="31" ry="28" fill="#8C7CD6" stroke="#3E3380" stroke-width="4"></ellipse><ellipse cx="40" cy="55" rx="13" ry="9" fill="#C9BEF0"></ellipse><circle cx="29" cy="41" r="5" fill="#171A45"></circle><circle cx="51" cy="41" r="5" fill="#171A45"></circle><circle cx="27.5" cy="39.5" r="1.6" fill="#FFFFFF"></circle><circle cx="49.5" cy="39.5" r="1.6" fill="#FFFFFF"></circle><path d="M37 51 L43 51 L40 55 Z" fill="#F29BB0"></path></svg>
+</template>
+
+<script>
+(function () {
+  'use strict';
+  var VERSION = '0.1.0';
+  var CHIME_B64 = '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';
+  var t0 = performance.now();
+
+  var stage = document.getElementById('stage');
+  var circleEl = document.getElementById('circle');
+  var countEl = document.getElementById('count');
+  var panel = document.getElementById('panel');
+  var tbody = document.querySelector('#results tbody');
+
+  // ---------- results the page measures ----------
+  var R = {
+    loadMs: null, lastInput: '—', drag: null, sound: 'Not tried yet', soundOk: null,
+    full: 'Not tried yet', fullOk: null, orient: '—', offline: 'Checking…', offlineOk: null,
+    storage: '—', storageOk: null
+  };
+
+  // ---------- scale the 1280x800 stage to fit ----------
+  var scale = 1, offX = 0, offY = 0;
+  function fit() {
+    var w = window.innerWidth, h = window.innerHeight;
+    scale = Math.min(w / 1280, h / 800);
+    offX = (w - 1280 * scale) / 2;
+    offY = (h - 800 * scale) / 2;
+    stage.style.transform = 'translate(' + offX + 'px,' + offY + 'px) scale(' + scale + ')';
+    renderResults();
+  }
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', function () { setTimeout(fit, 250); });
+
+  function toStage(clientX, clientY) {
+    return { x: (clientX - offX) / scale, y: (clientY - offY) / scale };
+  }
+
+  // ---------- the Mimi ----------
+  var CIRCLE = { x: 595, y: 360, r: 125 };
+  var HOME = [ { x: 970, y: 520 }, { x: 1080, y: 500 }, { x: 1170, y: 545 } ];
+  var SLOTS = [ { x: 595, y: 315 }, { x: 550, y: 400 }, { x: 640, y: 400 } ];
+  var art = document.getElementById('mimiArt');
+  var mimis = [];
+
+  HOME.forEach(function (home, i) {
+    var el = document.createElement('div');
+    el.className = 'mimi';
+    el.setAttribute('aria-label', 'Mimi ' + (i + 1));
+    el.appendChild(art.content.firstElementChild.cloneNode(true));
+    stage.appendChild(el);
+    var m = { el: el, home: home, x: home.x, y: home.y, slot: -1 };
+    place(m, home.x, home.y);
+    mimis.push(m);
+    el.addEventListener('pointerdown', function (e) { startDrag(m, e); });
+  });
+
+  function place(m, x, y) {
+    m.x = x; m.y = y;
+    m.el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+  }
+
+  function inCircle(x, y) {
+    var dx = x - CIRCLE.x, dy = y - CIRCLE.y;
+    return Math.sqrt(dx * dx + dy * dy) <= CIRCLE.r;
+  }
+  function freeSlot() {
+    for (var s = 0; s < SLOTS.length; s++) {
+      var used = mimis.some(function (m) { return m.slot === s; });
+      if (!used) return s;
+    }
+    return -1;
+  }
+  function updateCount() {
+    var n = mimis.filter(function (m) { return m.slot >= 0; }).length;
+    countEl.textContent = String(n);
+    circleEl.classList.toggle('has', n > 0);
+  }
+
+  // drag state: only one finger at a time
+  var drag = null;
+
+  function startDrag(m, e) {
+    if (drag) return;
+    unlockAudio();
+    e.preventDefault();
+    R.lastInput = e.pointerType || 'unknown';
+    try { m.el.setPointerCapture(e.pointerId); } catch (err) {}
+    var p = toStage(e.clientX, e.clientY);
+    drag = {
+      m: m, id: e.pointerId, dx: m.x - p.x, dy: m.y - p.y,
+      tx: m.x, ty: m.y, frames: [], lastT: null, raf: 0
+    };
+    m.el.classList.remove('returning');
+    m.el.classList.add('dragging');
+    drag.raf = requestAnimationFrame(frame);
+  }
+
+  function frame(t) {
+    if (!drag) return;
+    if (drag.lastT !== null) drag.frames.push(t - drag.lastT);
+    drag.lastT = t;
+    place(drag.m, drag.tx, drag.ty);
+    drag.raf = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var p = toStage(e.clientX, e.clientY);
+    drag.tx = Math.max(0, Math.min(1280, p.x + drag.dx));
+    drag.ty = Math.max(0, Math.min(800, p.y + drag.dy));
+  }, { passive: true });
+
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    cancelAnimationFrame(drag.raf);
+    var m = drag.m;
+    place(m, drag.tx, drag.ty);
+    m.el.classList.remove('dragging');
+    recordSmoothness(drag.frames);
+    drag = null;
+
+    var target = -1;
+    if (inCircle(m.x, m.y)) {
+      target = m.slot >= 0 ? m.slot : freeSlot();
+    }
+    m.el.classList.add('returning');
+    if (target >= 0) {
+      var wasIn = m.slot >= 0;
+      m.slot = target;
+      place(m, SLOTS[target].x, SLOTS[target].y);
+      if (!wasIn) { playChime(); glow(); }
+    } else {
+      m.slot = -1;
+      place(m, m.home.x, m.home.y);
+    }
+    updateCount();
+    renderResults();
+  }
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  function glow() {
+    circleEl.classList.add('glow');
+    setTimeout(function () { circleEl.classList.remove('glow'); }, 450);
+  }
+
+  function recordSmoothness(frames) {
+    if (frames.length < 5) return;
+    var sum = 0, worst = 0, slow = 0;
+    frames.forEach(function (f) { sum += f; if (f > worst) worst = f; if (f > 34) slow++; });
+    var avg = sum / frames.length;
+    R.drag = { fps: Math.round(1000 / avg), worst: Math.round(worst), slow: slow, n: frames.length };
+  }
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    mimis.forEach(function (m) { m.slot = -1; m.el.classList.add('returning'); place(m, m.home.x, m.home.y); });
+    updateCount();
+  });
+
+  // ---------- sound ----------
+  var ctx = null, chimeBuf = null, decoding = false;
+  function b64ToBuffer(b64) {
+    var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes.buffer;
+  }
+  function unlockAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { R.sound = 'No Web Audio in this browser'; R.soundOk = false; return; }
+    if (!ctx) {
+      try { ctx = new AC(); } catch (err) { R.sound = 'Could not start audio: ' + err.message; R.soundOk = false; return; }
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    if (!chimeBuf && !decoding) {
+      decoding = true;
+      var done = function (buf) { chimeBuf = buf; decoding = false; };
+      var fail = function (err) { decoding = false; R.sound = 'Could not read the sound file'; R.soundOk = false; renderResults(); };
+      try {
+        var p = ctx.decodeAudioData(b64ToBuffer(CHIME_B64), done, fail);
+        if (p && p.catch) p.catch(fail);
+      } catch (err) { fail(err); }
+    }
+  }
+  function playChime() {
+    unlockAudio();
+    if (!ctx) return;
+    var go = function () {
+      if (!chimeBuf) { setTimeout(go, 60); return; }
+      try {
+        var src = ctx.createBufferSource();
+        src.buffer = chimeBuf;
+        src.connect(ctx.destination);
+        src.start(0);
+        R.sound = 'Played (audio ' + ctx.state + ')';
+        R.soundOk = ctx.state === 'running';
+      } catch (err) { R.sound = 'Play failed: ' + err.message; R.soundOk = false; }
+      renderResults();
+    };
+    go();
+  }
+  document.getElementById('btnSound').addEventListener('click', function () { R.lastInput = 'tap'; playChime(); });
+
+  // ---------- full screen ----------
+  document.getElementById('btnFull').addEventListener('click', function () {
+    var el = document.documentElement;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (!req) { R.full = 'Not available in this browser'; R.fullOk = false; renderResults(); return; }
+    try {
+      var p = req.call(el, { navigationUI: 'hide' });
+      var after = function () {
+        R.full = 'Worked'; R.fullOk = true;
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').then(function () { R.orient = 'Locked to landscape'; renderResults(); })
+            .catch(function (err) { R.orient = 'Could not lock (' + err.name + ')'; renderResults(); });
+        } else { R.orient = 'Lock not available'; }
+        renderResults();
+      };
+      if (p && p.then) p.then(after).catch(function (err) { R.full = 'Refused (' + err.name + ')'; R.fullOk = false; renderResults(); });
+      else setTimeout(after, 300);
+    } catch (err) { R.full = 'Failed: ' + err.message; R.fullOk = false; renderResults(); }
+  });
+
+  // ---------- saving progress ----------
+  try {
+    localStorage.setItem('mimi-test', String(Date.now()));
+    var back = localStorage.getItem('mimi-test');
+    localStorage.removeItem('mimi-test');
+    R.storage = back ? 'Works' : 'Read back failed'; R.storageOk = !!back;
+  } catch (err) { R.storage = 'Blocked (' + err.name + ')'; R.storageOk = false; }
+
+  // ---------- offline copy ----------
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    var controlled = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(function () {
+      return navigator.serviceWorker.ready;
+    }).then(function () {
+      if (controlled) { R.offline = 'Opened from the saved copy'; R.offlineOk = true; }
+      else { R.offline = 'Saved for offline; works from the next visit'; R.offlineOk = true; }
+      renderResults();
+    }).catch(function (err) {
+      R.offline = 'Could not save (' + err.name + ')'; R.offlineOk = false; renderResults();
+    });
+  } else {
+    R.offline = window.isSecureContext ? 'Not available in this browser' : 'Needs the https address';
+    R.offlineOk = false;
+  }
+
+  // ---------- results panel ----------
+  function browserName() {
+    var ua = navigator.userAgent, m;
+    if ((m = ua.match(/Silk\/([\d.]+)/))) return 'Silk ' + m[1];
+    if ((m = ua.match(/(?:Chrome|CriOS)\/([\d.]+)/))) return 'Chrome ' + m[1];
+    if ((m = ua.match(/Firefox\/([\d.]+)/))) return 'Firefox ' + m[1];
+    if ((m = ua.match(/Version\/([\d.]+).*Safari/))) return 'Safari ' + m[1];
+    return 'Unknown';
+  }
+  function androidVersion() {
+    var m = navigator.userAgent.match(/Android\s([\d.]+)/);
+    return m ? 'Android ' + m[1] : 'not Android';
+  }
+  function installed() {
+    var mm = window.matchMedia;
+    if (!mm) return 'Unknown';
+    if (mm('(display-mode: fullscreen)').matches) return 'Opened from home screen (full screen)';
+    if (mm('(display-mode: standalone)').matches) return 'Opened from home screen';
+    return 'Opened in the browser';
+  }
+  function row(label, value, ok) {
+    var cls = ok === true ? 'ok' : ok === false ? 'warn' : '';
+    return '<tr><td>' + label + '</td><td class="' + cls + '">' + value + '</td></tr>';
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function renderResults() {
+    if (!panel.classList.contains('open')) return;
+    var dpr = window.devicePixelRatio || 1;
+    var mimiPx = Math.round(80 * scale * dpr);
+    var d = R.drag;
+    var dragText = d ? (d.fps + ' frames a second; slowest frame ' + d.worst + ' ms; ' + d.slow + ' slow of ' + d.n) : 'Drag a Mimi first';
+    var dragOk = d ? (d.fps >= 50 && d.slow <= Math.max(2, d.n * 0.05)) : null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    tbody.innerHTML = [
+      row('Page version', esc(VERSION)),
+      row('Browser', esc(browserName() + ' · ' + androidVersion())),
+      row('Screen', esc(screen.width + '×' + screen.height + ' at ' + dpr + 'x · page ' + window.innerWidth + '×' + window.innerHeight)),
+      row('Mimi size', esc(mimiPx + ' screen pixels wide (scale ' + scale.toFixed(2) + ')')),
+      row('Touch', esc((navigator.maxTouchPoints || 0) + ' touch points · Pointer events ' + (window.PointerEvent ? 'yes' : 'no') + ' · last input ' + R.lastInput)),
+      row('Drag smoothness', esc(dragText), dragOk),
+      row('Opened in', esc(R.loadMs === null ? '—' : (R.loadMs / 1000).toFixed(1) + ' s'), R.loadMs === null ? null : R.loadMs <= 3000),
+      row('Sound', esc(R.sound), R.soundOk),
+      row('Full screen', esc(R.full + (R.orient !== '—' ? ' · ' + R.orient : '')), R.fullOk),
+      row('Home screen', esc(installed())),
+      row('Offline copy', esc(R.offline + (navigator.onLine ? ' · online now' : ' · offline now')), R.offlineOk),
+      row('Saving progress', esc(R.storage), R.storageOk),
+      row('Reduce motion', reduce ? 'On' : 'Off')
+    ].join('');
+  }
+
+  document.getElementById('btnResults').addEventListener('click', function () { panel.classList.add('open'); renderResults(); });
+  document.getElementById('closePanel').addEventListener('click', function () { panel.classList.remove('open'); });
+  window.addEventListener('online', renderResults);
+  window.addEventListener('offline', renderResults);
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  window.addEventListener('load', function () {
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    R.loadMs = nav ? Math.round(nav.loadEventStart || performance.now()) : Math.round(performance.now() - t0);
+    renderResults();
+  });
+
+  fit();
+  updateCount();
+  window.__mimiTest = { R: R, mimis: mimis, toStageScale: function () { return scale; } };
+})();
+</script>
+</body>
+</html>

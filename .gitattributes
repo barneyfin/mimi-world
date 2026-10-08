@@ -1,0 +1,8 @@
+# Keep text files with LF line endings on every machine
+* text=auto eol=lf
+
+# Binary files: never touch
+*.png binary
+*.mp3 binary
+*.m4a binary
+*.woff2 binary
