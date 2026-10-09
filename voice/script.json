@@ -277,64 +277,55 @@
       "id": "crew-jobs",
       "group": "Crew",
       "words": "Let's give the crew their jobs!",
-      "how": "Excited, inviting.",
-      "pending": true
+      "how": "Excited, inviting."
     },
     {
       "id": "crew-ready",
       "group": "Crew",
       "words": "The crew are ready!",
-      "how": "Pleased, a big finish.",
-      "pending": true
+      "how": "Pleased, a big finish."
     },
     {
       "id": "name-moggles",
       "group": "Crew",
       "words": "Moggles…",
-      "how": "Keep the voice up: more follows (\"Moggles… is the… lookout.\").",
-      "pending": true
+      "how": "Keep the voice up: more follows (\"Moggles… is the… lookout.\")."
     },
     {
       "id": "name-snuffles",
       "group": "Crew",
       "words": "Snuffles…",
-      "how": "Keep the voice up: more follows.",
-      "pending": true
+      "how": "Keep the voice up: more follows."
     },
     {
       "id": "is-the",
       "group": "Crew",
       "words": "is the…",
-      "how": "Short and light, voice up: a job follows.",
-      "pending": true
+      "how": "Short and light, voice up: a job follows."
     },
     {
       "id": "job-lookout",
       "group": "Crew",
       "words": "lookout.",
-      "how": "Fall at the end: the last word of the sentence.",
-      "pending": true
+      "how": "Fall at the end: the last word of the sentence."
     },
     {
       "id": "job-engineer",
       "group": "Crew",
       "words": "engineer.",
-      "how": "Fall at the end: the last word of the sentence.",
-      "pending": true
+      "how": "Fall at the end: the last word of the sentence."
     },
     {
       "id": "job-navigator",
       "group": "Crew",
       "words": "navigator.",
-      "how": "Fall at the end: the last word of the sentence.",
-      "pending": true
+      "how": "Fall at the end: the last word of the sentence."
     },
     {
       "id": "job-cook",
       "group": "Crew",
       "words": "cook.",
-      "how": "Fall at the end: the last word of the sentence.",
-      "pending": true
+      "how": "Fall at the end: the last word of the sentence."
     }
   ]
 }

@@ -1,6 +1,7 @@
-/* MeeMee Rescue (trial round, phase 3).
-   Five part–whole questions in Barney's voice. The player drags MeeMee from the asteroid into the waiting circle.
-   Built only from the kit (kit/*.js); phase 4 adds the solar-system map, the crew screen and the progress grid. */
+/* MeeMee Rescue (phase 4).
+   Play opens the home map (kit/map.js); the MeeMee Rescue planet starts a round of five part–whole questions in
+   Barney's voice, chosen from the bonds that need work (bonds.js). The player drags MeeMee from the asteroid into the
+   waiting circle. Grown-ups see the progress grid. Built only from the kit (kit/*.js); 0.4.1 adds the crew screen. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -11,15 +12,16 @@
   const OTHER = { left: 'right', right: 'left' };
 
   const st = { token: 0, paused: false, pauses: {}, hintTimers: [], phase: 'idle', round: null, qi: 0, q: null, target: null, answer: 0,
-    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [] };
+    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], welcomed: false, check: null };
   const R = MW.rescue = { st: st, nextRound: null };
-  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger;
+  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, map;
 
   // ---------------------------------------------------------------- set-up
   function init() {
     const stageEl = MW.$('stage');
     MW.stage.init(stageEl);
     buildStart();
+    buildMap();
     buildGame();
     buildEnd();
     MW.shell.gate(stageEl, openGrownups);
@@ -41,13 +43,13 @@
 
   function buildStart() {
     const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee Rescue'));
+    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee World'));
     const p = MW.pod(s, 240, 150, 420);
     p.el.disabled = true; p.el.tabIndex = -1;
     const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
     const icon = MW.art('icon-play'); icon.setAttribute('width', 84); icon.setAttribute('height', 84);
     play.appendChild(icon);
-    MW.onTap(play, function () { MW.audio.unlock(); MW.shell.fullscreen(); startRound(); });
+    MW.onTap(play, function () { MW.audio.unlock(); MW.shell.fullscreen(); goMap(); });
     // If a browser didn't count the finger lifting as a tap for full screen, the click that follows tries again.
     play.addEventListener('click', function () { MW.audio.unlock(); if (MW.device.fullOk === false) MW.shell.fullscreen(); });
     s.appendChild(play);
@@ -55,6 +57,36 @@
     for (let i = 0; i < 3; i++) row.appendChild(MW.art('mimi'));
     s.appendChild(row);
     MW.shell.buttons(s, ['music'], {});
+  }
+
+  // The home map: "Welcome to MeeMee World!" the first time in a visit; the MeeMee Rescue planet starts a round.
+  function buildMap() {
+    const s = MW.$('screen-map');
+    map = MW.map(s, { onRescue: openRescue, onLocked: notReady });
+    MW.shell.buttons(s, ['music'], {});
+  }
+  function goMap() {
+    st.token++;
+    st.phase = 'map';
+    st.check = null;
+    MW.shell.show('screen-map');
+    if (!st.welcomed) { st.welcomed = true; speak([['map-welcome']]); }
+  }
+  async function openRescue() {
+    if (st.phase !== 'map' || st.paused) return;
+    st.phase = 'opening';
+    const token = ++st.token;
+    map.bounce();
+    MW.log('map', 'rescue');
+    await speak([['map-mimi-rescue']]);
+    if (token !== st.token) return;
+    if (st.paused) { st.phase = 'map'; return; }             // the grown-ups area opened (or the screen went off) meanwhile
+    startRound();
+  }
+  function notReady() {
+    if (st.phase !== 'map' || st.paused) return;
+    MW.log('map', 'locked');
+    speak([['map-not-ready']]);
   }
 
   function buildGame() {
@@ -130,23 +162,13 @@
     if (R.nextRound) { const r = R.nextRound; R.nextRound = null; return r.map(function (q) { return Object.assign({}, q); }); }
     let wholes = (MW.store.setting('wholes') || []).filter(function (w) { return w >= 2 && w <= 10; });
     if (!wholes.length) wholes = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const pool = [];
-    wholes.forEach(function (w) { for (let a = 1; a < w; a++) pool.push([w, a]); });
-    const qs = [];
-    let guard = 0;
-    while (qs.length < ROUND && guard++ < 1000) {
-      const pick = MW.pick(pool), w = pick[0], a = pick[1];
-      const same = qs.some(function (q) { return q.whole === w && (q.left === a || q.right === a); });
-      if (same && pool.length >= ROUND * 2) continue;
-      if (qs.length && qs[qs.length - 1].whole === w && wholes.length > 1 && guard < 500) continue;
-      const r = Math.random();
-      qs.push({ whole: w, left: a, right: w - a, missing: r < 0.25 ? 'whole' : (r < 0.625 ? 'left' : 'right') });
-    }
-    return qs;
+    // zero bonds are answered with an empty circle, so they come up only when the answer is checked by tapping Scruffles
+    return MW.bonds.pickRound({ wholes: wholes, answers: MW.store.get('answers') || [], size: ROUND, zero: check() === 'tap' });
   }
 
   async function startRound() {
     const token = ++st.token;
+    st.check = savedCheck();
     st.round = makeRound();
     st.qi = 0;
     clearBoard(true);
@@ -192,8 +214,9 @@
       st.counters.push(c);
     });
     st.prompt = promptFor(q);
-    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready."
-    if (check() === 'tap' && st.qi < 2) st.prompt = st.prompt.concat([['tap-scruffles']]);
+    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready.", and so does any
+    // question whose answer is zero (the answer is an empty circle and a tap on Scruffles)
+    if (check() === 'tap' && (st.qi < 2 || st.answer === 0)) st.prompt = st.prompt.concat([['tap-scruffles']]);
     st.phase = 'asking';
     MW.log('question', JSON.stringify(q));
     await speak(st.prompt);
@@ -217,7 +240,10 @@
     diagram.count(st.target, n);
     pod.ready(check() === 'tap' && n > 0 && st.phase !== 'celebrate');
   }
-  function check() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
+  // How answers are checked. A round keeps the mode it started with (its zero bonds need tap mode);
+  // a change in Settings starts with the next round.
+  function savedCheck() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
+  function check() { return st.check || savedCheck(); }
 
   function onDrop(c, x, y, cancelled) {
     if (st.counters.indexOf(c) < 0) return;                 // left over from a question that has ended
@@ -414,26 +440,79 @@
     MW.audio.hush();
     pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
-    MW.shell.show('screen-start');
+    goMap();
   }
 
-  // ---------------------------------------------------------------- grown-ups: this trial
+  // ---------------------------------------------------------------- grown-ups: progress and settings
   function sentence(a) {
     if (a.missing === 'whole') return a.left + ' + ' + a.right + ' = ?';
     if (a.missing === 'left') return '? + ' + a.right + ' = ' + a.whole;
     return a.left + ' + ? = ' + a.whole;
   }
+  // one cell of the progress grid: a tick for secure, a dashed edge for practising, faint for not yet
+  function cell(status, text) {
+    const c = MW.make('span', 'mw-cell label is-' + status);
+    if (status === 'secure') {
+      const tick = MW.art('icon-tick'); tick.setAttribute('width', 16); tick.setAttribute('height', 16);
+      c.appendChild(tick);
+    }
+    c.appendChild(document.createTextNode(text));
+    return c;
+  }
   function progressSection() {
     return {
       id: 'progress', title: 'Progress',
       render: function (el) {
+        const G = MW.grownups;
         const answers = MW.store.get('answers') || [];
-        const firstTime = answers.filter(function (a) { return !a.tries && !a.hint; }).length;
-        MW.grownups.p(el, answers.length
-          ? 'Questions answered on this tablet: ' + answers.length + '. Right first time: ' + firstTime + '.'
+        const map = MW.bonds.statuses(answers);
+        let nSecure = 0, nPractising = 0, total = 0;
+        // the progress grid (the design system's BondGrid): every bond of 2 to 10, smaller part first
+        const grid = MW.make('div', 'gu-grid');
+        for (let w = 2; w <= 10; w++) {
+          const row = MW.make('div', 'gu-grid-row');
+          row.appendChild(MW.make('span', 'gu-grid-whole', null, String(w)));
+          MW.bonds.pairs(w).forEach(function (pr) {
+            const status = MW.bonds.status(map, w, pr[0]);
+            total++;
+            if (status === 'secure') nSecure++; else if (status === 'practising') nPractising++;
+            row.appendChild(cell(status, pr[0] + ' + ' + pr[1]));
+          });
+          grid.appendChild(row);
+        }
+        G.p(el, answers.length
+          ? 'Secure: ' + nSecure + ' of ' + total + ' bonds. Practising: ' + nPractising + '. Questions answered on this tablet: ' + answers.length + '.'
           : 'No questions answered on this tablet yet.', 'gu-lead');
-        MW.grownups.p(el, 'This is the phase 3 trial. The full progress screen, showing which bonds are secure, comes with the finished game.', 'gu-note');
+        el.appendChild(grid);
+        const legend = MW.make('div', 'gu-legend');
+        legend.appendChild(cell('secure', 'Secure'));
+        legend.appendChild(cell('practising', 'Practising'));
+        legend.appendChild(cell('notyet', 'Not yet'));
+        el.appendChild(legend);
+        G.p(el, '<b>Secure</b> means right first time (no wrong check and no hint) on three different days. A wrong answer moves a bond back to practising, and its three days start again. Each round has 1 or 2 secure bonds and 3 or 4 that need work.', 'gu-note');
+        G.p(el, '<b>Zero bonds</b> (such as 0 + 7) join the rounds once the other bonds of that number are secure. They come up only when your child taps Scruffles to check (Settings), because the answer is an empty circle.', 'gu-note');
+
+        G.h3(el, 'Wholes in play');
+        const r2 = G.row(el);
+        const paintW = function () {
+          const on = MW.store.setting('wholes') || [];
+          Array.prototype.forEach.call(r2.children, function (b) { b.classList.toggle('is-on', on.indexOf(+b.textContent) >= 0); });
+        };
+        for (let w = 2; w <= 10; w++) {
+          G.btn(r2, String(w), function () {
+            let on = (MW.store.setting('wholes') || []).slice();
+            if (on.indexOf(w) >= 0) { if (on.length > 1) on = on.filter(function (x) { return x !== w; }); }
+            else on.push(w);
+            on.sort(function (a, b) { return a - b; });
+            MW.store.setting('wholes', on);
+            paintW();
+          }, 'mw-chip gu-chip');
+        }
+        paintW();
+        G.p(el, 'Questions use only the wholes switched on. Changes start with the next round.', 'gu-note');
+
         if (answers.length) {
+          G.h3(el, 'Recent answers');
           const rows = answers.slice(-25).reverse().map(function (a) {
             const d = new Date(a.t);
             const when = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -450,7 +529,7 @@
           }).join('');
           el.appendChild(t);
         }
-        const row = MW.grownups.row(el);
+        const row = G.row(el);
         let armed = 0;
         MW.grownups.btn(row, 'Clear this tablet\'s progress', function (b) {
           if (Date.now() - armed < 4000) {
@@ -473,39 +552,22 @@
         const r1 = G.row(el);
         const modes = [['tap', 'When your child taps Scruffles'], ['auto', 'As soon as the count is right']];
         const paint = function () {
-          Array.prototype.forEach.call(r1.children, function (b, i) { b.classList.toggle('is-on', modes[i][0] === check()); });
+          Array.prototype.forEach.call(r1.children, function (b, i) { b.classList.toggle('is-on', modes[i][0] === savedCheck()); });
         };
         modes.forEach(function (m) {
           G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); MW.store.setting('checkPicked', true); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice');
         });
         paint();
-        G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready.", and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
+        G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready." (so does any question whose answer is zero), and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
         G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No deciding when to stop, so it is easier but teaches less.', 'gu-note');
 
-        G.h3(el, 'Wholes in play');
-        const r2 = G.row(el);
-        const paintW = function () {
-          const on = MW.store.setting('wholes') || [];
-          Array.prototype.forEach.call(r2.children, function (b) { b.classList.toggle('is-on', on.indexOf(+b.textContent) >= 0); });
-        };
-        for (let w = 2; w <= 10; w++) {
-          G.btn(r2, String(w), function () {
-            let on = (MW.store.setting('wholes') || []).slice();
-            if (on.indexOf(w) >= 0) { if (on.length > 1) on = on.filter(function (x) { return x !== w; }); }
-            else on.push(w);
-            on.sort(function (a, b) { return a - b; });
-            MW.store.setting('wholes', on);
-            paintW();
-          }, 'mw-chip gu-chip');
-        }
-        paintW();
-        G.p(el, 'Questions use only the wholes switched on. Zero bonds (such as 7 + 0) aren\'t asked yet. Changes start with the next round.', 'gu-note');
+        G.p(el, 'A change starts with the next round. Zero bonds come up only in the first way. Which numbers are in play is on the Progress tab.', 'gu-note');
       }
     };
   }
 
   // ---------------------------------------------------------------- test hooks
-  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome;
+  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome; R.map = goMap; R.makeRound = makeRound;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

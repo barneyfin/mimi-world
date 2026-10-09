@@ -2,7 +2,7 @@
 
 1. A tablet with the phase 0 test page (v0.1.2) is moved to the new game on its next visit, without a second visit.
 2. A newer version switches over at the start screen.
-3. A newer version never interrupts a round: it waits for Home.
+3. A newer version never interrupts a round: it waits for Home (the map).
 
     python tools/tests/test_update.py PHASE0_DOCS_FOLDER
 PHASE0_DOCS_FOLDER is a copy of docs/ as it was at phase 0 (git: the docs folder from commit beaf3b0).
@@ -115,7 +115,7 @@ async def main(phase0):
             check("the update is waiting", await page.evaluate("!!MW.shell.updateReady"))
             await page.evaluate("MW.rescue.home()")
             v = await wait_version(page, NEWER2, 15)
-            check("tapping Home switches to the newer version", v == NEWER2, v)
+            check("tapping Home (back to the map) switches to the newer version", v == NEWER2, v)
 
             # offline afterwards
             await ctx.set_offline(True)

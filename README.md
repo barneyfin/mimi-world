@@ -2,7 +2,7 @@
 
 Maths and phonics games for a five-year-old, set in space with the family's three cats: Scruffles (the hero), Moggles and Snuffles. The MeeMee are the lost kittens they rescue.
 
-- **MeeMee Rescue** (in progress): number bonds to 10 on the part–whole diagram. A five-question trial round is live; the full game comes in phase 4.
+- **MeeMee Rescue** (phase 4 in progress): number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. Grown-ups see which bonds are secure. The crew screen comes next (0.4.1).
 - Tricky-words game: next.
 
 Live at https://barneyfin.github.io/mimi-world/ (the recording page is at /mimi-world/record/).
@@ -13,12 +13,12 @@ Live at https://barneyfin.github.io/mimi-world/ (the recording page is at /mimi-
 | --- | --- |
 | `docs/` | The website that GitHub Pages publishes. **Built by `tools/build.py`: don't edit it by hand.** |
 | `kit/` | The MeeMee World code kit: stage and scaling, sound, dragging, the part–whole diagram and other screen pieces, the shell (screens, full screen, buttons, grown-ups lock), the grown-ups area, the offline copy, styles and fonts (Andika, under the SIL Open Font Licence in `kit/Andika-OFL.txt`). |
-| `games/rescue/` | MeeMee Rescue: the page template and the game itself. |
+| `games/rescue/` | MeeMee Rescue: the page template, the bonds and how rounds are chosen (`bonds.js`), and the game itself (`rescue.js`). |
 | `design/` | The drawings and colours from the MeeMee World design system (`gen_art.py`, `gen_tokens.py`), and the scenes built from them (`gen_scenes.py`). |
 | `voice/` | Barney's recordings (WAV) and the script they follow. |
 | `music/` | "Paws in the Milky Way", Barney's track, as made. The build makes the looping web copy. |
 | `tools/` | The build, the audio maker, the recording page's template, and the tests. |
-| `notes/` | Results of each phase's checks. |
+| `notes/` | Results of each phase's checks, and `all-questions.md`: every question the game can ask (made by the tests). |
 | `SETUP-HOSTING.md` | Step-by-step: publish `docs/` with GitHub Pages and open it on both tablets. |
 
 The plan (PRD) lives in Claude, in the "MeeMee World PRD — kit and MeeMee Rescue" doc. The look is defined in the MeeMee World design system: https://claude.ai/artifact/7u4TCYp4hQ3ia695MpegK7

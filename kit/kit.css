@@ -108,6 +108,17 @@ button { font-family: var(--font-andika); }
 @keyframes mw-ship-flash { 0% { opacity: 1; } 50% { opacity: 0.15; } 100% { opacity: 0.15; } }
 @keyframes mw-ship-glow { 0% { opacity: 0.45; } 50% { opacity: 0; } 100% { opacity: 0; } }
 
+/* ---------------------------------------------------------------- the home map */
+.mw-planet { padding: 0; margin: 0; border: 0; background: transparent; border-radius: var(--radius-round); cursor: pointer; }
+.mw-planet:focus-visible, .mw-planet-badge:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; }
+.mw-planet-badge { box-sizing: border-box; padding: 0; margin: 0; border-radius: var(--radius-round); background: var(--moon);
+  border: 5px solid var(--mint); box-shadow: 0 0 0 10px rgba(127, 217, 196, 0.18); display: flex; align-items: center; justify-content: center;
+  line-height: 0; cursor: pointer; }
+.mw-planet-badge.is-hop { animation: mw-hop 420ms ease-out; }
+.mw-planet-lock { box-sizing: border-box; border-radius: var(--radius-round); background: var(--night-button); border: 4px solid var(--text-3);
+  color: var(--text-3); display: flex; align-items: center; justify-content: center; line-height: 0; }
+.mw-map-crew { line-height: 0; pointer-events: none; }
+
 /* ---------------------------------------------------------------- tap to start */
 .mw-pulse { animation: mw-pulse 2s ease-in-out infinite; }
 @keyframes mw-pulse { 0%, 100% { scale: 1; } 50% { scale: 1.06; } }
@@ -149,6 +160,19 @@ button { font-family: var(--font-andika); }
 .gu-table .ok { color: var(--mint); }
 .gu-table .warn { color: var(--peach); }
 
+/* the progress grid (the design system's BondGrid) */
+.gu-grid { margin: 6px 0 14px; }
+.gu-grid-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.gu-grid-whole { width: 44px; text-align: right; margin-right: 6px; font-size: 28px; line-height: 1; font-weight: 700; color: var(--moon); }
+.mw-cell { box-sizing: border-box; height: 44px; min-width: 84px; padding: 0 10px; border-radius: var(--radius-cell);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 17px;
+  background: var(--night-button); color: var(--moon); border: 2px solid var(--night-button); }
+.mw-cell.is-secure { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
+.mw-cell.is-practising { background: var(--night-button); border: 2px dashed var(--peach); color: var(--moon); }
+.mw-cell.is-notyet { background: var(--night-raised); border-color: var(--star-empty); color: var(--text-3); }
+.mw-cell svg { flex: none; }
+.gu-legend { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
+
 /* ---------------------------------------------------------------- turn me sideways */
 .mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
   align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
@@ -160,6 +184,7 @@ button { font-family: var(--font-andika); }
   .mw-mimi.is-rescued { transition: opacity 400ms ease-in !important; }
   .mw-mimi.is-hop .mw-mimi-art, .mw-mimi-art.is-hop { animation: none; }
   .mw-pulse { animation: none; }
+  .mw-planet-badge.is-hop { animation: none; }
   .mw-spark { animation: mw-spark-fade 1200ms ease-out forwards; }
   .mw-circle, .mw-pill { transition: none; }
   .mw-btn--main:active, .mw-btn--play:active, .mw-btn--nav:active { transform: none; }

@@ -17,7 +17,8 @@
     S.reloadIfIdle();
   };
   S.reloadIfIdle = function () {
-    if (S.updateReady && S.screen === 'screen-start' && !(MW.grownups && MW.grownups.open)) location.reload();
+    // a new version takes over only on a screen where nothing is lost: the start screen or the home map
+    if (S.updateReady && (S.screen === 'screen-start' || S.screen === 'screen-map') && !(MW.grownups && MW.grownups.open)) location.reload();
   };
 
   // ---------------------------------------------------------------- full screen and landscape (needs a tap)

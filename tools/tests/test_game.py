@@ -1,4 +1,4 @@
-"""Headless checks for MeeMee World (phase 3): the trial round and the kit, on Fire and Doogee screen sizes.
+"""Headless checks for MeeMee World (phase 4): the map, a round, the bonds and the kit, on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -29,6 +29,9 @@ ROUND = [
     {"whole": 4, "left": 3, "right": 1, "missing": "whole"},
 ]
 CENTRES = {"whole": (380, 205), "left": (210, 470), "right": (550, 470)}
+PLAY = (900, 380)                     # the Play button on the start screen
+RESCUE = (330, 300)                   # the MeeMee Rescue planet on the map
+LOCKED = (1010, 560)                  # a planet still to come
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -102,6 +105,21 @@ class Tablet:
     async def said(self):
         return await self.page.evaluate("MW.events.filter(e => e.type === 'say').map(e => e.detail)")
 
+    async def wait_screen(self, screen, timeout=10):
+        for _ in range(int(timeout / 0.1)):
+            if await self.page.evaluate("MW.shell.screen") == screen:
+                return True
+            await asyncio.sleep(0.1)
+        return False
+
+    async def start_round(self):
+        """Play on the start screen, then the MeeMee Rescue planet on the map."""
+        if await self.page.evaluate("MW.shell.screen") == "screen-start":
+            await self.tap(*PLAY)
+            await self.wait_screen("screen-map")
+        await self.tap(*RESCUE)
+        return await self.wait_phase(["asking", "open"])
+
 
 async def open_tablet(p, name, vw, vh, dpr, extra_args=(), mode="auto"):
     browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required", *extra_args])
@@ -123,10 +141,18 @@ async def play_round(t, name, shots=True):
     page = t.page
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    await t.tap(900, 380)                                    # the Play button
-    s = await t.wait_phase(["asking", "open"])
-    check(f"{name}: Play starts the round", s["screen"] == "screen-game" and s["qi"] == 0, json.dumps(s))
+    await t.tap(*PLAY)
+    check(f"{name}: Play opens the map", await t.wait_screen("screen-map"))
     check(f"{name}: sound running after the tap", await page.evaluate("MW.audio.running()"))
+    await asyncio.sleep(0.4)
+    check(f"{name}: the map says 'Welcome to MeeMee World!'", "map-welcome" in await t.said())
+    if shots:
+        await asyncio.sleep(0.6)
+        await page.screenshot(path=str(SHOTS / f"{name}-0b-map.png"))
+    await t.tap(*RESCUE)
+    s = await t.wait_phase(["asking", "open"])
+    check(f"{name}: the MeeMee Rescue planet says its name and starts the round",
+          s["screen"] == "screen-game" and s["qi"] == 0 and "map-mimi-rescue" in await t.said(), json.dumps(s))
 
     # Q1 missing right part 4 (whole 7, given 3)
     await t.fill(2, "right")
@@ -284,7 +310,7 @@ async def test_device(p, name, vw, vh, dpr):
     await page.wait_for_load_state("load")
     check(f"{name}: music off is remembered", not await page.evaluate("MW.audio.music.isOn()"))
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    await t.tap(900, 380)
+    await t.tap(*PLAY)
     await asyncio.sleep(1)
     check(f"{name}: music stays off after Play", not await page.evaluate("MW.audio.music.playing()"))
     icon = await page.evaluate("document.querySelector('#screen-game .mw-music').getAttribute('aria-label')")
@@ -313,7 +339,7 @@ async def test_tap_mode(p):
     check("tap: a new tablet checks by tapping Scruffles", await page.evaluate("MW.store.setting('check')") == "tap")
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    await t.tap(900, 380)
+    await t.start_round()
     await t.wait_phase(["open"], 15)
     said = await t.said()
     check("tap: question 1 ends with 'Tap Scruffles when you're ready.'", "q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more tap-scruffles" in said, str(said[-2:]))
@@ -386,7 +412,7 @@ async def test_edge_cases(p):
     browser, ctx, page, t, problems, _ = await open_tablet(p, "edge", 1046, 653, 1.22)
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    await t.tap(900, 380)
+    await t.start_round()
     await t.wait_phase(["open"], 15)
 
     # picking a MeeMee up keeps it fully visible (no fade-in replay)
@@ -439,10 +465,11 @@ async def test_edge_cases(p):
     await touch(t, "touchEnd", [])
     await asyncio.sleep(0.8)
     check("edge: a MeeMee let go after Home says nothing", len(await t.said()) == n_before, str((await t.said())[n_before:]))
+    check("edge: Home goes back to the map", await page.evaluate("MW.shell.screen") == "screen-map")
 
     # an interrupted hint comes back on the next wrong try
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
-    await t.tap(900, 380)
+    await t.start_round()
     await t.wait_phase(["open"], 15)
     for _ in range(2):
         free = await t.tray_free()
@@ -497,6 +524,276 @@ async def test_reduce_motion(p):
     await browser.close()
 
 
+# ---------------------------------------------------------------- phase 4: the map, zero bonds, the bonds, the grid
+DAY = 86_400_000
+T0 = 1_790_848_800_000                # 1 October 2026, 10:00 UTC
+
+
+def ans(t, w, a, first=True, missing="right", hint=False):
+    return {"t": t, "whole": w, "left": a, "right": w - a, "missing": missing, "tries": 0 if first else 1,
+            "misses": 0, "hint": hint, "check": "tap"}
+
+
+def secure_answers(bonds, start=T0):
+    """Right first time on three different days for each (whole, smaller part)."""
+    return [ans(start + d * DAY + i * 1000, w, a) for d in range(3) for i, (w, a) in enumerate(bonds)]
+
+
+NONZERO = [(w, a) for w in range(2, 11) for a in range(1, w // 2 + 1)]
+WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+
+
+async def seeded(browser, answers, check_mode="tap", vw=1280, vh=800):
+    ctx = await browser.new_context(viewport={"width": vw, "height": vh}, has_touch=True, is_mobile=True)
+    saved = {"v": 1, "music": True, "settings": {"check": check_mode, "checkPicked": True}, "answers": answers}
+    await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
+                              % json.dumps(json.dumps(saved)))
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(ORIGIN + "/")
+    await page.wait_for_load_state("load")
+    return ctx, page, problems
+
+
+async def test_map(p):
+    print("\n== the home map ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "map", 1280, 800, 1, mode="tap")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    caption = await page.inner_text("#screen-start .mw-caption")
+    check("map: the start screen says MeeMee World", caption == "MeeMee World", caption)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    nav = await page.evaluate("[document.querySelectorAll('#screen-map [aria-label=Home]').length, document.querySelectorAll('#screen-map .mw-music').length]")
+    check("map: a music button and no Home button", nav == [0, 1], str(nav))
+    sizes = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-planet')).map(b => b.offsetWidth)")
+    check("map: every planet is a big target (at least 120 stage px)", sizes and min(sizes) >= 120, str(sizes))
+    await asyncio.sleep(1.5)
+    await t.tap(*LOCKED)
+    await asyncio.sleep(0.3)
+    said = await t.said()
+    check("map: a locked planet says 'That planet isn't ready yet.'", said[-1:] == ["map-not-ready"] and await page.evaluate("MW.shell.screen") == "screen-map", str(said[-2:]))
+    await asyncio.sleep(1.5)
+    await t.tap(1150, 250)
+    await asyncio.sleep(0.3)
+    check("map: so does the other one", (await t.said())[-1:] == ["map-not-ready"])
+    await asyncio.sleep(1.5)
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(368 + 42, 166 + 42)                          # the MeeMee badge
+    s = await t.wait_phase(["asking", "open"])
+    check("map: the MeeMee badge starts a round too", s["screen"] == "screen-game", json.dumps(s))
+    await t.tap(66, 62)                                      # Home
+    await asyncio.sleep(0.5)
+    check("map: Home in a round goes back to the map", await page.evaluate("MW.shell.screen") == "screen-map")
+    check("map: the welcome is said once a visit", (await t.said()).count("map-welcome") == 1, str(await t.said()))
+    # a double tap on the planet starts one round, not two
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.tap(*RESCUE)
+    await t.wait_phase(["asking", "open"])
+    await asyncio.sleep(0.5)
+    rounds = await page.evaluate("MW.events.filter(e => e.type === 'round').length")
+    check("map: a double tap on the planet starts one round", rounds == 2, str(rounds))
+    # the screen going off while "MeeMee Rescue!" is said: back on the map, no round behind the pause
+    await page.evaluate("MW.rescue.home()")
+    await asyncio.sleep(0.3)
+    await t.tap(*RESCUE)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(1.5)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.8)
+    st = await page.evaluate("[MW.shell.screen, MW.rescue.st.phase, MW.events.filter(e => e.type === 'round').length]")
+    check("map: a pause during 'MeeMee Rescue!' stays on the map", st == ["screen-map", "map", 2], str(st))
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    s = await t.wait_phase(["asking", "open"])
+    check("map: and the planet works again after it", s["screen"] == "screen-game", json.dumps(s))
+    check("map: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_zero(p):
+    print("\n== zero bonds (tap Scruffles with the circle empty) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "zero", 1280, 800, 1, mode="tap")
+    zround = [{"whole": 5, "left": 5, "right": 0, "missing": "right"},
+              {"whole": 4, "left": 0, "right": 4, "missing": "left"},
+              {"whole": 6, "left": 0, "right": 6, "missing": "whole"},
+              {"whole": 3, "left": 3, "right": 0, "missing": "right"},
+              {"whole": 2, "left": 1, "right": 1, "missing": "right"}]
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(zround))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.start_round()
+    await t.wait_phase(["open"], 15)
+    check("zero: 5 + ? = 5 asks 'Let's make five. We've got five. How many more?'",
+          "q-lets-make num-end-5 q-weve-got num-end-5 q-how-many-more tap-scruffles" in await t.said())
+    await t.fill(1, "right")
+    await t.tap(1030, 300)
+    await asyncio.sleep(0.6)
+    check("zero: one MeeMee in is too many", (await t.said())[-1:] == ["too-many"])
+    placed = await page.evaluate("MW.rescue.st.counters.filter(c => c.where === 'right').map(c => [c.x, c.y])")
+    await t.drag(placed[0][0], placed[0][1], 1000, 640)
+    ready = await page.evaluate("document.querySelector('#screen-game .mw-pod').classList.contains('is-ready')")
+    check("zero: the ship's lights don't glow with the circle empty (no give-away)", not ready)
+    await t.tap(1030, 300)
+    s = await t.wait_phase(["celebrate"], 3)
+    check("zero: tapping Scruffles with the circle empty answers 0", s["phase"] == "celebrate", json.dumps(s))
+    await asyncio.sleep(2.5)
+    eq = await page.inner_text("#screen-game .mw-equation")
+    check("zero: the equation reads 5 + 0 = 5", eq.replace("\n", " ").split() == ["5", "+", "0", "=", "5"], eq)
+    check("zero: '5 and 0 make 5' is spoken", "num-mid-5 and num-mid-0 make num-end-5" in await t.said())
+    rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
+    check("zero: saved as the 5 and 0 bond with one wrong check", rec["whole"] == 5 and rec["right"] == 0 and rec["tries"] == 1, json.dumps(rec))
+    await t.wait_phase(["open"], 15)
+    await page.evaluate("MW.store.setting('check', 'auto')")  # a grown-up switches mode mid-round
+    await t.tap(1030, 300)                                   # ? + 4 = 4: straight away
+    s = await t.wait_phase(["celebrate"], 3)
+    check("zero: ? + 4 = 4 answered by a tap straight away (a mode change waits for the next round)", s["phase"] == "celebrate" and s["qi"] == 1, json.dumps(s))
+    await t.wait_phase(["open"], 15)
+    p3 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check("zero: 'zero and six, how many altogether?' (answer 6, no tap line from question 3)",
+          p3 == json.dumps([["q-weve-got", "num-mid-0", "and", "num-end-6"], ["q-how-many-altogether"]]).replace(" ", ""), p3)
+    await t.fill(6, "whole")
+    await t.tap(1030, 300)
+    await t.wait_phase(["celebrate"], 3)
+    s = await t.wait_phase(["open"], 15)
+    p4 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check("zero: a zero answer later in the round still ends with the tap line", s["qi"] == 3 and "tap-scruffles" in p4, p4)
+    await page.evaluate("MW.rescue.home()")
+    nxt = await page.evaluate("MW.rescue.st.check = 'auto', MW.rescue.makeRound()")
+    check("zero: the next round uses the new mode (no zero bonds in auto)", not any(0 in (q["left"], q["right"]) for q in nxt))
+    await page.evaluate("MW.rescue.st.check = null; MW.store.setting('check', 'tap')")
+    check("zero: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_bonds(p):
+    print("\n== the bonds: secure rule and rounds ==")
+    browser = await p.chromium.launch()
+    ctx, page, problems = await seeded(browser, [])
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    n = await E("[2,3,4,5,6,7,8,9,10].reduce((s, w) => s + MW.bonds.pairs(w).length, 0)")
+    check("bonds: wholes 2 to 10 have 34 bonds, zero bonds included", n == 34, str(n))
+    status = "(a) => { const m = MW.bonds.statuses(a.answers); return MW.bonds.status(m, a.w, a.a); }"
+    cases = [
+        ("three days right first time is secure", [ans(T0 + d * DAY, 7, 3) for d in range(3)], 7, 3, "secure"),
+        ("three times on one day is practising", [ans(T0 + i * 60000, 7, 3) for i in range(3)], 7, 3, "practising"),
+        ("3 + 4 and 4 + 3 are the same bond", [ans(T0, 7, 3), ans(T0 + DAY, 7, 4), ans(T0 + 2 * DAY, 7, 3)], 7, 3, "secure"),
+        ("a wrong check after secure is practising", [ans(T0 + d * DAY, 7, 3) for d in range(3)] + [ans(T0 + 3 * DAY, 7, 3, first=False)], 7, 3, "practising"),
+        ("a hint counts as not first time", [ans(T0 + d * DAY, 7, 3) for d in range(2)] + [ans(T0 + 2 * DAY, 7, 3, hint=True)], 7, 3, "practising"),
+        ("after a wrong answer the three days start again (2 more: practising)",
+         [ans(T0 + d * DAY, 7, 3) for d in range(3)] + [ans(T0 + 3 * DAY, 7, 3, first=False)] + [ans(T0 + d * DAY, 7, 3) for d in (4, 5)], 7, 3, "practising"),
+        ("after a wrong answer the three days start again (3 more: secure)",
+         [ans(T0 + d * DAY, 7, 3) for d in range(3)] + [ans(T0 + 3 * DAY, 7, 3, first=False)] + [ans(T0 + d * DAY, 7, 3) for d in (4, 5, 6)], 7, 3, "secure"),
+        ("never asked is not yet", [ans(T0, 7, 3)], 8, 3, "notyet"),
+        ("answers out of order are sorted by time", [ans(T0 + 3 * DAY, 7, 3, first=False)] + [ans(T0 + d * DAY, 7, 3) for d in range(3)], 7, 3, "practising"),
+        ("a malformed answer is ignored", [{"t": 1}, ans(T0, 7, 3)], 7, 3, "practising"),
+    ]
+    for label, answers, w, a, want in cases:
+        got = await E(status, {"answers": answers, "w": w, "a": a})
+        check(f"bonds: {label}", got == want, got)
+    all_secure = secure_answers(NONZERO)
+    c1 = await E("(a) => MW.bonds.candidates([2,3,4,5,6,7,8,9,10], MW.bonds.statuses(a), true).length", all_secure)
+    c2 = await E("(a) => MW.bonds.candidates([2,3,4,5,6,7,8,9,10], MW.bonds.statuses(a), false).length", all_secure)
+    check("bonds: all secure, tap mode: 34 candidates (zero bonds open)", c1 == 34, str(c1))
+    check("bonds: all secure, auto mode: 25 candidates (no zero bonds)", c2 == 25, str(c2))
+    c3 = await E("() => MW.bonds.candidates([2,3,4,5,6,7,8,9,10], MW.bonds.statuses([]), true).length")
+    check("bonds: nothing secure: no zero bonds yet", c3 == 25, str(c3))
+
+    # many rounds with wholes 2 to 6 secure (9 bonds) and 7 to 10 not yet (16 bonds)
+    some = secure_answers([b for b in NONZERO if b[0] <= 6])
+    rounds = await E("(a) => { const out = []; for (let i = 0; i < 2000; i++) out.push(MW.bonds.pickRound({ wholes: [2,3,4,5,6,7,8,9,10], answers: a, size: 5, zero: false })); return out; }", some)
+    sec = [sum(1 for q in r if q["status"] == "secure") for r in rounds]
+    check("bonds: every round has five questions", all(len(r) == 5 for r in rounds))
+    check("bonds: 1 or 2 secure bonds a round, both happen", set(sec) == {1, 2}, str(sorted(set(sec))))
+    check("bonds: no bond twice in a round", all(len({(q["whole"], min(q["left"], q["right"])) for q in r}) == 5 for r in rounds))
+    check("bonds: never the same whole twice in a row", all(r[i]["whole"] != r[i - 1]["whole"] for r in rounds for i in range(1, 5)))
+    check("bonds: at most two bonds from one whole in a round", all(max(sum(1 for q in r if q["whole"] == w) for w in range(2, 11)) <= 2 for r in rounds))
+    qs = [q for r in rounds for q in r]
+    share = sum(q["missing"] == "whole" for q in qs) / len(qs)
+    check("bonds: about 1 in 4 asks for the whole", 0.2 < share < 0.3, f"{share:.3f}")
+    check("bonds: both parts get asked, either way round", {q["missing"] for q in qs} == {"whole", "left", "right"}
+          and any(q["left"] > q["right"] for q in qs) and any(q["left"] < q["right"] for q in qs))
+    check("bonds: no zero bonds while none is open", not any(q["left"] == 0 or q["right"] == 0 for q in qs))
+    seen_work = {(q["whole"], min(q["left"], q["right"])) for q in qs if q["status"] != "secure"}
+    check("bonds: every bond that needs work comes up", len(seen_work) == 16, str(len(seen_work)))
+
+    # whole 5's other bonds secure: its zero bond joins in tap mode only
+    five = secure_answers([(5, 1), (5, 2), (3, 1)])
+    tap = await E("(a) => { const out = []; for (let i = 0; i < 300; i++) out.push(...MW.bonds.pickRound({ wholes: [2,3,4,5,6,7,8,9,10], answers: a, size: 5, zero: true })); return out; }", five)
+    auto = await E("(a) => { const out = []; for (let i = 0; i < 300; i++) out.push(...MW.bonds.pickRound({ wholes: [2,3,4,5,6,7,8,9,10], answers: a, size: 5, zero: false })); return out; }", five)
+    zeros = {q["whole"] for q in tap if q["left"] == 0 or q["right"] == 0}
+    check("bonds: 5 and 0 joins once 1 + 4 and 2 + 3 are secure (and 3 and 0 once 1 + 2 is)", zeros == {3, 5}, str(sorted(zeros)))
+    check("bonds: no zero bonds when the answer is checked automatically", not any(q["left"] == 0 or q["right"] == 0 for q in auto))
+
+    small = await E("() => MW.bonds.pickRound({ wholes: [2], answers: [], size: 5, zero: true })")
+    check("bonds: only 2 in play still makes a round (1 + 1 five times)", len(small) == 5 and all(q["whole"] == 2 and q["left"] == 1 for q in small), json.dumps(small))
+    two = await E("() => { const out = []; for (let i = 0; i < 200; i++) out.push(MW.bonds.pickRound({ wholes: [2, 3], answers: [], size: 5, zero: false })); return out; }")
+    spread = [sum(1 for q in r if q["whole"] == 2) for r in two]
+    check("bonds: with only 2 and 3 in play, rounds share the bonds out (2 or 3 of each)", set(spread) <= {2, 3}, str(sorted(set(spread))))
+
+    # every question the game can ask: listed for grown-ups to compare with a homework sheet
+    allq = await E("() => MW.bonds.allQuestions([2,3,4,5,6,7,8,9,10], true)")
+    nonzero = await E("() => MW.bonds.allQuestions([2,3,4,5,6,7,8,9,10], false).length")
+    check("bonds: the game can ask 189 questions (135 without zero bonds)", len(allq) == 189 and nonzero == 135, f"{len(allq)}, {nonzero}")
+    keys = {(q["whole"], q["left"], q["missing"]) for q in allq}
+    check("bonds: every question a round picks is on the list", all((q["whole"], q["left"], q["missing"]) in keys for q in qs + tap))
+    lines = ["# Every question MeeMee Rescue can ask", "",
+             "Made by tools/tests/test_game.py from the game's own list (MW.bonds.allQuestions); don't edit it by hand.",
+             "Zero bonds (marked *) come up only once the other bonds of that number are secure, and only when the answer",
+             "is checked by tapping Scruffles.", "",
+             "| Whole | Number sentence | Answer | What Scruffles says |", "|---|---|---|---|"]
+    for q in allq:
+        w, a, b, m = q["whole"], q["left"], q["right"], q["missing"]
+        if m == "whole":
+            sent, answer = f"{a} + {b} = ?", w
+            words = f"We've got {WORDS[a]} and {WORDS[b]}. How many altogether?"
+        else:
+            sent = f"? + {b} = {w}" if m == "left" else f"{a} + ? = {w}"
+            answer = q[m]
+            words = f"Let's make {WORDS[w]}. We've got {WORDS[q['right' if m == 'left' else 'left']]}. How many more?"
+        lines.append(f"| {w} | {sent}{' *' if 0 in (a, b) else ''} | {answer} | {words} |")
+    (ROOT / "notes" / "all-questions.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    print(f"   wrote notes/all-questions.md ({len(allq)} questions)")
+    check("bonds: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_grid(p):
+    print("\n== the progress grid ==")
+    browser = await p.chromium.launch()
+    answers = secure_answers([(7, 3), (2, 1), (5, 2)]) + [ans(T0, 5, 1, first=False), ans(T0 + DAY, 9, 4)]
+    for name, vw, vh in (("fire", 1046, 653), ("doogee", 1280, 800)):
+        ctx, page, problems = await seeded(browser, answers, vw=vw, vh=vh)
+        await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('progress')")
+        await asyncio.sleep(0.4)
+        cells = await page.evaluate("""Array.from(document.querySelectorAll('.gu-grid .mw-cell')).map(c => [c.textContent.trim(), c.className.split(' ').find(x => x.startsWith('is-'))])""")
+        got = {t: s for t, s in cells}
+        if name == "fire":
+            check("grid: 34 bonds, rows 2 to 10", len(cells) == 34, str(len(cells)))
+            check("grid: secure bonds marked secure", got.get("3 + 4") == "is-secure" and got.get("1 + 1") == "is-secure" and got.get("2 + 3") == "is-secure", str(got))
+            check("grid: answered but not secure is practising", got.get("1 + 4") == "is-practising" and got.get("4 + 5") == "is-practising")
+            check("grid: never asked is not yet", got.get("0 + 7") == "is-notyet" and got.get("5 + 5") == "is-notyet")
+            ticks = await page.evaluate("document.querySelectorAll('.gu-grid .mw-cell.is-secure svg').length")
+            check("grid: a tick on each secure bond", ticks == 3, str(ticks))
+            lead = await page.inner_text(".gu-lead")
+            check("grid: the summary counts them", lead.startswith("Secure: 3 of 34 bonds. Practising: 2."), lead)
+            chips = await page.evaluate("document.querySelectorAll('.gu-chip').length")
+            check("grid: the wholes-in-play switches are on the Progress tab", chips == 9, str(chips))
+            await page.evaluate("MW.grownups.show('settings')")
+            await asyncio.sleep(0.2)
+            chips = await page.evaluate("document.querySelectorAll('.gu-chip').length")
+            check("grid: and not on Settings", chips == 0, str(chips))
+            await page.evaluate("MW.grownups.show('progress')")
+            await asyncio.sleep(0.3)
+        wide = await page.evaluate("(() => { const g = document.querySelector('.gu-grid'); const b = g.closest('.gu-body') || g.parentElement; return [g.scrollWidth, b.clientWidth]; })()")
+        check(f"grid ({name}): the widest row (10) fits without sideways scrolling", wide[0] <= wide[1], str(wide))
+        await page.screenshot(path=str(SHOTS / f"{name}-5-grownups-grid.png"))
+        check(f"grid ({name}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -504,6 +801,10 @@ async def main():
         await test_device(p, "doogee", 1280, 800, 2)
         await test_tap_mode(p)
         await test_switch(p)
+        await test_map(p)
+        await test_zero(p)
+        await test_bonds(p)
+        await test_grid(p)
         await test_edge_cases(p)
         await test_portrait(p)
         await test_reduce_motion(p)

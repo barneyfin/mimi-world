@@ -225,6 +225,51 @@
    "dur": 2.28,
    "lufs_before": -23.1,
    "gain_db": 3.1
+  },
+  "crew-jobs": {
+   "dur": 3.06,
+   "lufs_before": -20.3,
+   "gain_db": 0.3
+  },
+  "crew-ready": {
+   "dur": 1.92,
+   "lufs_before": -18.9,
+   "gain_db": -1.1
+  },
+  "name-moggles": {
+   "dur": 1.36,
+   "lufs_before": -19.1,
+   "gain_db": -0.9
+  },
+  "name-snuffles": {
+   "dur": 1.56,
+   "lufs_before": -20.0,
+   "gain_db": -0.0
+  },
+  "is-the": {
+   "dur": 0.8,
+   "lufs_before": -19.7,
+   "gain_db": -0.3
+  },
+  "job-lookout": {
+   "dur": 0.81,
+   "lufs_before": -20.0,
+   "gain_db": 0.0
+  },
+  "job-engineer": {
+   "dur": 1.22,
+   "lufs_before": -19.1,
+   "gain_db": -0.9
+  },
+  "job-navigator": {
+   "dur": 1.39,
+   "lufs_before": -23.7,
+   "gain_db": 3.7
+  },
+  "job-cook": {
+   "dur": 0.94,
+   "lufs_before": -20.8,
+   "gain_db": 0.8
   }
  },
  "music": {

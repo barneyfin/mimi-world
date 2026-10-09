@@ -321,6 +321,17 @@ button { font-family: var(--font-andika); }
 @keyframes mw-ship-flash { 0% { opacity: 1; } 50% { opacity: 0.15; } 100% { opacity: 0.15; } }
 @keyframes mw-ship-glow { 0% { opacity: 0.45; } 50% { opacity: 0; } 100% { opacity: 0; } }
 
+/* ---------------------------------------------------------------- the home map */
+.mw-planet { padding: 0; margin: 0; border: 0; background: transparent; border-radius: var(--radius-round); cursor: pointer; }
+.mw-planet:focus-visible, .mw-planet-badge:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; }
+.mw-planet-badge { box-sizing: border-box; padding: 0; margin: 0; border-radius: var(--radius-round); background: var(--moon);
+  border: 5px solid var(--mint); box-shadow: 0 0 0 10px rgba(127, 217, 196, 0.18); display: flex; align-items: center; justify-content: center;
+  line-height: 0; cursor: pointer; }
+.mw-planet-badge.is-hop { animation: mw-hop 420ms ease-out; }
+.mw-planet-lock { box-sizing: border-box; border-radius: var(--radius-round); background: var(--night-button); border: 4px solid var(--text-3);
+  color: var(--text-3); display: flex; align-items: center; justify-content: center; line-height: 0; }
+.mw-map-crew { line-height: 0; pointer-events: none; }
+
 /* ---------------------------------------------------------------- tap to start */
 .mw-pulse { animation: mw-pulse 2s ease-in-out infinite; }
 @keyframes mw-pulse { 0%, 100% { scale: 1; } 50% { scale: 1.06; } }
@@ -362,6 +373,19 @@ button { font-family: var(--font-andika); }
 .gu-table .ok { color: var(--mint); }
 .gu-table .warn { color: var(--peach); }
 
+/* the progress grid (the design system's BondGrid) */
+.gu-grid { margin: 6px 0 14px; }
+.gu-grid-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.gu-grid-whole { width: 44px; text-align: right; margin-right: 6px; font-size: 28px; line-height: 1; font-weight: 700; color: var(--moon); }
+.mw-cell { box-sizing: border-box; height: 44px; min-width: 84px; padding: 0 10px; border-radius: var(--radius-cell);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 17px;
+  background: var(--night-button); color: var(--moon); border: 2px solid var(--night-button); }
+.mw-cell.is-secure { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
+.mw-cell.is-practising { background: var(--night-button); border: 2px dashed var(--peach); color: var(--moon); }
+.mw-cell.is-notyet { background: var(--night-raised); border-color: var(--star-empty); color: var(--text-3); }
+.mw-cell svg { flex: none; }
+.gu-legend { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
+
 /* ---------------------------------------------------------------- turn me sideways */
 .mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
   align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
@@ -373,6 +397,7 @@ button { font-family: var(--font-andika); }
   .mw-mimi.is-rescued { transition: opacity 400ms ease-in !important; }
   .mw-mimi.is-hop .mw-mimi-art, .mw-mimi-art.is-hop { animation: none; }
   .mw-pulse { animation: none; }
+  .mw-planet-badge.is-hop { animation: none; }
   .mw-spark { animation: mw-spark-fade 1200ms ease-out forwards; }
   .mw-circle, .mw-pill { transition: none; }
   .mw-btn--main:active, .mw-btn--play:active, .mw-btn--nav:active { transform: none; }
@@ -386,7 +411,8 @@ button { font-family: var(--font-andika); }
 <body>
 <div id="stage">
   <div class="mw-layer" aria-hidden="true"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="831.4" cy="63.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="649.4" cy="35.5" r="0.7" opacity="0.4"/><circle class="f-moon" cx="163" cy="181.9" r="2" opacity="0.9"/><circle class="f-galaxy" cx="737.8" cy="318.6" r="2" opacity="0.95"/><circle class="f-moon" cx="691.6" cy="455.9" r="1" opacity="0.4"/><circle class="f-moon" cx="730.3" cy="154" r="1.1" opacity="0.5"/><circle class="f-moon" cx="790.9" cy="397.2" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1176.9" cy="290.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="109.8" cy="242.6" r="0.9" opacity="0.5"/><circle class="f-moon" cx="778.2" cy="63.7" r="0.8" opacity="0.5"/><circle class="f-galaxy" cx="1189.4" cy="338.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="732.6" cy="695.9" r="1" opacity="0.6"/><circle class="f-moon" cx="741.3" cy="365.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1048.2" cy="230.3" r="1" opacity="0.4"/><circle class="f-moon" cx="591.4" cy="138.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="170" cy="201.1" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1101.5" cy="225.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="1220.4" cy="124.9" r="0.8" opacity="0.4"/><circle class="f-moon" cx="339.2" cy="9.2" r="0.9" opacity="0.5"/><circle class="f-moon" cx="863.4" cy="48.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="84.9" cy="59.1" r="0.8" opacity="0.5"/><circle class="f-moon" cx="72.7" cy="6.2" r="0.8" opacity="0.5"/><circle class="f-moon" cx="38.3" cy="695" r="1.5" opacity="0.9"/><circle class="f-moon" cx="114.9" cy="86.5" r="0.8" opacity="0.6"/><circle class="f-galaxy-peach" cx="210.7" cy="24.2" r="1.9" opacity="0.95"/><circle class="f-moon" cx="967.3" cy="240.9" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="1078" cy="414.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="681.3" cy="619.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="944.2" cy="184.7" r="0.9" opacity="0.4"/><circle class="f-moon" cx="41.4" cy="226.2" r="1" opacity="0.7"/><circle class="f-galaxy-mint" cx="573.1" cy="744.4" r="1.7" opacity="0.95"/><circle class="f-moon" cx="1255.3" cy="486.9" r="1.2" opacity="0.5"/><circle class="f-moon" cx="158" cy="312.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1133.3" cy="347.9" r="1.5" opacity="0.9"/><circle class="f-galaxy" cx="113.7" cy="131.2" r="1.7" opacity="0.95"/><circle class="f-galaxy-peach" cx="172.1" cy="17.2" r="1.7" opacity="0.95"/><circle class="f-galaxy" cx="956.4" cy="115.7" r="2.2" opacity="0.95"/><circle class="f-moon" cx="749.6" cy="210.4" r="0.8" opacity="0.7"/><circle class="f-moon" cx="539.4" cy="729.2" r="1" opacity="0.5"/><circle class="f-moon" cx="29.7" cy="352.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="925.5" cy="444.5" r="1" opacity="0.5"/><circle class="f-moon" cx="1000.5" cy="89.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="985.2" cy="406.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="884.4" cy="362.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="1200.7" cy="210.6" r="1.2" opacity="0.6"/><circle class="f-moon" cx="179.9" cy="101.8" r="0.7" opacity="0.4"/><circle class="f-moon" cx="843.2" cy="118.7" r="2" opacity="0.9"/><circle class="f-moon" cx="284.4" cy="756.6" r="0.9" opacity="0.7"/><circle class="f-moon" cx="1061.5" cy="133.2" r="1" opacity="0.5"/><circle class="f-moon" cx="254.2" cy="257" r="1.4" opacity="0.9"/><circle class="f-moon" cx="708.5" cy="353.1" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="655.5" cy="56.7" r="2.3" opacity="0.95"/><circle class="f-moon" cx="138.9" cy="215.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1171.5" cy="455.6" r="1.5" opacity="0.9"/><circle class="f-galaxy-peach" cx="545.3" cy="63.1" r="1.7" opacity="0.95"/><circle class="f-galaxy-mint" cx="160.3" cy="15.1" r="2.2" opacity="0.95"/><circle class="f-moon" cx="674.1" cy="193.9" r="0.8" opacity="0.4"/><circle class="f-moon" cx="373.7" cy="400.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="323.6" cy="18.1" r="1.7" opacity="0.9"/><circle class="f-moon" cx="1191.1" cy="89.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="633.7" cy="663.7" r="1" opacity="0.6"/><circle class="f-moon" cx="1251.7" cy="276.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="812.4" cy="324.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="113.1" cy="668.9" r="1.8" opacity="0.9"/><circle class="f-moon" cx="377.6" cy="368" r="0.9" opacity="0.4"/><circle class="f-galaxy-mint" cx="699.7" cy="198.6" r="1.8" opacity="0.95"/><circle class="f-moon" cx="238" cy="270.2" r="0.8" opacity="0.6"/><circle class="f-moon" cx="121.2" cy="649.8" r="1" opacity="0.5"/><circle class="f-moon" cx="386" cy="502.2" r="1.2" opacity="0.6"/><circle class="f-moon" cx="202.9" cy="709.5" r="1.8" opacity="0.9"/><circle class="f-moon" cx="632.6" cy="229.9" r="1.5" opacity="0.9"/><circle class="f-galaxy-peach" cx="894.9" cy="404.4" r="2" opacity="0.95"/><circle class="f-moon" cx="1036.8" cy="18.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="821.2" cy="73.1" r="1" opacity="0.7"/><circle class="f-moon" cx="70.4" cy="20.8" r="0.8" opacity="0.4"/><circle class="f-galaxy-peach" cx="585.4" cy="61.2" r="1.7" opacity="0.95"/><circle class="f-moon" cx="606.9" cy="643.7" r="1.5" opacity="0.9"/><circle class="f-moon" cx="965.2" cy="187.8" r="1.7" opacity="0.9"/><circle class="f-galaxy-mint" cx="1078.1" cy="66.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="104.2" cy="122.2" r="1.1" opacity="0.5"/><circle class="f-moon" cx="725.9" cy="15.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="374.8" cy="413" r="0.9" opacity="0.4"/><circle class="f-galaxy-mint" cx="1139.2" cy="163" r="1.6" opacity="0.95"/><circle class="f-moon" cx="1233.6" cy="360.2" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1214.1" cy="110.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="299.4" cy="713.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1071.4" cy="7.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="158.2" cy="736" r="1.9" opacity="0.9"/><circle class="f-moon" cx="504.2" cy="793" r="0.9" opacity="0.5"/><circle class="f-moon" cx="354.9" cy="44" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1192.3" cy="202.5" r="1" opacity="0.4"/><circle class="f-moon" cx="479.4" cy="759.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1198.8" cy="438.8" r="1.4" opacity="0.9"/><circle class="f-moon" cx="934.6" cy="361.3" r="1.8" opacity="0.9"/><circle class="f-galaxy" cx="368.9" cy="44.6" r="1.7" opacity="0.95"/><circle class="f-moon" cx="532.1" cy="228" r="1.1" opacity="0.6"/><circle class="f-moon" cx="521.1" cy="194.1" r="1" opacity="0.4"/><circle class="f-moon" cx="821.6" cy="65.2" r="1.1" opacity="0.5"/><circle class="f-moon" cx="580.4" cy="268.3" r="1.7" opacity="0.9"/><circle class="f-moon" cx="700.6" cy="198.3" r="1" opacity="0.5"/><circle class="f-moon" cx="262.3" cy="21.8" r="1.6" opacity="0.9"/><circle class="f-moon" cx="951.7" cy="171.5" r="1.1" opacity="0.5"/><circle class="f-moon" cx="734.2" cy="289.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="123.4" cy="712.7" r="1" opacity="0.5"/><circle class="f-moon" cx="1233.5" cy="106.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1233.8" cy="392" r="1.2" opacity="0.7"/><circle class="f-moon" cx="1238.4" cy="91.8" r="1.8" opacity="0.9"/><circle class="f-moon" cx="113.8" cy="618.2" r="0.8" opacity="0.5"/><circle class="f-galaxy-peach" cx="53.7" cy="569.4" r="1.8" opacity="0.95"/><circle class="f-moon" cx="148.2" cy="61.4" r="1" opacity="0.5"/><circle class="f-moon" cx="19.3" cy="243.6" r="1.2" opacity="0.6"/><circle class="f-moon" cx="1126.6" cy="380.5" r="0.8" opacity="0.7"/><circle class="f-moon" cx="899.5" cy="248.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="538.6" cy="208.7" r="2" opacity="0.9"/><circle class="f-moon" cx="293.6" cy="32.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="943.2" cy="403.8" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1045.8" cy="187.9" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1213" cy="396.7" r="0.8" opacity="0.5"/><circle class="f-moon" cx="191.6" cy="316" r="1.2" opacity="0.4"/><circle class="f-moon" cx="71.7" cy="53.4" r="1.1" opacity="0.7"/><g transform="translate(640 160) rotate(-18) scale(0.85)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.8" cy="2.3" r="1.1" opacity="0.8"/><circle class="f-moon" cx="16.4" cy="3.5" r="0.8" opacity="0.9"/><circle class="f-moon" cx="13.8" cy="6.3" r="1.6" opacity="0.7"/><circle class="f-moon" cx="12.3" cy="9.2" r="1.3" opacity="0.6"/><circle class="f-moon" cx="5" cy="12.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-3.6" cy="12" r="1.4" opacity="0.8"/><circle class="f-moon" cx="-15.6" cy="12.4" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-25.4" cy="13.5" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-38" cy="11.4" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="-14.1" cy="-4.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-14.7" cy="-7" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-10.6" cy="-8.5" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-3.1" cy="-10.4" r="1.3" opacity="0.6"/><circle class="f-moon" cx="5.7" cy="-11.9" r="1.5" opacity="0.8"/><circle class="f-moon" cx="15.7" cy="-14" r="1.5" opacity="0.8"/><circle class="f-moon" cx="25.4" cy="-13.6" r="1.5" opacity="0.9"/><circle class="f-moon" cx="35.9" cy="-10.2" r="1.1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(915 48) rotate(26) scale(0.6)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="15.3" cy="2.7" r="1.4" opacity="0.9"/><circle class="f-moon" cx="16.9" cy="5.2" r="0.8" opacity="0.7"/><circle class="f-moon" cx="16.5" cy="7.1" r="1.5" opacity="0.6"/><circle class="f-moon" cx="10.8" cy="8.8" r="1.2" opacity="0.8"/><circle class="f-moon" cx="2.5" cy="10.8" r="1" opacity="0.9"/><circle class="f-moon" cx="-3.2" cy="12.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="12.6" r="0.8" opacity="0.9"/><circle class="f-moon" cx="-27.4" cy="12.1" r="1.6" opacity="0.9"/><circle class="f-moon" cx="-38.4" cy="11.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-16" cy="-1.3" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-14.3" cy="-4.8" r="1.1" opacity="0.6"/><circle class="f-moon" cx="-16.1" cy="-7.7" r="1" opacity="0.8"/><circle class="f-moon" cx="-12.9" cy="-8.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="-3.2" cy="-11.4" r="1.1" opacity="0.7"/><circle class="f-moon" cx="5.1" cy="-13.8" r="1.6" opacity="0.5"/><circle class="f-moon" cx="15.8" cy="-12.7" r="0.8" opacity="0.9"/><circle class="f-moon" cx="25.7" cy="-12.6" r="0.8" opacity="0.5"/><circle class="f-moon" cx="36.3" cy="-9.8" r="1" opacity="0.8"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(64 300) rotate(-40) scale(0.62)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(216 330) scale(0.9)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(742 196) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(1238 470) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(560 92) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(30 640) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(705 760) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><line class="s-moon" x1="250" y1="104" x2="180.7" y2="64" stroke-width="2" stroke-linecap="round" opacity="0.5"/><line class="s-highlight" x1="250" y1="104" x2="222.3" y2="88" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/><circle class="f-highlight" cx="250" cy="104" r="2.6"/><clipPath id="sky-a"><circle cx="60" cy="830" r="175"/></clipPath><g clip-path="url(#sky-a)"><g transform="rotate(-45 60 830)"><rect class="f-planet-indigo-6" x="-115" y="655" width="350" height="350"/><rect class="f-planet-indigo-dark" x="-115" y="655" width="350" height="301"/><rect class="f-planet-indigo-4" x="-115" y="655" width="350" height="252"/><rect class="f-planet-indigo" x="-115" y="655" width="350" height="192.5"/><rect class="f-planet-indigo-2" x="-115" y="655" width="350" height="126"/><rect class="f-planet-indigo-light" x="-115" y="655" width="350" height="63"/></g><ellipse class="f-shadow" cx="103.8" cy="721.5" rx="19.2" ry="15" opacity="0.16"/><ellipse class="f-highlight" cx="100.3" cy="718" rx="13.9" ry="9.6" opacity="0.07"/><ellipse class="f-shadow" cx="156.2" cy="768.8" rx="12.3" ry="9.6" opacity="0.16"/><ellipse class="f-highlight" cx="154" cy="766.5" rx="8.8" ry="6.1" opacity="0.07"/><ellipse class="f-shadow" cx="68.8" cy="681.2" rx="10.5" ry="8.2" opacity="0.16"/><ellipse class="f-highlight" cx="66.9" cy="679.4" rx="7.6" ry="5.2" opacity="0.07"/><ellipse class="f-shadow" cx="168.5" cy="711" rx="8.8" ry="6.8" opacity="0.16"/><ellipse class="f-highlight" cx="166.9" cy="709.4" rx="6.3" ry="4.4" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="60" cy="830" r="177.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="sky-m"><circle cx="44" cy="548" r="13"/></clipPath><g clip-path="url(#sky-m)"><g transform="rotate(-45 44 548)"><rect class="f-planet-mint-4" x="31" y="535" width="26" height="26"/><rect class="f-planet-mint" x="31" y="535" width="26" height="14.3"/><rect class="f-planet-mint-2" x="31" y="535" width="26" height="9.4"/><rect class="f-planet-mint-light" x="31" y="535" width="26" height="4.7"/></g><ellipse class="f-shadow" cx="46.6" cy="546.7" rx="3.2" ry="2.5" opacity="0.16"/><ellipse class="f-highlight" cx="46" cy="546.1" rx="2.3" ry="1.6" opacity="0.07"/></g><g transform="rotate(-14 150 215)"><path class="s-mint-deep" d="M94 215 A56 12.2 0 0 1 206 215" fill="none" stroke-width="5.1" stroke-linecap="round"/><path class="s-mint-deeper" d="M101.8 215 A48.2 10.5 0 0 1 198.2 215" fill="none" stroke-width="1.6" stroke-linecap="round"/></g><clipPath id="sky-b"><circle cx="150" cy="215" r="32"/></clipPath><g clip-path="url(#sky-b)"><g transform="rotate(-45 150 215)"><rect class="f-planet-peach-dark" x="118" y="183" width="64" height="64"/><rect class="f-planet-peach-4" x="118" y="183" width="64" height="46.1"/><rect class="f-planet-peach" x="118" y="183" width="64" height="35.2"/><rect class="f-planet-peach-2" x="118" y="183" width="64" height="23"/><rect class="f-planet-peach-light" x="118" y="183" width="64" height="11.5"/></g></g><circle class="s-planet-peach-light" cx="150" cy="215" r="34.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#sky-b)"><g transform="rotate(-14 150 215)"><path class="s-shadow" d="M96.8 216.6 A53.2 10.9 0 0 0 203.2 216.6" fill="none" stroke-width="3.8" opacity="0.18"/></g></g><g transform="rotate(-14 150 215)"><path class="s-mint" d="M94 215 A56 12.2 0 0 0 206 215" fill="none" stroke-width="5.1" stroke-linecap="round"/><path class="s-mint-light" d="M89.5 215 A60.5 13.1 0 0 0 210.5 215" fill="none" stroke-width="1.9" stroke-linecap="round"/><path class="s-mint-deep" d="M101.8 215 A48.2 10.5 0 0 0 198.2 215" fill="none" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/></g><clipPath id="sky-c"><circle cx="790" cy="250" r="18"/></clipPath><g clip-path="url(#sky-c)"><g transform="rotate(-45 790 250)"><rect class="f-planet-mint-4" x="772" y="232" width="36" height="36"/><rect class="f-planet-mint" x="772" y="232" width="36" height="19.8"/><rect class="f-planet-mint-2" x="772" y="232" width="36" height="13"/><rect class="f-planet-mint-light" x="772" y="232" width="36" height="6.5"/></g><ellipse class="f-shadow" cx="786.4" cy="254.5" rx="4" ry="3.1" opacity="0.16"/><ellipse class="f-highlight" cx="785.7" cy="253.8" rx="2.9" ry="2" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="790" cy="250" r="20.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="sky-d"><circle cx="822" cy="232" r="4.5"/></clipPath><g clip-path="url(#sky-d)"><g transform="rotate(-45 822 232)"><rect class="f-planet-indigo" x="817.5" y="227.5" width="9" height="9"/><rect class="f-planet-indigo-2" x="817.5" y="227.5" width="9" height="6.1"/><rect class="f-planet-indigo-light" x="817.5" y="227.5" width="9" height="2.7"/></g></g></svg></div>
-  <section class="mw-screen" id="screen-start" aria-label="MeeMee Rescue: start"></section>
+  <section class="mw-screen" id="screen-start" aria-label="MeeMee World: start"></section>
+  <section class="mw-screen" id="screen-map" aria-label="MeeMee World"></section>
   <section class="mw-screen" id="screen-game" aria-label="MeeMee Rescue"></section>
   <section class="mw-screen" id="screen-end" aria-label="All the MeeMee rescued"></section>
 </div>
@@ -407,6 +433,7 @@ button { font-family: var(--font-andika); }
 <template id="art-spark"><svg viewBox="-14 -14 28 28" aria-hidden="true"><path class="f-spark" transform="translate(0 0) scale(1.0)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/></svg></template>
 <template id="art-moggles"><svg width="240" height="313.8" viewBox="0 0 260 340" aria-hidden="true"><ellipse class="f-mint" cx="130" cy="332" rx="92" ry="8" opacity="0.16"/><path class="s-moggles-rim" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="30" stroke-linecap="round"/><path class="s-moggles-black" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="20" stroke-linecap="round"/><path class="s-fur-shade" d="M226 300 C 238 286, 240 266, 232 250 M214 312 C 228 306, 236 296, 240 284" fill="none" stroke-width="3" stroke-linecap="round"/><clipPath id="moggles-body"><path d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/></clipPath><path class="f-moggles-black" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/><g clip-path="url(#moggles-body)"><path class="s-fur-shade" d="M116 228 C 118 236, 122 242, 127 246 M144 228 C 142 236, 138 242, 133 246 M130 234 L130 252 M108 244 C 110 252, 114 258, 118 262 M152 244 C 150 252, 146 258, 142 262" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-fur-shade" d="M96 260 C 98 280, 102 300, 108 316 M164 260 C 162 280, 158 300, 152 316" fill="none" stroke-width="4" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><ellipse class="f-moggles-black s-moggles-rim" cx="110" cy="324" rx="20" ry="10" stroke-width="5"/><ellipse class="f-moggles-black s-moggles-rim" cx="150" cy="324" rx="20" ry="10" stroke-width="5"/><path class="s-fur-shade" d="M104 320 v6 M111 319 v7 M144 320 v6 M151 319 v7" stroke-width="2.4" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M182 98 L188 38 L142 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-moggles-ear" d="M176 88 L180 54 L154 74 Z"/><path class="s-ear-tuft" d="M174 86 L168 74 M170 88 L162 78" stroke-width="2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M78 98 L72 38 L118 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-moggles-ear" d="M84 88 L80 54 L106 74 Z"/><path class="s-ear-tuft" d="M86 86 L92 74 M90 88 L98 78" stroke-width="2" stroke-linecap="round"/><clipPath id="moggles-head"><path d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/></clipPath><path class="f-moggles-black" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/><g clip-path="url(#moggles-head)"><path class="s-fur-shade" d="M96 84 C 110 72, 150 72, 164 84" fill="none" stroke-width="5" stroke-linecap="round"/><path class="s-fur-shade" d="M118 70 L120 84 M130 68 L130 84 M142 70 L140 84" stroke-width="3" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><path class="f-peach s-ink" d="M82 182 C 106 198, 154 198, 178 182 L 182 202 C 156 220, 104 220, 78 202 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-peach-shade" d="M96 196 L102 206 M116 200 L120 212 M140 200 L138 212 M160 196 L154 206" stroke-width="3" stroke-linecap="round"/><path class="f-peach s-ink" d="M150 206 L 168 250 L 156 246 L 150 256 L 142 240 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-peach-shade" d="M150 222 L158 240" stroke-width="3" stroke-linecap="round"/><circle class="f-peach-shade s-ink" cx="148" cy="206" r="7" stroke-width="3"/><ellipse class="f-moggles-eye" cx="104" cy="118" rx="15" ry="13.5"/><ellipse class="s-moggles-eye-dark" cx="104" cy="119" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="104" cy="119" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="99" cy="112" r="3.6"/><circle class="f-highlight" cx="108" cy="124" r="1.6"/><path class="s-moggles-rim" d="M88 113 C 94 103, 114 103, 120 113" fill="none" stroke-width="3" stroke-linecap="round"/><ellipse class="f-moggles-eye" cx="156" cy="118" rx="15" ry="13.5"/><ellipse class="s-moggles-eye-dark" cx="156" cy="119" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="156" cy="119" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="151" cy="112" r="3.6"/><circle class="f-highlight" cx="160" cy="124" r="1.6"/><path class="s-moggles-rim" d="M140 113 C 146 103, 166 103, 172 113" fill="none" stroke-width="3" stroke-linecap="round"/><path class="f-nose-dark s-moggles-rim" d="M123 141 L137 141 L130 149 Z" stroke-width="2" stroke-linejoin="round"/><path class="s-moggles-rim" d="M120 156 C 124 162, 130 160, 130 151 C 130 160, 136 162, 140 156" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-text-3" d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></template>
 <template id="art-snuffles"><svg width="240" height="313.8" viewBox="0 0 260 340" aria-hidden="true"><ellipse class="f-mint" cx="130" cy="332" rx="92" ry="8" opacity="0.16"/><path class="s-moggles-rim" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="30" stroke-linecap="round"/><path class="s-moggles-black" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="20" stroke-linecap="round"/><path class="s-fur-shade" d="M226 300 C 238 286, 240 266, 232 250 M214 312 C 228 306, 236 296, 240 284" fill="none" stroke-width="3" stroke-linecap="round"/><clipPath id="snuffles-body"><path d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/></clipPath><path class="f-moggles-black" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/><g clip-path="url(#snuffles-body)"><path class="f-cat-white" d="M100 202 C 116 214, 144 214, 160 202 C 172 248, 160 298, 130 312 C 100 298, 88 248, 100 202 Z"/><path class="f-white-shade" d="M108 270 C 116 290, 144 290, 152 270 C 150 292, 142 304, 130 310 C 118 304, 110 292, 108 270 Z"/><path class="s-white-shade" d="M118 222 C 120 230, 124 234, 128 238 M142 222 C 140 230, 136 234, 132 238 M130 226 L130 242" fill="none" stroke-width="2.6" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><rect class="f-cat-white" x="104" y="262" width="26" height="60" rx="12"/><rect class="f-moggles-black" x="104" y="284" width="26" height="22"/><rect class="s-ink" x="104" y="262" width="26" height="60" rx="12" fill="none" stroke-width="4"/><rect class="f-cat-white s-ink" x="132" y="262" width="26" height="60" rx="12" stroke-width="4"/><ellipse class="f-cat-white s-ink" cx="117" cy="324" rx="17" ry="9" stroke-width="4"/><ellipse class="f-cat-white s-ink" cx="145" cy="324" rx="17" ry="9" stroke-width="4"/><path class="s-white-shade" d="M112 320 v6 M118 320 v6 M140 320 v6 M146 320 v6" stroke-width="2.2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M182 98 L188 38 L142 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-snuffles-ear" d="M176 88 L180 54 L154 74 Z"/><path class="s-ear-tuft" d="M174 86 L168 74 M170 88 L162 78" stroke-width="2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M78 98 L72 38 L118 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-snuffles-ear" d="M84 88 L80 54 L106 74 Z"/><path class="s-ear-tuft" d="M86 86 L92 74 M90 88 L98 78" stroke-width="2" stroke-linecap="round"/><clipPath id="snuffles-head"><path d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/></clipPath><path class="f-moggles-black" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/><g clip-path="url(#snuffles-head)"><path class="s-fur-shade" d="M96 84 C 110 72, 150 72, 164 84" fill="none" stroke-width="5" stroke-linecap="round"/><path class="s-fur-shade" d="M118 70 L120 84 M130 68 L130 84 M142 70 L140 84" stroke-width="3" stroke-linecap="round"/><path class="f-cat-white" d="M130 76 C 134 96, 138 110, 142 118 C 154 128, 172 136, 170 154 C 166 172, 146 178, 130 178 C 114 178, 94 172, 90 154 C 88 136, 106 128, 118 118 C 122 110, 126 96, 130 76 Z"/><ellipse class="f-white-shade" cx="130" cy="180" rx="36" ry="12"/></g><path class="s-moggles-rim" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><path class="f-mint s-ink" d="M86 184 C 108 198, 152 198, 174 184 L 177 200 C 152 216, 108 216, 83 200 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mint-deep" d="M92 192 C 112 204, 148 204, 168 192" fill="none" stroke-width="2.4"/><circle class="f-peach s-ink" cx="130" cy="214" r="10" stroke-width="3"/><path class="f-spark" d="M130 208 L132 212 L136 212.5 L133 215 L134 219 L130 217 L126 219 L127 215 L124 212.5 L128 212 Z"/><ellipse class="f-snuffles-eye" cx="106" cy="114" rx="15" ry="13.5"/><ellipse class="s-snuffles-eye-dark" cx="106" cy="115" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="106" cy="115" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="101" cy="108" r="3.6"/><circle class="f-highlight" cx="110" cy="120" r="1.6"/><path class="s-moggles-rim" d="M90 109 C 96 99, 116 99, 122 109" fill="none" stroke-width="3" stroke-linecap="round"/><ellipse class="f-snuffles-eye" cx="154" cy="114" rx="15" ry="13.5"/><ellipse class="s-snuffles-eye-dark" cx="154" cy="115" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="154" cy="115" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="149" cy="108" r="3.6"/><circle class="f-highlight" cx="158" cy="120" r="1.6"/><path class="s-moggles-rim" d="M138 109 C 144 99, 164 99, 170 109" fill="none" stroke-width="3" stroke-linecap="round"/><path class="f-nose-pink s-ink" d="M123 139 L137 139 L130 147 Z" stroke-width="2" stroke-linejoin="round"/><path class="s-ink" d="M120 154 C 124 160, 130 158, 130 149 C 130 158, 136 160, 140 154" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-text-3" d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></template>
+<template id="art-map"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="10" cy="298.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="59.7" cy="792.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="786.9" cy="32.8" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1213.1" cy="296.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1182.6" cy="363.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="243" cy="35.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1234.4" cy="710.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="161.3" cy="381.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1176.6" cy="705.4" r="0.9" opacity="0.5"/><circle class="f-moon" cx="495.2" cy="789.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="916.5" cy="788.3" r="0.9" opacity="0.5"/><circle class="f-moon" cx="795.5" cy="148.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="394.8" cy="87.4" r="1.1" opacity="0.6"/><circle class="f-galaxy-mint" cx="863" cy="714.2" r="2.2" opacity="0.95"/><circle class="f-moon" cx="24.1" cy="279.1" r="1" opacity="0.7"/><circle class="f-moon" cx="946.1" cy="51.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="50.1" cy="201.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="191.3" cy="125.1" r="1.4" opacity="0.9"/><circle class="f-galaxy-mint" cx="1161.7" cy="383.5" r="2.2" opacity="0.95"/><circle class="f-moon" cx="1123.7" cy="479.9" r="1" opacity="0.6"/><circle class="f-galaxy" cx="19" cy="546" r="1.8" opacity="0.95"/><circle class="f-moon" cx="1217.8" cy="337.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1035.8" cy="115.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="97.2" cy="99.8" r="0.9" opacity="0.7"/><circle class="f-moon" cx="793.7" cy="149.1" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="951.4" cy="50.7" r="1.9" opacity="0.95"/><circle class="f-moon" cx="86.5" cy="608" r="1.1" opacity="0.4"/><circle class="f-moon" cx="59.1" cy="312.4" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1208.3" cy="83.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="937.4" cy="768.1" r="1" opacity="0.5"/><circle class="f-moon" cx="716.9" cy="56.2" r="2" opacity="0.9"/><circle class="f-moon" cx="1265.4" cy="90.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="793.9" cy="21.6" r="1.7" opacity="0.9"/><circle class="f-moon" cx="67.9" cy="347.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1227.2" cy="73.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="1135.1" cy="620.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="317" cy="728.3" r="1" opacity="0.6"/><circle class="f-moon" cx="1228" cy="785.5" r="0.9" opacity="0.5"/><circle class="f-moon" cx="502.1" cy="120.6" r="0.7" opacity="0.5"/><circle class="f-moon" cx="1202.4" cy="591" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1212.2" cy="259.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="486.6" cy="747.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="361.8" cy="143.4" r="0.8" opacity="0.4"/><circle class="f-moon" cx="1224.3" cy="33.1" r="2" opacity="0.9"/><circle class="f-moon" cx="899.4" cy="21" r="0.7" opacity="0.6"/><circle class="f-moon" cx="15.6" cy="435" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1140.2" cy="297.6" r="1.1" opacity="0.6"/><circle class="f-moon" cx="677.3" cy="44.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1075.6" cy="735" r="1.4" opacity="0.9"/><circle class="f-moon" cx="744.1" cy="69.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="81.6" cy="648.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="96" cy="59.3" r="1" opacity="0.4"/><circle class="f-moon" cx="348.2" cy="52.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="834.2" cy="130.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="105.3" cy="657.9" r="0.7" opacity="0.5"/><circle class="f-moon" cx="632.2" cy="133.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1155.3" cy="541.4" r="1.1" opacity="0.7"/><circle class="f-galaxy-mint" cx="682.2" cy="721.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="471.3" cy="725.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="237.2" cy="773.9" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1217" cy="723.2" r="1" opacity="0.5"/><circle class="f-galaxy-peach" cx="732.4" cy="789.4" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1254.1" cy="589.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1263" cy="239.3" r="1" opacity="0.6"/><circle class="f-moon" cx="57.4" cy="682.7" r="1.1" opacity="0.5"/><circle class="f-moon" cx="207" cy="118.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="40.3" cy="728.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="917.2" cy="61.7" r="0.8" opacity="0.6"/><circle class="f-moon" cx="164.4" cy="710.8" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="170.7" cy="598.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="251" cy="117.1" r="1" opacity="0.5"/><circle class="f-moon" cx="162.3" cy="699.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="1226.1" cy="300.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="31.2" cy="512.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="745.3" cy="74.4" r="0.8" opacity="0.6"/><circle class="f-moon" cx="279.1" cy="43.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="147.7" cy="427.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="689.1" cy="73" r="1" opacity="0.4"/><circle class="f-moon" cx="847.3" cy="13.1" r="0.9" opacity="0.7"/><circle class="f-moon" cx="49.5" cy="398.8" r="1.9" opacity="0.9"/><circle class="f-galaxy" cx="741" cy="149.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1168" cy="236.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1046.5" cy="114.7" r="1.6" opacity="0.9"/><circle class="f-moon" cx="864.7" cy="720.4" r="1.1" opacity="0.6"/><circle class="f-galaxy" cx="656.1" cy="89.8" r="2" opacity="0.95"/><circle class="f-moon" cx="1164.1" cy="341.3" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1079" cy="120.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="862.9" cy="765.9" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1269.9" cy="264.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="1111.9" cy="710.1" r="2" opacity="0.9"/><circle class="f-moon" cx="657.6" cy="769.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="170.2" cy="310.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="67.5" cy="507.7" r="1" opacity="0.5"/><circle class="f-moon" cx="929.8" cy="97.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1247.9" cy="208.6" r="1.6" opacity="0.9"/><circle class="f-galaxy-mint" cx="177.3" cy="277.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="210.2" cy="78.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1233.9" cy="40.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="645.9" cy="39.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="300" cy="107" r="1.1" opacity="0.6"/><circle class="f-moon" cx="257.8" cy="143" r="1.6" opacity="0.9"/><circle class="f-moon" cx="381.8" cy="737.1" r="0.8" opacity="0.4"/><circle class="f-moon" cx="246.1" cy="759.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1189.8" cy="150.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="69.6" cy="306" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1152.9" cy="741.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="787.5" cy="13" r="2" opacity="0.9"/><circle class="f-moon" cx="8.4" cy="705.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1222.5" cy="76.9" r="1.2" opacity="0.7"/><circle class="f-moon" cx="816.7" cy="772.1" r="1.2" opacity="0.4"/><g transform="translate(1130 90) rotate(20) scale(0.8)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="1.4" r="1.1" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="4.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="15.8" cy="6.3" r="1.2" opacity="0.6"/><circle class="f-moon" cx="9.6" cy="8.5" r="1" opacity="0.9"/><circle class="f-moon" cx="5.8" cy="12" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-5" cy="13.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="12.6" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.2" cy="12.1" r="1.2" opacity="0.5"/><circle class="f-moon" cx="-35.8" cy="11.5" r="1.2" opacity="0.6"/><circle class="f-moon" cx="-13.2" cy="-2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="-15.9" cy="-4.5" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-16.1" cy="-7.2" r="1.5" opacity="0.5"/><circle class="f-moon" cx="-12.7" cy="-9" r="1" opacity="0.7"/><circle class="f-moon" cx="-4.6" cy="-11.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="3.9" cy="-13.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="-12.9" r="1.1" opacity="0.8"/><circle class="f-moon" cx="27.9" cy="-13.5" r="0.8" opacity="0.6"/><circle class="f-moon" cx="38.6" cy="-10.5" r="1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(140 120) rotate(-24) scale(0.62)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="16" cy="2.8" r="1.2" opacity="0.6"/><circle class="f-moon" cx="13.9" cy="4.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="14.2" cy="7.4" r="1" opacity="0.9"/><circle class="f-moon" cx="11.8" cy="9.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="3.3" cy="11.5" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-3.1" cy="13.2" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-16.4" cy="14" r="1.4" opacity="0.7"/><circle class="f-moon" cx="-27.9" cy="12.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-35.8" cy="10.9" r="1" opacity="0.8"/><circle class="f-moon" cx="-15.4" cy="-1.3" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-15.3" cy="-4" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="-7.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-10.6" cy="-10.1" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-6" cy="-11.1" r="1" opacity="0.6"/><circle class="f-moon" cx="4.2" cy="-13.6" r="1" opacity="0.9"/><circle class="f-moon" cx="15.6" cy="-14.4" r="1.4" opacity="0.5"/><circle class="f-moon" cx="25.6" cy="-11.9" r="1.3" opacity="0.6"/><circle class="f-moon" cx="37.1" cy="-11" r="0.9" opacity="0.9"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(150 700) rotate(-30) scale(0.7)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(860 90) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(470 700) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(1230 420) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(70 330) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="s-night-button" cx="640" cy="430" rx="200" ry="80" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="330" ry="135" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="600" ry="250" fill="none" stroke-width="3" stroke-dasharray="6 10"/><circle class="f-planet-indigo-light" cx="1117" cy="434" r="3"/><circle class="f-asteroid" cx="1102" cy="450" r="5"/><circle class="f-planet-indigo-light" cx="1091" cy="479" r="7"/><circle class="f-asteroid" cx="1086" cy="494" r="4"/><circle class="f-planet-indigo-light" cx="1051" cy="522" r="6"/><circle class="f-asteroid" cx="1022" cy="535" r="3"/><circle class="f-planet-indigo-light" cx="999" cy="560" r="5"/><circle class="f-asteroid" cx="947" cy="569" r="7"/><circle class="f-planet-indigo-light" cx="902" cy="590" r="4"/><circle class="f-asteroid" cx="865" cy="595" r="6"/><circle class="f-planet-indigo-light" cx="802" cy="612" r="3"/><circle class="f-asteroid" cx="747" cy="611" r="5"/><circle class="f-planet-indigo-light" cx="704" cy="623" r="7"/><circle class="f-asteroid" cx="635" cy="617" r="4"/><circle class="f-planet-indigo-light" cx="578" cy="623" r="6"/><circle class="f-asteroid" cx="535" cy="611" r="3"/><circle class="f-planet-indigo-light" cx="468" cy="612" r="5"/><circle class="f-asteroid" cx="248" cy="319" r="5"/><circle class="f-planet-indigo-light" cx="283" cy="308" r="7"/><circle class="f-asteroid" cx="335" cy="285" r="4"/><circle class="f-planet-indigo-light" cx="368" cy="278" r="6"/><circle class="f-asteroid" cx="417" cy="259" r="3"/><circle class="f-planet-indigo-light" cx="480" cy="256" r="5"/><circle class="f-asteroid" cx="523" cy="243" r="7"/><circle class="f-planet-indigo-light" cx="578" cy="245" r="4"/><circle class="f-asteroid" cx="647" cy="237" r="6"/><circle class="f-planet-indigo-light" cx="692" cy="245" r="3"/><circle class="f-asteroid" cx="747" cy="243" r="5"/><circle class="f-planet-indigo-light" cx="814" cy="256" r="7"/><circle class="f-asteroid" cx="853" cy="259" r="4"/><circle class="f-planet-indigo-light" cx="902" cy="278" r="6"/><circle class="f-asteroid" cx="959" cy="285" r="3"/><circle class="f-planet-indigo-light" cx="987" cy="308" r="5"/><circle class="f-asteroid" cx="1022" cy="319" r="7"/><circle class="f-planet-indigo-light" cx="1063" cy="346" r="4"/><circle class="f-asteroid" cx="1074" cy="360" r="6"/><circle class="f-planet-indigo-light" cx="1091" cy="389" r="3"/><circle class="f-asteroid" cx="1114" cy="404" r="5"/><circle class="f-peach" cx="640" cy="430" r="112" opacity="0.10"/><circle class="f-peach" cx="640" cy="430" r="86" opacity="0.16"/><clipPath id="map-sun"><circle cx="640" cy="430" r="64"/></clipPath><g clip-path="url(#map-sun)"><g transform="rotate(-45 640 430)"><rect class="f-planet-peach-6" x="576" y="366" width="128" height="128"/><rect class="f-planet-peach-dark" x="576" y="366" width="128" height="110.1"/><rect class="f-planet-peach-4" x="576" y="366" width="128" height="92.2"/><rect class="f-planet-peach" x="576" y="366" width="128" height="70.4"/><rect class="f-planet-peach-2" x="576" y="366" width="128" height="46.1"/><rect class="f-planet-peach-light" x="576" y="366" width="128" height="23"/></g></g><circle class="s-planet-peach-light" cx="640" cy="430" r="66.5" fill="none" stroke-width="3" opacity="0.28"/><circle class="s-mint" cx="330" cy="300" r="78" fill="none" stroke-width="10" opacity="0.3"/><g transform="rotate(-14 330 300)"><path class="s-mint-deep" d="M228.5 300 A101.5 22 0 0 1 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-deeper" d="M242.7 300 A87.3 19 0 0 1 417.3 300" fill="none" stroke-width="2.9" stroke-linecap="round"/></g><clipPath id="map-rescue"><circle cx="330" cy="300" r="58"/></clipPath><g clip-path="url(#map-rescue)"><g transform="rotate(-45 330 300)"><rect class="f-planet-mint-dark" x="272" y="242" width="116" height="116"/><rect class="f-planet-mint-4" x="272" y="242" width="116" height="83.5"/><rect class="f-planet-mint" x="272" y="242" width="116" height="63.8"/><rect class="f-planet-mint-2" x="272" y="242" width="116" height="41.8"/><rect class="f-planet-mint-light" x="272" y="242" width="116" height="20.9"/></g><ellipse class="f-shadow" cx="347.4" cy="320.3" rx="7" ry="5.4" opacity="0.16"/><ellipse class="f-highlight" cx="346.1" cy="319" rx="5" ry="3.5" opacity="0.07"/><ellipse class="f-shadow" cx="309.7" cy="305.8" rx="4.6" ry="3.6" opacity="0.16"/><ellipse class="f-highlight" cx="308.9" cy="305" rx="3.3" ry="2.3" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="330" cy="300" r="60.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#map-rescue)"><g transform="rotate(-14 330 300)"><path class="s-shadow" d="M233.6 302.9 A96.4 19.8 0 0 0 426.4 302.9" fill="none" stroke-width="7" opacity="0.18"/></g></g><g transform="rotate(-14 330 300)"><path class="s-mint" d="M228.5 300 A101.5 22 0 0 0 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-light" d="M220.4 300 A109.6 23.8 0 0 0 439.6 300" fill="none" stroke-width="3.5" stroke-linecap="round"/><path class="s-mint-deep" d="M242.7 300 A87.3 19 0 0 0 417.3 300" fill="none" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/></g><clipPath id="map-moon"><circle cx="232" cy="232" r="14"/></clipPath><g clip-path="url(#map-moon)"><g transform="rotate(-45 232 232)"><rect class="f-planet-peach-4" x="218" y="218" width="28" height="28"/><rect class="f-planet-peach" x="218" y="218" width="28" height="15.4"/><rect class="f-planet-peach-2" x="218" y="218" width="28" height="10.1"/><rect class="f-planet-peach-light" x="218" y="218" width="28" height="5"/></g></g><g opacity="0.45"><clipPath id="map-l0"><circle cx="1010" cy="560" r="46"/></clipPath><g clip-path="url(#map-l0)"><g transform="rotate(-45 1010 560)"><rect class="f-planet-indigo-6" x="964" y="514" width="92" height="92"/><rect class="f-planet-indigo-dark" x="964" y="514" width="92" height="79.1"/><rect class="f-planet-indigo-4" x="964" y="514" width="92" height="66.2"/><rect class="f-planet-indigo" x="964" y="514" width="92" height="50.6"/><rect class="f-planet-indigo-2" x="964" y="514" width="92" height="33.1"/><rect class="f-planet-indigo-light" x="964" y="514" width="92" height="16.6"/></g><ellipse class="f-shadow" cx="1019.2" cy="546.2" rx="6.4" ry="5" opacity="0.16"/><ellipse class="f-highlight" cx="1018" cy="545" rx="4.6" ry="3.2" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="1010" cy="560" r="48.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="map-l1"><circle cx="1150" cy="250" r="30"/></clipPath><g clip-path="url(#map-l1)"><g transform="rotate(-45 1150 250)"><rect class="f-planet-peach-dark" x="1120" y="220" width="60" height="60"/><rect class="f-planet-peach-4" x="1120" y="220" width="60" height="43.2"/><rect class="f-planet-peach" x="1120" y="220" width="60" height="33"/><rect class="f-planet-peach-2" x="1120" y="220" width="60" height="21.6"/><rect class="f-planet-peach-light" x="1120" y="220" width="60" height="10.8"/></g></g><circle class="s-planet-peach-light" cx="1150" cy="250" r="32.5" fill="none" stroke-width="3" opacity="0.28"/></g><ellipse class="f-mint" cx="250" cy="598" rx="210" ry="26" opacity="0.12"/></svg></template>
 <template id="art-icon-home"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 23 L24 8 L41 23"/><path d="M12 20 V40 H36 V20"/><path d="M20 40 V30 H28 V40"/></svg></template>
 <template id="art-icon-hear"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 H16 L26 9 V39 L16 30 H8 Z"/><path d="M32 17 C 36 21, 36 27, 32 31"/><path d="M37 12 C 44 19, 44 29, 37 36"/></svg></template>
 <template id="art-icon-music"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 34 V10 L38 6 V30"/><ellipse cx="13" cy="34" rx="6" ry="5"/><ellipse cx="33" cy="30" rx="6" ry="5"/></svg></template>
@@ -416,9 +443,9 @@ button { font-family: var(--font-andika); }
 <template id="art-icon-full"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 V8 H18 M30 8 H40 V18 M8 30 V40 H18 M30 40 H40 V30"/></svg></template>
 <template id="art-icon-tick"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 25 L20 35 L38 14"/></svg></template>
 <script>
-window.MW = { VERSION: '0.3.3' };
-window.MW_AUDIO = {"voice":{"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-welcome":{"dur":3.09},"map-mimi-rescue":{"dur":1.76},"map-not-ready":{"dur":2.28}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
-window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."}];
+window.MW = { VERSION: '0.4.0' };
+window.MW_AUDIO = {"voice":{"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-welcome":{"dur":3.09},"map-mimi-rescue":{"dur":1.76},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
+window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."}];
 </script>
 <script>
 /* MeeMee World kit: core.
@@ -1171,6 +1198,85 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 })();
 
+/* MeeMee World kit: the home map (phase 4).
+   An alien solar system: each game is a planet. The drawing is the "map" art (design/gen_scenes.py, whose MAP holds
+   the same positions); this file puts the buttons over it. Tapping a game's planet says its name and opens it;
+   a planet still to come says "That planet isn't ready yet." The crew wait by Scruffles's ship. */
+(function () {
+  'use strict';
+  const MW = window.MW;
+
+  const M = MW.LAYOUT.map = {
+    rescue: { x: 330, y: 300, tap: 180 },                     // tap area at least 120 stage px across (design system)
+    badge: { x: 368, y: 166, d: 84 },
+    locked: [{ x: 1010, y: 560, tap: 130, lock: { x: 1056, y: 470, d: 60, icon: 30 } },
+      { x: 1150, y: 250, tap: 120, lock: { x: 1186, y: 196, d: 50, icon: 24 } }],
+    ship: { x: 155, y: 400, w: 190 },
+    crew: [{ who: 'moggles', x: 44, y: 456, w: 112 }, { who: 'snuffles', x: 344, y: 456, w: 112 }]
+  };
+
+  function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
+
+  // opts: { onRescue: fn, onLocked: fn }
+  MW.map = function (parent, opts) {
+    const map = {};
+    const art = MW.art('map');
+    art.setAttribute('class', 'mw-layer');
+    parent.appendChild(art);
+
+    // the crew by the ship (pictures only for now; tapping them opens the crew screen from 0.4.1)
+    const ship = MW.art('pod');
+    ship.setAttribute('width', M.ship.w); ship.setAttribute('height', Math.round(M.ship.w * 430 / 400));
+    Array.prototype.forEach.call(ship.querySelectorAll('[data-face]'), function (g) { g.style.display = g.getAttribute('data-face') === 'thinking' ? '' : 'none'; });
+    const shipBox = place(MW.make('div', 'mw-abs mw-map-crew'), M.ship.x, M.ship.y);
+    shipBox.appendChild(ship);
+    parent.appendChild(shipBox);
+    map.crew = {};
+    M.crew.forEach(function (c) {
+      const box = place(MW.make('div', 'mw-abs mw-map-crew', { 'data-who': c.who }), c.x, c.y);
+      const pic = MW.art(c.who);
+      pic.setAttribute('width', c.w); pic.setAttribute('height', Math.round(c.w * 340 / 260));
+      box.appendChild(pic);
+      parent.appendChild(box);
+      map.crew[c.who] = box;
+    });
+
+    // MeeMee Rescue: the planet and its badge are one big button
+    const r = M.rescue;
+    const rescue = place(MW.make('button', 'mw-planet mw-abs', { type: 'button', 'aria-label': 'MeeMee Rescue' }), r.x - r.tap / 2, r.y - r.tap / 2);
+    rescue.style.width = rescue.style.height = r.tap + 'px';
+    parent.appendChild(rescue);
+    const badge = place(MW.make('button', 'mw-planet-badge mw-abs', { type: 'button', 'aria-label': 'MeeMee Rescue' }), M.badge.x, M.badge.y);
+    badge.style.width = badge.style.height = M.badge.d + 'px';
+    const mm = MW.art('mimi'); mm.setAttribute('width', 56); mm.setAttribute('height', 56);
+    badge.appendChild(mm);
+    parent.appendChild(badge);
+    [rescue, badge].forEach(function (b) { MW.onTap(b, function () { if (opts.onRescue) opts.onRescue(); }); });
+    map.rescue = rescue; map.badge = badge;
+
+    // planets still to come: dimmed, with a lock
+    map.locked = M.locked.map(function (l) {
+      const b = place(MW.make('button', 'mw-planet mw-abs', { type: 'button', 'aria-label': 'A planet that isn\'t ready yet' }), l.x - l.tap / 2, l.y - l.tap / 2);
+      b.style.width = b.style.height = l.tap + 'px';
+      parent.appendChild(b);
+      const lock = place(MW.make('div', 'mw-planet-lock mw-abs'), l.lock.x, l.lock.y);
+      lock.style.width = lock.style.height = l.lock.d + 'px';
+      const icon = MW.art('icon-lock'); icon.setAttribute('width', l.lock.icon); icon.setAttribute('height', l.lock.icon);
+      lock.appendChild(icon);
+      parent.appendChild(lock);
+      MW.onTap(b, function () { if (opts.onLocked) opts.onLocked(); });
+      MW.onTap(lock, function () { if (opts.onLocked) opts.onLocked(); });
+      return b;
+    });
+
+    // a little bounce on the badge when its planet is chosen
+    map.bounce = function () {
+      badge.classList.remove('is-hop'); void badge.getBoundingClientRect(); badge.classList.add('is-hop');
+    };
+    return map;
+  };
+})();
+
 /* MeeMee World kit: the shell around every game.
    Screens, full screen and landscape on the first tap, "turn me sideways", the buttons the player taps,
    and the grown-ups lock (press and hold for 3 seconds). */
@@ -1190,7 +1296,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     S.reloadIfIdle();
   };
   S.reloadIfIdle = function () {
-    if (S.updateReady && S.screen === 'screen-start' && !(MW.grownups && MW.grownups.open)) location.reload();
+    // a new version takes over only on a screen where nothing is lost: the start screen or the home map
+    if (S.updateReady && (S.screen === 'screen-start' || S.screen === 'screen-map') && !(MW.grownups && MW.grownups.open)) location.reload();
   };
 
   // ---------------------------------------------------------------- full screen and landscape (needs a tap)
@@ -1534,9 +1641,145 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   }
 })();
 
-/* MeeMee Rescue (trial round, phase 3).
-   Five part–whole questions in Barney's voice. The player drags MeeMee from the asteroid into the waiting circle.
-   Built only from the kit (kit/*.js); phase 4 adds the solar-system map, the crew screen and the progress grid. */
+/* MeeMee Rescue: the number bonds, how secure each one is, and which go into a round (phase 4).
+
+   A bond is a whole and its two parts in either order: 3 + 4 and 4 + 3 are the same bond, "7: 3 and 4".
+   Secure, practising, not yet (decided 9 October):
+     secure      right first time (no wrong check, no hint) on three different days;
+     practising  answered, but not yet three days right first time; a wrong answer moves a secure bond back here
+                 and its days start again;
+     not yet     never asked.
+   A round of five: 1 or 2 bonds he is secure on, the rest he is practising or hasn't met. If there aren't enough of
+   one kind, the other fills in. At most two bonds come from one whole, and the same whole isn't asked twice in a row,
+   while there are enough wholes in play. A whole's zero bond (5 and 0) joins once its other bonds are secure, and only when
+   the answer is checked by tapping Scruffles (an empty circle is the answer to "how many more?").
+   Pure functions of the saved answers, so they are easy to test. */
+(function () {
+  'use strict';
+  const MW = window.MW;
+
+  function day(t) {
+    const d = new Date(t);
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();      // the tablet's own calendar day
+  }
+  function shuffle(list, rand) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+
+  // the first n of a shuffled list, but at most two from one whole while there are others to take
+  function take(list, n, already) {
+    const count = {}, out = [], later = [];
+    already.forEach(function (c) { count[c.whole] = (count[c.whole] || 0) + 1; });
+    list.forEach(function (c) {
+      if (out.length >= n) return;
+      if ((count[c.whole] || 0) >= 2) { later.push(c); return; }
+      out.push(c); count[c.whole] = (count[c.whole] || 0) + 1;
+    });
+    for (let i = 0; out.length < n && i < later.length; i++) out.push(later[i]);
+    return out;
+  }
+
+  const B = MW.bonds = {};
+
+  B.key = function (w, a, b) { return w + ':' + Math.min(a, b); };
+  B.firstTime = function (ans) { return !ans.tries && !ans.hint; };
+
+  // Every bond of a whole, smaller part first: 7 -> [0,7] [1,6] [2,5] [3,4]
+  B.pairs = function (w) {
+    const out = [];
+    for (let a = 0; a <= Math.floor(w / 2); a++) out.push([a, w - a]);
+    return out;
+  };
+
+  // { '7:3': { status: 'secure' | 'practising', days: [...], answers: n } } from the answers saved on this tablet
+  B.statuses = function (answers) {
+    const by = {};
+    (answers || []).filter(function (a) {
+      return a && typeof a.t === 'number' && a.whole >= 1 && a.left >= 0 && a.right >= 0 && a.left + a.right === a.whole;
+    }).sort(function (x, y) { return x.t - y.t; }).forEach(function (a) {
+      const k = B.key(a.whole, a.left, a.right);
+      const s = by[k] || (by[k] = { status: 'practising', days: [], answers: 0 });
+      s.answers++;
+      if (B.firstTime(a)) { const d = day(a.t); if (s.days.indexOf(d) < 0) s.days.push(d); }
+      else s.days = [];
+      s.status = s.days.length >= 3 ? 'secure' : 'practising';
+    });
+    return by;
+  };
+  B.status = function (map, w, a) { const s = map[B.key(w, a, w - a)]; return s ? s.status : 'notyet'; };
+
+  // A whole's zero bond is open once every other bond of that whole is secure.
+  B.zeroOpen = function (map, w) {
+    return B.pairs(w).every(function (p) { return p[0] === 0 || B.status(map, w, p[0]) === 'secure'; });
+  };
+
+  // The bonds a round can draw from: every bond of the wholes in play, zero bonds only when allowed and open.
+  B.candidates = function (wholes, map, zero) {
+    const out = [];
+    wholes.forEach(function (w) {
+      B.pairs(w).forEach(function (p) {
+        if (p[0] === 0 && !(zero && B.zeroOpen(map, w))) return;
+        out.push({ whole: w, a: p[0], b: p[1], status: B.status(map, w, p[0]) });
+      });
+    });
+    return out;
+  };
+
+  // opts: { wholes: [2..10], answers: [...], size: 5, zero: true in tap-Scruffles mode, rand: Math.random }
+  // -> [{ whole, left, right, missing: 'whole' | 'left' | 'right', status }]
+  B.pickRound = function (opts) {
+    const rand = opts.rand || Math.random;
+    const size = opts.size || 5;
+    const map = B.statuses(opts.answers);
+    const cands = B.candidates(opts.wholes, map, !!opts.zero);
+    const secure = shuffle(cands.filter(function (c) { return c.status === 'secure'; }), rand);
+    const work = shuffle(cands.filter(function (c) { return c.status !== 'secure'; }), rand);
+    let nSecure = Math.min(rand() < 0.5 ? 1 : 2, secure.length);
+    const nWork = Math.min(size - nSecure, work.length);
+    nSecure = Math.min(size - nWork, secure.length);                   // too few to practise: more secure ones
+    const chosen = take(secure, nSecure, []);
+    Array.prototype.push.apply(chosen, take(work, nWork, chosen));
+    // very few wholes in play: every bond is already in, so go round them again in turn
+    const again = shuffle(cands, rand);
+    for (let i = 0; chosen.length < size; i++) chosen.push(again[i % again.length]);
+    // the same whole twice in a row only when it can't be helped: a search over a shuffled order finds an order
+    // with no repeats whenever there is one (a round is only five long)
+    const pool = shuffle(chosen, rand);
+    let best = null, bestRuns = Infinity;
+    (function place(order, left, runs) {
+      if (runs >= bestRuns) return;
+      if (!left.length) { best = order; bestRuns = runs; return; }
+      for (let i = 0; i < left.length && bestRuns > 0; i++) {
+        const same = order.length && order[order.length - 1].whole === left[i].whole ? 1 : 0;
+        place(order.concat([left[i]]), left.slice(0, i).concat(left.slice(i + 1)), runs + same);
+      }
+    })([], pool, 0);
+    return best.map(function (c) {
+      const swap = rand() < 0.5;
+      const r = rand();
+      return { whole: c.whole, left: swap ? c.b : c.a, right: swap ? c.a : c.b,
+        missing: r < 0.25 ? 'whole' : (r < 0.625 ? 'left' : 'right'), status: c.status };
+    });
+  };
+
+  // Every question the game can ask for these wholes (tests and the grown-ups' list).
+  B.allQuestions = function (wholes, zero) {
+    const out = [];
+    wholes.forEach(function (w) {
+      for (let left = zero ? 0 : 1; left <= (zero ? w : w - 1); left++) {
+        ['whole', 'left', 'right'].forEach(function (m) { out.push({ whole: w, left: left, right: w - left, missing: m }); });
+      }
+    });
+    return out;
+  };
+})();
+
+/* MeeMee Rescue (phase 4).
+   Play opens the home map (kit/map.js); the MeeMee Rescue planet starts a round of five part–whole questions in
+   Barney's voice, chosen from the bonds that need work (bonds.js). The player drags MeeMee from the asteroid into the
+   waiting circle. Grown-ups see the progress grid. Built only from the kit (kit/*.js); 0.4.1 adds the crew screen. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -1547,15 +1790,16 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   const OTHER = { left: 'right', right: 'left' };
 
   const st = { token: 0, paused: false, pauses: {}, hintTimers: [], phase: 'idle', round: null, qi: 0, q: null, target: null, answer: 0,
-    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [] };
+    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], welcomed: false, check: null };
   const R = MW.rescue = { st: st, nextRound: null };
-  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger;
+  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, map;
 
   // ---------------------------------------------------------------- set-up
   function init() {
     const stageEl = MW.$('stage');
     MW.stage.init(stageEl);
     buildStart();
+    buildMap();
     buildGame();
     buildEnd();
     MW.shell.gate(stageEl, openGrownups);
@@ -1577,13 +1821,13 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
 
   function buildStart() {
     const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee Rescue'));
+    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee World'));
     const p = MW.pod(s, 240, 150, 420);
     p.el.disabled = true; p.el.tabIndex = -1;
     const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
     const icon = MW.art('icon-play'); icon.setAttribute('width', 84); icon.setAttribute('height', 84);
     play.appendChild(icon);
-    MW.onTap(play, function () { MW.audio.unlock(); MW.shell.fullscreen(); startRound(); });
+    MW.onTap(play, function () { MW.audio.unlock(); MW.shell.fullscreen(); goMap(); });
     // If a browser didn't count the finger lifting as a tap for full screen, the click that follows tries again.
     play.addEventListener('click', function () { MW.audio.unlock(); if (MW.device.fullOk === false) MW.shell.fullscreen(); });
     s.appendChild(play);
@@ -1591,6 +1835,36 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     for (let i = 0; i < 3; i++) row.appendChild(MW.art('mimi'));
     s.appendChild(row);
     MW.shell.buttons(s, ['music'], {});
+  }
+
+  // The home map: "Welcome to MeeMee World!" the first time in a visit; the MeeMee Rescue planet starts a round.
+  function buildMap() {
+    const s = MW.$('screen-map');
+    map = MW.map(s, { onRescue: openRescue, onLocked: notReady });
+    MW.shell.buttons(s, ['music'], {});
+  }
+  function goMap() {
+    st.token++;
+    st.phase = 'map';
+    st.check = null;
+    MW.shell.show('screen-map');
+    if (!st.welcomed) { st.welcomed = true; speak([['map-welcome']]); }
+  }
+  async function openRescue() {
+    if (st.phase !== 'map' || st.paused) return;
+    st.phase = 'opening';
+    const token = ++st.token;
+    map.bounce();
+    MW.log('map', 'rescue');
+    await speak([['map-mimi-rescue']]);
+    if (token !== st.token) return;
+    if (st.paused) { st.phase = 'map'; return; }             // the grown-ups area opened (or the screen went off) meanwhile
+    startRound();
+  }
+  function notReady() {
+    if (st.phase !== 'map' || st.paused) return;
+    MW.log('map', 'locked');
+    speak([['map-not-ready']]);
   }
 
   function buildGame() {
@@ -1666,23 +1940,13 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     if (R.nextRound) { const r = R.nextRound; R.nextRound = null; return r.map(function (q) { return Object.assign({}, q); }); }
     let wholes = (MW.store.setting('wholes') || []).filter(function (w) { return w >= 2 && w <= 10; });
     if (!wholes.length) wholes = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const pool = [];
-    wholes.forEach(function (w) { for (let a = 1; a < w; a++) pool.push([w, a]); });
-    const qs = [];
-    let guard = 0;
-    while (qs.length < ROUND && guard++ < 1000) {
-      const pick = MW.pick(pool), w = pick[0], a = pick[1];
-      const same = qs.some(function (q) { return q.whole === w && (q.left === a || q.right === a); });
-      if (same && pool.length >= ROUND * 2) continue;
-      if (qs.length && qs[qs.length - 1].whole === w && wholes.length > 1 && guard < 500) continue;
-      const r = Math.random();
-      qs.push({ whole: w, left: a, right: w - a, missing: r < 0.25 ? 'whole' : (r < 0.625 ? 'left' : 'right') });
-    }
-    return qs;
+    // zero bonds are answered with an empty circle, so they come up only when the answer is checked by tapping Scruffles
+    return MW.bonds.pickRound({ wholes: wholes, answers: MW.store.get('answers') || [], size: ROUND, zero: check() === 'tap' });
   }
 
   async function startRound() {
     const token = ++st.token;
+    st.check = savedCheck();
     st.round = makeRound();
     st.qi = 0;
     clearBoard(true);
@@ -1728,8 +1992,9 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
       st.counters.push(c);
     });
     st.prompt = promptFor(q);
-    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready."
-    if (check() === 'tap' && st.qi < 2) st.prompt = st.prompt.concat([['tap-scruffles']]);
+    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready.", and so does any
+    // question whose answer is zero (the answer is an empty circle and a tap on Scruffles)
+    if (check() === 'tap' && (st.qi < 2 || st.answer === 0)) st.prompt = st.prompt.concat([['tap-scruffles']]);
     st.phase = 'asking';
     MW.log('question', JSON.stringify(q));
     await speak(st.prompt);
@@ -1753,7 +2018,10 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     diagram.count(st.target, n);
     pod.ready(check() === 'tap' && n > 0 && st.phase !== 'celebrate');
   }
-  function check() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
+  // How answers are checked. A round keeps the mode it started with (its zero bonds need tap mode);
+  // a change in Settings starts with the next round.
+  function savedCheck() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
+  function check() { return st.check || savedCheck(); }
 
   function onDrop(c, x, y, cancelled) {
     if (st.counters.indexOf(c) < 0) return;                 // left over from a question that has ended
@@ -1950,26 +2218,79 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     MW.audio.hush();
     pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
-    MW.shell.show('screen-start');
+    goMap();
   }
 
-  // ---------------------------------------------------------------- grown-ups: this trial
+  // ---------------------------------------------------------------- grown-ups: progress and settings
   function sentence(a) {
     if (a.missing === 'whole') return a.left + ' + ' + a.right + ' = ?';
     if (a.missing === 'left') return '? + ' + a.right + ' = ' + a.whole;
     return a.left + ' + ? = ' + a.whole;
   }
+  // one cell of the progress grid: a tick for secure, a dashed edge for practising, faint for not yet
+  function cell(status, text) {
+    const c = MW.make('span', 'mw-cell label is-' + status);
+    if (status === 'secure') {
+      const tick = MW.art('icon-tick'); tick.setAttribute('width', 16); tick.setAttribute('height', 16);
+      c.appendChild(tick);
+    }
+    c.appendChild(document.createTextNode(text));
+    return c;
+  }
   function progressSection() {
     return {
       id: 'progress', title: 'Progress',
       render: function (el) {
+        const G = MW.grownups;
         const answers = MW.store.get('answers') || [];
-        const firstTime = answers.filter(function (a) { return !a.tries && !a.hint; }).length;
-        MW.grownups.p(el, answers.length
-          ? 'Questions answered on this tablet: ' + answers.length + '. Right first time: ' + firstTime + '.'
+        const map = MW.bonds.statuses(answers);
+        let nSecure = 0, nPractising = 0, total = 0;
+        // the progress grid (the design system's BondGrid): every bond of 2 to 10, smaller part first
+        const grid = MW.make('div', 'gu-grid');
+        for (let w = 2; w <= 10; w++) {
+          const row = MW.make('div', 'gu-grid-row');
+          row.appendChild(MW.make('span', 'gu-grid-whole', null, String(w)));
+          MW.bonds.pairs(w).forEach(function (pr) {
+            const status = MW.bonds.status(map, w, pr[0]);
+            total++;
+            if (status === 'secure') nSecure++; else if (status === 'practising') nPractising++;
+            row.appendChild(cell(status, pr[0] + ' + ' + pr[1]));
+          });
+          grid.appendChild(row);
+        }
+        G.p(el, answers.length
+          ? 'Secure: ' + nSecure + ' of ' + total + ' bonds. Practising: ' + nPractising + '. Questions answered on this tablet: ' + answers.length + '.'
           : 'No questions answered on this tablet yet.', 'gu-lead');
-        MW.grownups.p(el, 'This is the phase 3 trial. The full progress screen, showing which bonds are secure, comes with the finished game.', 'gu-note');
+        el.appendChild(grid);
+        const legend = MW.make('div', 'gu-legend');
+        legend.appendChild(cell('secure', 'Secure'));
+        legend.appendChild(cell('practising', 'Practising'));
+        legend.appendChild(cell('notyet', 'Not yet'));
+        el.appendChild(legend);
+        G.p(el, '<b>Secure</b> means right first time (no wrong check and no hint) on three different days. A wrong answer moves a bond back to practising, and its three days start again. Each round has 1 or 2 secure bonds and 3 or 4 that need work.', 'gu-note');
+        G.p(el, '<b>Zero bonds</b> (such as 0 + 7) join the rounds once the other bonds of that number are secure. They come up only when your child taps Scruffles to check (Settings), because the answer is an empty circle.', 'gu-note');
+
+        G.h3(el, 'Wholes in play');
+        const r2 = G.row(el);
+        const paintW = function () {
+          const on = MW.store.setting('wholes') || [];
+          Array.prototype.forEach.call(r2.children, function (b) { b.classList.toggle('is-on', on.indexOf(+b.textContent) >= 0); });
+        };
+        for (let w = 2; w <= 10; w++) {
+          G.btn(r2, String(w), function () {
+            let on = (MW.store.setting('wholes') || []).slice();
+            if (on.indexOf(w) >= 0) { if (on.length > 1) on = on.filter(function (x) { return x !== w; }); }
+            else on.push(w);
+            on.sort(function (a, b) { return a - b; });
+            MW.store.setting('wholes', on);
+            paintW();
+          }, 'mw-chip gu-chip');
+        }
+        paintW();
+        G.p(el, 'Questions use only the wholes switched on. Changes start with the next round.', 'gu-note');
+
         if (answers.length) {
+          G.h3(el, 'Recent answers');
           const rows = answers.slice(-25).reverse().map(function (a) {
             const d = new Date(a.t);
             const when = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -1986,7 +2307,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
           }).join('');
           el.appendChild(t);
         }
-        const row = MW.grownups.row(el);
+        const row = G.row(el);
         let armed = 0;
         MW.grownups.btn(row, 'Clear this tablet\'s progress', function (b) {
           if (Date.now() - armed < 4000) {
@@ -2009,39 +2330,22 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
         const r1 = G.row(el);
         const modes = [['tap', 'When your child taps Scruffles'], ['auto', 'As soon as the count is right']];
         const paint = function () {
-          Array.prototype.forEach.call(r1.children, function (b, i) { b.classList.toggle('is-on', modes[i][0] === check()); });
+          Array.prototype.forEach.call(r1.children, function (b, i) { b.classList.toggle('is-on', modes[i][0] === savedCheck()); });
         };
         modes.forEach(function (m) {
           G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); MW.store.setting('checkPicked', true); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice');
         });
         paint();
-        G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready.", and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
+        G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready." (so does any question whose answer is zero), and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
         G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No deciding when to stop, so it is easier but teaches less.', 'gu-note');
 
-        G.h3(el, 'Wholes in play');
-        const r2 = G.row(el);
-        const paintW = function () {
-          const on = MW.store.setting('wholes') || [];
-          Array.prototype.forEach.call(r2.children, function (b) { b.classList.toggle('is-on', on.indexOf(+b.textContent) >= 0); });
-        };
-        for (let w = 2; w <= 10; w++) {
-          G.btn(r2, String(w), function () {
-            let on = (MW.store.setting('wholes') || []).slice();
-            if (on.indexOf(w) >= 0) { if (on.length > 1) on = on.filter(function (x) { return x !== w; }); }
-            else on.push(w);
-            on.sort(function (a, b) { return a - b; });
-            MW.store.setting('wholes', on);
-            paintW();
-          }, 'mw-chip gu-chip');
-        }
-        paintW();
-        G.p(el, 'Questions use only the wholes switched on. Zero bonds (such as 7 + 0) aren\'t asked yet. Changes start with the next round.', 'gu-note');
+        G.p(el, 'A change starts with the next round. Zero bonds come up only in the first way. Which numbers are in play is on the Progress tab.', 'gu-note');
       }
     };
   }
 
   // ---------------------------------------------------------------- test hooks
-  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome;
+  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome; R.map = goMap; R.makeRound = makeRound;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

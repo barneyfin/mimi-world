@@ -23,8 +23,9 @@ sys.path.insert(0, str(ROOT / "tools"))
 from gen_tokens import COLOURS, OPACITY, RADIUS, SHADOWS, SIZES, SPACING, TYPE_STYLES  # noqa: E402
 import gen_scenes  # noqa: E402
 
-VERSION = "0.3.3"
-KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "shell.js", "grownups.js"]
+VERSION = "0.4.0"
+KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "map.js", "shell.js", "grownups.js"]
+GAME_JS = ["bonds.js", "rescue.js"]           # games/rescue/, in this order
 
 
 # ---------------------------------------------------------------- tokens -> CSS
@@ -55,7 +56,7 @@ def build_game(audio_manifest):
     script = json.loads((ROOT / "voice" / "script.json").read_text(encoding="utf-8"))
     page = (ROOT / "games" / "rescue" / "index.template.html").read_text(encoding="utf-8")
     js = "\n".join((KIT / f).read_text(encoding="utf-8") for f in KIT_JS)
-    js += "\n" + (ROOT / "games" / "rescue" / "rescue.js").read_text(encoding="utf-8")
+    js += "\n" + "\n".join((ROOT / "games" / "rescue" / f).read_text(encoding="utf-8") for f in GAME_JS)
     audio = {
         "voice": {k: {"dur": v["dur"]} for k, v in audio_manifest["voice"].items()},
         "effects": {k: {"dur": v["dur"]} for k, v in audio_manifest["effects"].items()},

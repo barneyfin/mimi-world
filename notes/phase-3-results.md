@@ -97,3 +97,9 @@ Barney chose round 3 of the mock-ups: the same colours and direction, drawn with
 - **Barney re-recorded 43 of the 44 lines** with more expression, and recorded the new one. All 45 clips are mono 44.1 kHz with peaks at −1 dB or below. Each re-recorded clip was matched by machine against its old recording (same words: 43 of 43), and the build levels them all to the same loudness. "Zero" at the end of a sentence (`num-end-0`) kept its old recording; the game doesn't use zero yet.
 - **Ship lights last twice as long:** about 4 seconds after a right answer and on the end screen (six 0.66 s cycles; the beacon four 1 s cycles). The rate is unchanged, so the flashing rule still holds. The lights switch off when the next question starts or Home is tapped.
 - Checks: `test_game.py` 104 of 104 (new: a new tablet starts in tap mode; the line on questions 1 and 2 but not 3; the steady cue; the one-off switch and a picked mode kept; the longer lights), `test_update.py` 7 of 7.
+
+## On the tablets (9 October, night)
+
+- **Fire:** 0.3.3 runs at 60 frames a second while dragging (slowest frame 17 ms).
+- **Doogee:** about five rounds of the older look played smoothly.
+- **Tap Scruffles:** the child understood "Tap Scruffles when you're ready." and knew what to do.
