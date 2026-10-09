@@ -21,3 +21,30 @@ Phase 4 turns the trial round into the full game, in two releases (plan signed o
 - **Review.** An independent review found that switching the answer check mid-round could leave a zero question with no way to answer it, and that a pause during "MeeMee Rescue!" could start a round unseen. Both are fixed and tested. When only one or two wholes are in play, rounds now share out the few bonds evenly.
 - **Checks:** `test_game.py` 175 of 175 (new: the map and its planets, the welcome once a visit, a double tap starting one round, a pause on the map, zero bonds answered with an empty circle, the secure rule across days, 2,000 rounds checked for the mix, the zero-bond rule in each mode, the grid at both screen sizes), `test_update.py` 7 of 7.
 - **To check on the tablets:** the map and a round on each; the progress grid after a few days of play (criterion 7).
+- **On the tablets:** Barney pushed 0.4.0 at about 22:20; the live site served it a few minutes later, and Barney reported that everything seemed fine.
+
+## 0.4.1 (9 October, night): the crew screen, job badges and job moments
+
+Built from round 4 of the design canvas, which Barney approved that evening.
+
+- **The crew screen.** Tapping Moggles, Snuffles and the ship on the map opens it: "Let's give the crew their jobs!" The four jobs wait in a row as pictures: a telescope (lookout), a spanner (engineer), a star map (navigator) and a frying pan (cook). The cats start on the deck under Scruffles's ship. Dragging a cat onto a job gives it that job: "Moggles… is the… lookout." Once both have jobs: "The crew are ready!", and the Home button pulses to lead back to the map.
+- **One job per cat.** Dropping a cat on the other cat's job swaps them, and both new jobs are said. Dropping a cat back up on the deck takes its job off. Tapping a cat says its job; Hear-again says both. Each tablet remembers the jobs.
+- **Job badges.** A cat with a job wears its picture as a badge on its chest: on the map, on the crew screen and on the end screen. Until both cats have jobs, they hop when the map opens, to say "tap us".
+- **Job moments** (no words, so a round sounds the same; never over the diagram or the asteroid):
+  - *Lookout:* as a round starts, peeks over the asteroid with the telescope, then ducks down once the MeeMee arrive.
+  - *Engineer:* on a right answer, comes to the ship's left fin and taps it twice with the spanner while the lights flash; gone as the lights stop.
+  - *Navigator:* as a star turns peach, holds up the star map with a dotted route to the next star.
+  - *Cook:* on the end screen, holds out a pan of fish beside the rescued MeeMee, who hop again.
+  A job no cat has has no moment. With reduce motion the cats fade in and out instead of moving.
+- **Art and colours.** The four job pictures, the badges and the held telescope moved from the mock-up into `design/gen_art.py`. Two colour tokens were added for the spanner: `steel` and `steel-dark`, which reuse Scruffles's light and dark greys, so the spanner no longer borrows a token named after his fur. The crew screen has its own sky and deck (`gen_scenes.crew_art`).
+- **Design system.** The Crew card now shows the four jobs, their badges and the rules, and the tokens include `steel` and `steel-dark`.
+- **Kit.** The dragger takes a grab radius, so a whole cat can be picked up (MeeMee keep 60 stage px). On the game screen the ship is now drawn before the asteroid (they don't overlap), so the lookout can stand between them.
+- **Review.** An independent review found nothing serious. It did find four smaller things, all now fixed and tested:
+  - On a very quick first answer, the engineer could appear on top of the lookout; the lookout now ducks down first.
+  - Pausing didn't let go of a cat being dragged on the crew screen.
+  - Crew lines could carry on over the map after Home.
+  - After a pause, the crew screen didn't say its opening line again.
+- **Size:** the page is about 300 KB (was 257 KB).
+- **Checks:** `test_game.py` 236 of 236 (new: the crew screen at both screen sizes, with drags, swaps, a pause mid-drag and the jobs remembered; each moment, where it sits and when it goes; no moments without jobs), `test_update.py` 7 of 7.
+- **To check on the tablets:** dragging the cats on the crew screen, on both tablets; whether each moment reads clearly in a real round, and whether any one gets in the way.
+

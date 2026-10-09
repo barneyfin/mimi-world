@@ -2,7 +2,7 @@
 
 Maths and phonics games for a five-year-old, set in space with the family's three cats: Scruffles (the hero), Moggles and Snuffles. The MeeMee are the lost kittens they rescue.
 
-- **MeeMee Rescue** (phase 4 in progress): number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. Grown-ups see which bonds are secure. The crew screen comes next (0.4.1).
+- **MeeMee Rescue** (phase 4 in progress): number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. On the crew screen the player gives Moggles and Snuffles their jobs (lookout, engineer, navigator, cook), and each job has a moment in a round. Grown-ups see which bonds are secure.
 - Tricky-words game: next.
 
 Live at https://barneyfin.github.io/mimi-world/ (the recording page is at /mimi-world/record/).
@@ -12,8 +12,8 @@ Live at https://barneyfin.github.io/mimi-world/ (the recording page is at /mimi-
 | Path | What it is |
 | --- | --- |
 | `docs/` | The website that GitHub Pages publishes. **Built by `tools/build.py`: don't edit it by hand.** |
-| `kit/` | The MeeMee World code kit: stage and scaling, sound, dragging, the part–whole diagram and other screen pieces, the shell (screens, full screen, buttons, grown-ups lock), the grown-ups area, the offline copy, styles and fonts (Andika, under the SIL Open Font Licence in `kit/Andika-OFL.txt`). |
-| `games/rescue/` | MeeMee Rescue: the page template, the bonds and how rounds are chosen (`bonds.js`), and the game itself (`rescue.js`). |
+| `kit/` | The MeeMee World code kit: stage and scaling, sound, dragging, the part–whole diagram and other screen pieces, the home map, the crew screen, the shell (screens, full screen, buttons, grown-ups lock), the grown-ups area, the offline copy, styles and fonts (Andika, under the SIL Open Font Licence in `kit/Andika-OFL.txt`). |
+| `games/rescue/` | MeeMee Rescue: the page template, the bonds and how rounds are chosen (`bonds.js`), the crew's job moments (`moments.js`), and the game itself (`rescue.js`). |
 | `design/` | The drawings and colours from the MeeMee World design system (`gen_art.py`, `gen_tokens.py`), and the scenes built from them (`gen_scenes.py`). |
 | `voice/` | Barney's recordings (WAV) and the script they follow. |
 | `music/` | "Paws in the Milky Way", Barney's track, as made. The build makes the looping web copy. |

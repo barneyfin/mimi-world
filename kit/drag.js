@@ -52,13 +52,14 @@
   };
 
   // ---------------------------------------------------------------- dragging
-  // MW.dragger(stageEl, { counters: () => [...], onPick(c), onDrop(c, x, y) })
+  // MW.dragger(stageEl, { counters: () => [...], onPick(c), onDrop(c, x, y), grab: radius in stage px (default 60) })
+  // Anything with x, y (its centre), draggable, el, lift(on) and moveTo(x, y, size, animate) can be dragged.
   MW.dragger = function (surface, opts) {
     let drag = null;
     const stats = MW.dragStats = MW.dragStats || { last: null };
 
     function nearest(p) {
-      let best = null, bestD = GRAB_R;
+      let best = null, bestD = opts.grab || GRAB_R;
       opts.counters().forEach(function (c) {
         if (!c.draggable) return;
         const d = Math.hypot(c.x - p.x, c.y - p.y);

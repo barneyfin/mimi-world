@@ -79,6 +79,8 @@ COLOURS = [
     ("planet-mint-4", "#4DAF9B", "Band 4 of mint planets."),
     ("planet-mint-dark", "{mint-deep}", "Band 5 of mint planets."),
     ("planet-mint-6", "#2F8475", "Band 6 (darkest) of mint planets."),
+    ("steel", "{scruffles-grey-light}", "The engineer's spanner (a crew job picture)."),
+    ("steel-dark", "{scruffles-grey-dark}", "The hole in the spanner's ring."),
     ("galaxy", "#B9A6F2", "Inner glow of lilac galaxies (32% opacity), and some coloured stars."),
     ("galaxy-peach", "#FFD3B5", "Inner glow and arms of peach galaxies, and some coloured stars."),
     ("galaxy-mint", "#B5EDE0", "Inner glow and arms of mint galaxies, and some coloured stars."),

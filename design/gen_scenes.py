@@ -4,8 +4,8 @@ Each function returns an SVG string. Colours are classes (f-*, s-*) bound to tok
 design system share one palette."""
 import math
 
-from gen_art import (ICONS, cross_star, galaxy, icon, mimi, moggles, nebula, planet, scruffles_pod, sky_art, snuffles, spark, starfield,
-                     tok, tray)
+from gen_art import (ICONS, JOBS, cross_star, galaxy, held_telescope, icon, job_badge, job_picture, mimi, moggles, nebula, planet,
+                     scruffles_pod, sky_art, snuffles, spark, starfield, tok, tray)
 
 
 def sky(uid="sky"):
@@ -52,7 +52,30 @@ def map_art(uid="map"):
         + planet(rx - 98, ry - 68, 14, "peach", f"{uid}-moon", bands=4, rim=False)
         + '<g opacity="0.45">' + "".join(planet(x, y, r, ramp, f"{uid}-l{i}", bands=6 if r > 40 else 5, craters=[(0.2, -0.3, 0.14)] if r > 40 else ())
                                          for i, (x, y, r, ramp) in enumerate(MAP["locked"])) + '</g>'
-        + tok(f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="@mint" opacity="0.12"/>')
+        + tok(f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="@mint" opacity="0.12"/>'
+              f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="none" stroke="@mint" stroke-width="3" stroke-dasharray="2 12" '
+              'stroke-linecap="round" opacity="0.7"/>')
+        + '</svg>'
+    )
+
+
+# The crew screen (phase 4, 0.4.1): where the cats wait before they have jobs. kit/crew.js puts the job stations,
+# the ship and the cats over it.
+CREW = {"deck": (300, 372), "spots": {"moggles": (220, 368), "snuffles": (380, 368)}}
+
+
+def crew_art(uid="crew"):
+    """The crew screen's own sky and the deck the cats wait on."""
+    dx, dy = CREW["deck"]
+    sky = (nebula() + starfield(33, 70, [(30, 410, 1230, 380), (500, 20, 280, 280)]) + galaxy(200, 140, -20, 0.7, "lilac", 7)
+           + galaxy(980, 300, 18, 0.55, "mint", 8) + cross_star(380, 240, 0.8) + spark(860, 110, 0.6))
+    spots = "".join(f'<ellipse cx="{x}" cy="{y}" rx="64" ry="11" fill="none" stroke="@mint" stroke-width="3" stroke-dasharray="2 10" '
+                    'stroke-linecap="round" opacity="0.7"/>' for x, y in CREW["spots"].values())
+    return (
+        '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true">'
+        + tok('<rect width="1280" height="800" fill="@night"/>') + sky
+        + tok(f'<ellipse cx="{dx}" cy="{dy}" rx="200" ry="22" fill="@night-raised"/>'
+              f'<ellipse cx="{dx}" cy="{dy}" rx="200" ry="22" fill="none" stroke="@night-button" stroke-width="3"/>' + spots)
         + '</svg>'
     )
 
@@ -77,7 +100,12 @@ def templates():
         "moggles": moggles(240),
         "snuffles": snuffles(240),
         "map": map_art(),
+        "crew": crew_art(),
+        "held-telescope": held_telescope(100),
     }
+    for job in JOBS:
+        art["job-" + job] = job_picture(job, 100)
+        art["badge-" + job] = job_badge(job, 56)
     for name in ICONS:
         art["icon-" + name] = icon(name, 48, 4.5, fill_play=(name == "play"))
     return "\n".join(f'<template id="art-{k}">{v}</template>' for k, v in art.items())

@@ -660,6 +660,90 @@ def snuffles(w=260, uid="snuffles"):
     return cat("snuffles", w, uid)
 
 
+
+# ---------------------------------------------------------------- crew jobs (phase 4, round 4 of the design canvas)
+# Four pictures in a 100 x 100 box centred on (50, 50): lookout, engineer, navigator, cook. A cat wears its job as a
+# badge (the picture in a moon disc with a mint rim) on its chest.
+
+def job_telescope(tripod=True):
+    """A brass-and-mint telescope on a little tripod, pointing up to the right."""
+    return (
+        ('<path d="M34 66 L22 90 M38 66 L40 92 M42 64 L58 88" stroke="@ink" stroke-width="4" stroke-linecap="round"/>' if tripod else '')
+        + '<g transform="rotate(-32 50 52)">'
+        '<rect x="14" y="44" width="22" height="16" rx="4" fill="@peach-dark" stroke="@ink" stroke-width="3.5"/>'
+        '<rect x="34" y="41" width="30" height="22" rx="4" fill="@mint-dark" stroke="@ink" stroke-width="3.5"/>'
+        '<rect x="62" y="37" width="26" height="30" rx="5" fill="@mint" stroke="@ink" stroke-width="3.5"/>'
+        '<rect x="44" y="41" width="6" height="22" fill="@peach"/>'
+        '<rect x="44" y="41" width="6" height="22" fill="none" stroke="@ink" stroke-width="2"/>'
+        '<ellipse cx="88" cy="52" rx="5" ry="15" fill="@glass" stroke="@ink" stroke-width="3.5"/>'
+        '<path d="M66 42 h16" stroke="@mint-light" stroke-width="3" stroke-linecap="round"/>'
+        '</g>'
+        + ('<circle cx="40" cy="64" r="4.5" fill="@ink"/>' if tripod else '')
+    )
+
+
+def job_spanner():
+    """An open-ended spanner, corner to corner, with a ring at the other end."""
+    return (
+        '<g transform="rotate(-45 50 50)">'
+        '<path d="M44 34 L56 34 L56 76 L44 76 Z" fill="@steel" stroke="@ink" stroke-width="3.5" stroke-linejoin="round"/>'
+        '<path d="M43 9 L43 25 L57 25 L57 9 A20 20 0 1 1 43 9 Z" fill="@steel" stroke="@ink" stroke-width="3.5" stroke-linejoin="round"/>'
+        '<circle cx="50" cy="84" r="10" fill="@steel" stroke="@ink" stroke-width="3.5"/>'
+        '<circle cx="50" cy="84" r="4" fill="@steel-dark" stroke="@ink" stroke-width="2"/>'
+        '<path d="M50 40 L50 70" stroke="@cat-white" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>'
+        '</g>'
+    )
+
+
+def job_star_map():
+    """A rolled star map: three stars joined by a dotted route."""
+    star5 = "M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z"
+    return (
+        '<path d="M18 26 L82 26 L82 78 L18 78 Z" fill="@moon" stroke="@ink" stroke-width="3.5" stroke-linejoin="round"/>'
+        '<path d="M12 22 C 12 16, 24 16, 24 22 L24 82 C 24 88, 12 88, 12 82 Z" fill="@moon-dim" stroke="@ink" stroke-width="3.5"/>'
+        '<path d="M76 18 C 76 12, 88 12, 88 18 L88 78 C 88 84, 76 84, 76 78 Z" fill="@moon-dim" stroke="@ink" stroke-width="3.5"/>'
+        '<path d="M34 64 C 42 52, 46 46, 52 44 C 58 42, 62 40, 66 36" fill="none" stroke="@mint-deep" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round"/>'
+        + "".join(f'<path transform="translate({x} {y}) scale({k})" d="{star5}" fill="@{c}" stroke="@ink" stroke-width="2"/>'
+                  for (x, y, k, c) in [(34, 64, 1.0, "peach"), (52, 44, 0.8, "spark"), (68, 34, 1.1, "peach")])
+    )
+
+
+def job_frying_pan():
+    """A frying pan with a fish in it (the crew are cats)."""
+    return (
+        '<path d="M62 62 L92 86" stroke="@ink" stroke-width="12" stroke-linecap="round"/>'
+        '<path d="M62 62 L92 86" stroke="@peach-dark" stroke-width="6" stroke-linecap="round"/>'
+        '<ellipse cx="42" cy="46" rx="34" ry="32" fill="@night-button" stroke="@ink" stroke-width="4"/>'
+        '<ellipse cx="42" cy="46" rx="26" ry="24" fill="@asteroid-crater"/>'
+        '<path d="M22 46 C 30 34, 46 34, 54 46 C 46 58, 30 58, 22 46 Z" fill="@peach" stroke="@ink" stroke-width="3" stroke-linejoin="round"/>'
+        '<path d="M54 46 L64 38 L64 54 Z" fill="@peach" stroke="@ink" stroke-width="3" stroke-linejoin="round"/>'
+        '<circle cx="30" cy="44" r="2.4" fill="@ink"/>'
+        '<path d="M38 40 C 40 44, 40 48, 38 52 M44 40 C 46 44, 46 48, 44 52" fill="none" stroke="@peach-dark" stroke-width="2" stroke-linecap="round"/>'
+        '<path d="M26 22 C 30 18, 36 16, 42 16" fill="none" stroke="@mint-light" stroke-width="3" stroke-linecap="round" opacity="0.5"/>'
+    )
+
+
+JOB_ART = {"lookout": job_telescope, "engineer": job_spanner, "navigator": job_star_map, "cook": job_frying_pan}
+JOBS = list(JOB_ART)
+
+
+def job_picture(job, size=100):
+    """A job's picture alone."""
+    return f'<svg width="{size}" height="{size}" viewBox="0 0 100 100" aria-hidden="true">' + tok(JOB_ART[job]()) + '</svg>'
+
+
+def job_badge(job, size=56):
+    """The badge a cat wears: the picture in a moon disc with a mint rim."""
+    return (f'<svg width="{size}" height="{size}" viewBox="-8 -8 116 116" aria-hidden="true">'
+            + tok('<circle cx="50" cy="50" r="54" fill="@moon" stroke="@mint" stroke-width="7"/>'
+                  '<circle cx="50" cy="50" r="58" fill="none" stroke="@ink" stroke-width="2.5"/>')
+            + '<g transform="translate(9 9) scale(0.82)">' + tok(JOB_ART[job]()) + '</g></svg>')
+
+
+def held_telescope(size=100):
+    """The telescope without its tripod, for a cat holding it to its eye."""
+    return f'<svg width="{size}" height="{size}" viewBox="0 0 100 100" aria-hidden="true">' + tok(job_telescope(False)) + '</svg>'
+
 # ---------------------------------------------------------------- icons (48 viewBox, stroke currentColor)
 
 ICONS = {

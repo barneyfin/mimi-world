@@ -84,6 +84,8 @@
   --planet-mint-4: #4DAF9B;
   --planet-mint-dark: #3E9C8A;
   --planet-mint-6: #2F8475;
+  --steel: #A9ABB8;
+  --steel-dark: #6F7182;
   --galaxy: #B9A6F2;
   --galaxy-peach: #FFD3B5;
   --galaxy-mint: #B5EDE0;
@@ -197,6 +199,8 @@
 .f-planet-mint-4{fill:var(--planet-mint-4)}.s-planet-mint-4{stroke:var(--planet-mint-4)}.bg-planet-mint-4{background:var(--planet-mint-4)}.c-planet-mint-4{color:var(--planet-mint-4)}
 .f-planet-mint-dark{fill:var(--planet-mint-dark)}.s-planet-mint-dark{stroke:var(--planet-mint-dark)}.bg-planet-mint-dark{background:var(--planet-mint-dark)}.c-planet-mint-dark{color:var(--planet-mint-dark)}
 .f-planet-mint-6{fill:var(--planet-mint-6)}.s-planet-mint-6{stroke:var(--planet-mint-6)}.bg-planet-mint-6{background:var(--planet-mint-6)}.c-planet-mint-6{color:var(--planet-mint-6)}
+.f-steel{fill:var(--steel)}.s-steel{stroke:var(--steel)}.bg-steel{background:var(--steel)}.c-steel{color:var(--steel)}
+.f-steel-dark{fill:var(--steel-dark)}.s-steel-dark{stroke:var(--steel-dark)}.bg-steel-dark{background:var(--steel-dark)}.c-steel-dark{color:var(--steel-dark)}
 .f-galaxy{fill:var(--galaxy)}.s-galaxy{stroke:var(--galaxy)}.bg-galaxy{background:var(--galaxy)}.c-galaxy{color:var(--galaxy)}
 .f-galaxy-peach{fill:var(--galaxy-peach)}.s-galaxy-peach{stroke:var(--galaxy-peach)}.bg-galaxy-peach{background:var(--galaxy-peach)}.c-galaxy-peach{color:var(--galaxy-peach)}
 .f-galaxy-mint{fill:var(--galaxy-mint)}.s-galaxy-mint{stroke:var(--galaxy-mint)}.bg-galaxy-mint{background:var(--galaxy-mint)}.c-galaxy-mint{color:var(--galaxy-mint)}
@@ -386,6 +390,45 @@ button { font-family: var(--font-andika); }
 .mw-cell svg { flex: none; }
 .gu-legend { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
 
+/* ---------------------------------------------------------------- the crew (phase 4, 0.4.1) */
+.mw-cat { position: relative; line-height: 0; }
+.mw-cat-body { position: relative; width: 100%; height: 100%; transform-origin: 50% 80%; }
+.mw-cat-body.is-hop { animation: mw-hop 420ms ease-out; }
+.mw-badge { position: absolute; }
+.mw-map-crew-btn { padding: 0; margin: 0; border: 0; background: transparent; border-radius: 120px; cursor: pointer; }
+.mw-map-crew-btn:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; }
+/* the crew screen */
+.mw-crew-cat { position: absolute; left: 0; top: 0; z-index: 3; cursor: grab; }
+.mw-crew-cat.is-moving { transition: transform 320ms cubic-bezier(.2,.8,.2,1); }
+.mw-crew-cat.is-lifted { z-index: 6; }
+.mw-crew-cat.is-lifted .mw-cat-body { transform: scale(1.06); filter: drop-shadow(0 18px 10px rgba(0, 0, 0, 0.45)); }
+.mw-station { box-sizing: border-box; border-radius: 28px; background: var(--night-raised); border: 3px solid var(--night-button); }
+.mw-station-disc { box-sizing: border-box; width: 124px; height: 124px; border-radius: var(--radius-round); background: var(--moon);
+  border: 4px dashed var(--mint); display: flex; align-items: center; justify-content: center; line-height: 0; }
+.mw-station.is-taken .mw-station-disc { border-style: solid; box-shadow: 0 0 0 10px rgba(127, 217, 196, 0.18); }
+.mw-station-spot { position: absolute; left: 0; top: 0; }
+.mw-spot-fill { opacity: 0.08; }
+.mw-spot-rim { opacity: 0.8; stroke-dasharray: 2 10; }
+.mw-station.is-taken .mw-spot-fill { opacity: 0.18; }
+.mw-station.is-taken .mw-spot-rim { stroke-dasharray: none; }
+/* the job moments: never over the diagram or the asteroid, nothing to tap */
+.mw-moments, .mw-moment { pointer-events: none; }
+.mw-moment { position: absolute; line-height: 0; }
+.mw-peek { overflow: hidden; }
+.mw-peek-inner { position: absolute; left: 0; top: 0; transform: translateY(190px); transition: transform 450ms cubic-bezier(.2,.8,.2,1); }
+.mw-peek.is-shown .mw-peek-inner { transform: translateY(0); }
+.mw-held-scope { position: absolute; transform: rotate(36deg); transform-origin: 43px 98px; }
+.mw-moment-pop { opacity: 0; transform: translateY(18px); transition: opacity 300ms ease-out, transform 300ms ease-out; }
+.mw-moment-pop.is-shown { opacity: 1; transform: none; }
+.mw-spanner { position: absolute; transform-origin: 22% 78%; transform: rotate(-8deg); }   /* held by the ring */
+.mw-spanner svg { transform: scaleX(-1); }                                                    /* jaw towards the ship */
+.mw-spanner.is-tapping { animation: mw-spanner-tap 800ms ease-in-out 2; }
+@keyframes mw-spanner-tap { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(12deg); } }
+.mw-star-map { position: absolute; transform: rotate(-8deg); }
+.mw-cook-pan { scale: 0; transition: scale 380ms cubic-bezier(.3,1.5,.5,1); }
+.mw-cook-pan.is-flipped svg { transform: scaleX(-1); }
+.mw-cook-pan.is-shown { scale: 1; }
+
 /* ---------------------------------------------------------------- turn me sideways */
 .mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
   align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
@@ -403,6 +446,14 @@ button { font-family: var(--font-andika); }
   .mw-btn--main:active, .mw-btn--play:active, .mw-btn--nav:active { transform: none; }
   .mw-pod.is-celebrating .mw-ship-light, .mw-pod.is-celebrating .mw-ship-beacon { animation: none; opacity: 1; }
   .mw-pod.is-celebrating .mw-ship-glow, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation: none; opacity: 0.3; }
+  .mw-cat-body.is-hop { animation: none; }
+  .mw-crew-cat.is-moving { transition: none; }
+  .mw-peek-inner { transform: none; opacity: 0; transition: opacity 300ms ease-out; }
+  .mw-peek.is-shown .mw-peek-inner { transform: none; opacity: 1; }
+  .mw-moment-pop { transform: none; }
+  .mw-spanner.is-tapping { animation: none; }
+  .mw-cook-pan { scale: 1; opacity: 0; transition: opacity 300ms ease-out; }
+  .mw-cook-pan.is-shown { opacity: 1; }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -413,6 +464,7 @@ button { font-family: var(--font-andika); }
   <div class="mw-layer" aria-hidden="true"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="831.4" cy="63.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="649.4" cy="35.5" r="0.7" opacity="0.4"/><circle class="f-moon" cx="163" cy="181.9" r="2" opacity="0.9"/><circle class="f-galaxy" cx="737.8" cy="318.6" r="2" opacity="0.95"/><circle class="f-moon" cx="691.6" cy="455.9" r="1" opacity="0.4"/><circle class="f-moon" cx="730.3" cy="154" r="1.1" opacity="0.5"/><circle class="f-moon" cx="790.9" cy="397.2" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1176.9" cy="290.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="109.8" cy="242.6" r="0.9" opacity="0.5"/><circle class="f-moon" cx="778.2" cy="63.7" r="0.8" opacity="0.5"/><circle class="f-galaxy" cx="1189.4" cy="338.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="732.6" cy="695.9" r="1" opacity="0.6"/><circle class="f-moon" cx="741.3" cy="365.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1048.2" cy="230.3" r="1" opacity="0.4"/><circle class="f-moon" cx="591.4" cy="138.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="170" cy="201.1" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1101.5" cy="225.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="1220.4" cy="124.9" r="0.8" opacity="0.4"/><circle class="f-moon" cx="339.2" cy="9.2" r="0.9" opacity="0.5"/><circle class="f-moon" cx="863.4" cy="48.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="84.9" cy="59.1" r="0.8" opacity="0.5"/><circle class="f-moon" cx="72.7" cy="6.2" r="0.8" opacity="0.5"/><circle class="f-moon" cx="38.3" cy="695" r="1.5" opacity="0.9"/><circle class="f-moon" cx="114.9" cy="86.5" r="0.8" opacity="0.6"/><circle class="f-galaxy-peach" cx="210.7" cy="24.2" r="1.9" opacity="0.95"/><circle class="f-moon" cx="967.3" cy="240.9" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="1078" cy="414.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="681.3" cy="619.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="944.2" cy="184.7" r="0.9" opacity="0.4"/><circle class="f-moon" cx="41.4" cy="226.2" r="1" opacity="0.7"/><circle class="f-galaxy-mint" cx="573.1" cy="744.4" r="1.7" opacity="0.95"/><circle class="f-moon" cx="1255.3" cy="486.9" r="1.2" opacity="0.5"/><circle class="f-moon" cx="158" cy="312.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1133.3" cy="347.9" r="1.5" opacity="0.9"/><circle class="f-galaxy" cx="113.7" cy="131.2" r="1.7" opacity="0.95"/><circle class="f-galaxy-peach" cx="172.1" cy="17.2" r="1.7" opacity="0.95"/><circle class="f-galaxy" cx="956.4" cy="115.7" r="2.2" opacity="0.95"/><circle class="f-moon" cx="749.6" cy="210.4" r="0.8" opacity="0.7"/><circle class="f-moon" cx="539.4" cy="729.2" r="1" opacity="0.5"/><circle class="f-moon" cx="29.7" cy="352.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="925.5" cy="444.5" r="1" opacity="0.5"/><circle class="f-moon" cx="1000.5" cy="89.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="985.2" cy="406.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="884.4" cy="362.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="1200.7" cy="210.6" r="1.2" opacity="0.6"/><circle class="f-moon" cx="179.9" cy="101.8" r="0.7" opacity="0.4"/><circle class="f-moon" cx="843.2" cy="118.7" r="2" opacity="0.9"/><circle class="f-moon" cx="284.4" cy="756.6" r="0.9" opacity="0.7"/><circle class="f-moon" cx="1061.5" cy="133.2" r="1" opacity="0.5"/><circle class="f-moon" cx="254.2" cy="257" r="1.4" opacity="0.9"/><circle class="f-moon" cx="708.5" cy="353.1" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="655.5" cy="56.7" r="2.3" opacity="0.95"/><circle class="f-moon" cx="138.9" cy="215.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1171.5" cy="455.6" r="1.5" opacity="0.9"/><circle class="f-galaxy-peach" cx="545.3" cy="63.1" r="1.7" opacity="0.95"/><circle class="f-galaxy-mint" cx="160.3" cy="15.1" r="2.2" opacity="0.95"/><circle class="f-moon" cx="674.1" cy="193.9" r="0.8" opacity="0.4"/><circle class="f-moon" cx="373.7" cy="400.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="323.6" cy="18.1" r="1.7" opacity="0.9"/><circle class="f-moon" cx="1191.1" cy="89.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="633.7" cy="663.7" r="1" opacity="0.6"/><circle class="f-moon" cx="1251.7" cy="276.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="812.4" cy="324.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="113.1" cy="668.9" r="1.8" opacity="0.9"/><circle class="f-moon" cx="377.6" cy="368" r="0.9" opacity="0.4"/><circle class="f-galaxy-mint" cx="699.7" cy="198.6" r="1.8" opacity="0.95"/><circle class="f-moon" cx="238" cy="270.2" r="0.8" opacity="0.6"/><circle class="f-moon" cx="121.2" cy="649.8" r="1" opacity="0.5"/><circle class="f-moon" cx="386" cy="502.2" r="1.2" opacity="0.6"/><circle class="f-moon" cx="202.9" cy="709.5" r="1.8" opacity="0.9"/><circle class="f-moon" cx="632.6" cy="229.9" r="1.5" opacity="0.9"/><circle class="f-galaxy-peach" cx="894.9" cy="404.4" r="2" opacity="0.95"/><circle class="f-moon" cx="1036.8" cy="18.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="821.2" cy="73.1" r="1" opacity="0.7"/><circle class="f-moon" cx="70.4" cy="20.8" r="0.8" opacity="0.4"/><circle class="f-galaxy-peach" cx="585.4" cy="61.2" r="1.7" opacity="0.95"/><circle class="f-moon" cx="606.9" cy="643.7" r="1.5" opacity="0.9"/><circle class="f-moon" cx="965.2" cy="187.8" r="1.7" opacity="0.9"/><circle class="f-galaxy-mint" cx="1078.1" cy="66.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="104.2" cy="122.2" r="1.1" opacity="0.5"/><circle class="f-moon" cx="725.9" cy="15.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="374.8" cy="413" r="0.9" opacity="0.4"/><circle class="f-galaxy-mint" cx="1139.2" cy="163" r="1.6" opacity="0.95"/><circle class="f-moon" cx="1233.6" cy="360.2" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1214.1" cy="110.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="299.4" cy="713.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1071.4" cy="7.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="158.2" cy="736" r="1.9" opacity="0.9"/><circle class="f-moon" cx="504.2" cy="793" r="0.9" opacity="0.5"/><circle class="f-moon" cx="354.9" cy="44" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1192.3" cy="202.5" r="1" opacity="0.4"/><circle class="f-moon" cx="479.4" cy="759.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1198.8" cy="438.8" r="1.4" opacity="0.9"/><circle class="f-moon" cx="934.6" cy="361.3" r="1.8" opacity="0.9"/><circle class="f-galaxy" cx="368.9" cy="44.6" r="1.7" opacity="0.95"/><circle class="f-moon" cx="532.1" cy="228" r="1.1" opacity="0.6"/><circle class="f-moon" cx="521.1" cy="194.1" r="1" opacity="0.4"/><circle class="f-moon" cx="821.6" cy="65.2" r="1.1" opacity="0.5"/><circle class="f-moon" cx="580.4" cy="268.3" r="1.7" opacity="0.9"/><circle class="f-moon" cx="700.6" cy="198.3" r="1" opacity="0.5"/><circle class="f-moon" cx="262.3" cy="21.8" r="1.6" opacity="0.9"/><circle class="f-moon" cx="951.7" cy="171.5" r="1.1" opacity="0.5"/><circle class="f-moon" cx="734.2" cy="289.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="123.4" cy="712.7" r="1" opacity="0.5"/><circle class="f-moon" cx="1233.5" cy="106.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1233.8" cy="392" r="1.2" opacity="0.7"/><circle class="f-moon" cx="1238.4" cy="91.8" r="1.8" opacity="0.9"/><circle class="f-moon" cx="113.8" cy="618.2" r="0.8" opacity="0.5"/><circle class="f-galaxy-peach" cx="53.7" cy="569.4" r="1.8" opacity="0.95"/><circle class="f-moon" cx="148.2" cy="61.4" r="1" opacity="0.5"/><circle class="f-moon" cx="19.3" cy="243.6" r="1.2" opacity="0.6"/><circle class="f-moon" cx="1126.6" cy="380.5" r="0.8" opacity="0.7"/><circle class="f-moon" cx="899.5" cy="248.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="538.6" cy="208.7" r="2" opacity="0.9"/><circle class="f-moon" cx="293.6" cy="32.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="943.2" cy="403.8" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1045.8" cy="187.9" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1213" cy="396.7" r="0.8" opacity="0.5"/><circle class="f-moon" cx="191.6" cy="316" r="1.2" opacity="0.4"/><circle class="f-moon" cx="71.7" cy="53.4" r="1.1" opacity="0.7"/><g transform="translate(640 160) rotate(-18) scale(0.85)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.8" cy="2.3" r="1.1" opacity="0.8"/><circle class="f-moon" cx="16.4" cy="3.5" r="0.8" opacity="0.9"/><circle class="f-moon" cx="13.8" cy="6.3" r="1.6" opacity="0.7"/><circle class="f-moon" cx="12.3" cy="9.2" r="1.3" opacity="0.6"/><circle class="f-moon" cx="5" cy="12.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-3.6" cy="12" r="1.4" opacity="0.8"/><circle class="f-moon" cx="-15.6" cy="12.4" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-25.4" cy="13.5" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-38" cy="11.4" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="-14.1" cy="-4.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-14.7" cy="-7" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-10.6" cy="-8.5" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-3.1" cy="-10.4" r="1.3" opacity="0.6"/><circle class="f-moon" cx="5.7" cy="-11.9" r="1.5" opacity="0.8"/><circle class="f-moon" cx="15.7" cy="-14" r="1.5" opacity="0.8"/><circle class="f-moon" cx="25.4" cy="-13.6" r="1.5" opacity="0.9"/><circle class="f-moon" cx="35.9" cy="-10.2" r="1.1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(915 48) rotate(26) scale(0.6)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="15.3" cy="2.7" r="1.4" opacity="0.9"/><circle class="f-moon" cx="16.9" cy="5.2" r="0.8" opacity="0.7"/><circle class="f-moon" cx="16.5" cy="7.1" r="1.5" opacity="0.6"/><circle class="f-moon" cx="10.8" cy="8.8" r="1.2" opacity="0.8"/><circle class="f-moon" cx="2.5" cy="10.8" r="1" opacity="0.9"/><circle class="f-moon" cx="-3.2" cy="12.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="12.6" r="0.8" opacity="0.9"/><circle class="f-moon" cx="-27.4" cy="12.1" r="1.6" opacity="0.9"/><circle class="f-moon" cx="-38.4" cy="11.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-16" cy="-1.3" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-14.3" cy="-4.8" r="1.1" opacity="0.6"/><circle class="f-moon" cx="-16.1" cy="-7.7" r="1" opacity="0.8"/><circle class="f-moon" cx="-12.9" cy="-8.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="-3.2" cy="-11.4" r="1.1" opacity="0.7"/><circle class="f-moon" cx="5.1" cy="-13.8" r="1.6" opacity="0.5"/><circle class="f-moon" cx="15.8" cy="-12.7" r="0.8" opacity="0.9"/><circle class="f-moon" cx="25.7" cy="-12.6" r="0.8" opacity="0.5"/><circle class="f-moon" cx="36.3" cy="-9.8" r="1" opacity="0.8"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(64 300) rotate(-40) scale(0.62)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(216 330) scale(0.9)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(742 196) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(1238 470) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(560 92) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(30 640) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(705 760) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><line class="s-moon" x1="250" y1="104" x2="180.7" y2="64" stroke-width="2" stroke-linecap="round" opacity="0.5"/><line class="s-highlight" x1="250" y1="104" x2="222.3" y2="88" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/><circle class="f-highlight" cx="250" cy="104" r="2.6"/><clipPath id="sky-a"><circle cx="60" cy="830" r="175"/></clipPath><g clip-path="url(#sky-a)"><g transform="rotate(-45 60 830)"><rect class="f-planet-indigo-6" x="-115" y="655" width="350" height="350"/><rect class="f-planet-indigo-dark" x="-115" y="655" width="350" height="301"/><rect class="f-planet-indigo-4" x="-115" y="655" width="350" height="252"/><rect class="f-planet-indigo" x="-115" y="655" width="350" height="192.5"/><rect class="f-planet-indigo-2" x="-115" y="655" width="350" height="126"/><rect class="f-planet-indigo-light" x="-115" y="655" width="350" height="63"/></g><ellipse class="f-shadow" cx="103.8" cy="721.5" rx="19.2" ry="15" opacity="0.16"/><ellipse class="f-highlight" cx="100.3" cy="718" rx="13.9" ry="9.6" opacity="0.07"/><ellipse class="f-shadow" cx="156.2" cy="768.8" rx="12.3" ry="9.6" opacity="0.16"/><ellipse class="f-highlight" cx="154" cy="766.5" rx="8.8" ry="6.1" opacity="0.07"/><ellipse class="f-shadow" cx="68.8" cy="681.2" rx="10.5" ry="8.2" opacity="0.16"/><ellipse class="f-highlight" cx="66.9" cy="679.4" rx="7.6" ry="5.2" opacity="0.07"/><ellipse class="f-shadow" cx="168.5" cy="711" rx="8.8" ry="6.8" opacity="0.16"/><ellipse class="f-highlight" cx="166.9" cy="709.4" rx="6.3" ry="4.4" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="60" cy="830" r="177.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="sky-m"><circle cx="44" cy="548" r="13"/></clipPath><g clip-path="url(#sky-m)"><g transform="rotate(-45 44 548)"><rect class="f-planet-mint-4" x="31" y="535" width="26" height="26"/><rect class="f-planet-mint" x="31" y="535" width="26" height="14.3"/><rect class="f-planet-mint-2" x="31" y="535" width="26" height="9.4"/><rect class="f-planet-mint-light" x="31" y="535" width="26" height="4.7"/></g><ellipse class="f-shadow" cx="46.6" cy="546.7" rx="3.2" ry="2.5" opacity="0.16"/><ellipse class="f-highlight" cx="46" cy="546.1" rx="2.3" ry="1.6" opacity="0.07"/></g><g transform="rotate(-14 150 215)"><path class="s-mint-deep" d="M94 215 A56 12.2 0 0 1 206 215" fill="none" stroke-width="5.1" stroke-linecap="round"/><path class="s-mint-deeper" d="M101.8 215 A48.2 10.5 0 0 1 198.2 215" fill="none" stroke-width="1.6" stroke-linecap="round"/></g><clipPath id="sky-b"><circle cx="150" cy="215" r="32"/></clipPath><g clip-path="url(#sky-b)"><g transform="rotate(-45 150 215)"><rect class="f-planet-peach-dark" x="118" y="183" width="64" height="64"/><rect class="f-planet-peach-4" x="118" y="183" width="64" height="46.1"/><rect class="f-planet-peach" x="118" y="183" width="64" height="35.2"/><rect class="f-planet-peach-2" x="118" y="183" width="64" height="23"/><rect class="f-planet-peach-light" x="118" y="183" width="64" height="11.5"/></g></g><circle class="s-planet-peach-light" cx="150" cy="215" r="34.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#sky-b)"><g transform="rotate(-14 150 215)"><path class="s-shadow" d="M96.8 216.6 A53.2 10.9 0 0 0 203.2 216.6" fill="none" stroke-width="3.8" opacity="0.18"/></g></g><g transform="rotate(-14 150 215)"><path class="s-mint" d="M94 215 A56 12.2 0 0 0 206 215" fill="none" stroke-width="5.1" stroke-linecap="round"/><path class="s-mint-light" d="M89.5 215 A60.5 13.1 0 0 0 210.5 215" fill="none" stroke-width="1.9" stroke-linecap="round"/><path class="s-mint-deep" d="M101.8 215 A48.2 10.5 0 0 0 198.2 215" fill="none" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/></g><clipPath id="sky-c"><circle cx="790" cy="250" r="18"/></clipPath><g clip-path="url(#sky-c)"><g transform="rotate(-45 790 250)"><rect class="f-planet-mint-4" x="772" y="232" width="36" height="36"/><rect class="f-planet-mint" x="772" y="232" width="36" height="19.8"/><rect class="f-planet-mint-2" x="772" y="232" width="36" height="13"/><rect class="f-planet-mint-light" x="772" y="232" width="36" height="6.5"/></g><ellipse class="f-shadow" cx="786.4" cy="254.5" rx="4" ry="3.1" opacity="0.16"/><ellipse class="f-highlight" cx="785.7" cy="253.8" rx="2.9" ry="2" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="790" cy="250" r="20.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="sky-d"><circle cx="822" cy="232" r="4.5"/></clipPath><g clip-path="url(#sky-d)"><g transform="rotate(-45 822 232)"><rect class="f-planet-indigo" x="817.5" y="227.5" width="9" height="9"/><rect class="f-planet-indigo-2" x="817.5" y="227.5" width="9" height="6.1"/><rect class="f-planet-indigo-light" x="817.5" y="227.5" width="9" height="2.7"/></g></g></svg></div>
   <section class="mw-screen" id="screen-start" aria-label="MeeMee World: start"></section>
   <section class="mw-screen" id="screen-map" aria-label="MeeMee World"></section>
+  <section class="mw-screen" id="screen-crew" aria-label="The crew's jobs"></section>
   <section class="mw-screen" id="screen-game" aria-label="MeeMee Rescue"></section>
   <section class="mw-screen" id="screen-end" aria-label="All the MeeMee rescued"></section>
 </div>
@@ -433,7 +485,17 @@ button { font-family: var(--font-andika); }
 <template id="art-spark"><svg viewBox="-14 -14 28 28" aria-hidden="true"><path class="f-spark" transform="translate(0 0) scale(1.0)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/></svg></template>
 <template id="art-moggles"><svg width="240" height="313.8" viewBox="0 0 260 340" aria-hidden="true"><ellipse class="f-mint" cx="130" cy="332" rx="92" ry="8" opacity="0.16"/><path class="s-moggles-rim" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="30" stroke-linecap="round"/><path class="s-moggles-black" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="20" stroke-linecap="round"/><path class="s-fur-shade" d="M226 300 C 238 286, 240 266, 232 250 M214 312 C 228 306, 236 296, 240 284" fill="none" stroke-width="3" stroke-linecap="round"/><clipPath id="moggles-body"><path d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/></clipPath><path class="f-moggles-black" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/><g clip-path="url(#moggles-body)"><path class="s-fur-shade" d="M116 228 C 118 236, 122 242, 127 246 M144 228 C 142 236, 138 242, 133 246 M130 234 L130 252 M108 244 C 110 252, 114 258, 118 262 M152 244 C 150 252, 146 258, 142 262" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-fur-shade" d="M96 260 C 98 280, 102 300, 108 316 M164 260 C 162 280, 158 300, 152 316" fill="none" stroke-width="4" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><ellipse class="f-moggles-black s-moggles-rim" cx="110" cy="324" rx="20" ry="10" stroke-width="5"/><ellipse class="f-moggles-black s-moggles-rim" cx="150" cy="324" rx="20" ry="10" stroke-width="5"/><path class="s-fur-shade" d="M104 320 v6 M111 319 v7 M144 320 v6 M151 319 v7" stroke-width="2.4" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M182 98 L188 38 L142 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-moggles-ear" d="M176 88 L180 54 L154 74 Z"/><path class="s-ear-tuft" d="M174 86 L168 74 M170 88 L162 78" stroke-width="2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M78 98 L72 38 L118 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-moggles-ear" d="M84 88 L80 54 L106 74 Z"/><path class="s-ear-tuft" d="M86 86 L92 74 M90 88 L98 78" stroke-width="2" stroke-linecap="round"/><clipPath id="moggles-head"><path d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/></clipPath><path class="f-moggles-black" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/><g clip-path="url(#moggles-head)"><path class="s-fur-shade" d="M96 84 C 110 72, 150 72, 164 84" fill="none" stroke-width="5" stroke-linecap="round"/><path class="s-fur-shade" d="M118 70 L120 84 M130 68 L130 84 M142 70 L140 84" stroke-width="3" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><path class="f-peach s-ink" d="M82 182 C 106 198, 154 198, 178 182 L 182 202 C 156 220, 104 220, 78 202 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-peach-shade" d="M96 196 L102 206 M116 200 L120 212 M140 200 L138 212 M160 196 L154 206" stroke-width="3" stroke-linecap="round"/><path class="f-peach s-ink" d="M150 206 L 168 250 L 156 246 L 150 256 L 142 240 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-peach-shade" d="M150 222 L158 240" stroke-width="3" stroke-linecap="round"/><circle class="f-peach-shade s-ink" cx="148" cy="206" r="7" stroke-width="3"/><ellipse class="f-moggles-eye" cx="104" cy="118" rx="15" ry="13.5"/><ellipse class="s-moggles-eye-dark" cx="104" cy="119" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="104" cy="119" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="99" cy="112" r="3.6"/><circle class="f-highlight" cx="108" cy="124" r="1.6"/><path class="s-moggles-rim" d="M88 113 C 94 103, 114 103, 120 113" fill="none" stroke-width="3" stroke-linecap="round"/><ellipse class="f-moggles-eye" cx="156" cy="118" rx="15" ry="13.5"/><ellipse class="s-moggles-eye-dark" cx="156" cy="119" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="156" cy="119" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="151" cy="112" r="3.6"/><circle class="f-highlight" cx="160" cy="124" r="1.6"/><path class="s-moggles-rim" d="M140 113 C 146 103, 166 103, 172 113" fill="none" stroke-width="3" stroke-linecap="round"/><path class="f-nose-dark s-moggles-rim" d="M123 141 L137 141 L130 149 Z" stroke-width="2" stroke-linejoin="round"/><path class="s-moggles-rim" d="M120 156 C 124 162, 130 160, 130 151 C 130 160, 136 162, 140 156" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-text-3" d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></template>
 <template id="art-snuffles"><svg width="240" height="313.8" viewBox="0 0 260 340" aria-hidden="true"><ellipse class="f-mint" cx="130" cy="332" rx="92" ry="8" opacity="0.16"/><path class="s-moggles-rim" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="30" stroke-linecap="round"/><path class="s-moggles-black" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="20" stroke-linecap="round"/><path class="s-fur-shade" d="M226 300 C 238 286, 240 266, 232 250 M214 312 C 228 306, 236 296, 240 284" fill="none" stroke-width="3" stroke-linecap="round"/><clipPath id="snuffles-body"><path d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/></clipPath><path class="f-moggles-black" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/><g clip-path="url(#snuffles-body)"><path class="f-cat-white" d="M100 202 C 116 214, 144 214, 160 202 C 172 248, 160 298, 130 312 C 100 298, 88 248, 100 202 Z"/><path class="f-white-shade" d="M108 270 C 116 290, 144 290, 152 270 C 150 292, 142 304, 130 310 C 118 304, 110 292, 108 270 Z"/><path class="s-white-shade" d="M118 222 C 120 230, 124 234, 128 238 M142 222 C 140 230, 136 234, 132 238 M130 226 L130 242" fill="none" stroke-width="2.6" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><rect class="f-cat-white" x="104" y="262" width="26" height="60" rx="12"/><rect class="f-moggles-black" x="104" y="284" width="26" height="22"/><rect class="s-ink" x="104" y="262" width="26" height="60" rx="12" fill="none" stroke-width="4"/><rect class="f-cat-white s-ink" x="132" y="262" width="26" height="60" rx="12" stroke-width="4"/><ellipse class="f-cat-white s-ink" cx="117" cy="324" rx="17" ry="9" stroke-width="4"/><ellipse class="f-cat-white s-ink" cx="145" cy="324" rx="17" ry="9" stroke-width="4"/><path class="s-white-shade" d="M112 320 v6 M118 320 v6 M140 320 v6 M146 320 v6" stroke-width="2.2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M182 98 L188 38 L142 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-snuffles-ear" d="M176 88 L180 54 L154 74 Z"/><path class="s-ear-tuft" d="M174 86 L168 74 M170 88 L162 78" stroke-width="2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M78 98 L72 38 L118 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-snuffles-ear" d="M84 88 L80 54 L106 74 Z"/><path class="s-ear-tuft" d="M86 86 L92 74 M90 88 L98 78" stroke-width="2" stroke-linecap="round"/><clipPath id="snuffles-head"><path d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/></clipPath><path class="f-moggles-black" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/><g clip-path="url(#snuffles-head)"><path class="s-fur-shade" d="M96 84 C 110 72, 150 72, 164 84" fill="none" stroke-width="5" stroke-linecap="round"/><path class="s-fur-shade" d="M118 70 L120 84 M130 68 L130 84 M142 70 L140 84" stroke-width="3" stroke-linecap="round"/><path class="f-cat-white" d="M130 76 C 134 96, 138 110, 142 118 C 154 128, 172 136, 170 154 C 166 172, 146 178, 130 178 C 114 178, 94 172, 90 154 C 88 136, 106 128, 118 118 C 122 110, 126 96, 130 76 Z"/><ellipse class="f-white-shade" cx="130" cy="180" rx="36" ry="12"/></g><path class="s-moggles-rim" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><path class="f-mint s-ink" d="M86 184 C 108 198, 152 198, 174 184 L 177 200 C 152 216, 108 216, 83 200 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mint-deep" d="M92 192 C 112 204, 148 204, 168 192" fill="none" stroke-width="2.4"/><circle class="f-peach s-ink" cx="130" cy="214" r="10" stroke-width="3"/><path class="f-spark" d="M130 208 L132 212 L136 212.5 L133 215 L134 219 L130 217 L126 219 L127 215 L124 212.5 L128 212 Z"/><ellipse class="f-snuffles-eye" cx="106" cy="114" rx="15" ry="13.5"/><ellipse class="s-snuffles-eye-dark" cx="106" cy="115" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="106" cy="115" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="101" cy="108" r="3.6"/><circle class="f-highlight" cx="110" cy="120" r="1.6"/><path class="s-moggles-rim" d="M90 109 C 96 99, 116 99, 122 109" fill="none" stroke-width="3" stroke-linecap="round"/><ellipse class="f-snuffles-eye" cx="154" cy="114" rx="15" ry="13.5"/><ellipse class="s-snuffles-eye-dark" cx="154" cy="115" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="154" cy="115" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="149" cy="108" r="3.6"/><circle class="f-highlight" cx="158" cy="120" r="1.6"/><path class="s-moggles-rim" d="M138 109 C 144 99, 164 99, 170 109" fill="none" stroke-width="3" stroke-linecap="round"/><path class="f-nose-pink s-ink" d="M123 139 L137 139 L130 147 Z" stroke-width="2" stroke-linejoin="round"/><path class="s-ink" d="M120 154 C 124 160, 130 158, 130 149 C 130 158, 136 160, 140 154" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-text-3" d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></template>
-<template id="art-map"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="10" cy="298.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="59.7" cy="792.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="786.9" cy="32.8" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1213.1" cy="296.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1182.6" cy="363.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="243" cy="35.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1234.4" cy="710.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="161.3" cy="381.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1176.6" cy="705.4" r="0.9" opacity="0.5"/><circle class="f-moon" cx="495.2" cy="789.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="916.5" cy="788.3" r="0.9" opacity="0.5"/><circle class="f-moon" cx="795.5" cy="148.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="394.8" cy="87.4" r="1.1" opacity="0.6"/><circle class="f-galaxy-mint" cx="863" cy="714.2" r="2.2" opacity="0.95"/><circle class="f-moon" cx="24.1" cy="279.1" r="1" opacity="0.7"/><circle class="f-moon" cx="946.1" cy="51.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="50.1" cy="201.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="191.3" cy="125.1" r="1.4" opacity="0.9"/><circle class="f-galaxy-mint" cx="1161.7" cy="383.5" r="2.2" opacity="0.95"/><circle class="f-moon" cx="1123.7" cy="479.9" r="1" opacity="0.6"/><circle class="f-galaxy" cx="19" cy="546" r="1.8" opacity="0.95"/><circle class="f-moon" cx="1217.8" cy="337.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1035.8" cy="115.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="97.2" cy="99.8" r="0.9" opacity="0.7"/><circle class="f-moon" cx="793.7" cy="149.1" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="951.4" cy="50.7" r="1.9" opacity="0.95"/><circle class="f-moon" cx="86.5" cy="608" r="1.1" opacity="0.4"/><circle class="f-moon" cx="59.1" cy="312.4" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1208.3" cy="83.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="937.4" cy="768.1" r="1" opacity="0.5"/><circle class="f-moon" cx="716.9" cy="56.2" r="2" opacity="0.9"/><circle class="f-moon" cx="1265.4" cy="90.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="793.9" cy="21.6" r="1.7" opacity="0.9"/><circle class="f-moon" cx="67.9" cy="347.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1227.2" cy="73.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="1135.1" cy="620.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="317" cy="728.3" r="1" opacity="0.6"/><circle class="f-moon" cx="1228" cy="785.5" r="0.9" opacity="0.5"/><circle class="f-moon" cx="502.1" cy="120.6" r="0.7" opacity="0.5"/><circle class="f-moon" cx="1202.4" cy="591" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1212.2" cy="259.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="486.6" cy="747.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="361.8" cy="143.4" r="0.8" opacity="0.4"/><circle class="f-moon" cx="1224.3" cy="33.1" r="2" opacity="0.9"/><circle class="f-moon" cx="899.4" cy="21" r="0.7" opacity="0.6"/><circle class="f-moon" cx="15.6" cy="435" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1140.2" cy="297.6" r="1.1" opacity="0.6"/><circle class="f-moon" cx="677.3" cy="44.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1075.6" cy="735" r="1.4" opacity="0.9"/><circle class="f-moon" cx="744.1" cy="69.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="81.6" cy="648.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="96" cy="59.3" r="1" opacity="0.4"/><circle class="f-moon" cx="348.2" cy="52.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="834.2" cy="130.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="105.3" cy="657.9" r="0.7" opacity="0.5"/><circle class="f-moon" cx="632.2" cy="133.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1155.3" cy="541.4" r="1.1" opacity="0.7"/><circle class="f-galaxy-mint" cx="682.2" cy="721.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="471.3" cy="725.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="237.2" cy="773.9" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1217" cy="723.2" r="1" opacity="0.5"/><circle class="f-galaxy-peach" cx="732.4" cy="789.4" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1254.1" cy="589.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1263" cy="239.3" r="1" opacity="0.6"/><circle class="f-moon" cx="57.4" cy="682.7" r="1.1" opacity="0.5"/><circle class="f-moon" cx="207" cy="118.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="40.3" cy="728.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="917.2" cy="61.7" r="0.8" opacity="0.6"/><circle class="f-moon" cx="164.4" cy="710.8" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="170.7" cy="598.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="251" cy="117.1" r="1" opacity="0.5"/><circle class="f-moon" cx="162.3" cy="699.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="1226.1" cy="300.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="31.2" cy="512.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="745.3" cy="74.4" r="0.8" opacity="0.6"/><circle class="f-moon" cx="279.1" cy="43.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="147.7" cy="427.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="689.1" cy="73" r="1" opacity="0.4"/><circle class="f-moon" cx="847.3" cy="13.1" r="0.9" opacity="0.7"/><circle class="f-moon" cx="49.5" cy="398.8" r="1.9" opacity="0.9"/><circle class="f-galaxy" cx="741" cy="149.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1168" cy="236.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1046.5" cy="114.7" r="1.6" opacity="0.9"/><circle class="f-moon" cx="864.7" cy="720.4" r="1.1" opacity="0.6"/><circle class="f-galaxy" cx="656.1" cy="89.8" r="2" opacity="0.95"/><circle class="f-moon" cx="1164.1" cy="341.3" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1079" cy="120.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="862.9" cy="765.9" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1269.9" cy="264.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="1111.9" cy="710.1" r="2" opacity="0.9"/><circle class="f-moon" cx="657.6" cy="769.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="170.2" cy="310.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="67.5" cy="507.7" r="1" opacity="0.5"/><circle class="f-moon" cx="929.8" cy="97.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1247.9" cy="208.6" r="1.6" opacity="0.9"/><circle class="f-galaxy-mint" cx="177.3" cy="277.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="210.2" cy="78.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1233.9" cy="40.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="645.9" cy="39.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="300" cy="107" r="1.1" opacity="0.6"/><circle class="f-moon" cx="257.8" cy="143" r="1.6" opacity="0.9"/><circle class="f-moon" cx="381.8" cy="737.1" r="0.8" opacity="0.4"/><circle class="f-moon" cx="246.1" cy="759.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1189.8" cy="150.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="69.6" cy="306" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1152.9" cy="741.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="787.5" cy="13" r="2" opacity="0.9"/><circle class="f-moon" cx="8.4" cy="705.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1222.5" cy="76.9" r="1.2" opacity="0.7"/><circle class="f-moon" cx="816.7" cy="772.1" r="1.2" opacity="0.4"/><g transform="translate(1130 90) rotate(20) scale(0.8)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="1.4" r="1.1" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="4.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="15.8" cy="6.3" r="1.2" opacity="0.6"/><circle class="f-moon" cx="9.6" cy="8.5" r="1" opacity="0.9"/><circle class="f-moon" cx="5.8" cy="12" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-5" cy="13.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="12.6" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.2" cy="12.1" r="1.2" opacity="0.5"/><circle class="f-moon" cx="-35.8" cy="11.5" r="1.2" opacity="0.6"/><circle class="f-moon" cx="-13.2" cy="-2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="-15.9" cy="-4.5" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-16.1" cy="-7.2" r="1.5" opacity="0.5"/><circle class="f-moon" cx="-12.7" cy="-9" r="1" opacity="0.7"/><circle class="f-moon" cx="-4.6" cy="-11.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="3.9" cy="-13.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="-12.9" r="1.1" opacity="0.8"/><circle class="f-moon" cx="27.9" cy="-13.5" r="0.8" opacity="0.6"/><circle class="f-moon" cx="38.6" cy="-10.5" r="1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(140 120) rotate(-24) scale(0.62)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="16" cy="2.8" r="1.2" opacity="0.6"/><circle class="f-moon" cx="13.9" cy="4.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="14.2" cy="7.4" r="1" opacity="0.9"/><circle class="f-moon" cx="11.8" cy="9.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="3.3" cy="11.5" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-3.1" cy="13.2" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-16.4" cy="14" r="1.4" opacity="0.7"/><circle class="f-moon" cx="-27.9" cy="12.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-35.8" cy="10.9" r="1" opacity="0.8"/><circle class="f-moon" cx="-15.4" cy="-1.3" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-15.3" cy="-4" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="-7.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-10.6" cy="-10.1" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-6" cy="-11.1" r="1" opacity="0.6"/><circle class="f-moon" cx="4.2" cy="-13.6" r="1" opacity="0.9"/><circle class="f-moon" cx="15.6" cy="-14.4" r="1.4" opacity="0.5"/><circle class="f-moon" cx="25.6" cy="-11.9" r="1.3" opacity="0.6"/><circle class="f-moon" cx="37.1" cy="-11" r="0.9" opacity="0.9"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(150 700) rotate(-30) scale(0.7)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(860 90) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(470 700) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(1230 420) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(70 330) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="s-night-button" cx="640" cy="430" rx="200" ry="80" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="330" ry="135" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="600" ry="250" fill="none" stroke-width="3" stroke-dasharray="6 10"/><circle class="f-planet-indigo-light" cx="1117" cy="434" r="3"/><circle class="f-asteroid" cx="1102" cy="450" r="5"/><circle class="f-planet-indigo-light" cx="1091" cy="479" r="7"/><circle class="f-asteroid" cx="1086" cy="494" r="4"/><circle class="f-planet-indigo-light" cx="1051" cy="522" r="6"/><circle class="f-asteroid" cx="1022" cy="535" r="3"/><circle class="f-planet-indigo-light" cx="999" cy="560" r="5"/><circle class="f-asteroid" cx="947" cy="569" r="7"/><circle class="f-planet-indigo-light" cx="902" cy="590" r="4"/><circle class="f-asteroid" cx="865" cy="595" r="6"/><circle class="f-planet-indigo-light" cx="802" cy="612" r="3"/><circle class="f-asteroid" cx="747" cy="611" r="5"/><circle class="f-planet-indigo-light" cx="704" cy="623" r="7"/><circle class="f-asteroid" cx="635" cy="617" r="4"/><circle class="f-planet-indigo-light" cx="578" cy="623" r="6"/><circle class="f-asteroid" cx="535" cy="611" r="3"/><circle class="f-planet-indigo-light" cx="468" cy="612" r="5"/><circle class="f-asteroid" cx="248" cy="319" r="5"/><circle class="f-planet-indigo-light" cx="283" cy="308" r="7"/><circle class="f-asteroid" cx="335" cy="285" r="4"/><circle class="f-planet-indigo-light" cx="368" cy="278" r="6"/><circle class="f-asteroid" cx="417" cy="259" r="3"/><circle class="f-planet-indigo-light" cx="480" cy="256" r="5"/><circle class="f-asteroid" cx="523" cy="243" r="7"/><circle class="f-planet-indigo-light" cx="578" cy="245" r="4"/><circle class="f-asteroid" cx="647" cy="237" r="6"/><circle class="f-planet-indigo-light" cx="692" cy="245" r="3"/><circle class="f-asteroid" cx="747" cy="243" r="5"/><circle class="f-planet-indigo-light" cx="814" cy="256" r="7"/><circle class="f-asteroid" cx="853" cy="259" r="4"/><circle class="f-planet-indigo-light" cx="902" cy="278" r="6"/><circle class="f-asteroid" cx="959" cy="285" r="3"/><circle class="f-planet-indigo-light" cx="987" cy="308" r="5"/><circle class="f-asteroid" cx="1022" cy="319" r="7"/><circle class="f-planet-indigo-light" cx="1063" cy="346" r="4"/><circle class="f-asteroid" cx="1074" cy="360" r="6"/><circle class="f-planet-indigo-light" cx="1091" cy="389" r="3"/><circle class="f-asteroid" cx="1114" cy="404" r="5"/><circle class="f-peach" cx="640" cy="430" r="112" opacity="0.10"/><circle class="f-peach" cx="640" cy="430" r="86" opacity="0.16"/><clipPath id="map-sun"><circle cx="640" cy="430" r="64"/></clipPath><g clip-path="url(#map-sun)"><g transform="rotate(-45 640 430)"><rect class="f-planet-peach-6" x="576" y="366" width="128" height="128"/><rect class="f-planet-peach-dark" x="576" y="366" width="128" height="110.1"/><rect class="f-planet-peach-4" x="576" y="366" width="128" height="92.2"/><rect class="f-planet-peach" x="576" y="366" width="128" height="70.4"/><rect class="f-planet-peach-2" x="576" y="366" width="128" height="46.1"/><rect class="f-planet-peach-light" x="576" y="366" width="128" height="23"/></g></g><circle class="s-planet-peach-light" cx="640" cy="430" r="66.5" fill="none" stroke-width="3" opacity="0.28"/><circle class="s-mint" cx="330" cy="300" r="78" fill="none" stroke-width="10" opacity="0.3"/><g transform="rotate(-14 330 300)"><path class="s-mint-deep" d="M228.5 300 A101.5 22 0 0 1 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-deeper" d="M242.7 300 A87.3 19 0 0 1 417.3 300" fill="none" stroke-width="2.9" stroke-linecap="round"/></g><clipPath id="map-rescue"><circle cx="330" cy="300" r="58"/></clipPath><g clip-path="url(#map-rescue)"><g transform="rotate(-45 330 300)"><rect class="f-planet-mint-dark" x="272" y="242" width="116" height="116"/><rect class="f-planet-mint-4" x="272" y="242" width="116" height="83.5"/><rect class="f-planet-mint" x="272" y="242" width="116" height="63.8"/><rect class="f-planet-mint-2" x="272" y="242" width="116" height="41.8"/><rect class="f-planet-mint-light" x="272" y="242" width="116" height="20.9"/></g><ellipse class="f-shadow" cx="347.4" cy="320.3" rx="7" ry="5.4" opacity="0.16"/><ellipse class="f-highlight" cx="346.1" cy="319" rx="5" ry="3.5" opacity="0.07"/><ellipse class="f-shadow" cx="309.7" cy="305.8" rx="4.6" ry="3.6" opacity="0.16"/><ellipse class="f-highlight" cx="308.9" cy="305" rx="3.3" ry="2.3" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="330" cy="300" r="60.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#map-rescue)"><g transform="rotate(-14 330 300)"><path class="s-shadow" d="M233.6 302.9 A96.4 19.8 0 0 0 426.4 302.9" fill="none" stroke-width="7" opacity="0.18"/></g></g><g transform="rotate(-14 330 300)"><path class="s-mint" d="M228.5 300 A101.5 22 0 0 0 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-light" d="M220.4 300 A109.6 23.8 0 0 0 439.6 300" fill="none" stroke-width="3.5" stroke-linecap="round"/><path class="s-mint-deep" d="M242.7 300 A87.3 19 0 0 0 417.3 300" fill="none" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/></g><clipPath id="map-moon"><circle cx="232" cy="232" r="14"/></clipPath><g clip-path="url(#map-moon)"><g transform="rotate(-45 232 232)"><rect class="f-planet-peach-4" x="218" y="218" width="28" height="28"/><rect class="f-planet-peach" x="218" y="218" width="28" height="15.4"/><rect class="f-planet-peach-2" x="218" y="218" width="28" height="10.1"/><rect class="f-planet-peach-light" x="218" y="218" width="28" height="5"/></g></g><g opacity="0.45"><clipPath id="map-l0"><circle cx="1010" cy="560" r="46"/></clipPath><g clip-path="url(#map-l0)"><g transform="rotate(-45 1010 560)"><rect class="f-planet-indigo-6" x="964" y="514" width="92" height="92"/><rect class="f-planet-indigo-dark" x="964" y="514" width="92" height="79.1"/><rect class="f-planet-indigo-4" x="964" y="514" width="92" height="66.2"/><rect class="f-planet-indigo" x="964" y="514" width="92" height="50.6"/><rect class="f-planet-indigo-2" x="964" y="514" width="92" height="33.1"/><rect class="f-planet-indigo-light" x="964" y="514" width="92" height="16.6"/></g><ellipse class="f-shadow" cx="1019.2" cy="546.2" rx="6.4" ry="5" opacity="0.16"/><ellipse class="f-highlight" cx="1018" cy="545" rx="4.6" ry="3.2" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="1010" cy="560" r="48.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="map-l1"><circle cx="1150" cy="250" r="30"/></clipPath><g clip-path="url(#map-l1)"><g transform="rotate(-45 1150 250)"><rect class="f-planet-peach-dark" x="1120" y="220" width="60" height="60"/><rect class="f-planet-peach-4" x="1120" y="220" width="60" height="43.2"/><rect class="f-planet-peach" x="1120" y="220" width="60" height="33"/><rect class="f-planet-peach-2" x="1120" y="220" width="60" height="21.6"/><rect class="f-planet-peach-light" x="1120" y="220" width="60" height="10.8"/></g></g><circle class="s-planet-peach-light" cx="1150" cy="250" r="32.5" fill="none" stroke-width="3" opacity="0.28"/></g><ellipse class="f-mint" cx="250" cy="598" rx="210" ry="26" opacity="0.12"/></svg></template>
+<template id="art-map"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="10" cy="298.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="59.7" cy="792.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="786.9" cy="32.8" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1213.1" cy="296.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1182.6" cy="363.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="243" cy="35.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1234.4" cy="710.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="161.3" cy="381.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1176.6" cy="705.4" r="0.9" opacity="0.5"/><circle class="f-moon" cx="495.2" cy="789.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="916.5" cy="788.3" r="0.9" opacity="0.5"/><circle class="f-moon" cx="795.5" cy="148.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="394.8" cy="87.4" r="1.1" opacity="0.6"/><circle class="f-galaxy-mint" cx="863" cy="714.2" r="2.2" opacity="0.95"/><circle class="f-moon" cx="24.1" cy="279.1" r="1" opacity="0.7"/><circle class="f-moon" cx="946.1" cy="51.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="50.1" cy="201.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="191.3" cy="125.1" r="1.4" opacity="0.9"/><circle class="f-galaxy-mint" cx="1161.7" cy="383.5" r="2.2" opacity="0.95"/><circle class="f-moon" cx="1123.7" cy="479.9" r="1" opacity="0.6"/><circle class="f-galaxy" cx="19" cy="546" r="1.8" opacity="0.95"/><circle class="f-moon" cx="1217.8" cy="337.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1035.8" cy="115.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="97.2" cy="99.8" r="0.9" opacity="0.7"/><circle class="f-moon" cx="793.7" cy="149.1" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="951.4" cy="50.7" r="1.9" opacity="0.95"/><circle class="f-moon" cx="86.5" cy="608" r="1.1" opacity="0.4"/><circle class="f-moon" cx="59.1" cy="312.4" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1208.3" cy="83.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="937.4" cy="768.1" r="1" opacity="0.5"/><circle class="f-moon" cx="716.9" cy="56.2" r="2" opacity="0.9"/><circle class="f-moon" cx="1265.4" cy="90.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="793.9" cy="21.6" r="1.7" opacity="0.9"/><circle class="f-moon" cx="67.9" cy="347.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1227.2" cy="73.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="1135.1" cy="620.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="317" cy="728.3" r="1" opacity="0.6"/><circle class="f-moon" cx="1228" cy="785.5" r="0.9" opacity="0.5"/><circle class="f-moon" cx="502.1" cy="120.6" r="0.7" opacity="0.5"/><circle class="f-moon" cx="1202.4" cy="591" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1212.2" cy="259.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="486.6" cy="747.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="361.8" cy="143.4" r="0.8" opacity="0.4"/><circle class="f-moon" cx="1224.3" cy="33.1" r="2" opacity="0.9"/><circle class="f-moon" cx="899.4" cy="21" r="0.7" opacity="0.6"/><circle class="f-moon" cx="15.6" cy="435" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1140.2" cy="297.6" r="1.1" opacity="0.6"/><circle class="f-moon" cx="677.3" cy="44.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1075.6" cy="735" r="1.4" opacity="0.9"/><circle class="f-moon" cx="744.1" cy="69.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="81.6" cy="648.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="96" cy="59.3" r="1" opacity="0.4"/><circle class="f-moon" cx="348.2" cy="52.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="834.2" cy="130.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="105.3" cy="657.9" r="0.7" opacity="0.5"/><circle class="f-moon" cx="632.2" cy="133.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1155.3" cy="541.4" r="1.1" opacity="0.7"/><circle class="f-galaxy-mint" cx="682.2" cy="721.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="471.3" cy="725.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="237.2" cy="773.9" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1217" cy="723.2" r="1" opacity="0.5"/><circle class="f-galaxy-peach" cx="732.4" cy="789.4" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1254.1" cy="589.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1263" cy="239.3" r="1" opacity="0.6"/><circle class="f-moon" cx="57.4" cy="682.7" r="1.1" opacity="0.5"/><circle class="f-moon" cx="207" cy="118.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="40.3" cy="728.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="917.2" cy="61.7" r="0.8" opacity="0.6"/><circle class="f-moon" cx="164.4" cy="710.8" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="170.7" cy="598.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="251" cy="117.1" r="1" opacity="0.5"/><circle class="f-moon" cx="162.3" cy="699.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="1226.1" cy="300.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="31.2" cy="512.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="745.3" cy="74.4" r="0.8" opacity="0.6"/><circle class="f-moon" cx="279.1" cy="43.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="147.7" cy="427.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="689.1" cy="73" r="1" opacity="0.4"/><circle class="f-moon" cx="847.3" cy="13.1" r="0.9" opacity="0.7"/><circle class="f-moon" cx="49.5" cy="398.8" r="1.9" opacity="0.9"/><circle class="f-galaxy" cx="741" cy="149.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1168" cy="236.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1046.5" cy="114.7" r="1.6" opacity="0.9"/><circle class="f-moon" cx="864.7" cy="720.4" r="1.1" opacity="0.6"/><circle class="f-galaxy" cx="656.1" cy="89.8" r="2" opacity="0.95"/><circle class="f-moon" cx="1164.1" cy="341.3" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1079" cy="120.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="862.9" cy="765.9" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1269.9" cy="264.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="1111.9" cy="710.1" r="2" opacity="0.9"/><circle class="f-moon" cx="657.6" cy="769.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="170.2" cy="310.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="67.5" cy="507.7" r="1" opacity="0.5"/><circle class="f-moon" cx="929.8" cy="97.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1247.9" cy="208.6" r="1.6" opacity="0.9"/><circle class="f-galaxy-mint" cx="177.3" cy="277.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="210.2" cy="78.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1233.9" cy="40.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="645.9" cy="39.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="300" cy="107" r="1.1" opacity="0.6"/><circle class="f-moon" cx="257.8" cy="143" r="1.6" opacity="0.9"/><circle class="f-moon" cx="381.8" cy="737.1" r="0.8" opacity="0.4"/><circle class="f-moon" cx="246.1" cy="759.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1189.8" cy="150.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="69.6" cy="306" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1152.9" cy="741.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="787.5" cy="13" r="2" opacity="0.9"/><circle class="f-moon" cx="8.4" cy="705.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1222.5" cy="76.9" r="1.2" opacity="0.7"/><circle class="f-moon" cx="816.7" cy="772.1" r="1.2" opacity="0.4"/><g transform="translate(1130 90) rotate(20) scale(0.8)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="1.4" r="1.1" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="4.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="15.8" cy="6.3" r="1.2" opacity="0.6"/><circle class="f-moon" cx="9.6" cy="8.5" r="1" opacity="0.9"/><circle class="f-moon" cx="5.8" cy="12" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-5" cy="13.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="12.6" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.2" cy="12.1" r="1.2" opacity="0.5"/><circle class="f-moon" cx="-35.8" cy="11.5" r="1.2" opacity="0.6"/><circle class="f-moon" cx="-13.2" cy="-2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="-15.9" cy="-4.5" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-16.1" cy="-7.2" r="1.5" opacity="0.5"/><circle class="f-moon" cx="-12.7" cy="-9" r="1" opacity="0.7"/><circle class="f-moon" cx="-4.6" cy="-11.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="3.9" cy="-13.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="-12.9" r="1.1" opacity="0.8"/><circle class="f-moon" cx="27.9" cy="-13.5" r="0.8" opacity="0.6"/><circle class="f-moon" cx="38.6" cy="-10.5" r="1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(140 120) rotate(-24) scale(0.62)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="16" cy="2.8" r="1.2" opacity="0.6"/><circle class="f-moon" cx="13.9" cy="4.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="14.2" cy="7.4" r="1" opacity="0.9"/><circle class="f-moon" cx="11.8" cy="9.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="3.3" cy="11.5" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-3.1" cy="13.2" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-16.4" cy="14" r="1.4" opacity="0.7"/><circle class="f-moon" cx="-27.9" cy="12.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-35.8" cy="10.9" r="1" opacity="0.8"/><circle class="f-moon" cx="-15.4" cy="-1.3" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-15.3" cy="-4" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="-7.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-10.6" cy="-10.1" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-6" cy="-11.1" r="1" opacity="0.6"/><circle class="f-moon" cx="4.2" cy="-13.6" r="1" opacity="0.9"/><circle class="f-moon" cx="15.6" cy="-14.4" r="1.4" opacity="0.5"/><circle class="f-moon" cx="25.6" cy="-11.9" r="1.3" opacity="0.6"/><circle class="f-moon" cx="37.1" cy="-11" r="0.9" opacity="0.9"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(150 700) rotate(-30) scale(0.7)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(860 90) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(470 700) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(1230 420) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(70 330) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="s-night-button" cx="640" cy="430" rx="200" ry="80" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="330" ry="135" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="600" ry="250" fill="none" stroke-width="3" stroke-dasharray="6 10"/><circle class="f-planet-indigo-light" cx="1117" cy="434" r="3"/><circle class="f-asteroid" cx="1102" cy="450" r="5"/><circle class="f-planet-indigo-light" cx="1091" cy="479" r="7"/><circle class="f-asteroid" cx="1086" cy="494" r="4"/><circle class="f-planet-indigo-light" cx="1051" cy="522" r="6"/><circle class="f-asteroid" cx="1022" cy="535" r="3"/><circle class="f-planet-indigo-light" cx="999" cy="560" r="5"/><circle class="f-asteroid" cx="947" cy="569" r="7"/><circle class="f-planet-indigo-light" cx="902" cy="590" r="4"/><circle class="f-asteroid" cx="865" cy="595" r="6"/><circle class="f-planet-indigo-light" cx="802" cy="612" r="3"/><circle class="f-asteroid" cx="747" cy="611" r="5"/><circle class="f-planet-indigo-light" cx="704" cy="623" r="7"/><circle class="f-asteroid" cx="635" cy="617" r="4"/><circle class="f-planet-indigo-light" cx="578" cy="623" r="6"/><circle class="f-asteroid" cx="535" cy="611" r="3"/><circle class="f-planet-indigo-light" cx="468" cy="612" r="5"/><circle class="f-asteroid" cx="248" cy="319" r="5"/><circle class="f-planet-indigo-light" cx="283" cy="308" r="7"/><circle class="f-asteroid" cx="335" cy="285" r="4"/><circle class="f-planet-indigo-light" cx="368" cy="278" r="6"/><circle class="f-asteroid" cx="417" cy="259" r="3"/><circle class="f-planet-indigo-light" cx="480" cy="256" r="5"/><circle class="f-asteroid" cx="523" cy="243" r="7"/><circle class="f-planet-indigo-light" cx="578" cy="245" r="4"/><circle class="f-asteroid" cx="647" cy="237" r="6"/><circle class="f-planet-indigo-light" cx="692" cy="245" r="3"/><circle class="f-asteroid" cx="747" cy="243" r="5"/><circle class="f-planet-indigo-light" cx="814" cy="256" r="7"/><circle class="f-asteroid" cx="853" cy="259" r="4"/><circle class="f-planet-indigo-light" cx="902" cy="278" r="6"/><circle class="f-asteroid" cx="959" cy="285" r="3"/><circle class="f-planet-indigo-light" cx="987" cy="308" r="5"/><circle class="f-asteroid" cx="1022" cy="319" r="7"/><circle class="f-planet-indigo-light" cx="1063" cy="346" r="4"/><circle class="f-asteroid" cx="1074" cy="360" r="6"/><circle class="f-planet-indigo-light" cx="1091" cy="389" r="3"/><circle class="f-asteroid" cx="1114" cy="404" r="5"/><circle class="f-peach" cx="640" cy="430" r="112" opacity="0.10"/><circle class="f-peach" cx="640" cy="430" r="86" opacity="0.16"/><clipPath id="map-sun"><circle cx="640" cy="430" r="64"/></clipPath><g clip-path="url(#map-sun)"><g transform="rotate(-45 640 430)"><rect class="f-planet-peach-6" x="576" y="366" width="128" height="128"/><rect class="f-planet-peach-dark" x="576" y="366" width="128" height="110.1"/><rect class="f-planet-peach-4" x="576" y="366" width="128" height="92.2"/><rect class="f-planet-peach" x="576" y="366" width="128" height="70.4"/><rect class="f-planet-peach-2" x="576" y="366" width="128" height="46.1"/><rect class="f-planet-peach-light" x="576" y="366" width="128" height="23"/></g></g><circle class="s-planet-peach-light" cx="640" cy="430" r="66.5" fill="none" stroke-width="3" opacity="0.28"/><circle class="s-mint" cx="330" cy="300" r="78" fill="none" stroke-width="10" opacity="0.3"/><g transform="rotate(-14 330 300)"><path class="s-mint-deep" d="M228.5 300 A101.5 22 0 0 1 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-deeper" d="M242.7 300 A87.3 19 0 0 1 417.3 300" fill="none" stroke-width="2.9" stroke-linecap="round"/></g><clipPath id="map-rescue"><circle cx="330" cy="300" r="58"/></clipPath><g clip-path="url(#map-rescue)"><g transform="rotate(-45 330 300)"><rect class="f-planet-mint-dark" x="272" y="242" width="116" height="116"/><rect class="f-planet-mint-4" x="272" y="242" width="116" height="83.5"/><rect class="f-planet-mint" x="272" y="242" width="116" height="63.8"/><rect class="f-planet-mint-2" x="272" y="242" width="116" height="41.8"/><rect class="f-planet-mint-light" x="272" y="242" width="116" height="20.9"/></g><ellipse class="f-shadow" cx="347.4" cy="320.3" rx="7" ry="5.4" opacity="0.16"/><ellipse class="f-highlight" cx="346.1" cy="319" rx="5" ry="3.5" opacity="0.07"/><ellipse class="f-shadow" cx="309.7" cy="305.8" rx="4.6" ry="3.6" opacity="0.16"/><ellipse class="f-highlight" cx="308.9" cy="305" rx="3.3" ry="2.3" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="330" cy="300" r="60.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#map-rescue)"><g transform="rotate(-14 330 300)"><path class="s-shadow" d="M233.6 302.9 A96.4 19.8 0 0 0 426.4 302.9" fill="none" stroke-width="7" opacity="0.18"/></g></g><g transform="rotate(-14 330 300)"><path class="s-mint" d="M228.5 300 A101.5 22 0 0 0 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-light" d="M220.4 300 A109.6 23.8 0 0 0 439.6 300" fill="none" stroke-width="3.5" stroke-linecap="round"/><path class="s-mint-deep" d="M242.7 300 A87.3 19 0 0 0 417.3 300" fill="none" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/></g><clipPath id="map-moon"><circle cx="232" cy="232" r="14"/></clipPath><g clip-path="url(#map-moon)"><g transform="rotate(-45 232 232)"><rect class="f-planet-peach-4" x="218" y="218" width="28" height="28"/><rect class="f-planet-peach" x="218" y="218" width="28" height="15.4"/><rect class="f-planet-peach-2" x="218" y="218" width="28" height="10.1"/><rect class="f-planet-peach-light" x="218" y="218" width="28" height="5"/></g></g><g opacity="0.45"><clipPath id="map-l0"><circle cx="1010" cy="560" r="46"/></clipPath><g clip-path="url(#map-l0)"><g transform="rotate(-45 1010 560)"><rect class="f-planet-indigo-6" x="964" y="514" width="92" height="92"/><rect class="f-planet-indigo-dark" x="964" y="514" width="92" height="79.1"/><rect class="f-planet-indigo-4" x="964" y="514" width="92" height="66.2"/><rect class="f-planet-indigo" x="964" y="514" width="92" height="50.6"/><rect class="f-planet-indigo-2" x="964" y="514" width="92" height="33.1"/><rect class="f-planet-indigo-light" x="964" y="514" width="92" height="16.6"/></g><ellipse class="f-shadow" cx="1019.2" cy="546.2" rx="6.4" ry="5" opacity="0.16"/><ellipse class="f-highlight" cx="1018" cy="545" rx="4.6" ry="3.2" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="1010" cy="560" r="48.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="map-l1"><circle cx="1150" cy="250" r="30"/></clipPath><g clip-path="url(#map-l1)"><g transform="rotate(-45 1150 250)"><rect class="f-planet-peach-dark" x="1120" y="220" width="60" height="60"/><rect class="f-planet-peach-4" x="1120" y="220" width="60" height="43.2"/><rect class="f-planet-peach" x="1120" y="220" width="60" height="33"/><rect class="f-planet-peach-2" x="1120" y="220" width="60" height="21.6"/><rect class="f-planet-peach-light" x="1120" y="220" width="60" height="10.8"/></g></g><circle class="s-planet-peach-light" cx="1150" cy="250" r="32.5" fill="none" stroke-width="3" opacity="0.28"/></g><ellipse class="f-mint" cx="250" cy="598" rx="210" ry="26" opacity="0.12"/><ellipse class="s-mint" cx="250" cy="598" rx="210" ry="26" fill="none" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round" opacity="0.7"/></svg></template>
+<template id="art-crew"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="1042" cy="224.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1158.4" cy="153" r="1.8" opacity="0.9"/><circle class="f-galaxy-peach" cx="675.8" cy="356.9" r="1.6" opacity="0.95"/><circle class="f-moon" cx="1039.7" cy="227" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1102.3" cy="257.6" r="2" opacity="0.9"/><circle class="f-moon" cx="1262" cy="58.2" r="1" opacity="0.6"/><circle class="f-moon" cx="709.8" cy="312.6" r="1.9" opacity="0.9"/><circle class="f-moon" cx="86.3" cy="79.5" r="1.4" opacity="0.9"/><circle class="f-moon" cx="622.4" cy="13.6" r="1.1" opacity="0.5"/><circle class="f-galaxy-peach" cx="852.5" cy="198.1" r="1.9" opacity="0.95"/><circle class="f-moon" cx="896.3" cy="134.6" r="1" opacity="0.4"/><circle class="f-moon" cx="931" cy="370.6" r="1" opacity="0.4"/><circle class="f-moon" cx="418" cy="89.2" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1060.1" cy="348" r="2" opacity="0.9"/><circle class="f-moon" cx="749.9" cy="409" r="1.8" opacity="0.9"/><circle class="f-moon" cx="920.5" cy="185.6" r="0.8" opacity="0.6"/><circle class="f-moon" cx="1268.4" cy="541.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="181.1" cy="37.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="295.1" cy="94.8" r="1.1" opacity="0.6"/><circle class="f-moon" cx="26.8" cy="11.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="420.4" cy="107" r="0.9" opacity="0.5"/><circle class="f-moon" cx="110" cy="166" r="0.8" opacity="0.5"/><circle class="f-moon" cx="696.8" cy="368.6" r="1.5" opacity="0.9"/><circle class="f-moon" cx="35.7" cy="68" r="0.9" opacity="0.4"/><circle class="f-moon" cx="16.9" cy="359.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="290.6" cy="39.3" r="1.2" opacity="0.5"/><circle class="f-moon" cx="58.5" cy="193.2" r="1.7" opacity="0.9"/><circle class="f-moon" cx="1007" cy="310.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="796.6" cy="154.6" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1036.3" cy="229.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="800.9" cy="190.9" r="2" opacity="0.9"/><circle class="f-moon" cx="1021.9" cy="355.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="206.7" cy="178.1" r="0.8" opacity="0.5"/><circle class="f-moon" cx="128.9" cy="112.7" r="1.2" opacity="0.7"/><circle class="f-moon" cx="631.9" cy="405.2" r="1" opacity="0.5"/><circle class="f-galaxy" cx="365" cy="367.1" r="1.9" opacity="0.95"/><circle class="f-moon" cx="23.8" cy="139.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="398.8" cy="245.6" r="1.6" opacity="0.9"/><circle class="f-moon" cx="325.5" cy="348.1" r="0.9" opacity="0.6"/><circle class="f-moon" cx="256.2" cy="346" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1048.6" cy="212.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1083.3" cy="232.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="412.2" cy="91.2" r="1.8" opacity="0.9"/><circle class="f-galaxy-peach" cx="1022.2" cy="282.5" r="1.6" opacity="0.95"/><circle class="f-galaxy" cx="856.2" cy="210.3" r="1.8" opacity="0.95"/><circle class="f-moon" cx="497.5" cy="120.3" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1023" cy="282.6" r="1.6" opacity="0.9"/><circle class="f-moon" cx="851.2" cy="6.9" r="1.2" opacity="0.5"/><circle class="f-moon" cx="238.1" cy="124.2" r="0.8" opacity="0.4"/><circle class="f-moon" cx="757.3" cy="344.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="223.8" cy="222.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="148.2" cy="60" r="0.8" opacity="0.4"/><circle class="f-moon" cx="163.4" cy="377" r="0.7" opacity="0.6"/><circle class="f-moon" cx="712.3" cy="345.8" r="1" opacity="0.4"/><circle class="f-moon" cx="246.8" cy="124" r="1.1" opacity="0.7"/><circle class="f-moon" cx="828" cy="122" r="0.8" opacity="0.5"/><circle class="f-moon" cx="1237.3" cy="110.8" r="0.8" opacity="0.5"/><circle class="f-moon" cx="434.4" cy="405" r="1.1" opacity="0.4"/><circle class="f-moon" cx="142.8" cy="99.2" r="0.8" opacity="0.5"/><circle class="f-moon" cx="485.8" cy="277.3" r="1" opacity="0.5"/><circle class="f-moon" cx="396.7" cy="210.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="726.5" cy="343.9" r="1.7" opacity="0.9"/><circle class="f-galaxy-peach" cx="896.3" cy="161.2" r="2.1" opacity="0.95"/><circle class="f-moon" cx="437.4" cy="303.8" r="1.5" opacity="0.9"/><circle class="f-moon" cx="396.5" cy="298.3" r="0.8" opacity="0.6"/><circle class="f-moon" cx="398.6" cy="51.1" r="2" opacity="0.9"/><circle class="f-moon" cx="111.5" cy="179.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1133.2" cy="10.9" r="0.9" opacity="0.7"/><circle class="f-moon" cx="93.5" cy="168.3" r="1.7" opacity="0.9"/><circle class="f-moon" cx="28.6" cy="389.3" r="1.8" opacity="0.9"/><g transform="translate(200 140) rotate(-20) scale(0.7)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.1" cy="1.5" r="1.3" opacity="0.5"/><circle class="f-moon" cx="16.1" cy="4.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="12.9" cy="6.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="10.6" cy="9.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="5" cy="12.3" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-2.4" cy="12" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-16.2" cy="12.6" r="1" opacity="0.9"/><circle class="f-moon" cx="-27.5" cy="12.9" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-37.4" cy="9.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="-14.1" cy="-2.3" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.1" cy="-4.8" r="1.4" opacity="0.8"/><circle class="f-moon" cx="-15.8" cy="-6.7" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-10" cy="-9.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="-4.8" cy="-10.9" r="0.9" opacity="0.7"/><circle class="f-moon" cx="2.4" cy="-12.5" r="1.4" opacity="0.8"/><circle class="f-moon" cx="16.3" cy="-13.7" r="1.4" opacity="0.8"/><circle class="f-moon" cx="26.6" cy="-12.8" r="1.5" opacity="0.9"/><circle class="f-moon" cx="37.5" cy="-10.4" r="0.8" opacity="0.8"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(980 300) rotate(18) scale(0.55)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="3.1" r="0.9" opacity="0.8"/><circle class="f-moon" cx="14.3" cy="3.9" r="1.6" opacity="0.6"/><circle class="f-moon" cx="15.3" cy="6.7" r="1.2" opacity="0.7"/><circle class="f-moon" cx="9.7" cy="9.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="2.6" cy="10.9" r="1.1" opacity="0.9"/><circle class="f-moon" cx="-4.8" cy="12.1" r="1" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="13.6" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-26.9" cy="13.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-36" cy="10.9" r="0.9" opacity="0.5"/><circle class="f-moon" cx="-13" cy="-2.2" r="1" opacity="0.9"/><circle class="f-moon" cx="-15.6" cy="-3.9" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-15.3" cy="-6.1" r="0.9" opacity="0.8"/><circle class="f-moon" cx="-12.5" cy="-8.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-3.1" cy="-11.4" r="1" opacity="0.6"/><circle class="f-moon" cx="4.4" cy="-12.8" r="0.9" opacity="0.9"/><circle class="f-moon" cx="14.8" cy="-13" r="1" opacity="0.6"/><circle class="f-moon" cx="24.3" cy="-13" r="1" opacity="0.7"/><circle class="f-moon" cx="37.1" cy="-10.1" r="1.5" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(380 240) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(860 110) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="f-night-raised" cx="300" cy="372" rx="200" ry="22"/><ellipse class="s-night-button" cx="300" cy="372" rx="200" ry="22" fill="none" stroke-width="3"/><ellipse class="s-mint" cx="220" cy="368" rx="64" ry="11" fill="none" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.7"/><ellipse class="s-mint" cx="380" cy="368" rx="64" ry="11" fill="none" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.7"/></svg></template>
+<template id="art-held-telescope"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g></svg></template>
+<template id="art-job-lookout"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><path class="s-ink" d="M34 66 L22 90 M38 66 L40 92 M42 64 L58 88" stroke-width="4" stroke-linecap="round"/><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g><circle class="f-ink" cx="40" cy="64" r="4.5"/></svg></template>
+<template id="art-badge-lookout"><svg width="56" height="56" viewBox="-8 -8 116 116" aria-hidden="true"><circle class="f-moon s-mint" cx="50" cy="50" r="54" stroke-width="7"/><circle class="s-ink" cx="50" cy="50" r="58" fill="none" stroke-width="2.5"/><g transform="translate(9 9) scale(0.82)"><path class="s-ink" d="M34 66 L22 90 M38 66 L40 92 M42 64 L58 88" stroke-width="4" stroke-linecap="round"/><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g><circle class="f-ink" cx="40" cy="64" r="4.5"/></g></svg></template>
+<template id="art-job-engineer"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-45 50 50)"><path class="f-steel s-ink" d="M44 34 L56 34 L56 76 L44 76 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-steel s-ink" d="M43 9 L43 25 L57 25 L57 9 A20 20 0 1 1 43 9 Z" stroke-width="3.5" stroke-linejoin="round"/><circle class="f-steel s-ink" cx="50" cy="84" r="10" stroke-width="3.5"/><circle class="f-steel-dark s-ink" cx="50" cy="84" r="4" stroke-width="2"/><path class="s-cat-white" d="M50 40 L50 70" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/></g></svg></template>
+<template id="art-badge-engineer"><svg width="56" height="56" viewBox="-8 -8 116 116" aria-hidden="true"><circle class="f-moon s-mint" cx="50" cy="50" r="54" stroke-width="7"/><circle class="s-ink" cx="50" cy="50" r="58" fill="none" stroke-width="2.5"/><g transform="translate(9 9) scale(0.82)"><g transform="rotate(-45 50 50)"><path class="f-steel s-ink" d="M44 34 L56 34 L56 76 L44 76 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-steel s-ink" d="M43 9 L43 25 L57 25 L57 9 A20 20 0 1 1 43 9 Z" stroke-width="3.5" stroke-linejoin="round"/><circle class="f-steel s-ink" cx="50" cy="84" r="10" stroke-width="3.5"/><circle class="f-steel-dark s-ink" cx="50" cy="84" r="4" stroke-width="2"/><path class="s-cat-white" d="M50 40 L50 70" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/></g></g></svg></template>
+<template id="art-job-navigator"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><path class="f-moon s-ink" d="M18 26 L82 26 L82 78 L18 78 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-moon-dim s-ink" d="M12 22 C 12 16, 24 16, 24 22 L24 82 C 24 88, 12 88, 12 82 Z" stroke-width="3.5"/><path class="f-moon-dim s-ink" d="M76 18 C 76 12, 88 12, 88 18 L88 78 C 88 84, 76 84, 76 78 Z" stroke-width="3.5"/><path class="s-mint-deep" d="M34 64 C 42 52, 46 46, 52 44 C 58 42, 62 40, 66 36" fill="none" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round"/><path class="f-peach s-ink" transform="translate(34 64) scale(1.0)" d="M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z" stroke-width="2"/><path class="f-spark s-ink" transform="translate(52 44) scale(0.8)" d="M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z" stroke-width="2"/><path class="f-peach s-ink" transform="translate(68 34) scale(1.1)" d="M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z" stroke-width="2"/></svg></template>
+<template id="art-badge-navigator"><svg width="56" height="56" viewBox="-8 -8 116 116" aria-hidden="true"><circle class="f-moon s-mint" cx="50" cy="50" r="54" stroke-width="7"/><circle class="s-ink" cx="50" cy="50" r="58" fill="none" stroke-width="2.5"/><g transform="translate(9 9) scale(0.82)"><path class="f-moon s-ink" d="M18 26 L82 26 L82 78 L18 78 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-moon-dim s-ink" d="M12 22 C 12 16, 24 16, 24 22 L24 82 C 24 88, 12 88, 12 82 Z" stroke-width="3.5"/><path class="f-moon-dim s-ink" d="M76 18 C 76 12, 88 12, 88 18 L88 78 C 88 84, 76 84, 76 78 Z" stroke-width="3.5"/><path class="s-mint-deep" d="M34 64 C 42 52, 46 46, 52 44 C 58 42, 62 40, 66 36" fill="none" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round"/><path class="f-peach s-ink" transform="translate(34 64) scale(1.0)" d="M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z" stroke-width="2"/><path class="f-spark s-ink" transform="translate(52 44) scale(0.8)" d="M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z" stroke-width="2"/><path class="f-peach s-ink" transform="translate(68 34) scale(1.1)" d="M0 -9 L2.6 -2.8 L9 -2.8 L3.8 1.4 L5.8 8 L0 4 L-5.8 8 L-3.8 1.4 L-9 -2.8 L-2.6 -2.8 Z" stroke-width="2"/></g></svg></template>
+<template id="art-job-cook"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><path class="s-ink" d="M62 62 L92 86" stroke-width="12" stroke-linecap="round"/><path class="s-peach-dark" d="M62 62 L92 86" stroke-width="6" stroke-linecap="round"/><ellipse class="f-night-button s-ink" cx="42" cy="46" rx="34" ry="32" stroke-width="4"/><ellipse class="f-asteroid-crater" cx="42" cy="46" rx="26" ry="24"/><path class="f-peach s-ink" d="M22 46 C 30 34, 46 34, 54 46 C 46 58, 30 58, 22 46 Z" stroke-width="3" stroke-linejoin="round"/><path class="f-peach s-ink" d="M54 46 L64 38 L64 54 Z" stroke-width="3" stroke-linejoin="round"/><circle class="f-ink" cx="30" cy="44" r="2.4"/><path class="s-peach-dark" d="M38 40 C 40 44, 40 48, 38 52 M44 40 C 46 44, 46 48, 44 52" fill="none" stroke-width="2" stroke-linecap="round"/><path class="s-mint-light" d="M26 22 C 30 18, 36 16, 42 16" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.5"/></svg></template>
+<template id="art-badge-cook"><svg width="56" height="56" viewBox="-8 -8 116 116" aria-hidden="true"><circle class="f-moon s-mint" cx="50" cy="50" r="54" stroke-width="7"/><circle class="s-ink" cx="50" cy="50" r="58" fill="none" stroke-width="2.5"/><g transform="translate(9 9) scale(0.82)"><path class="s-ink" d="M62 62 L92 86" stroke-width="12" stroke-linecap="round"/><path class="s-peach-dark" d="M62 62 L92 86" stroke-width="6" stroke-linecap="round"/><ellipse class="f-night-button s-ink" cx="42" cy="46" rx="34" ry="32" stroke-width="4"/><ellipse class="f-asteroid-crater" cx="42" cy="46" rx="26" ry="24"/><path class="f-peach s-ink" d="M22 46 C 30 34, 46 34, 54 46 C 46 58, 30 58, 22 46 Z" stroke-width="3" stroke-linejoin="round"/><path class="f-peach s-ink" d="M54 46 L64 38 L64 54 Z" stroke-width="3" stroke-linejoin="round"/><circle class="f-ink" cx="30" cy="44" r="2.4"/><path class="s-peach-dark" d="M38 40 C 40 44, 40 48, 38 52 M44 40 C 46 44, 46 48, 44 52" fill="none" stroke-width="2" stroke-linecap="round"/><path class="s-mint-light" d="M26 22 C 30 18, 36 16, 42 16" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.5"/></g></svg></template>
 <template id="art-icon-home"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 23 L24 8 L41 23"/><path d="M12 20 V40 H36 V20"/><path d="M20 40 V30 H28 V40"/></svg></template>
 <template id="art-icon-hear"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 H16 L26 9 V39 L16 30 H8 Z"/><path d="M32 17 C 36 21, 36 27, 32 31"/><path d="M37 12 C 44 19, 44 29, 37 36"/></svg></template>
 <template id="art-icon-music"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 34 V10 L38 6 V30"/><ellipse cx="13" cy="34" rx="6" ry="5"/><ellipse cx="33" cy="30" rx="6" ry="5"/></svg></template>
@@ -443,7 +505,7 @@ button { font-family: var(--font-andika); }
 <template id="art-icon-full"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 V8 H18 M30 8 H40 V18 M8 30 V40 H18 M30 40 H40 V30"/></svg></template>
 <template id="art-icon-tick"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 25 L20 35 L38 14"/></svg></template>
 <script>
-window.MW = { VERSION: '0.4.0' };
+window.MW = { VERSION: '0.4.1' };
 window.MW_AUDIO = {"voice":{"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-welcome":{"dur":3.09},"map-mimi-rescue":{"dur":1.76},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
 window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."}];
 </script>
@@ -916,13 +978,14 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 
   // ---------------------------------------------------------------- dragging
-  // MW.dragger(stageEl, { counters: () => [...], onPick(c), onDrop(c, x, y) })
+  // MW.dragger(stageEl, { counters: () => [...], onPick(c), onDrop(c, x, y), grab: radius in stage px (default 60) })
+  // Anything with x, y (its centre), draggable, el, lift(on) and moveTo(x, y, size, animate) can be dragged.
   MW.dragger = function (surface, opts) {
     let drag = null;
     const stats = MW.dragStats = MW.dragStats || { last: null };
 
     function nearest(p) {
-      let best = null, bestD = GRAB_R;
+      let best = null, bestD = opts.grab || GRAB_R;
       opts.counters().forEach(function (c) {
         if (!c.draggable) return;
         const d = Math.hypot(c.x - p.x, c.y - p.y);
@@ -1201,7 +1264,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
 /* MeeMee World kit: the home map (phase 4).
    An alien solar system: each game is a planet. The drawing is the "map" art (design/gen_scenes.py, whose MAP holds
    the same positions); this file puts the buttons over it. Tapping a game's planet says its name and opens it;
-   a planet still to come says "That planet isn't ready yet." The crew wait by Scruffles's ship. */
+   a planet still to come says "That planet isn't ready yet." The crew wait by Scruffles's ship, wearing their job
+   badges; tapping them opens the crew screen (kit/crew.js). */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -1212,19 +1276,20 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     locked: [{ x: 1010, y: 560, tap: 130, lock: { x: 1056, y: 470, d: 60, icon: 30 } },
       { x: 1150, y: 250, tap: 120, lock: { x: 1186, y: 196, d: 50, icon: 24 } }],
     ship: { x: 155, y: 400, w: 190 },
-    crew: [{ who: 'moggles', x: 44, y: 456, w: 112 }, { who: 'snuffles', x: 344, y: 456, w: 112 }]
+    crew: [{ who: 'moggles', x: 44, y: 456, w: 112 }, { who: 'snuffles', x: 344, y: 456, w: 112 }],
+    crewTap: { x: 34, y: 392, w: 432, h: 236 }                // the ship and both cats
   };
 
   function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
 
-  // opts: { onRescue: fn, onLocked: fn }
+  // opts: { onRescue: fn, onLocked: fn, onCrew: fn }
   MW.map = function (parent, opts) {
     const map = {};
     const art = MW.art('map');
     art.setAttribute('class', 'mw-layer');
     parent.appendChild(art);
 
-    // the crew by the ship (pictures only for now; tapping them opens the crew screen from 0.4.1)
+    // the crew by the ship: one big button that opens the crew screen
     const ship = MW.art('pod');
     ship.setAttribute('width', M.ship.w); ship.setAttribute('height', Math.round(M.ship.w * 430 / 400));
     Array.prototype.forEach.call(ship.querySelectorAll('[data-face]'), function (g) { g.style.display = g.getAttribute('data-face') === 'thinking' ? '' : 'none'; });
@@ -1234,12 +1299,21 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     map.crew = {};
     M.crew.forEach(function (c) {
       const box = place(MW.make('div', 'mw-abs mw-map-crew', { 'data-who': c.who }), c.x, c.y);
-      const pic = MW.art(c.who);
-      pic.setAttribute('width', c.w); pic.setAttribute('height', Math.round(c.w * 340 / 260));
-      box.appendChild(pic);
+      const cat = MW.crew.cat(c.who, c.w);
+      box.appendChild(cat);
       parent.appendChild(box);
-      map.crew[c.who] = box;
+      map.crew[c.who] = cat;
     });
+    const t = M.crewTap;
+    const crewBtn = place(MW.make('button', 'mw-map-crew-btn mw-abs', { type: 'button', 'aria-label': 'The crew' }), t.x, t.y);
+    crewBtn.style.width = t.w + 'px'; crewBtn.style.height = t.h + 'px';
+    parent.appendChild(crewBtn);
+    MW.onTap(crewBtn, function () { if (opts.onCrew) opts.onCrew(); });
+    map.crewBtn = crewBtn;
+    // their job badges, as given on the crew screen
+    map.setCrew = function (jobs) { MW.crew.CATS.forEach(function (w) { map.crew[w].setJob(jobs[w]); }); };
+    // no jobs yet: the cats hop, to say "tap us"
+    map.callCrew = function () { map.crew.moggles.hop(0); map.crew.snuffles.hop(180); };
 
     // MeeMee Rescue: the planet and its badge are one big button
     const r = M.rescue;
@@ -1274,6 +1348,184 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
       badge.classList.remove('is-hop'); void badge.getBoundingClientRect(); badge.classList.add('is-hop');
     };
     return map;
+  };
+})();
+
+/* MeeMee World kit: the crew (phase 4, 0.4.1).
+   Moggles and Snuffles each get a job (lookout, engineer, navigator or cook) on the crew screen, by dragging the cat
+   onto the job's picture: one job per cat, never the same job for both. Each tablet remembers the jobs. A cat wears its
+   job as a badge on its chest on the map, the crew screen and the end screen; the game gives each job a moment.
+   Layout from the design canvas's round 4 (Crew4). */
+(function () {
+  'use strict';
+  const MW = window.MW;
+  const CATS = ['moggles', 'snuffles'];
+  const JOBS = ['lookout', 'engineer', 'navigator', 'cook'];
+  const C = MW.crew = { CATS: CATS, JOBS: JOBS };
+
+  // ---------------------------------------------------------------- the jobs, saved on this tablet
+  C.jobs = function () {
+    const saved = MW.store.setting('crew') || {};
+    const out = {};
+    CATS.forEach(function (c) { out[c] = JOBS.indexOf(saved[c]) >= 0 ? saved[c] : null; });
+    if (out.moggles && out.moggles === out.snuffles) out.snuffles = null;    // never the same job twice
+    return out;
+  };
+  C.save = function (jobs) { MW.store.setting('crew', { moggles: jobs.moggles || null, snuffles: jobs.snuffles || null }); };
+  C.who = function (job) { const j = C.jobs(); return CATS.filter(function (c) { return j[c] === job; })[0] || null; };
+  C.ready = function () { const j = C.jobs(); return CATS.every(function (c) { return !!j[c]; }); };
+  // "Moggles… is the… lookout."
+  C.line = function (cat, job) { return ['name-' + cat, 'is-the', 'job-' + job]; };
+
+  // ---------------------------------------------------------------- a cat with a place for its badge
+  // MW.crew.cat('moggles', 112) -> a box w wide; box.setJob('cook') puts the badge on its chest (null takes it off).
+  C.cat = function (who, w) {
+    const h = Math.round(w * 340 / 260);
+    const box = MW.make('div', 'mw-cat', { 'data-who': who });
+    box.style.width = w + 'px'; box.style.height = h + 'px';
+    const body = MW.make('div', 'mw-cat-body');
+    const pic = MW.art(who); pic.setAttribute('width', w); pic.setAttribute('height', h);
+    body.appendChild(pic);
+    box.appendChild(body);
+    const b = Math.max(26, Math.round(w * 0.26));
+    let badge = null;
+    box.w = w; box.h = h; box.body = body;
+    box.setJob = function (job) {
+      if (badge) { body.removeChild(badge); badge = null; }
+      box.setAttribute('data-job', job || '');
+      if (!job) return;
+      badge = MW.art('badge-' + job);
+      badge.setAttribute('width', b); badge.setAttribute('height', b);
+      badge.setAttribute('class', 'mw-badge');
+      badge.style.left = Math.round(w * 130 / 260 - b / 2) + 'px';
+      badge.style.top = Math.round(h * 238 / 340 - b / 2) + 'px';
+      body.appendChild(badge);
+    };
+    box.hop = function (delay) {
+      setTimeout(function () { body.classList.remove('is-hop'); void body.getBoundingClientRect(); body.classList.add('is-hop'); }, delay || 0);
+    };
+    return box;
+  };
+
+  // ---------------------------------------------------------------- the crew screen
+  const L = MW.LAYOUT.crew = {
+    ship: { x: 530, y: 40, w: 220 },
+    deck: { moggles: { x: 220, y: 368 }, snuffles: { x: 380, y: 368 } },     // where each cat's feet go before it has a job
+    stations: [{ job: 'lookout', x: 40 }, { job: 'engineer', x: 350 }, { job: 'navigator', x: 660 }, { job: 'cook', x: 970 }],
+    top: 420, w: 270, h: 340, disc: 124, pic: 98, spotY: 726,
+    cat: 136, foot: 173,          // a cat's width, and how far below the top of its picture its feet are
+    dropY: 430,                   // a cat let go with its middle below this line takes the nearest job
+    grab: 92                      // the cats are big: a finger anywhere on one picks it up
+  };
+  function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
+
+  // opts: { speak(lines), onHome(), enabled() }
+  C.screen = function (parent, opts) {
+    const scr = {};
+    const art = MW.art('crew'); art.setAttribute('class', 'mw-layer');
+    parent.appendChild(art);
+    const ship = MW.art('pod');
+    ship.setAttribute('width', L.ship.w); ship.setAttribute('height', Math.round(L.ship.w * 430 / 400));
+    Array.prototype.forEach.call(ship.querySelectorAll('[data-face]'), function (g) { g.style.display = g.getAttribute('data-face') === 'thinking' ? '' : 'none'; });
+    const shipBox = place(MW.make('div', 'mw-abs mw-map-crew'), L.ship.x, L.ship.y);
+    shipBox.appendChild(ship);
+    parent.appendChild(shipBox);
+
+    const stations = L.stations.map(function (s) {
+      const el = place(MW.make('div', 'mw-station mw-abs', { 'data-job': s.job }), s.x, L.top);
+      el.style.width = L.w + 'px'; el.style.height = L.h + 'px';
+      const disc = place(MW.make('div', 'mw-station-disc mw-abs'), (L.w - L.disc) / 2, 14);
+      const pic = MW.art('job-' + s.job); pic.setAttribute('width', L.pic); pic.setAttribute('height', L.pic);
+      disc.appendChild(pic);
+      el.appendChild(disc);
+      const sy = L.spotY - L.top;
+      el.insertAdjacentHTML('beforeend', '<svg class="mw-station-spot" width="' + L.w + '" height="' + L.h + '" viewBox="0 0 ' + L.w + ' ' + L.h + '" aria-hidden="true">'
+        + '<ellipse class="f-mint mw-spot-fill" cx="' + (L.w / 2) + '" cy="' + sy + '" rx="92" ry="17"/>'
+        + '<ellipse class="s-mint mw-spot-rim" fill="none" stroke-width="3" stroke-linecap="round" cx="' + (L.w / 2) + '" cy="' + sy + '" rx="92" ry="17"/></svg>');
+      parent.appendChild(el);
+      return { job: s.job, cx: s.x + L.w / 2, el: el };
+    });
+
+    const cats = {};
+    CATS.forEach(function (who) {
+      const box = C.cat(who, L.cat);
+      box.classList.add('mw-crew-cat');
+      parent.appendChild(box);
+      const c = { el: box, who: who, x: 0, y: 0, size: 80, draggable: true };
+      c.moveTo = function (x, y, size, animate) {
+        c.x = x; c.y = y;
+        box.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
+        box.style.transform = 'translate3d(' + (x - box.w / 2) + 'px,' + (y - box.h / 2) + 'px,0)';
+      };
+      c.lift = function (on) { box.classList.toggle('is-lifted', !!on); };
+      cats[who] = c;
+    });
+    scr.cats = cats; scr.stations = stations;
+
+    const nav = MW.shell.buttons(parent, ['home', 'music', 'hear'], {
+      home: function () { if (opts.onHome) opts.onHome(); },
+      hear: function () { scr.intro(); }
+    });
+
+    function feet(who, job) {
+      if (!job) return L.deck[who];
+      const s = stations.filter(function (x) { return x.job === job; })[0];
+      return { x: s.cx, y: L.spotY };
+    }
+    function layout(animate) {
+      const jobs = C.jobs();
+      CATS.forEach(function (who) {
+        const f = feet(who, jobs[who]), c = cats[who];
+        c.moveTo(f.x, f.y - L.foot + c.el.h / 2, 80, animate);
+        c.el.setJob(jobs[who]);
+      });
+      stations.forEach(function (s) {
+        s.el.classList.toggle('is-taken', CATS.some(function (w) { return jobs[w] === s.job; }));
+      });
+      nav.home.classList.toggle('mw-pulse', C.ready());       // the crew are ready: back to the map
+    }
+    scr.layout = layout;
+
+    function onDrop(c, x, y, cancelled) {
+      if (cancelled || (opts.enabled && !opts.enabled())) { layout(true); return; }
+      const jobs = C.jobs();
+      const was = jobs[c.who];
+      const other = CATS.filter(function (w) { return w !== c.who; })[0];
+      let job = null;
+      if (y > L.dropY) {
+        let best = Infinity;
+        stations.forEach(function (s) { const d = Math.abs(x - s.cx); if (d < best) { best = d; job = s.job; } });
+      }
+      let swapped = false;
+      if (job && job !== was && jobs[other] === job) { jobs[other] = was; swapped = true; }   // the two cats swap places
+      jobs[c.who] = job;
+      C.save(jobs);
+      layout(true);
+      MW.log('crew', c.who + ' ' + (job || 'no job') + (swapped ? ', ' + other + ' ' + (jobs[other] || 'no job') : ''));
+      if (!job) { if (was) MW.audio.sfx('whoosh'); return; }
+      MW.audio.sfx('pop');
+      c.el.hop(260);
+      const lines = [C.line(c.who, job)];
+      if (swapped && jobs[other]) lines.push(C.line(other, jobs[other]));
+      if (C.ready() && (job !== was || swapped)) lines.push(['crew-ready']);   // not again for a tap on a cat
+      if (opts.speak) opts.speak(lines);
+    }
+    scr.dragger = MW.dragger(parent, {
+      counters: function () { return CATS.map(function (w) { return cats[w]; }); },
+      enabled: function () { return !opts.enabled || opts.enabled(); },
+      onDrop: onDrop,
+      grab: L.grab
+    });
+
+    // what the screen says when it opens, and again on Hear-again
+    scr.intro = function () {
+      const jobs = C.jobs();
+      if (C.ready()) return opts.speak(CATS.map(function (w) { return C.line(w, jobs[w]); }));
+      return opts.speak([['crew-jobs']]);
+    };
+    scr.enter = function () { layout(false); scr.intro(); };
+    layout(false);
+    return scr;
   };
 })();
 
@@ -1776,10 +2028,162 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 })();
 
+/* MeeMee Rescue: the crew's job moments (phase 4, 0.4.1; the design canvas's round 4, Moments4).
+   A cat with a job appears briefly at its own moment, with no words, never over the diagram or the tray:
+     lookout    as a round starts, peeks over the asteroid with the telescope and spots the MeeMee;
+     engineer   on a right answer, gives the ship a tap with the spanner while the lights flash;
+     navigator  as a star turns peach, holds up the star map and points to the next one;
+     cook       on the end screen, brings fish for the rescued MeeMee.
+   A job no cat has has no moment. With reduce motion the cats fade in and out instead of moving. */
+(function () {
+  'use strict';
+  const MW = window.MW;
+
+  const L = MW.LAYOUT.moments = {
+    lookout: { x: 690, y: 390, w: 220, show: 175, box: 250, scope: { x: 89, y: 2, size: 150 } },   // behind the asteroid
+    engineer: { x: 700, y: 318, w: 140, spanner: { x: 100, y: 84, size: 88 } },                     // by the ship's left fin
+    navigator: { x: 686, y: 124, w: 120, map: { x: 64, y: 50, size: 80 } },                         // under the stars
+    cook: { size: 104, moggles: { x: 254, y: 494, flip: true }, snuffles: { x: 770, y: 494, flip: false } }   // end screen
+  };
+  function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
+  function size(svg, s) { svg.setAttribute('width', s); svg.setAttribute('height', s); return svg; }
+  function drop(el, ms) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms); }
+
+  // opts: { game: the game screen, tray: the asteroid's element, over: the layer the moments go under,
+  //         stars: MW.stars on the game screen, end: the end screen, endCats: { moggles: box, snuffles: box } }
+  MW.moments = function (opts) {
+    const m = {};
+    let timers = [];
+    const low = MW.make('div', 'mw-layer mw-fill mw-moments');       // behind the asteroid: the lookout
+    opts.game.insertBefore(low, opts.tray);
+    const high = MW.make('div', 'mw-layer mw-fill mw-moments');      // over the ship: the engineer and the navigator
+    opts.game.insertBefore(high, opts.over);
+    const endLayer = MW.make('div', 'mw-layer mw-fill mw-moments');
+    opts.end.appendChild(endLayer);
+    let peek = null;
+
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+    function catFor(job, w) {
+      const who = MW.crew.who(job);
+      if (!who) return null;
+      const c = MW.crew.cat(who, w);
+      c.setJob(job);
+      return c;
+    }
+    function show(el) { void el.getBoundingClientRect(); el.classList.add('is-shown'); }
+    function hide(el, after) { later(function () { el.classList.remove('is-shown'); drop(el, 400); }, after); }
+
+    // ---------------------------------------------------------------- lookout
+    m.lookoutUp = function () {
+      m.lookoutDown(true);
+      const k = L.lookout, cat = catFor('lookout', k.w);
+      if (!cat) return false;
+      const box = place(MW.make('div', 'mw-moment mw-peek', { 'data-moment': 'lookout' }), k.x, k.y);
+      box.style.width = k.box + 'px'; box.style.height = k.show + 'px';
+      const inner = MW.make('div', 'mw-peek-inner');
+      inner.appendChild(cat);
+      const scope = place(size(MW.art('held-telescope'), k.scope.size), k.scope.x, k.scope.y);
+      scope.setAttribute('class', 'mw-held-scope');
+      inner.appendChild(scope);
+      box.appendChild(inner);
+      low.appendChild(box);
+      peek = box;
+      show(box);
+      MW.log('moment', 'lookout');
+      return true;
+    };
+    m.lookoutDown = function (now) {
+      if (!peek) return;
+      const b = peek; peek = null;
+      if (now) { drop(b, 0); return; }
+      b.classList.remove('is-shown');
+      drop(b, 600);
+    };
+
+    // ---------------------------------------------------------------- engineer
+    m.engineer = function () {
+      const k = L.engineer, cat = catFor('engineer', k.w);
+      if (!cat) return false;
+      const box = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'engineer' }), k.x, k.y);
+      box.appendChild(cat);
+      const sp = MW.make('div', 'mw-spanner');
+      place(sp, k.spanner.x, k.spanner.y);
+      sp.appendChild(size(MW.art('job-engineer'), k.spanner.size));
+      box.appendChild(sp);
+      high.appendChild(box);
+      show(box);
+      later(function () { sp.classList.add('is-tapping'); }, 250);           // two taps on the hull
+      hide(box, 3700);                                                       // gone as the lights stop (about 4 s)
+      MW.log('moment', 'engineer');
+      return true;
+    };
+
+    // ---------------------------------------------------------------- navigator
+    // next: the star to point at (0 to 4), or null after the last question
+    m.navigator = function (next) {
+      const k = L.navigator, cat = catFor('navigator', k.w);
+      if (!cat) return false;
+      const box = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'navigator' }), k.x, k.y);
+      box.appendChild(cat);
+      const mp = place(MW.make('div', 'mw-star-map'), k.map.x, k.map.y);
+      mp.appendChild(size(MW.art('job-navigator'), k.map.size));
+      box.appendChild(mp);
+      const star = next !== null && next !== undefined ? opts.stars.el.children[next] : null;
+      if (star) {
+        // a dotted route from the top of the map to the star (positions on the 1280 x 800 stage)
+        const k2 = MW.stage.scale || 1, box0 = opts.stars.el.getBoundingClientRect(), r = star.getBoundingClientRect();
+        const sx = opts.stars.el.offsetLeft + (r.left - box0.left + r.width / 2) / k2;
+        const sy = opts.stars.el.offsetTop + (r.bottom - box0.top) / k2 + 4;
+        const fx = k.x + k.map.x + k.map.size * 0.62, fy = k.y + k.map.y + 6;
+        const route = MW.make('div', 'mw-layer mw-fill mw-route');
+        route.innerHTML = '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><path class="s-mint" fill="none" stroke-width="5" '
+          + 'stroke-dasharray="2 14" stroke-linecap="round" d="M' + fx + ' ' + fy + ' Q ' + ((fx + sx) / 2 + 30) + ' ' + Math.min(fy, sy) + ' ' + sx + ' ' + sy + '"/></svg>';
+        route.classList.add('mw-moment-pop');
+        high.appendChild(route);
+        later(function () { show(route); }, 250);
+        hide(route, 1900);
+      }
+      high.appendChild(box);
+      show(box);
+      hide(box, 2100);
+      MW.log('moment', 'navigator ' + (star ? next : 'end'));
+      return true;
+    };
+
+    // ---------------------------------------------------------------- cook (end screen)
+    m.cook = function () {
+      const who = MW.crew.who('cook');
+      if (!who) return false;
+      const k = L.cook, at = k[who];
+      const pan = place(MW.make('div', 'mw-moment mw-cook-pan' + (at.flip ? ' is-flipped' : ''), { 'data-moment': 'cook' }), at.x, at.y);
+      pan.appendChild(size(MW.art('job-cook'), k.size));
+      endLayer.appendChild(pan);
+      show(pan);
+      if (opts.endCats && opts.endCats[who]) opts.endCats[who].hop(0);
+      MW.sparkles(endLayer, at.x + k.size / 2, at.y + k.size / 2, 70);
+      MW.log('moment', 'cook');
+      return true;
+    };
+
+    // the in-round cats leave when the next question starts
+    m.settle = function () {
+      Array.prototype.forEach.call(high.querySelectorAll('.is-shown'), function (el) { el.classList.remove('is-shown'); drop(el, 400); });
+    };
+    // leaving: everything goes at once
+    m.clear = function () {
+      timers.forEach(clearTimeout); timers = [];
+      peek = null;
+      [low, high, endLayer].forEach(function (l) { l.innerHTML = ''; });
+    };
+    return m;
+  };
+})();
+
 /* MeeMee Rescue (phase 4).
    Play opens the home map (kit/map.js); the MeeMee Rescue planet starts a round of five part–whole questions in
    Barney's voice, chosen from the bonds that need work (bonds.js). The player drags MeeMee from the asteroid into the
-   waiting circle. Grown-ups see the progress grid. Built only from the kit (kit/*.js); 0.4.1 adds the crew screen. */
+   waiting circle. Grown-ups see the progress grid. The crew screen (kit/crew.js) gives Moggles and Snuffles their
+   jobs, and each job has its moment in a round (moments.js). Built from the kit (kit/*.js). */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -1792,7 +2196,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   const st = { token: 0, paused: false, pauses: {}, hintTimers: [], phase: 'idle', round: null, qi: 0, q: null, target: null, answer: 0,
     counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], welcomed: false, check: null };
   const R = MW.rescue = { st: st, nextRound: null };
-  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, map;
+  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, map, tray, crewScreen, moments;
+  const endCats = {};
 
   // ---------------------------------------------------------------- set-up
   function init() {
@@ -1800,8 +2205,10 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     MW.stage.init(stageEl);
     buildStart();
     buildMap();
+    buildCrew();
     buildGame();
     buildEnd();
+    moments = MW.moments({ game: MW.$('screen-game'), tray: tray.el, over: ghostLayer, stars: stars, end: MW.$('screen-end'), endCats: endCats });
     MW.shell.gate(stageEl, openGrownups);
     MW.grownups.init(stageEl, { title: 'Grown-ups', sections: [progressSection(), settingsSection()], onClose: function () { resume('grown-ups'); } });
     MW.shell.watchSideways(function () { pause('sideways'); }, function () { resume('sideways'); });
@@ -1840,15 +2247,37 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   // The home map: "Welcome to MeeMee World!" the first time in a visit; the MeeMee Rescue planet starts a round.
   function buildMap() {
     const s = MW.$('screen-map');
-    map = MW.map(s, { onRescue: openRescue, onLocked: notReady });
+    map = MW.map(s, { onRescue: openRescue, onLocked: notReady, onCrew: openCrew });
     MW.shell.buttons(s, ['music'], {});
   }
   function goMap() {
     st.token++;
     st.phase = 'map';
     st.check = null;
+    MW.audio.hush();                                          // nothing from the last screen carries on over the map
+    if (crewScreen) crewScreen.dragger.cancel();
+    if (moments) moments.clear();
+    map.setCrew(MW.crew.jobs());
     MW.shell.show('screen-map');
     if (!st.welcomed) { st.welcomed = true; speak([['map-welcome']]); }
+    if (!MW.crew.ready()) map.callCrew();                    // no jobs yet: the cats hop, to say "tap us"
+  }
+
+  // The crew screen: "Let's give the crew their jobs!" The player drags each cat onto a job.
+  function buildCrew() {
+    crewScreen = MW.crew.screen(MW.$('screen-crew'), {
+      speak: speak,
+      onHome: goMap,
+      enabled: function () { return !st.paused && MW.shell.screen === 'screen-crew'; }
+    });
+  }
+  function openCrew() {
+    if (st.phase !== 'map' || st.paused) return;
+    st.token++;
+    st.phase = 'crew';
+    MW.log('map', 'crew');
+    MW.shell.show('screen-crew');
+    crewScreen.enter();
   }
   async function openRescue() {
     if (st.phase !== 'map' || st.paused) return;
@@ -1870,8 +2299,9 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   function buildGame() {
     const s = MW.$('screen-game');
     diagram = MW.diagram(s);
-    MW.tray(s);
+    // the ship goes in before the asteroid (they don't overlap), so the lookout can peek out between them
     pod = MW.pod(s, MW.LAYOUT.pod.x, MW.LAYOUT.pod.y, MW.LAYOUT.pod.w);
+    tray = MW.tray(s);
     MW.onTap(pod.el, onPodTap);
     equation = MW.equation(s);
     stars = MW.stars(s, MW.LAYOUT.stars.x, MW.LAYOUT.stars.y);
@@ -1890,9 +2320,9 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   function buildEnd() {
     const s = MW.$('screen-end');
     endStars = MW.stars(s, 450, 40, 60);
-    const mog = MW.make('div', 'mw-abs mw-crew', { style: 'left:70px;top:330px' }); mog.appendChild(MW.art('moggles')); s.appendChild(mog);
+    const mog = MW.make('div', 'mw-abs mw-crew', { style: 'left:70px;top:330px' }); mog.appendChild(endCats.moggles = MW.crew.cat('moggles', 240)); s.appendChild(mog);
     const p = endPod = MW.pod(s, 380, 130, 400); p.face('got-it'); p.el.disabled = true; p.el.tabIndex = -1;
-    const snu = MW.make('div', 'mw-abs mw-crew', { style: 'left:790px;top:330px' }); snu.appendChild(MW.art('snuffles')); s.appendChild(snu);
+    const snu = MW.make('div', 'mw-abs mw-crew', { style: 'left:790px;top:330px' }); snu.appendChild(endCats.snuffles = MW.crew.cat('snuffles', 240)); s.appendChild(snu);
     endMimi = MW.make('div', 'mw-abs mw-start-mimi', { style: 'left:352px;top:600px' });
     for (let i = 0; i < 5; i++) endMimi.appendChild(MW.art('mimi'));
     s.appendChild(endMimi);
@@ -1913,6 +2343,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     clearHint();
     MW.audio.hush();
     if (dragger) dragger.cancel();
+    if (crewScreen) crewScreen.dragger.cancel();            // a cat held when the screen goes off goes back to its place
     MW.log('pause', why);
   }
   function resume(why) {
@@ -1922,6 +2353,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     st.paused = false;
     MW.log('resume', why);
     if (MW.shell.screen === 'screen-game' && (st.phase === 'open' || st.phase === 'asking')) speak(st.prompt);
+    else if (MW.shell.screen === 'screen-crew' && st.phase === 'crew') crewScreen.intro();
   }
   function openGrownups() { pause('grown-ups'); MW.grownups.openPanel(); }
   // Wait while paused; false if the player has left this round meanwhile.
@@ -1950,9 +2382,11 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     st.round = makeRound();
     st.qi = 0;
     clearBoard(true);
+    moments.clear();
     MW.shell.show('screen-game');
     stars.set(0);
     st.phase = 'starting';
+    moments.lookoutUp();                                     // the lookout peeks over the asteroid
     MW.log('round', JSON.stringify(st.round));
     await speak([['round-ready']]);
     if (!(await ok(token))) return;
@@ -1975,6 +2409,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     diagram.set(q);
     pod.face('thinking');
     pod.lightsOff();                                         // never still flashing into the next question
+    if (st.qi === 0) setTimeout(function () { if (token === st.token) moments.lookoutDown(); }, 1800);   // spotted them
+    else moments.settle();
     stars.set(st.qi);
     // the MeeMee already rescued: the given part(s), in their counting pattern
     ['left', 'right'].forEach(function (k) {
@@ -2154,6 +2590,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     const token = st.token, q = st.q;
     st.phase = 'celebrate';
     clearHint();
+    moments.lookoutDown();                                   // a quick first answer: the lookout makes way for the engineer
     MW.store.recordAnswer({ t: Date.now(), whole: q.whole, left: q.left, right: q.right, missing: q.missing,
       tries: st.tries, misses: st.misses, hint: st.hinted, check: check() });
     if (st.ghosts) { st.ghosts.clear(); st.ghosts = null; }
@@ -2162,6 +2599,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     MW.sparkles(fxLayer, c.x, c.y, c.r + 34);
     pod.face('got-it');
     pod.celebrate();                                         // the ship's lights flash for about 4 s
+    moments.engineer();                                      // the engineer taps the ship with the spanner
     MW.audio.sfx('chime');
     MW.log('success', JSON.stringify(q));
     await MW.wait(550);
@@ -2174,6 +2612,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     if (!(await ok(token))) return;
     stars.set(st.qi + 1);
     MW.audio.sfx('twinkle');
+    moments.navigator(st.qi + 1 < ROUND ? st.qi + 1 : null); // the navigator points to the next star
     await MW.wait(800);
     if (!(await ok(token))) return;
     // the rescued MeeMee fly up into the pod
@@ -2192,6 +2631,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     clearBoard(true);
     MW.shell.show('screen-end');
     endStars.set(ROUND, ROUND);
+    const jobs = MW.crew.jobs();
+    MW.crew.CATS.forEach(function (w) { endCats[w].setJob(jobs[w]); });
     MW.audio.sfx('tune');
     endPod.celebrate();
     await MW.wait(300);
@@ -2203,6 +2644,14 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     });
     await MW.wait(500);
     if (!(await ok(token))) return;
+    if (moments.cook()) {                                    // the cook brings fish; the MeeMee hop again
+      await MW.wait(450);
+      Array.prototype.forEach.call(endMimi.children, function (m, i) {
+        setTimeout(function () { m.classList.remove('is-hop'); void m.getBoundingClientRect(); m.classList.add('is-hop'); }, i * 120);
+      });
+      await MW.wait(900);
+      if (!(await ok(token))) return;
+    }
     await speak([['round-another']]);
   }
 
@@ -2218,7 +2667,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     MW.audio.hush();
     pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
-    goMap();
+    goMap();                                                  // (and the crew's moments go)
   }
 
   // ---------------------------------------------------------------- grown-ups: progress and settings
@@ -2345,7 +2794,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   }
 
   // ---------------------------------------------------------------- test hooks
-  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome; R.map = goMap; R.makeRound = makeRound;
+  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome; R.map = goMap; R.makeRound = makeRound; R.crew = function () { return crewScreen; };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

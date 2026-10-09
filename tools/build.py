@@ -23,9 +23,9 @@ sys.path.insert(0, str(ROOT / "tools"))
 from gen_tokens import COLOURS, OPACITY, RADIUS, SHADOWS, SIZES, SPACING, TYPE_STYLES  # noqa: E402
 import gen_scenes  # noqa: E402
 
-VERSION = "0.4.0"
-KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "map.js", "shell.js", "grownups.js"]
-GAME_JS = ["bonds.js", "rescue.js"]           # games/rescue/, in this order
+VERSION = "0.4.1"
+KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "map.js", "crew.js", "shell.js", "grownups.js"]
+GAME_JS = ["bonds.js", "moments.js", "rescue.js"]           # games/rescue/, in this order
 
 
 # ---------------------------------------------------------------- tokens -> CSS

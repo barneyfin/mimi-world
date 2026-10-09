@@ -173,6 +173,45 @@ button { font-family: var(--font-andika); }
 .mw-cell svg { flex: none; }
 .gu-legend { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
 
+/* ---------------------------------------------------------------- the crew (phase 4, 0.4.1) */
+.mw-cat { position: relative; line-height: 0; }
+.mw-cat-body { position: relative; width: 100%; height: 100%; transform-origin: 50% 80%; }
+.mw-cat-body.is-hop { animation: mw-hop 420ms ease-out; }
+.mw-badge { position: absolute; }
+.mw-map-crew-btn { padding: 0; margin: 0; border: 0; background: transparent; border-radius: 120px; cursor: pointer; }
+.mw-map-crew-btn:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; }
+/* the crew screen */
+.mw-crew-cat { position: absolute; left: 0; top: 0; z-index: 3; cursor: grab; }
+.mw-crew-cat.is-moving { transition: transform 320ms cubic-bezier(.2,.8,.2,1); }
+.mw-crew-cat.is-lifted { z-index: 6; }
+.mw-crew-cat.is-lifted .mw-cat-body { transform: scale(1.06); filter: drop-shadow(0 18px 10px rgba(0, 0, 0, 0.45)); }
+.mw-station { box-sizing: border-box; border-radius: 28px; background: var(--night-raised); border: 3px solid var(--night-button); }
+.mw-station-disc { box-sizing: border-box; width: 124px; height: 124px; border-radius: var(--radius-round); background: var(--moon);
+  border: 4px dashed var(--mint); display: flex; align-items: center; justify-content: center; line-height: 0; }
+.mw-station.is-taken .mw-station-disc { border-style: solid; box-shadow: 0 0 0 10px rgba(127, 217, 196, 0.18); }
+.mw-station-spot { position: absolute; left: 0; top: 0; }
+.mw-spot-fill { opacity: 0.08; }
+.mw-spot-rim { opacity: 0.8; stroke-dasharray: 2 10; }
+.mw-station.is-taken .mw-spot-fill { opacity: 0.18; }
+.mw-station.is-taken .mw-spot-rim { stroke-dasharray: none; }
+/* the job moments: never over the diagram or the asteroid, nothing to tap */
+.mw-moments, .mw-moment { pointer-events: none; }
+.mw-moment { position: absolute; line-height: 0; }
+.mw-peek { overflow: hidden; }
+.mw-peek-inner { position: absolute; left: 0; top: 0; transform: translateY(190px); transition: transform 450ms cubic-bezier(.2,.8,.2,1); }
+.mw-peek.is-shown .mw-peek-inner { transform: translateY(0); }
+.mw-held-scope { position: absolute; transform: rotate(36deg); transform-origin: 43px 98px; }
+.mw-moment-pop { opacity: 0; transform: translateY(18px); transition: opacity 300ms ease-out, transform 300ms ease-out; }
+.mw-moment-pop.is-shown { opacity: 1; transform: none; }
+.mw-spanner { position: absolute; transform-origin: 22% 78%; transform: rotate(-8deg); }   /* held by the ring */
+.mw-spanner svg { transform: scaleX(-1); }                                                    /* jaw towards the ship */
+.mw-spanner.is-tapping { animation: mw-spanner-tap 800ms ease-in-out 2; }
+@keyframes mw-spanner-tap { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(12deg); } }
+.mw-star-map { position: absolute; transform: rotate(-8deg); }
+.mw-cook-pan { scale: 0; transition: scale 380ms cubic-bezier(.3,1.5,.5,1); }
+.mw-cook-pan.is-flipped svg { transform: scaleX(-1); }
+.mw-cook-pan.is-shown { scale: 1; }
+
 /* ---------------------------------------------------------------- turn me sideways */
 .mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
   align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
@@ -190,5 +229,13 @@ button { font-family: var(--font-andika); }
   .mw-btn--main:active, .mw-btn--play:active, .mw-btn--nav:active { transform: none; }
   .mw-pod.is-celebrating .mw-ship-light, .mw-pod.is-celebrating .mw-ship-beacon { animation: none; opacity: 1; }
   .mw-pod.is-celebrating .mw-ship-glow, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation: none; opacity: 0.3; }
+  .mw-cat-body.is-hop { animation: none; }
+  .mw-crew-cat.is-moving { transition: none; }
+  .mw-peek-inner { transform: none; opacity: 0; transition: opacity 300ms ease-out; }
+  .mw-peek.is-shown .mw-peek-inner { transform: none; opacity: 1; }
+  .mw-moment-pop { transform: none; }
+  .mw-spanner.is-tapping { animation: none; }
+  .mw-cook-pan { scale: 1; opacity: 0; transition: opacity 300ms ease-out; }
+  .mw-cook-pan.is-shown { opacity: 1; }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }

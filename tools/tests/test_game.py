@@ -1,4 +1,4 @@
-"""Headless checks for MeeMee World (phase 4): the map, a round, the bonds and the kit, on Fire and Doogee screen sizes.
+"""Headless checks for MeeMee World (phase 4): the map, the crew, a round, the bonds and the kit, on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -521,6 +521,9 @@ async def test_reduce_motion(p):
     lit = await page.evaluate("""(() => { const pod = document.querySelector('#screen-start .mw-pod'); pod.classList.add('is-celebrating');
         const l = getComputedStyle(pod.querySelector('.mw-ship-light')); return [l.animationName, l.opacity]; })()""")
     check("reduce motion: the ship's lights stay lit instead of flashing", lit == ["none", "1"], str(lit))
+    peek = await page.evaluate("""(() => { const d = document.createElement('div'); d.className = 'mw-peek'; d.innerHTML = '<div class="mw-peek-inner"></div>';
+        document.body.appendChild(d); const t = getComputedStyle(d.firstChild).transform; d.remove(); return t; })()""")
+    check("reduce motion: the lookout fades in instead of rising", peek == "none", peek)
     await browser.close()
 
 
@@ -638,7 +641,10 @@ async def test_zero(p):
     await t.tap(1030, 300)
     s = await t.wait_phase(["celebrate"], 3)
     check("zero: tapping Scruffles with the circle empty answers 0", s["phase"] == "celebrate", json.dumps(s))
-    await asyncio.sleep(2.5)
+    for _ in range(80):                                      # after the praise, however long it is
+        if "num-mid-5 and num-mid-0 make num-end-5" in await t.said():
+            break
+        await asyncio.sleep(0.1)
     eq = await page.inner_text("#screen-game .mw-equation")
     check("zero: the equation reads 5 + 0 = 5", eq.replace("\n", " ").split() == ["5", "+", "0", "=", "5"], eq)
     check("zero: '5 and 0 make 5' is spoken", "num-mid-5 and num-mid-0 make num-end-5" in await t.said())
@@ -794,6 +800,231 @@ async def test_grid(p):
     await browser.close()
 
 
+
+# ---------------------------------------------------------------- 0.4.1: the crew screen and the job moments
+CREW_BTN = (250, 510)                 # the crew corner on the map
+DECK = {"moggles": (220, 279), "snuffles": (380, 279)}                     # a waiting cat's middle
+STATION = {"lookout": (175, 640), "engineer": (485, 640), "navigator": (795, 640), "cook": (1105, 640)}
+
+
+async def crew_state(page):
+    return await page.evaluate("""({ jobs: MW.crew.jobs(), taken: Array.from(document.querySelectorAll('#screen-crew .mw-station.is-taken')).map(e => e.dataset.job),
+        badges: Array.from(document.querySelectorAll('#screen-crew .mw-crew-cat')).map(e => e.dataset.who + ':' + e.dataset.job),
+        pulse: document.querySelector('#screen-crew [aria-label=Home]').classList.contains('mw-pulse') })""")
+
+
+async def cat_at(page, who):
+    return await page.evaluate("(w => { const c = MW.rescue.crew().cats[w]; return [c.x, c.y]; })(%s)" % json.dumps(who))
+
+
+async def test_crew(p, name="crew", vw=1280, vh=800, dpr=1):
+    print(f"\n== the crew screen ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, name, vw, vh, dpr, mode="tap")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    jobs = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-cat')).map(e => e.dataset.job || '')")
+    check(f"{name}: a new tablet's crew have no jobs (no badges on the map)", jobs == ["", ""], str(jobs))
+    await asyncio.sleep(1.4)
+    await t.tap(*CREW_BTN)
+    check(f"{name}: tapping the crew on the map opens the crew screen", await t.wait_screen("screen-crew"))
+    await asyncio.sleep(0.3)
+    check(f"{name}: it says 'Let's give the crew their jobs!'", (await t.said())[-1:] == ["crew-jobs"], str((await t.said())[-2:]))
+    if name == "crew":
+        await page.screenshot(path=str(SHOTS / "crew-1-no-jobs.png"))
+    await asyncio.sleep(1.5)
+    x, y = await cat_at(page, "moggles")
+    await t.drag(x, y, *STATION["lookout"])
+    await asyncio.sleep(0.5)
+    st = await crew_state(page)
+    check(f"{name}: Moggles dragged onto the telescope is the lookout", st["jobs"] == {"moggles": "lookout", "snuffles": None} and st["taken"] == ["lookout"]
+          and "moggles:lookout" in st["badges"], json.dumps(st))
+    check(f"{name}: 'Moggles is the lookout.'", (await t.said())[-1:] == ["name-moggles is-the job-lookout"], str((await t.said())[-1:]))
+    check(f"{name}: no 'crew are ready' with one job left", not st["pulse"])
+    await asyncio.sleep(2)
+    x, y = await cat_at(page, "snuffles")
+    await t.drag(x, y, *STATION["cook"])
+    await asyncio.sleep(0.5)
+    st = await crew_state(page)
+    check(f"{name}: Snuffles onto the frying pan is the cook", st["jobs"] == {"moggles": "lookout", "snuffles": "cook"}, json.dumps(st))
+    check(f"{name}: 'Snuffles is the cook. The crew are ready!'", (await t.said())[-1:] == ["name-snuffles is-the job-cook crew-ready"], str((await t.said())[-1:]))
+    check(f"{name}: with both jobs given, Home pulses (back to the map)", st["pulse"])
+    if name == "crew":
+        await asyncio.sleep(0.5)
+        await page.screenshot(path=str(SHOTS / "crew-2-jobs.png"))
+    await asyncio.sleep(2.5)
+    # Moggles onto Snuffles's job: they swap
+    x, y = await cat_at(page, "moggles")
+    await t.drag(x, y, *STATION["cook"])
+    await asyncio.sleep(0.5)
+    st = await crew_state(page)
+    check(f"{name}: one job per cat: onto the other cat's job, they swap", st["jobs"] == {"moggles": "cook", "snuffles": "lookout"}, json.dumps(st))
+    check(f"{name}: both new jobs are said", (await t.said())[-1:] == ["name-moggles is-the job-cook name-snuffles is-the job-lookout crew-ready"], str((await t.said())[-1:]))
+    await asyncio.sleep(3.5)
+    # a drop between the stations' rows (off the bottom half) takes the job off
+    x, y = await cat_at(page, "snuffles")
+    await t.drag(x, y, 640, 300)
+    await asyncio.sleep(0.5)
+    st = await crew_state(page)
+    check(f"{name}: a cat put back on the deck has no job", st["jobs"] == {"moggles": "cook", "snuffles": None} and not st["pulse"], json.dumps(st))
+    back = await cat_at(page, "snuffles")
+    check(f"{name}: ... and goes back to its place on the deck", abs(back[0] - DECK["snuffles"][0]) < 3 and abs(back[1] - DECK["snuffles"][1]) < 6, str(back))
+    x, y = await cat_at(page, "snuffles")
+    await t.drag(x, y, *STATION["engineer"])
+    await asyncio.sleep(2.5)
+    n = len(await t.said())
+    x, y = await cat_at(page, "moggles")
+    await t.tap(x, y)
+    await asyncio.sleep(0.5)
+    check(f"{name}: tapping a cat says its job", (await t.said())[n:] == ["name-moggles is-the job-cook"], str((await t.said())[n:]))
+    await asyncio.sleep(2)
+    await t.tap(1208, 68)                                    # Hear it again
+    await asyncio.sleep(0.4)
+    check(f"{name}: Hear-again says each cat's job", (await t.said())[-1:] == ["name-moggles is-the job-cook name-snuffles is-the job-engineer"], str((await t.said())[-1:]))
+    # the screen going off mid-drag: the cat goes back to its place, and the next drag still works
+    x, y = await cat_at(page, "snuffles")
+    sx, sy = await t.screen(x, y)
+    await touch(t, "touchStart", [(7, (sx, sy))])
+    for k in range(1, 6):
+        await touch(t, "touchMove", [(7, (sx + k * 30, sy - k * 10))])
+        await asyncio.sleep(0.03)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.5)
+    held = await page.evaluate("MW.rescue.crew().dragger.dragging()")
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.6)
+    st = await crew_state(page)
+    check(f"{name}: a pause lets go of a held cat, and its job stays", not held and st["jobs"] == {"moggles": "cook", "snuffles": "engineer"}, json.dumps([held, st["jobs"]]))
+    check(f"{name}: coming back says the crew's jobs again", (await t.said())[-1:] == ["name-moggles is-the job-cook name-snuffles is-the job-engineer"], str((await t.said())[-1:]))
+    await t.tap(66, 62)                                      # Home
+    check(f"{name}: Home goes back to the map", await t.wait_screen("screen-map"))
+    jobs = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
+    check(f"{name}: the cats wear their job badges on the map", jobs == ["moggles:cook", "snuffles:engineer"]
+          and await page.evaluate("document.querySelectorAll('#screen-map .mw-badge').length") == 2, str(jobs))
+    if name == "crew":
+        await asyncio.sleep(0.4)
+        await page.screenshot(path=str(SHOTS / "crew-3-map-badges.png"))
+    await page.reload()
+    await page.wait_for_load_state("load")
+    check(f"{name}: the jobs are remembered after closing the game", await page.evaluate("JSON.stringify(MW.crew.jobs())") == json.dumps({"moggles": "cook", "snuffles": "engineer"}, separators=(",", ":")))
+    check(f"{name}: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+def overlaps_circle(box, c):
+    """box: [x, y, w, h] on the stage; c: (cx, cy, r)."""
+    nx = min(max(c[0], box[0]), box[0] + box[2]); ny = min(max(c[1], box[1]), box[1] + box[3])
+    return (nx - c[0]) ** 2 + (ny - c[1]) ** 2 < c[2] ** 2
+
+
+async def moment_box(page, sel):
+    """The stage box of what is drawn in a moment (its cat and what it holds), or None."""
+    return await page.evaluate("""(sel => { const el = document.querySelector(sel); if (!el) return null;
+        const s = MW.stage.scale, ox = MW.stage.offX, oy = MW.stage.offY;
+        let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        el.querySelectorAll('svg').forEach(g => { const r = g.getBoundingClientRect(); x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); });
+        return [(x0 - ox) / s, (y0 - oy) / s, (x1 - x0) / s, (y1 - y0) / s]; })(%s)""" % json.dumps(sel))
+
+
+async def test_moments(p):
+    print("\n== the job moments ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "moments", 1046, 653, 1.22, mode="auto")
+    await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'engineer'})")
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(0.3)
+    await t.tap(*RESCUE)
+    await t.wait_screen("screen-game")
+    await asyncio.sleep(1.2)
+    up = await page.evaluate("!!document.querySelector('#screen-game [data-moment=lookout].is-shown')")
+    check("moments: the lookout peeks over the asteroid as the round starts", up)
+    order = await page.evaluate("""(() => { const lay = document.querySelector('[data-moment=lookout]').closest('.mw-moments');
+        const kids = Array.from(document.querySelectorAll('#screen-game > *'));
+        const tray = kids.find(e => e.style.left === '745px' && e.style.top === '515px');
+        const pod = document.querySelector('#screen-game .mw-pod');
+        return [kids.indexOf(pod) < kids.indexOf(lay), lay.nextElementSibling === tray]; })()""")
+    lb = await moment_box(page, "#screen-game [data-moment=lookout]")
+    check("moments: the lookout is behind the asteroid and in front of the ship", order == [True, True], str(order))
+    check("moments: the lookout keeps clear of the diagram", lb and not any(overlaps_circle(lb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]), str(lb))
+    await page.screenshot(path=str(SHOTS / "moments-1-lookout.png"))
+    await t.wait_phase(["open"], 15)
+    await asyncio.sleep(2.4)
+    check("moments: the lookout ducks down once the MeeMee are spotted", not await page.evaluate("!!document.querySelector('[data-moment=lookout]')"))
+    await t.fill(4, "right")
+    await asyncio.sleep(0.5)
+    eb = await moment_box(page, "#screen-game [data-moment=engineer]")
+    check("moments: the engineer comes to the ship on a right answer", eb is not None)
+    check("moments: the engineer keeps clear of the diagram and the asteroid",
+          eb and not any(overlaps_circle(eb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and eb[1] + eb[3] < 530, str(eb))
+    tapping = await page.evaluate("document.querySelector('[data-moment=engineer] .mw-spanner').classList.contains('is-tapping')")
+    check("moments: ... and taps it with the spanner", tapping)
+    await page.screenshot(path=str(SHOTS / "moments-2-engineer.png"))
+    await asyncio.sleep(3.8)
+    check("moments: the engineer goes as the lights stop", not await page.evaluate("!!document.querySelector('[data-moment=engineer].is-shown')"))
+    # the navigator and the cook
+    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'cook'})")
+    s = await t.wait_phase(["open"], 15)
+    n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
+    await t.fill(5, "whole")
+    for _ in range(80):
+        if await page.evaluate("MW.events.filter(e => e.type === 'moment').length") > n0:
+            break
+        await asyncio.sleep(0.1)
+    await asyncio.sleep(0.5)
+    nb = await moment_box(page, "#screen-game [data-moment=navigator]")
+    route = await page.evaluate("(() => { const r = document.querySelector('#screen-game .mw-route path'); return r ? r.getAttribute('d') : null; })()")
+    check("moments: the navigator holds up the star map as the star turns peach", nb is not None)
+    check("moments: ... with a dotted route to the next star", route is not None and "NaN" not in route, str(route))
+    check("moments: the navigator keeps clear of the diagram and the stars",
+          nb and not any(overlaps_circle(nb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and nb[1] > 95, str(nb))
+    await page.screenshot(path=str(SHOTS / "moments-3-navigator.png"))
+    for q in range(2, 5):
+        s = await t.wait_phase(["open"], 15)
+        await t.fill(s["answer"], s["target"])
+    await t.wait_phase(["done"], 20)
+    for _ in range(80):
+        if await page.evaluate("!!document.querySelector('#screen-end [data-moment=cook].is-shown')"):
+            break
+        await asyncio.sleep(0.1)
+    check("moments: the cook brings fish on the end screen", await page.evaluate("!!document.querySelector('#screen-end [data-moment=cook].is-shown')"))
+    badges = await page.evaluate("Array.from(document.querySelectorAll('#screen-end .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
+    check("moments: the end screen's cats wear their badges", badges == ["moggles:navigator", "snuffles:cook"], str(badges))
+    await asyncio.sleep(1)
+    await page.screenshot(path=str(SHOTS / "moments-4-cook.png"))
+    for _ in range(80):                                      # the cook's moment comes before "Another rescue?"
+        if "round-another" in await t.said():
+            break
+        await asyncio.sleep(0.1)
+    said = await t.said()
+    check("moments: no words in the moments (a round sounds the same)", "round-another" in said and not any("job-" in x or "name-" in x for x in said), str(said[-3:]))
+    await t.tap(66, 62)
+    await asyncio.sleep(0.4)
+    check("moments: Home clears them", await page.evaluate("document.querySelectorAll('[data-moment]').length") == 0)
+    # nobody has a job: no moments
+    await page.evaluate("MW.crew.save({moggles: null, snuffles: null}); MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
+    await t.tap(*RESCUE)
+    await t.wait_phase(["open"], 15)
+    await t.fill(4, "right")
+    await asyncio.sleep(4)
+    check("moments: no jobs, no moments", await page.evaluate("MW.events.filter(e => e.type === 'moment').length") == n0)
+    # a very quick first answer: the lookout makes way for the engineer
+    await t.tap(66, 62)
+    await asyncio.sleep(0.3)
+    await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'engineer'}); MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.wait_phase(["asking", "open"], 15)
+    await page.evaluate("for (let i = 0; i < 4; i++) { const c = MW.rescue.st.counters.filter(c => c.where === 'tray').pop(); MW.rescue.drop(c, 550, 470, false); }")
+    await asyncio.sleep(0.5)
+    both = await page.evaluate("[!!document.querySelector('[data-moment=lookout].is-shown'), !!document.querySelector('[data-moment=engineer].is-shown')]")
+    check("moments: a quick first answer: the lookout ducks down as the engineer comes", both == [False, True], str(both))
+    check("moments: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -805,6 +1036,9 @@ async def main():
         await test_zero(p)
         await test_bonds(p)
         await test_grid(p)
+        await test_crew(p)
+        await test_crew(p, "crew-fire", 1046, 653, 1.22)
+        await test_moments(p)
         await test_edge_cases(p)
         await test_portrait(p)
         await test_reduce_motion(p)
