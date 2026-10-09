@@ -54,8 +54,19 @@ add("Map", "map-welcome", "Welcome to MeeMee World!", "Warm welcome.")
 add("Map", "map-mimi-rescue", "MeeMee Rescue!", "Announcing the game's name.")
 add("Map", "map-not-ready", "That planet isn't ready yet.", "Gentle, no disappointment.")
 
-assert len(clips) == 45, len(clips)
-assert len({c["id"] for c in clips}) == 45
+# The crew screen (phase 4, 0.4.1). The game builds "Moggles is the lookout." from pieces, like the numbers.
+add("Crew", "crew-jobs", "Let's give the crew their jobs!", "Excited, inviting.", pending=True)
+add("Crew", "crew-ready", "The crew are ready!", "Pleased, a big finish.", pending=True)
+add("Crew", "name-moggles", "Moggles…", "Keep the voice up: more follows (\"Moggles… is the… lookout.\").", pending=True)
+add("Crew", "name-snuffles", "Snuffles…", "Keep the voice up: more follows.", pending=True)
+add("Crew", "is-the", "is the…", "Short and light, voice up: a job follows.", pending=True)
+add("Crew", "job-lookout", "lookout.", "Fall at the end: the last word of the sentence.", pending=True)
+add("Crew", "job-engineer", "engineer.", "Fall at the end: the last word of the sentence.", pending=True)
+add("Crew", "job-navigator", "navigator.", "Fall at the end: the last word of the sentence.", pending=True)
+add("Crew", "job-cook", "cook.", "Fall at the end: the last word of the sentence.", pending=True)
+
+assert len(clips) == 54, len(clips)
+assert len({c["id"] for c in clips}) == 54
 
 script = {
     "game": "MeeMee Rescue",

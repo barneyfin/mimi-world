@@ -272,6 +272,69 @@
       "group": "Map",
       "words": "That planet isn't ready yet.",
       "how": "Gentle, no disappointment."
+    },
+    {
+      "id": "crew-jobs",
+      "group": "Crew",
+      "words": "Let's give the crew their jobs!",
+      "how": "Excited, inviting.",
+      "pending": true
+    },
+    {
+      "id": "crew-ready",
+      "group": "Crew",
+      "words": "The crew are ready!",
+      "how": "Pleased, a big finish.",
+      "pending": true
+    },
+    {
+      "id": "name-moggles",
+      "group": "Crew",
+      "words": "Moggles…",
+      "how": "Keep the voice up: more follows (\"Moggles… is the… lookout.\").",
+      "pending": true
+    },
+    {
+      "id": "name-snuffles",
+      "group": "Crew",
+      "words": "Snuffles…",
+      "how": "Keep the voice up: more follows.",
+      "pending": true
+    },
+    {
+      "id": "is-the",
+      "group": "Crew",
+      "words": "is the…",
+      "how": "Short and light, voice up: a job follows.",
+      "pending": true
+    },
+    {
+      "id": "job-lookout",
+      "group": "Crew",
+      "words": "lookout.",
+      "how": "Fall at the end: the last word of the sentence.",
+      "pending": true
+    },
+    {
+      "id": "job-engineer",
+      "group": "Crew",
+      "words": "engineer.",
+      "how": "Fall at the end: the last word of the sentence.",
+      "pending": true
+    },
+    {
+      "id": "job-navigator",
+      "group": "Crew",
+      "words": "navigator.",
+      "how": "Fall at the end: the last word of the sentence.",
+      "pending": true
+    },
+    {
+      "id": "job-cook",
+      "group": "Crew",
+      "words": "cook.",
+      "how": "Fall at the end: the last word of the sentence.",
+      "pending": true
     }
   ]
 }
