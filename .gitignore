@@ -1,6 +1,11 @@
 # Staging area for files Claude writes in; never committed
 dist/
 
+# Made by the tests and the build tools
+tools/tests/shots/
+tools/tests/serve/
+__pycache__/
+
 # Windows clutter
 Thumbs.db
 desktop.ini

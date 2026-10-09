@@ -1,0 +1,252 @@
+{
+ "reference_lufs": -20.0,
+ "voice": {
+  "num-mid-0": {
+   "dur": 0.99,
+   "lufs_before": -20.1,
+   "gain_db": 0.1
+  },
+  "num-mid-1": {
+   "dur": 0.71,
+   "lufs_before": -19.3,
+   "gain_db": -0.7
+  },
+  "num-mid-2": {
+   "dur": 0.71,
+   "lufs_before": -20.2,
+   "gain_db": 0.2
+  },
+  "num-mid-3": {
+   "dur": 0.97,
+   "lufs_before": -20.0,
+   "gain_db": 0.0
+  },
+  "num-mid-4": {
+   "dur": 0.66,
+   "lufs_before": -19.5,
+   "gain_db": -0.5
+  },
+  "num-mid-5": {
+   "dur": 1.04,
+   "lufs_before": -19.7,
+   "gain_db": -0.3
+  },
+  "num-mid-6": {
+   "dur": 0.72,
+   "lufs_before": -24.9,
+   "gain_db": 4.9
+  },
+  "num-mid-7": {
+   "dur": 0.67,
+   "lufs_before": -20.5,
+   "gain_db": 0.5
+  },
+  "num-mid-8": {
+   "dur": 0.59,
+   "lufs_before": -22.9,
+   "gain_db": 2.9
+  },
+  "num-mid-9": {
+   "dur": 0.84,
+   "lufs_before": -20.3,
+   "gain_db": 0.3
+  },
+  "num-mid-10": {
+   "dur": 0.85,
+   "lufs_before": -20.5,
+   "gain_db": 0.5
+  },
+  "num-end-0": {
+   "dur": 1.02,
+   "lufs_before": -22.6,
+   "gain_db": 2.6
+  },
+  "num-end-1": {
+   "dur": 0.49,
+   "lufs_before": -22.9,
+   "gain_db": 2.9
+  },
+  "num-end-2": {
+   "dur": 0.74,
+   "lufs_before": -20.4,
+   "gain_db": 0.4
+  },
+  "num-end-3": {
+   "dur": 0.75,
+   "lufs_before": -20.0,
+   "gain_db": -0.0
+  },
+  "num-end-4": {
+   "dur": 0.46,
+   "lufs_before": -21.6,
+   "gain_db": 1.6
+  },
+  "num-end-5": {
+   "dur": 0.52,
+   "lufs_before": -20.6,
+   "gain_db": 0.6
+  },
+  "num-end-6": {
+   "dur": 0.94,
+   "lufs_before": -26.1,
+   "gain_db": 6.1
+  },
+  "num-end-7": {
+   "dur": 0.6,
+   "lufs_before": -22.1,
+   "gain_db": 2.1
+  },
+  "num-end-8": {
+   "dur": 0.96,
+   "lufs_before": -21.8,
+   "gain_db": 1.8
+  },
+  "num-end-9": {
+   "dur": 0.96,
+   "lufs_before": -20.4,
+   "gain_db": 0.4
+  },
+  "num-end-10": {
+   "dur": 0.79,
+   "lufs_before": -22.0,
+   "gain_db": 2.0
+  },
+  "and": {
+   "dur": 0.71,
+   "lufs_before": -20.7,
+   "gain_db": 0.7
+  },
+  "make": {
+   "dur": 0.83,
+   "lufs_before": -22.3,
+   "gain_db": 2.3
+  },
+  "q-lets-make": {
+   "dur": 1.72,
+   "lufs_before": -20.3,
+   "gain_db": 0.3
+  },
+  "q-weve-got": {
+   "dur": 1.74,
+   "lufs_before": -20.2,
+   "gain_db": 0.2
+  },
+  "q-how-many-more": {
+   "dur": 1.03,
+   "lufs_before": -19.2,
+   "gain_db": -0.8
+  },
+  "q-how-many-altogether": {
+   "dur": 1.46,
+   "lufs_before": -19.5,
+   "gain_db": -0.5
+  },
+  "q-count-on-from": {
+   "dur": 1.82,
+   "lufs_before": -21.0,
+   "gain_db": 1.0
+  },
+  "praise-found-it": {
+   "dur": 0.97,
+   "lufs_before": -19.1,
+   "gain_db": -0.9
+  },
+  "praise-thats-right": {
+   "dur": 0.9,
+   "lufs_before": -19.5,
+   "gain_db": -0.5
+  },
+  "praise-super-counting": {
+   "dur": 1.19,
+   "lufs_before": -21.7,
+   "gain_db": 1.7
+  },
+  "praise-brilliant-rescuing": {
+   "dur": 1.41,
+   "lufs_before": -20.5,
+   "gain_db": 0.5
+  },
+  "praise-well-done": {
+   "dur": 0.7,
+   "lufs_before": -20.0,
+   "gain_db": -0.0
+  },
+  "again-try-again": {
+   "dur": 1.24,
+   "lufs_before": -19.4,
+   "gain_db": -0.6
+  },
+  "again-look-again": {
+   "dur": 1.32,
+   "lufs_before": -20.6,
+   "gain_db": 0.6
+  },
+  "again-count-with-me": {
+   "dur": 1.46,
+   "lufs_before": -20.1,
+   "gain_db": 0.1
+  },
+  "too-many": {
+   "dur": 2.07,
+   "lufs_before": -20.5,
+   "gain_db": 0.5
+  },
+  "round-ready": {
+   "dur": 2.73,
+   "lufs_before": -19.0,
+   "gain_db": -1.0
+  },
+  "round-rescued-all": {
+   "dur": 2.96,
+   "lufs_before": -21.6,
+   "gain_db": 1.6
+  },
+  "round-another": {
+   "dur": 1.0,
+   "lufs_before": -20.3,
+   "gain_db": 0.3
+  },
+  "map-welcome": {
+   "dur": 3.0,
+   "lufs_before": -22.2,
+   "gain_db": 2.2
+  },
+  "map-mimi-rescue": {
+   "dur": 1.38,
+   "lufs_before": -20.1,
+   "gain_db": 0.1
+  },
+  "map-not-ready": {
+   "dur": 2.22,
+   "lufs_before": -20.1,
+   "gain_db": 0.1
+  }
+ },
+ "music": {
+  "dur": 159.85,
+  "fade": 1.5,
+  "gain_db": -7.4
+ },
+ "effects": {
+  "chime": {
+   "dur": 0.61,
+   "lufs": -21.0
+  },
+  "pop": {
+   "dur": 0.12,
+   "lufs": -25.0
+  },
+  "whoosh": {
+   "dur": 0.34,
+   "lufs": -27.0
+  },
+  "twinkle": {
+   "dur": 0.9,
+   "lufs": -23.0
+  },
+  "tune": {
+   "dur": 2.6,
+   "lufs": -21.0
+  }
+ }
+}

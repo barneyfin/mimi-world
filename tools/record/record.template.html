@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Mimi Rescue · voice recording</title>
+<style>
+  @font-face { font-family: Andika; src: url(data:font/woff2;base64,__FONT400__) format("woff2"); font-weight: 400; }
+  @font-face { font-family: Andika; src: url(data:font/woff2;base64,__FONT700__) format("woff2"); font-weight: 700; }
+  :root {
+    --night: #171A45; --night-raised: #1C2052; --night-button: #262B66; --ink: #0F1236;
+    --moon: #F4EFE1; --numeral: #1B1E4A; --mint: #7FD9C4; --peach: #FFB48A; --peach-dark: #B9724E;
+    --text-2: #B9BEE8; --text-3: #9DA2DF; --star-empty: #6268B0; --mimi: #8C7CD6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--night); color: var(--moon); font-family: Andika, "Trebuchet MS", sans-serif; }
+  body { font-size: 17px; line-height: 1.45; }
+  main { max-width: 980px; margin: 0 auto; padding: 28px 20px 140px; }
+  h1 { margin: 0; font-size: 30px; line-height: 1.2; }
+  h2 { margin: 0 0 12px; font-size: 22px; }
+  .lead { color: var(--text-2); margin: 6px 0 22px; max-width: 70ch; }
+  .card { background: var(--night-raised); border-radius: 22px; padding: 22px 24px; margin-bottom: 18px; }
+  .row-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  button { font: inherit; cursor: pointer; }
+  .btn { height: 48px; padding: 0 20px; border-radius: 24px; border: 3px solid var(--mint); background: var(--night-button);
+         color: var(--moon); font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+  .btn.peach { background: var(--peach); border-color: var(--peach); color: var(--numeral); }
+  .btn.rec { background: var(--peach); border-color: var(--peach); color: var(--numeral); min-width: 128px; justify-content: center; }
+  .btn.rec.is-on { background: var(--night); color: var(--peach); border-color: var(--peach); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+  .btn:focus-visible, .clip:focus-visible { outline: 3px solid var(--mint); outline-offset: 3px; }
+  .muted { color: var(--text-2); }
+  .small { font-size: 15px; }
+  .ok { color: var(--mint); }
+  .warn { color: var(--peach); }
+  .meter { width: 240px; height: 14px; border-radius: 7px; background: var(--night-button); overflow: hidden; }
+  .meter > i { display: block; height: 100%; width: 0; background: var(--mint); }
+  .meter.hot > i { background: var(--peach); }
+  .progress { font-weight: 700; }
+  .group { margin: 26px 0 8px; font-size: 19px; font-weight: 700; color: var(--text-2); }
+  .clip { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; align-items: center;
+          background: var(--night-raised); border: 3px solid transparent; border-radius: 18px; padding: 14px 18px; margin-bottom: 10px; }
+  .clip.is-current { border-color: var(--mint); }
+  .clip .words { font-size: 24px; font-weight: 700; }
+  .clip .how { color: var(--text-2); font-size: 15px; }
+  .clip .status { font-size: 15px; }
+  .clip canvas { width: 160px; height: 36px; display: block; }
+  .clip .actions { display: flex; gap: 8px; align-items: center; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 1px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+  .tag.mid { background: var(--night-button); color: var(--mint); }
+  .tag.end { background: var(--night-button); color: var(--peach); }
+  .check { position: fixed; left: 0; right: 0; bottom: 0; background: var(--ink); border-top: 3px solid var(--night-button); }
+  .check .inner { max-width: 980px; margin: 0 auto; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  select { font: inherit; height: 44px; border-radius: 12px; border: 2px solid var(--mint); background: var(--night-button); color: var(--moon); padding: 0 10px; }
+  kbd { font-family: inherit; font-size: 14px; border: 2px solid var(--text-3); border-radius: 6px; padding: 0 6px; color: var(--text-2); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Mimi Rescue voice recording</h1>
+  <p class="lead">Record each line once, in a quiet room, at the same distance from your headset microphone. The page trims the silence, brings every clip to the same loudness and saves it straight into the Mimi World <b>voice</b> folder. Redo any line as often as you like.</p>
+
+  <section class="card">
+    <h2>1. Choose the voice folder</h2>
+    <p class="muted small">Pick <b>Documents › Calude Code › Mimi World › voice</b>. Chrome will ask to let this page save files there: choose <b>Allow</b> / <b>Edit files</b>. Recordings stay on your PC; nothing is uploaded.</p>
+    <div class="row-actions">
+      <button class="btn peach" id="pick">Choose folder</button>
+      <span id="folderStatus" class="muted">No folder chosen yet.</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. Check the microphone</h2>
+    <p class="muted small">Say "Mimi World" at your normal speaking voice. The bar should reach the middle, and never turn peach.</p>
+    <div class="row-actions">
+      <button class="btn" id="micBtn">Start microphone check</button>
+      <div class="meter" id="meter"><i></i></div>
+      <span id="micStatus" class="muted small"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. Record each line</h2>
+    <p class="muted small">Press <b>Record</b>, wait half a second, say the words, then press <b>Stop</b>. Keyboard: <kbd>Space</kbd> record or stop the highlighted line, <kbd>P</kbd> play it, <kbd>↑</kbd> <kbd>↓</kbd> move between lines. After each save the next line is highlighted.</p>
+    <p class="progress" id="progress">0 of 0 recorded</p>
+  </section>
+
+  <div id="list"></div>
+</main>
+
+<div class="check">
+  <div class="inner">
+    <b>Hear a sentence:</b>
+    <select id="pa" aria-label="First part"></select>
+    <span>and</span>
+    <select id="pb" aria-label="Second part"></select>
+    <button class="btn" id="playSentence">Play "… and … make …"</button>
+    <button class="btn" id="playQuestion">Play the question</button>
+    <span id="checkStatus" class="muted small"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var SCRIPT = __SCRIPT_JSON__;
+  var RATE = 44100;
+  var TARGET_RMS_DB = -18;     // loudness of speech after normalising
+  var PEAK_DB = -1;            // never louder than this
+  var SILENCE_DB = -45;        // below this counts as silence when trimming
+
+  var clips = SCRIPT.clips;
+  var state = {};              // id -> { buffer: AudioBuffer, info: string }
+  var dir = null;              // FileSystemDirectoryHandle
+  var current = 0;
+  var ctx = null, stream = null, analyser = null, meterRaf = 0;
+  var recorder = null, recChunks = [], recId = null, recPeak = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function audio() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  function db(x) { return 20 * Math.log10(Math.max(x, 1e-9)); }
+
+  // ---------------------------------------------------------------- list
+  var list = $('list');
+  var lastGroup = null;
+  clips.forEach(function (c, i) {
+    if (c.group !== lastGroup) {
+      var g = document.createElement('div'); g.className = 'group'; g.textContent = c.group; list.appendChild(g);
+      lastGroup = c.group;
+    }
+    var el = document.createElement('div');
+    el.className = 'clip'; el.id = 'clip-' + c.id; el.tabIndex = 0;
+    var tag = c.id.indexOf('num-mid') === 0 ? '<span class="tag mid">lift ↗</span>' : c.id.indexOf('num-end') === 0 ? '<span class="tag end">fall ↘</span>' : '';
+    el.innerHTML =
+      '<div><div class="words"></div><div class="how"></div><div class="status muted">Not recorded</div></div>' +
+      '<div class="actions"><canvas width="320" height="72" aria-hidden="true"></canvas>' +
+      '<button class="btn rec">Record</button><button class="btn play" disabled>Play</button></div>';
+    el.querySelector('.words').textContent = c.words;
+    if (tag) el.querySelector('.words').insertAdjacentHTML('beforeend', tag);
+    el.querySelector('.how').textContent = c.how;
+    el.querySelector('.rec').addEventListener('click', function () { select(i); toggleRecord(); });
+    el.querySelector('.play').addEventListener('click', function () { select(i); play(c.id); });
+    el.addEventListener('click', function (e) { if (e.target === el || !e.target.closest('button')) select(i); });
+    list.appendChild(el);
+  });
+
+  function rowOf(id) { return $('clip-' + id); }
+  function select(i) {
+    current = Math.max(0, Math.min(clips.length - 1, i));
+    Array.prototype.forEach.call(document.querySelectorAll('.clip'), function (el) { el.classList.remove('is-current'); });
+    var el = rowOf(clips[current].id);
+    el.classList.add('is-current');
+    return el;
+  }
+  function scrollToCurrent() { rowOf(clips[current].id).scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  select(0);
+
+  function updateProgress() {
+    var n = clips.filter(function (c) { return state[c.id]; }).length;
+    $('progress').textContent = n + ' of ' + clips.length + ' recorded';
+  }
+
+  function showClip(id) {
+    var el = rowOf(id), s = state[id];
+    el.querySelector('.play').disabled = !s;
+    el.querySelector('.rec').textContent = s ? 'Redo' : 'Record';
+    var st = el.querySelector('.status');
+    st.className = 'status ' + (s ? (s.warn ? 'warn' : 'ok') : 'muted');
+    st.textContent = s ? s.info : 'Not recorded';
+    drawWave(el.querySelector('canvas'), s ? s.buffer : null);
+    updateProgress();
+  }
+
+  function drawWave(cv, buf) {
+    var g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height);
+    if (!buf) return;
+    var d = buf.getChannelData(0), w = cv.width, h = cv.height, step = Math.max(1, Math.floor(d.length / w));
+    g.fillStyle = '#7FD9C4';
+    for (var x = 0; x < w; x++) {
+      var mx = 0;
+      for (var k = x * step; k < (x + 1) * step && k < d.length; k++) { var a = Math.abs(d[k]); if (a > mx) mx = a; }
+      var bh = Math.max(2, mx * h);
+      g.fillRect(x, (h - bh) / 2, 1, bh);
+    }
+  }
+
+  // ---------------------------------------------------------------- folder
+  var canPick = !!window.showDirectoryPicker;
+  if (!canPick) {
+    $('folderStatus').innerHTML = '<span class="warn">This browser can\'t save into a folder. Each recording will download instead: move them into the voice folder afterwards. Chrome or Edge on your PC can save directly.</span>';
+    $('pick').disabled = true;
+  }
+  $('pick').addEventListener('click', async function () {
+    try {
+      var h = await window.showDirectoryPicker({ id: 'mimi-voice', mode: 'readwrite', startIn: 'documents' });
+      var hasScript = false;
+      try { await h.getFileHandle('script.json'); hasScript = true; } catch (e) {}
+      if (!hasScript) {
+        $('folderStatus').innerHTML = '<span class="warn">That folder has no script.json, so it isn\'t the Mimi World voice folder. Choose <b>Mimi World › voice</b>.</span>';
+        return;
+      }
+      dir = h;
+      $('folderStatus').innerHTML = '<span class="ok">Saving into “' + h.name + '”.</span>';
+      await loadExisting();
+    } catch (e) {
+      if (e && e.name !== 'AbortError') $('folderStatus').innerHTML = '<span class="warn">Couldn\'t open the folder (' + e.name + ').</span>';
+    }
+  });
+
+  async function loadExisting() {
+    var found = 0;
+    for (var i = 0; i < clips.length; i++) {
+      var id = clips[i].id;
+      try {
+        var fh = await dir.getFileHandle(id + '.wav');
+        var f = await fh.getFile();
+        var buf = await audio().decodeAudioData(await f.arrayBuffer());
+        state[id] = { buffer: buf, info: 'Saved · ' + buf.duration.toFixed(1) + ' s' };
+        found++;
+      } catch (e) { /* not recorded yet */ }
+      showClip(id);
+    }
+    var first = clips.findIndex(function (c) { return !state[c.id]; });
+    select(first < 0 ? 0 : first); scrollToCurrent();
+    if (found) $('folderStatus').innerHTML += ' <span class="muted">' + found + ' already recorded.</span>';
+  }
+
+  // ---------------------------------------------------------------- microphone
+  async function openMic() {
+    if (stream) return stream;
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: false }
+    });
+    var src = audio().createMediaStreamSource(stream);
+    analyser = audio().createAnalyser(); analyser.fftSize = 2048;
+    src.connect(analyser);
+    runMeter();
+    return stream;
+  }
+  function runMeter() {
+    var data = new Float32Array(analyser.fftSize);
+    var bar = $('meter').querySelector('i');
+    (function tick() {
+      analyser.getFloatTimeDomainData(data);
+      var pk = 0; for (var i = 0; i < data.length; i++) { var a = Math.abs(data[i]); if (a > pk) pk = a; }
+      if (recorder && recorder.state === 'recording') recPeak = Math.max(recPeak, pk);
+      var pct = Math.max(0, Math.min(1, (db(pk) + 60) / 60));
+      bar.style.width = (pct * 100).toFixed(0) + '%';
+      $('meter').classList.toggle('hot', pk > 0.89);
+      meterRaf = requestAnimationFrame(tick);
+    })();
+  }
+  $('micBtn').addEventListener('click', async function () {
+    try { await openMic(); $('micStatus').textContent = 'Microphone on.'; $('micBtn').disabled = true; }
+    catch (e) { $('micStatus').innerHTML = '<span class="warn">No microphone (' + e.name + '). Check Chrome is allowed to use it.</span>'; }
+  });
+
+  // ---------------------------------------------------------------- recording
+  async function toggleRecord() {
+    if (recorder && recorder.state === 'recording') { stopRecord(); return; }
+    try { await openMic(); } catch (e) { alertRow('No microphone (' + e.name + ').'); return; }
+    $('micBtn').disabled = true; $('micStatus').textContent = 'Microphone on.';
+    recId = clips[current].id; recChunks = []; recPeak = 0;
+    var opts = {};
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) opts = { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 256000 };
+    recorder = new MediaRecorder(stream, opts);
+    recorder.ondataavailable = function (e) { if (e.data && e.data.size) recChunks.push(e.data); };
+    recorder.onstop = finishRecord;
+    recorder.start();
+    var btn = rowOf(recId).querySelector('.rec'); btn.textContent = 'Stop'; btn.classList.add('is-on');
+    rowOf(recId).querySelector('.status').textContent = 'Recording… press Stop when you\'ve finished.';
+  }
+  function stopRecord() {
+    // keep 250 ms more so the last sound isn't clipped
+    setTimeout(function () { if (recorder && recorder.state === 'recording') recorder.stop(); }, 250);
+  }
+  function alertRow(msg) { var st = rowOf(clips[current].id).querySelector('.status'); st.className = 'status warn'; st.textContent = msg; }
+
+  async function finishRecord() {
+    var id = recId, btn = rowOf(id).querySelector('.rec');
+    btn.classList.remove('is-on');
+    try {
+      var blob = new Blob(recChunks, { type: recorder.mimeType || 'audio/webm' });
+      var raw = await audio().decodeAudioData(await blob.arrayBuffer());
+      var out = await processClip(raw, recPeak);
+      await save(id, out.wav);
+      state[id] = { buffer: out.buffer, info: out.info, warn: out.warn };
+      showClip(id);
+      play(id);
+      var next = clips.findIndex(function (c, i) { return i > current && !state[c.id]; });
+      if (next >= 0) { select(next); scrollToCurrent(); }
+      // move keyboard focus to the highlighted line, so Space records that line next
+      rowOf(clips[current].id).focus({ preventScroll: true });
+    } catch (e) {
+      showClip(id);
+      alertRow(e.message || ('Recording failed (' + e.name + ').'));
+    }
+  }
+
+  // Trim silence, normalise loudness, fade the edges, resample to 44.1 kHz mono.
+  async function processClip(raw, rawPeak) {
+    var len = Math.ceil(raw.duration * RATE);
+    var off = new OfflineAudioContext(1, len, RATE);
+    var src = off.createBufferSource(); src.buffer = raw; src.connect(off.destination); src.start();
+    var mono = await off.startRendering();
+    var d = mono.getChannelData(0);
+    var win = Math.round(RATE * 0.01), first = -1, last = -1;
+    for (var s = 0; s + win <= d.length; s += win) {
+      var sum = 0; for (var k = s; k < s + win; k++) sum += d[k] * d[k];
+      if (db(Math.sqrt(sum / win)) > SILENCE_DB) { if (first < 0) first = s; last = s + win; }
+    }
+    if (first < 0) throw new Error('Nothing heard. Check the microphone and try again.');
+    var start = Math.max(0, first - Math.round(RATE * 0.06));
+    var end = Math.min(d.length, last + Math.round(RATE * 0.12));
+    var seg = d.slice(start, end);
+    // loudness of the voiced part only
+    var vs = 0, vn = 0;
+    for (s = 0; s + win <= seg.length; s += win) {
+      var e2 = 0; for (k = s; k < s + win; k++) e2 += seg[k] * seg[k];
+      var r = Math.sqrt(e2 / win);
+      if (db(r) > SILENCE_DB + 10) { vs += e2; vn += win; }
+    }
+    var rms = Math.sqrt(vs / Math.max(1, vn)), peak = 0;
+    for (k = 0; k < seg.length; k++) { var a = Math.abs(seg[k]); if (a > peak) peak = a; }
+    var gain = Math.min(Math.pow(10, (TARGET_RMS_DB - db(rms)) / 20), Math.pow(10, PEAK_DB / 20) / peak);
+    var fin = Math.round(RATE * 0.01), fout = Math.round(RATE * 0.03);
+    for (k = 0; k < seg.length; k++) {
+      var g = gain;
+      if (k < fin) g *= k / fin;
+      if (k > seg.length - fout) g *= (seg.length - k) / fout;
+      seg[k] *= g;
+    }
+    var buffer = audio().createBuffer(1, seg.length, RATE);
+    buffer.copyToChannel(seg, 0);
+    var warn = false, info = 'Saved · ' + (seg.length / RATE).toFixed(1) + ' s';
+    if (rawPeak > 0.98) { warn = true; info += ' · it may have clipped: move the mic a little further away and redo.'; }
+    else if (db(rms) < -42) { warn = true; info += ' · very quiet: move the mic closer and redo.'; }
+    return { buffer: buffer, wav: encodeWav(seg), info: info, warn: warn };
+  }
+
+  function encodeWav(samples) {
+    var n = samples.length, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    function str(o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+    str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, RATE, true); v.setUint32(28, RATE * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    str(36, 'data'); v.setUint32(40, n * 2, true);
+    for (var i = 0; i < n; i++) { var x = Math.max(-1, Math.min(1, samples[i])); v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7FFF, true); }
+    return new Blob([buf], { type: 'audio/wav' });
+  }
+
+  async function save(id, blob) {
+    if (dir) {
+      var fh = await dir.getFileHandle(id + '.wav', { create: true });
+      var w = await fh.createWritable(); await w.write(blob); await w.close();
+      return;
+    }
+    if (canPick) throw new Error('Choose the voice folder first (step 1), then record again.');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = id + '.wav';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+
+  // ---------------------------------------------------------------- playback
+  var playing = [];
+  function stopAll() { playing.forEach(function (s) { try { s.stop(); } catch (e) {} }); playing = []; }
+  function play(id) { return playSeq([id]); }
+  function playSeq(ids) {
+    stopAll();
+    var missing = ids.filter(function (id) { return !state[id]; });
+    if (missing.length) return missing;
+    var t = audio().currentTime + 0.05;
+    ids.forEach(function (id) {
+      var s = audio().createBufferSource(); s.buffer = state[id].buffer; s.connect(audio().destination); s.start(t);
+      playing.push(s);
+      t += state[id].buffer.duration + 0.06;
+    });
+    return [];
+  }
+
+  // ---------------------------------------------------------------- sentence check
+  var words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+  [$('pa'), $('pb')].forEach(function (sel, j) {
+    words.forEach(function (w, n) { var o = document.createElement('option'); o.value = n; o.textContent = w; sel.appendChild(o); });
+    sel.value = j === 0 ? 3 : 4;
+  });
+  function wordsOf(ids) { return ids.map(function (id) { var c = clips.find(function (x) { return x.id === id; }); return c ? c.words : id; }).join(', '); }
+  function check(ids) {
+    var missing = playSeq(ids);
+    $('checkStatus').innerHTML = missing.length ? '<span class="warn">Record these first: ' + wordsOf(missing) + '</span>' : '';
+  }
+  $('playSentence').addEventListener('click', function () {
+    var a = +$('pa').value, b = +$('pb').value, w = a + b;
+    if (w > 10) { $('checkStatus').innerHTML = '<span class="warn">Pick parts that make 10 or less.</span>'; return; }
+    check(['num-mid-' + a, 'and', 'num-mid-' + b, 'make', 'num-end-' + w]);
+  });
+  $('playQuestion').addEventListener('click', function () {
+    var a = +$('pa').value, b = +$('pb').value, w = a + b;
+    if (w > 10) { $('checkStatus').innerHTML = '<span class="warn">Pick parts that make 10 or less.</span>'; return; }
+    check(['q-lets-make', 'num-end-' + w, 'q-weve-got', 'num-end-' + a, 'q-how-many-more']);
+  });
+
+  // ---------------------------------------------------------------- keyboard
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /^(SELECT|INPUT|TEXTAREA|BUTTON)$/.test(e.target.tagName)) return;
+    if (e.code === 'Space') { e.preventDefault(); toggleRecord(); }
+    else if (e.key === 'p' || e.key === 'P') { play(clips[current].id); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); select(current + 1); scrollToCurrent(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); select(current - 1); scrollToCurrent(); }
+  });
+
+  clips.forEach(function (c) { showClip(c.id); });
+  window.__rec = { state: state, processClip: processClip, select: select, toggleRecord: toggleRecord, clips: clips, setDir: function (d) { dir = d; } };
+})();
+</script>
+</body>
+</html>

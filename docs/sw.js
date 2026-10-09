@@ -1,7 +1,64 @@
-// Mimi World offline copy.
-// Change VERSION whenever any file below changes, so tablets pick up the new copy.
-const VERSION = 'mimi-world-v0.1.2';
-const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+// Mimi World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
+// VERSION changes with every build that changes a file, so tablets pick up the new copy. A tablet saves the new
+// copy in the background the next time Mimi World opens, then switches to it at the start screen (never mid-round).
+const VERSION = 'mimi-world-v0.3.0-40253012';
+const FILES = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./audio/music.mp3",
+  "./audio/sfx/chime.mp3",
+  "./audio/sfx/pop.mp3",
+  "./audio/sfx/tune.mp3",
+  "./audio/sfx/twinkle.mp3",
+  "./audio/sfx/whoosh.mp3",
+  "./audio/voice/again-count-with-me.mp3",
+  "./audio/voice/again-look-again.mp3",
+  "./audio/voice/again-try-again.mp3",
+  "./audio/voice/and.mp3",
+  "./audio/voice/make.mp3",
+  "./audio/voice/map-mimi-rescue.mp3",
+  "./audio/voice/map-not-ready.mp3",
+  "./audio/voice/map-welcome.mp3",
+  "./audio/voice/num-end-0.mp3",
+  "./audio/voice/num-end-1.mp3",
+  "./audio/voice/num-end-10.mp3",
+  "./audio/voice/num-end-2.mp3",
+  "./audio/voice/num-end-3.mp3",
+  "./audio/voice/num-end-4.mp3",
+  "./audio/voice/num-end-5.mp3",
+  "./audio/voice/num-end-6.mp3",
+  "./audio/voice/num-end-7.mp3",
+  "./audio/voice/num-end-8.mp3",
+  "./audio/voice/num-end-9.mp3",
+  "./audio/voice/num-mid-0.mp3",
+  "./audio/voice/num-mid-1.mp3",
+  "./audio/voice/num-mid-10.mp3",
+  "./audio/voice/num-mid-2.mp3",
+  "./audio/voice/num-mid-3.mp3",
+  "./audio/voice/num-mid-4.mp3",
+  "./audio/voice/num-mid-5.mp3",
+  "./audio/voice/num-mid-6.mp3",
+  "./audio/voice/num-mid-7.mp3",
+  "./audio/voice/num-mid-8.mp3",
+  "./audio/voice/num-mid-9.mp3",
+  "./audio/voice/praise-brilliant-rescuing.mp3",
+  "./audio/voice/praise-found-it.mp3",
+  "./audio/voice/praise-super-counting.mp3",
+  "./audio/voice/praise-thats-right.mp3",
+  "./audio/voice/praise-well-done.mp3",
+  "./audio/voice/q-count-on-from.mp3",
+  "./audio/voice/q-how-many-altogether.mp3",
+  "./audio/voice/q-how-many-more.mp3",
+  "./audio/voice/q-lets-make.mp3",
+  "./audio/voice/q-weve-got.mp3",
+  "./audio/voice/round-another.mp3",
+  "./audio/voice/round-ready.mp3",
+  "./audio/voice/round-rescued-all.mp3",
+  "./audio/voice/too-many.mp3"
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -14,9 +71,22 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
+    caches.keys().then((keys) => {
+      // only Mimi World's own saved copies: other apps on the same site keep theirs
+      const old = keys.filter((k) => k !== VERSION && k.indexOf('mimi-world-') === 0);
+      // The phase 0 tablet test page (offline copies named mimi-world-v0.1.*) can't hear the message below,
+      // so a tablet still showing it is moved straight to the new page.
+      const fromTestPage = old.some((k) => /^mimi-world-v0\.1\./.test(k));
+      return Promise.all(old.map((k) => caches.delete(k)))
+        .then(() => self.clients.claim())
+        .then(() => self.clients.matchAll({ type: 'window' }))
+        .then((windows) => windows.forEach((w) => {
+          const page = w.url.split(/[?#]/)[0];
+          if (page !== self.registration.scope && page !== self.registration.scope + 'index.html') return; // not the game (e.g. the recording page)
+          if (fromTestPage) w.navigate(w.url);
+          else if (old.length) w.postMessage({ type: 'mw-updated', version: VERSION });
+        }));
+    })
   );
 });
 

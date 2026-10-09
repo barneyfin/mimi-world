@@ -1,0 +1,153 @@
+/* Mimi World kit styles. Colours, sizes and type come only from tokens (generated from design/gen_tokens.py). */
+
+/* ---------------------------------------------------------------- page and stage */
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: var(--night);
+  overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+body { position: fixed; inset: 0; touch-action: none; font-family: var(--font-andika); color: var(--moon); }
+button { font-family: var(--font-andika); }
+#stage { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; transform-origin: 0 0; overflow: hidden; background: var(--night); }
+.mw-screen { position: absolute; inset: 0; display: none; }
+.mw-screen.is-shown { display: block; }
+.mw-fill { width: 1280px; height: 800px; pointer-events: none; }
+
+/* ---------------------------------------------------------------- from the design system (components/bundle.css) */
+.mw-abs { position: absolute; }
+.mw-layer { position: absolute; left: 0; top: 0; }
+
+.mw-circle { position: absolute; box-sizing: border-box; border-radius: var(--radius-round);
+  background: var(--moon); border: var(--rim) solid var(--mint); box-shadow: var(--halo-mint); }
+.mw-circle--whole { width: var(--circle-whole); height: var(--circle-whole);
+  display: flex; align-items: center; justify-content: center; color: var(--numeral); }
+.mw-circle--part { width: var(--circle-part); height: var(--circle-part); }
+.mw-circle.is-waiting { background: var(--moon-dim); border-style: dashed; box-shadow: none; }
+.mw-circle.is-success { box-shadow: var(--ring-success); }
+
+.mw-pill { position: absolute; box-sizing: border-box; width: var(--pill-width); height: var(--pill-height);
+  border-radius: var(--radius-pill); background: var(--moon); border: 5px solid var(--mint);
+  display: flex; align-items: center; justify-content: center; color: var(--numeral); box-shadow: var(--halo-mint); }
+.mw-pill.is-waiting { background: var(--moon-dim); border-style: dashed; box-shadow: none; }
+.mw-pill.is-success { box-shadow: var(--ring-success); }
+
+.mw-equation { position: absolute; display: flex; align-items: center; justify-content: center; gap: 22px; color: var(--moon); }
+.mw-equation .op { color: var(--peach); }
+
+.mw-btn { padding: 0; border: none; border-radius: var(--radius-round); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.mw-btn:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; }
+.mw-btn--main { width: var(--button-main); height: var(--button-main); background: var(--peach); color: var(--numeral); box-shadow: var(--press-peach); }
+.mw-btn--play { width: var(--button-play); height: var(--button-play); background: var(--peach); color: var(--numeral); box-shadow: var(--press-peach); }
+.mw-btn--nav { width: var(--button-nav); height: var(--button-nav); background: var(--night-button); color: var(--moon);
+  border: 5px solid var(--mint); box-shadow: var(--press-ink); }
+.mw-btn--grownups { width: var(--button-grownups); height: var(--button-grownups); background: var(--night); color: var(--text-3); border: 3px solid var(--text-3); }
+.mw-btn--main:active, .mw-btn--play:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--peach-dark); }
+.mw-btn--nav:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink); }
+
+.mw-stars { position: absolute; display: flex; gap: var(--space-s); line-height: 0; }
+.mw-panel { background: var(--night-raised); border-radius: var(--radius-panel); box-sizing: border-box; color: var(--moon); }
+.mw-chip { box-sizing: border-box; min-width: 48px; height: 48px; border-radius: var(--radius-round); display: inline-flex;
+  align-items: center; justify-content: center; border: 3px solid var(--mint); color: var(--moon); background: transparent; }
+.mw-chip.is-on { background: var(--mint); color: var(--numeral); }
+.mw-caption { color: var(--text-2); }
+
+/* ---------------------------------------------------------------- the diagram in play */
+.mw-circle, .mw-pill { transition: box-shadow 450ms cubic-bezier(.2,.8,.2,1), background-color 260ms; }
+.mw-circle.is-hinting { box-shadow: 0 0 0 14px rgba(127, 217, 196, 0.22); }
+.mw-equation { opacity: 0; transition: opacity 300ms ease-out; pointer-events: none; }
+.mw-equation.is-shown { opacity: 1; }
+
+/* ---------------------------------------------------------------- the Mimi (counters) */
+.mw-counters .mw-mimi, .mw-mimi { position: absolute; left: 0; top: 0; width: var(--mimi-grab); height: var(--mimi-grab);
+  margin: -60px 0 0 -60px; display: flex; align-items: center; justify-content: center; line-height: 0;
+  pointer-events: none; will-change: transform; }
+.mw-mimi-art { transition: transform 120ms ease-out; transform-origin: 50% 50%; overflow: visible; }
+.mw-mimi.is-moving { transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-mimi.is-moving .mw-mimi-art { transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-mimi.is-lifted { z-index: 5; }
+.mw-mimi.is-lifted .mw-mimi-art { filter: drop-shadow(0 14px 8px rgba(0,0,0,0.45)); }
+.mw-mimi.is-arriving { animation: mw-arrive 360ms ease-out both; }
+.mw-mimi.is-rescued { transition: transform 600ms cubic-bezier(.4,0,.6,1), opacity 600ms ease-in; opacity: 0; }
+.mw-mimi.is-rescued .mw-mimi-art { transition: transform 600ms cubic-bezier(.4,0,.6,1); }
+.mw-mimi.is-hop .mw-mimi-art, .mw-mimi-art.is-hop { animation: mw-hop 420ms ease-out; }
+@keyframes mw-arrive { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mw-hop { 0% { translate: 0 0; } 40% { translate: 0 -18px; } 100% { translate: 0 0; } }
+.mw-start-mimi { display: flex; gap: 16px; line-height: 0; }
+
+/* hint ghosts: where the missing Mimi would sit */
+.mw-ghost { position: absolute; box-sizing: border-box; border-radius: var(--radius-round);
+  border: 3px dashed var(--mimi); opacity: 0.6; transition: background-color 200ms, opacity 200ms; }
+.mw-ghost.is-lit { background: rgba(140, 124, 214, 0.35); opacity: 1; }
+
+/* sparkles: grow in 300 ms, fade by 1.2 s; once, never blinking */
+.mw-spark { position: absolute; pointer-events: none; animation: mw-spark 1200ms ease-out forwards; }
+@keyframes mw-spark { 0% { transform: scale(0.2); opacity: 0; } 25% { transform: scale(1); opacity: 1; } 55% { opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+
+/* ---------------------------------------------------------------- Scruffles's pod (a button in the game) */
+.mw-pod { position: absolute; padding: 0; margin: 0; border: 0; background: none; line-height: 0; cursor: pointer; }
+.mw-pod:disabled { cursor: default; }
+/* the picture inside a button never takes the tap, so changing Scruffles's face mid-tap can't swallow it */
+.mw-pod svg, .mw-btn svg, .gu-btn svg { pointer-events: none; }
+.mw-pod:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; border-radius: 40px; }
+
+/* ---------------------------------------------------------------- tap to start */
+.mw-pulse { animation: mw-pulse 2s ease-in-out infinite; }
+@keyframes mw-pulse { 0%, 100% { scale: 1; } 50% { scale: 1.06; } }
+
+/* ---------------------------------------------------------------- the grown-ups lock */
+.mw-gate { z-index: 50; overflow: visible; }
+.mw-gate-ring { position: absolute; left: -13px; top: -13px; width: 64px; height: 64px; pointer-events: none; opacity: 0; }
+.mw-gate.is-holding .mw-gate-ring { opacity: 1; transition: opacity 150ms 250ms; }
+
+/* ---------------------------------------------------------------- the grown-ups area */
+.mw-grownups { position: absolute; inset: 0; z-index: 100; display: none; background: rgba(15, 18, 54, 0.92); }
+.mw-grownups.is-open { display: block; }
+.gu-panel { position: absolute; left: 24px; top: 24px; width: 1232px; height: 752px; display: flex; flex-direction: column; padding: 24px 32px 0; }
+.gu-head { display: flex; align-items: center; gap: 24px; margin-bottom: 10px; }
+.gu-title { margin: 0; }
+.gu-tabs { display: flex; gap: 8px; flex: 1; }
+.gu-tab { height: 52px; padding: 0 22px; border-radius: 26px; border: 3px solid var(--night-button); background: transparent; color: var(--text-2); cursor: pointer; }
+.gu-tab.is-on { background: var(--night-button); color: var(--moon); border-color: var(--mint); }
+.gu-btn { min-height: 52px; padding: 0 22px; border-radius: 26px; border: 3px solid var(--mint); background: var(--night-button); color: var(--moon); cursor: pointer; }
+.gu-btn:active { transform: translateY(2px); }
+.gu-btn.is-on { background: var(--mint); color: var(--numeral); }
+.gu-btn:focus-visible, .gu-tab:focus-visible { outline: 4px solid var(--mint); outline-offset: 3px; }
+.gu-quiet { border-color: var(--text-3); }
+.gu-small { min-height: 44px; margin-bottom: 8px; }
+.gu-clip { min-height: 46px; font-size: 19px; padding: 0 16px; }
+.gu-chip { width: 52px; height: 52px; min-height: 0; padding: 0; }
+.gu-body { flex: 1; overflow-y: auto; touch-action: pan-y; padding: 4px 4px 32px 0; -webkit-overflow-scrolling: touch; }
+.gu-h3 { font-size: 22px; line-height: 26px; font-weight: 700; margin: 22px 0 10px; color: var(--moon); }
+.gu-p { margin: 0 0 10px; color: var(--text-2); max-width: 1060px; }
+.gu-p b { color: var(--moon); }
+.gu-lead { color: var(--moon); margin-top: 6px; }
+.gu-note { font-size: 17px; line-height: 22px; }
+.gu-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+.gu-group { color: var(--text-3); margin: 12px 0 6px; }
+.gu-table { border-collapse: collapse; width: 100%; max-width: 1120px; margin: 4px 0 12px; }
+.gu-table td, .gu-table th { padding: 7px 10px; border-bottom: 1px solid var(--night-button); text-align: left; vertical-align: top; }
+.gu-table th { color: var(--text-3); font-weight: 400; }
+.gu-table td:first-child { color: var(--text-2); width: 220px; }
+.gu-table .ok { color: var(--mint); }
+.gu-table .warn { color: var(--peach); }
+
+/* ---------------------------------------------------------------- turn me sideways */
+.mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
+  align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
+@media (orientation: portrait) { .mw-sideways { display: flex; } }
+
+/* ---------------------------------------------------------------- reduce motion: movement becomes an instant change or a fade */
+@media (prefers-reduced-motion: reduce) {
+  .mw-mimi.is-moving, .mw-mimi.is-moving .mw-mimi-art, .mw-mimi-art { transition: none !important; }
+  .mw-mimi.is-rescued { transition: opacity 400ms ease-in !important; }
+  .mw-mimi.is-hop .mw-mimi-art, .mw-mimi-art.is-hop { animation: none; }
+  .mw-pulse { animation: none; }
+  .mw-spark { animation: mw-spark-fade 1200ms ease-out forwards; }
+  .mw-circle, .mw-pill { transition: none; }
+  .mw-btn--main:active, .mw-btn--play:active, .mw-btn--nav:active { transform: none; }
+}
+@keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }

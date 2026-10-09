@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#171A45">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mimi World</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face { font-family: "Andika"; font-weight: 400; font-display: block; src: url(data:font/woff2;base64,__FONT400__) format("woff2"); }
+@font-face { font-family: "Andika"; font-weight: 700; font-display: block; src: url(data:font/woff2;base64,__FONT700__) format("woff2"); }
+__TOKENS_CSS__
+__KIT_CSS__
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="mw-layer" aria-hidden="true">__SKY__</div>
+  <section class="mw-screen" id="screen-start" aria-label="Mimi Rescue: start"></section>
+  <section class="mw-screen" id="screen-game" aria-label="Mimi Rescue"></section>
+  <section class="mw-screen" id="screen-end" aria-label="All the Mimi rescued"></section>
+</div>
+
+<div class="mw-sideways" role="alert">
+  <svg width="220" height="160" viewBox="0 0 220 160" aria-hidden="true">
+    <rect class="s-mint" x="20" y="20" width="80" height="120" rx="12" fill="none" stroke-width="6"></rect>
+    <rect class="s-peach" x="104" y="50" width="100" height="70" rx="12" fill="none" stroke-width="6"></rect>
+    <path class="s-moon" d="M70 12 C 120 -2, 160 20, 168 42" fill="none" stroke-width="5" stroke-linecap="round"></path>
+    <path class="s-moon" d="M156 38 L168 44 L172 30" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+  </svg>
+  <div>Turn the tablet sideways</div>
+</div>
+
+__ART__
+<script>
+window.MW = { VERSION: '__VERSION__' };
+window.MW_AUDIO = __AUDIO__;
+window.MW_SCRIPT = __SCRIPT__;
+</script>
+<script>
+__JS__
+</script>
+</body>
+</html>
