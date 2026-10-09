@@ -2,7 +2,7 @@
 
 Built overnight 8–9 October 2026. Version 0.3.0.
 
-Agreed the night before: the page at the bookmark opens into a five-question trial round of Mimi Rescue, built only from the kit, so Eli can try it. The kit's checks sit behind the grown-ups lock. The full game (solar-system map, crew jobs, progress grid, zero bonds) is still phase 4.
+Agreed the night before: the page at the bookmark opens into a five-question trial round of Mimi Rescue, built only from the kit, so it could be tried with the player straight away. The kit's checks sit behind the grown-ups lock. The full game (solar-system map, crew jobs, progress grid, zero bonds) is still phase 4.
 
 ## What's in the kit (`kit/`)
 
@@ -20,7 +20,7 @@ Agreed the night before: the page at the bookmark opens into a five-question tri
 
 - Tap Play: full screen, sound on, "Ready for a rescue?", then five questions from wholes 2–10 (no zero bonds yet). About 3 in 4 ask for a missing part (left or right side), 1 in 4 for the whole.
 - Missing part: "Let's make seven. We've got three. How many more?" Missing whole: "We've got three and four. How many altogether?"
-- Eli drags Mimi from the asteroid into the waiting circle; its pill counts them. A Mimi dropped anywhere else floats back to its spot.
+- The player drags Mimi from the asteroid into the waiting circle; its pill counts them. A Mimi dropped anywhere else floats back to its spot.
 - Right answer: the circle rings peach, sparkles, Scruffles's "got it" face, the chime, praise, then "Three and four make seven" with 3 + 4 = 7 on screen; the star turns peach; the Mimi fly into the pod.
 - Wrong tries: Scruffles's "try again" face and "Let's try again"; after two, the counting-on hint ("Let's count on from three. Four, five, six, seven", with ghost Mimi lighting up in the circle) or, for a missing whole, "Count them with me" over every Mimi.
 - After five: the crew screen, "You rescued all the Mimi!", the end tune, "Another rescue?" and a Play button.
@@ -40,15 +40,29 @@ Headless Chromium at the Fire's page size (1046×653 at 1.22x) and the Doogee's 
   - an interrupted hint never came back.
 - Build checks: every recording present, no outside addresses, no fast repeating animation, no child's name on the website.
 
-## Not checked here (needs the tablets)
+## On the tablets (9 October, morning)
 
-- How the voice, effects and music sound on each speaker, and whether the music level is right.
-- Touch feel and timing on the real hardware, especially the Fire.
-- That the Fire's Kids browser moves from the old test page to the game by itself. If it doesn't, closing and reopening the bookmark does it.
+Barney committed and pushed at 07:10. By 07:41 both tablets were on 0.3.0; the Fire moved from the old test page to the game by itself.
 
-## Open questions for Barney (phase 4)
+| Check | Fire HD 8 (Silk 152, Kids profile, bookmark) | Doogee T30 Pro (Chrome 154, installed app) |
+| --- | --- | --- |
+| Page | 1046×653 at 1.22x, scale 0.82, Mimi 80 screen pixels | 1280×800 at 2x, scale 1.00, Mimi 160 screen pixels |
+| Drag smoothness | 60 frames a second, slowest 20 ms, 0 slow of 20 | 59 frames a second, slowest 22 ms, 0 slow of 641 |
+| Opens in | 0.4 s | 0.2 s |
+| Sound | On (48 kHz), 50 of 50 files ready | On (48 kHz), 50 of 50 files ready |
+| Full screen | Yes, locked to landscape | Yes (app), locked to landscape |
+| Offline copy | Opened from the saved copy | Opened from the saved copy |
+| Saving progress | Works | Works |
 
-1. **Answer check.** Now: as soon as the count is right (no explaining needed, but Eli never has to decide when to stop). The other option is in Settings: he taps Scruffles to check, which brings in "too many" and the hint after two wrong checks, and would need one new recording ("Tap Scruffles when you're ready"). Try both with Eli.
-2. **Music level.** 12 dB under the voice, 22 dB under while a line is spoken. Louder or quieter?
-3. **Question mix.** About 1 in 4 asks for the whole. Keep, or start with missing parts only?
-4. **The sentence joins.** Do the built sentences sound natural, or should the num-mid pieces be re-recorded with more lift?
+- **Voice (phase 2's gate):** clear on the Fire's speaker, and the built sentences sound like real sentences. Barney may re-record some lines with more expression.
+- **The first trial:** the player worked out each question, sometimes with a little help, and never added Mimi at random.
+
+**Status:** phases 2 and 3 pass their gates.
+
+## Decisions from the trial (9 October)
+
+1. **Answer check: switch to "tap Scruffles to check".** Needs one new recording, and the plan for when it plays is agreed before building.
+2. **Music level:** about right; unchanged.
+3. **Question mix:** keep about 1 in 4 asking for the whole.
+4. **Sentence joins:** natural. Re-recording for more expression is optional.
+5. **The child's name:** taken out of the repository files. The website check now reads its names from `tools/private-names.txt`, which stays on the PC and is never committed. Older commits still contain the name; removing it from history would mean rewriting it.

@@ -18,7 +18,7 @@ Your GitHub user name is `barneyfin`, so the repository is `https://github.com/b
 2. Click the **+** at the top right, then **New repository**.
 3. Fill in the form:
    - **Repository name:** `mimi-world`
-   - **Description:** leave it blank, or write "Games for Eli".
+   - **Description:** leave it blank.
    - **Public:** selected. GitHub Pages needs a public repository on the free plan.
    - **Add a README file:** leave it OFF.
    - **Add .gitignore:** None.
@@ -178,13 +178,13 @@ Do both tablets. On each, follow the six steps in the page's **Results** panel (
 First, on your PC or phone:
 
 1. Open the Amazon Parent Dashboard at https://parents.amazon.co.uk and sign in.
-2. Choose Eli's profile, then its **settings**.
+2. Choose your child's profile, then its **settings**.
 3. Find the web browser settings, called **Fire Tablet Web Browser** in Amazon's guides. Make sure the web browser is switched on.
 4. Add `https://barneyfin.github.io/mimi-world/` to the list of approved websites.
 
 Amazon changes these menus from time to time, so the names may differ slightly. Finding out what the Kids profile allows is part of this test: write down what you find, including anything it won't let you do.
 
-Then on the Fire, in Eli's profile:
+Then on the Fire, in your child's profile:
 
 5. Open the web browser (or the **Web** tab) and go to Mimi World.
 6. Follow the steps in the Results panel. The Kids browser may not offer full screen or "add to home screen". That's fine: just note it.
@@ -199,5 +199,5 @@ Then on the Fire, in Eli's profile:
 
 ## Good to know
 
-- **The website is public.** Anyone with the address can open it, though nobody will find it by chance. It holds nothing personal, and nothing in Mimi World will ever say Eli's name.
-- **Updates.** When Claude changes the game, you commit and push as above (with a new CMn.txt). GitHub Pages updates in a minute or two. Each tablet picks up the new version the second time it opens the game, because the first time it opens its saved copy.
+- **The website is public.** Anyone with the address can open it, though nobody will find it by chance. It holds nothing personal, and nothing in Mimi World will ever say your child's name.
+- **Updates.** When Claude changes the game, you commit and push as above (with a new CMn.txt). GitHub Pages updates in a minute or two. Each tablet saves the new version in the background when it next opens the game, then switches to it at the start screen.

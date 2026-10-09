@@ -1,6 +1,6 @@
 # Mimi World
 
-Maths and phonics games for Eli, set in space with his three cats: Scruffles (the hero), Moggles and Snuffles. The Mimi are the lost kittens they rescue.
+Maths and phonics games for a five-year-old, set in space with the family's three cats: Scruffles (the hero), Moggles and Snuffles. The Mimi are the lost kittens they rescue.
 
 - **Mimi Rescue** (in progress): number bonds to 10 on the part–whole diagram. A five-question trial round is live; the full game comes in phase 4.
 - Tricky-words game: next.
@@ -33,13 +33,13 @@ python tools/build.py --no-audio   # reuse docs/audio as it is
 python tools/tests/test_game.py    # the headless checks (Fire and Doogee screen sizes)
 ```
 
-The build stops if a recording in `voice/script.json` is missing, if a page would load anything from outside the site, if anything repeats faster than once a second, or if a page says Eli's name.
+The build stops if a recording in `voice/script.json` is missing, if a page would load anything from outside the site, if anything repeats faster than once a second, or if a page says a name listed in `tools/private-names.txt` (kept on the PC, never committed).
 
 ## Rules that already apply
 
 - Played on two tablets, held sideways: Fire HD 8 Kids (Amazon Kids profile, opened from a bookmark) and Doogee T30 Pro. The first tap goes full screen.
 - Everything is invented. No characters, pictures, sounds or fonts copied from shows, apps or school schemes.
-- The website is public, so nothing in it says Eli's name.
+- The website and this repository are public, so neither names the child who plays.
 - Nothing leaves the tablet: no accounts, adverts, tracking or outside links.
 - The whole screen never flashes, and nothing bigger than a character flashes more than 3 times a second.
 - Every sound is at one loudness reference: voice clips match each other, effects sit a little under the voice, and the music sits well under both and dips while a line is spoken.

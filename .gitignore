@@ -1,6 +1,9 @@
 # Staging area for files Claude writes in; never committed
 dist/
 
+# Names the website must never show (read by tools/build.py); private, so never committed
+tools/private-names.txt
+
 # Made by the tests and the build tools
 tools/tests/shots/
 tools/tests/serve/

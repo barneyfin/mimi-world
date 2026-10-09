@@ -143,10 +143,17 @@ def checks(page):
             secs = float(d.group(1)) / (1000 if d.group(2) == "ms" else 1) if d else 0
             if secs < 1:
                 problems.append(f"repeating animation faster than once a second: {decl.strip()}")
-    # the website is public: it never says the child's name
+    # the website is public: it never says the family's private names. They are listed, one per line, in
+    # tools/private-names.txt, which stays on the PC (it's in .gitignore) so the names aren't in the repository either.
+    names_file = ROOT / "tools" / "private-names.txt"
+    names = [n.strip() for n in names_file.read_text(encoding="utf-8").splitlines() if n.strip()] if names_file.exists() else []
+    if not names:
+        print("warning: tools/private-names.txt is missing, so the private-name check was skipped")
     for f in [DOCS / "index.html", DOCS / "record" / "index.html"]:
-        if re.search(r"\bEli\b", f.read_text(encoding="utf-8")):
-            problems.append(f"{f.relative_to(ROOT)} contains the child's name")
+        text = f.read_text(encoding="utf-8")
+        for n in names:
+            if re.search(r"\b" + re.escape(n) + r"\b", text):
+                problems.append(f"{f.relative_to(ROOT)} contains a private name")
     # every voice clip in the script has its web file
     script = json.loads((ROOT / "voice" / "script.json").read_text(encoding="utf-8"))
     for c in script["clips"]:

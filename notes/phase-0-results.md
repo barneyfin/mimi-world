@@ -38,7 +38,7 @@ Tested 8–9 October 2026 with the tablet test page (v0.1.0 to v0.1.2) at https:
 
 ## Decisions that follow
 
-- **Full screen on the first tap.** The Fire opens Mimi World from a bookmark, not an icon, so the first screen asks for full screen and landscape on Eli's first tap. Browsers only allow full screen after a tap. On the Doogee the installed app is already full screen, so the request does nothing there, harmlessly.
+- **Full screen on the first tap.** The Fire opens Mimi World from a bookmark, not an icon, so the first screen asks for full screen and landscape on the first tap. Browsers only allow full screen after a tap. On the Doogee the installed app is already full screen, so the request does nothing there, harmlessly.
 - **One layout for both.** Both tablets are 16:10 and show the whole 1280×800 stage: the Fire at 0.82 scale, the Doogee at 1.0.
 - **Sizes stand.** The Fire, the smaller screen, gets 11 mm counters and a 16 mm grab area at the planned sizes. No need to enlarge them.
 - **Every sound is normalised.** All sounds play at full, consistent loudness. Voice lines are brought to the same level in phase 2; the music sits well below them.

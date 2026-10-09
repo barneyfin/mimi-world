@@ -63,7 +63,7 @@ COLOURS = [
 SPACING = [
     ("space-xs", "8px", "Gap between buttons in a row; the gap between Mimi in a tight pattern."),
     ("space-s", "14px", "Gap between progress stars; padding inside a pill."),
-    ("space-m", "24px", "Distance from the screen edge to any button (nothing Eli taps sits closer)."),
+    ("space-m", "24px", "Distance from the screen edge to any button (nothing the player taps sits closer)."),
     ("space-l", "32px", "Grown-ups panel padding; gap between the diagram and the tray."),
     ("space-xl", "48px", "Gap between major zones on a screen."),
 ]
@@ -72,7 +72,7 @@ RADIUS = [
     ("radius-cell", "12px", "Cells in the grown-ups bond grid."),
     ("radius-panel", "28px", "The grown-ups panel and the equation card."),
     ("radius-pill", "35px", "Number pills (90 × 70)."),
-    ("radius-round", "50%", "Circles, Mimi grab areas and every button Eli taps."),
+    ("radius-round", "50%", "Circles, Mimi grab areas and every button the player taps."),
 ]
 
 SIZES = [
@@ -88,7 +88,7 @@ SIZES = [
     ("line-width", "10px", "The lines joining the whole to its parts."),
     ("pill-width", "90px", "Number pill width."),
     ("pill-height", "70px", "Number pill height."),
-    ("button-main", "96px", "Hear-again: the one button Eli uses most."),
+    ("button-main", "96px", "Hear-again: the one button the player uses most."),
     ("button-nav", "84px", "Home and Music buttons."),
     ("button-play", "160px", "The Play button on the tap-to-start screen."),
     ("button-grownups", "44px", "The grown-ups lock (press and hold for 3 seconds)."),
@@ -99,7 +99,7 @@ SHADOWS = [
     ("press-ink", "0 6px 0 #0F1236", "Solid shadow under navigation buttons; drops to 0 2px 0 when pressed."),
     ("press-peach", "0 7px 0 #B9724E", "Solid shadow under peach buttons."),
     ("halo-mint", "0 0 0 12px rgba(127,217,196,0.14)", "Soft halo around given circles and pills."),
-    ("ring-success", "0 0 0 16px rgba(255,180,138,0.3)", "The success ring around a circle Eli has just completed."),
+    ("ring-success", "0 0 0 16px rgba(255,180,138,0.3)", "The success ring around a circle the player has just completed."),
     ("lift", "0 14px 8px rgba(0,0,0,0.45)", "Under a Mimi while it is dragged (used as a drop-shadow filter)."),
 ]
 
@@ -110,7 +110,7 @@ OPACITY = [
 ]
 
 TYPE_STYLES = {
-    "For Eli": [
+    "For the player": [
         {"name": "numeral-whole", "fontSize": "140px", "lineHeight": 1, "fontWeight": 700, "sample": "7",
          "usage": "The numeral inside the whole circle, in numeral on moon."},
         {"name": "equation", "fontSize": "64px", "lineHeight": 1, "fontWeight": 700, "sample": "3 + 4 = 7",
