@@ -33,7 +33,7 @@
   // ---------------------------------------------------------------- what this tablet remembers
   // One localStorage entry. Browser storage can be cleared, so this is a convenience, not a record.
   const KEY = 'mimi-world';
-  const DEFAULTS = { v: 1, music: true, settings: { check: 'auto', wholes: [2, 3, 4, 5, 6, 7, 8, 9, 10] }, answers: [] };
+  const DEFAULTS = { v: 1, music: true, settings: { check: 'tap', wholes: [2, 3, 4, 5, 6, 7, 8, 9, 10] }, answers: [] };
   let data = null;
   function load() {
     if (data) return data;

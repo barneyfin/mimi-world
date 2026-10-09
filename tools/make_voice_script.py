@@ -42,7 +42,7 @@ add("Try again", "again-look-again", "Let's look again.", "Cheerful and calm.")
 add("Try again", "again-count-with-me", "Count them with me.", "Inviting, as if counting side by side.")
 
 add("Checking", "tap-scruffles", "Tap Scruffles when you're ready.",
-    "Friendly and clear, like showing someone a new button. Warm, not bossy.", pending=True)
+    "Friendly and clear, like showing someone a new button. Warm, not bossy.")
 
 add("Too many", "too-many", "That's too many. Take one back.", "Light, a little playful.")
 

@@ -117,15 +117,20 @@
       });
       btn.setAttribute('data-face', name);
     };
-    // The ship's lights flash for about 2 seconds (kit.css). Small lights only, each under 2 flashes a second;
-    // with reduce motion they just stay lit for those 2 seconds.
-    let lightsOff = null;
+    // The ship's lights flash for about 4 seconds (kit.css). Small lights only, each under 2 flashes a second;
+    // with reduce motion they just stay lit for those 4 seconds.
+    let lightsTimer = null;
+    pod.lightsOff = function () {
+      clearTimeout(lightsTimer);
+      btn.classList.remove('is-celebrating', 'is-ready');
+    };
+    // "Ready to check": the lights glow steadily (no flashing) while there is something for Scruffles to check.
+    pod.ready = function (on) { btn.classList.toggle('is-ready', !!on && !btn.classList.contains('is-celebrating')); };
     pod.celebrate = function () {
-      clearTimeout(lightsOff);
-      btn.classList.remove('is-celebrating');
+      pod.lightsOff();
       void btn.getBoundingClientRect();                    // so the flashing starts again from the beginning
       btn.classList.add('is-celebrating');
-      lightsOff = setTimeout(function () { btn.classList.remove('is-celebrating'); }, 2100);
+      lightsTimer = setTimeout(pod.lightsOff, 4100);
     };
     pod.face('thinking');
     return pod;

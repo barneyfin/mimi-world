@@ -307,14 +307,17 @@ button { font-family: var(--font-andika); }
 .mw-pod svg, .mw-btn svg, .gu-btn svg { pointer-events: none; }
 .mw-pod:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; border-radius: 40px; }
 
-/* the rescue ship's lights: unlit until a right answer, then about 2 s of flashing (3 × 0.66 s; the beacon 2 × 1 s).
+/* the rescue ship's lights: unlit until a right answer, then about 4 s of flashing (6 × 0.66 s; the beacon 4 × 1 s).
    Only the small lights flash, each on and off 1.5 times a second, in three groups chasing round the rim. */
 .mw-ship-light, .mw-ship-glow, .mw-ship-beacon, .mw-ship-beacon-glow { opacity: 0; }
-.mw-pod.is-celebrating .mw-ship-light, .mw-pod.is-celebrating .mw-ship-beacon { animation: mw-ship-flash 0.66s steps(1, end) 3; }
-.mw-pod.is-celebrating .mw-ship-glow, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation: mw-ship-glow 0.66s steps(1, end) 3; }
-.mw-pod.is-celebrating .mw-ship-beacon, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation-duration: 1s; animation-iteration-count: 2; }
+.mw-pod.is-celebrating .mw-ship-light, .mw-pod.is-celebrating .mw-ship-beacon { animation: mw-ship-flash 0.66s steps(1, end) 6; }
+.mw-pod.is-celebrating .mw-ship-glow, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation: mw-ship-glow 0.66s steps(1, end) 6; }
+.mw-pod.is-celebrating .mw-ship-beacon, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation-duration: 1s; animation-iteration-count: 4; }
 .mw-pod.is-celebrating .mw-ship-p1 { animation-delay: -0.22s; }
 .mw-pod.is-celebrating .mw-ship-p2 { animation-delay: -0.44s; }
+/* ready to check (tap mode, something in the circle): the lights glow steadily; nothing flashes */
+.mw-pod.is-ready .mw-ship-light, .mw-pod.is-ready .mw-ship-beacon { opacity: 1; }
+.mw-pod.is-ready .mw-ship-glow, .mw-pod.is-ready .mw-ship-beacon-glow { opacity: 0.3; }
 @keyframes mw-ship-flash { 0% { opacity: 1; } 50% { opacity: 0.15; } 100% { opacity: 0.15; } }
 @keyframes mw-ship-glow { 0% { opacity: 0.45; } 50% { opacity: 0; } 100% { opacity: 0; } }
 
@@ -413,9 +416,9 @@ button { font-family: var(--font-andika); }
 <template id="art-icon-full"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 V8 H18 M30 8 H40 V18 M8 30 V40 H18 M30 40 H40 V30"/></svg></template>
 <template id="art-icon-tick"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 25 L20 35 L38 14"/></svg></template>
 <script>
-window.MW = { VERSION: '0.3.2' };
-window.MW_AUDIO = {"voice":{"num-mid-0":{"dur":0.99},"num-mid-1":{"dur":0.71},"num-mid-2":{"dur":0.71},"num-mid-3":{"dur":0.97},"num-mid-4":{"dur":0.66},"num-mid-5":{"dur":1.04},"num-mid-6":{"dur":0.72},"num-mid-7":{"dur":0.67},"num-mid-8":{"dur":0.59},"num-mid-9":{"dur":0.84},"num-mid-10":{"dur":0.85},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.49},"num-end-2":{"dur":0.74},"num-end-3":{"dur":0.75},"num-end-4":{"dur":0.46},"num-end-5":{"dur":0.52},"num-end-6":{"dur":0.94},"num-end-7":{"dur":0.6},"num-end-8":{"dur":0.96},"num-end-9":{"dur":0.96},"num-end-10":{"dur":0.79},"and":{"dur":0.71},"make":{"dur":0.83},"q-lets-make":{"dur":1.72},"q-weve-got":{"dur":1.74},"q-how-many-more":{"dur":1.03},"q-how-many-altogether":{"dur":1.46},"q-count-on-from":{"dur":1.82},"praise-found-it":{"dur":0.97},"praise-thats-right":{"dur":0.9},"praise-super-counting":{"dur":1.19},"praise-brilliant-rescuing":{"dur":1.41},"praise-well-done":{"dur":0.7},"again-try-again":{"dur":1.24},"again-look-again":{"dur":1.32},"again-count-with-me":{"dur":1.46},"too-many":{"dur":2.07},"round-ready":{"dur":2.73},"round-rescued-all":{"dur":2.96},"round-another":{"dur":1.0},"map-welcome":{"dur":3.0},"map-mimi-rescue":{"dur":1.38},"map-not-ready":{"dur":2.22}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
-window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."}];
+window.MW = { VERSION: '0.3.3' };
+window.MW_AUDIO = {"voice":{"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-welcome":{"dur":3.09},"map-mimi-rescue":{"dur":1.76},"map-not-ready":{"dur":2.28}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
+window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."}];
 </script>
 <script>
 /* MeeMee World kit: core.
@@ -453,7 +456,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   // ---------------------------------------------------------------- what this tablet remembers
   // One localStorage entry. Browser storage can be cleared, so this is a convenience, not a record.
   const KEY = 'mimi-world';
-  const DEFAULTS = { v: 1, music: true, settings: { check: 'auto', wholes: [2, 3, 4, 5, 6, 7, 8, 9, 10] }, answers: [] };
+  const DEFAULTS = { v: 1, music: true, settings: { check: 'tap', wholes: [2, 3, 4, 5, 6, 7, 8, 9, 10] }, answers: [] };
   let data = null;
   function load() {
     if (data) return data;
@@ -1078,15 +1081,20 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
       });
       btn.setAttribute('data-face', name);
     };
-    // The ship's lights flash for about 2 seconds (kit.css). Small lights only, each under 2 flashes a second;
-    // with reduce motion they just stay lit for those 2 seconds.
-    let lightsOff = null;
+    // The ship's lights flash for about 4 seconds (kit.css). Small lights only, each under 2 flashes a second;
+    // with reduce motion they just stay lit for those 4 seconds.
+    let lightsTimer = null;
+    pod.lightsOff = function () {
+      clearTimeout(lightsTimer);
+      btn.classList.remove('is-celebrating', 'is-ready');
+    };
+    // "Ready to check": the lights glow steadily (no flashing) while there is something for Scruffles to check.
+    pod.ready = function (on) { btn.classList.toggle('is-ready', !!on && !btn.classList.contains('is-celebrating')); };
     pod.celebrate = function () {
-      clearTimeout(lightsOff);
-      btn.classList.remove('is-celebrating');
+      pod.lightsOff();
       void btn.getBoundingClientRect();                    // so the flashing starts again from the beginning
       btn.classList.add('is-celebrating');
-      lightsOff = setTimeout(function () { btn.classList.remove('is-celebrating'); }, 2100);
+      lightsTimer = setTimeout(pod.lightsOff, 4100);
     };
     pod.face('thinking');
     return pod;
@@ -1555,6 +1563,9 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     MW.shell.watchSideways(function () { pause('sideways'); }, function () { resume('sideways'); });
     // The screen going off, or switching to another app, pauses the game; it carries on when it comes back.
     document.addEventListener('visibilitychange', function () { if (document.hidden) pause('hidden'); else resume('hidden'); });
+    // 9 October: "tap Scruffles to check" became the default. A tablet still on the old default moves to it once;
+    // a mode a grown-up picks in Settings from now on is kept.
+    if (!MW.store.setting('checkPicked') && MW.store.setting('check') !== 'tap') MW.store.setting('check', 'tap');
     MW.shell.registerOffline();
     MW.audio.preloadAll();
     MW.shell.show('screen-start');
@@ -1699,6 +1710,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     clearBoard(true);
     diagram.set(q);
     pod.face('thinking');
+    pod.lightsOff();                                         // never still flashing into the next question
     stars.set(st.qi);
     // the MeeMee already rescued: the given part(s), in their counting pattern
     ['left', 'right'].forEach(function (k) {
@@ -1716,6 +1728,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
       st.counters.push(c);
     });
     st.prompt = promptFor(q);
+    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready."
+    if (check() === 'tap' && st.qi < 2) st.prompt = st.prompt.concat([['tap-scruffles']]);
     st.phase = 'asking';
     MW.log('question', JSON.stringify(q));
     await speak(st.prompt);
@@ -1737,6 +1751,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     const slots = diagram.slots(st.target, st.hinted && n <= st.answer ? st.answer : n);
     placed.forEach(function (c, i) { c.moveTo(slots[i].x, slots[i].y, slots[i].size, animate); });
     diagram.count(st.target, n);
+    pod.ready(check() === 'tap' && n > 0 && st.phase !== 'celebrate');
   }
   function check() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
 
@@ -1878,7 +1893,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     const c = MW.LAYOUT[st.target];
     MW.sparkles(fxLayer, c.x, c.y, c.r + 34);
     pod.face('got-it');
-    pod.celebrate();                                         // the ship's lights flash for about 2 s
+    pod.celebrate();                                         // the ship's lights flash for about 4 s
     MW.audio.sfx('chime');
     MW.log('success', JSON.stringify(q));
     await MW.wait(550);
@@ -1933,6 +1948,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     st.token++;
     st.phase = 'idle';
     MW.audio.hush();
+    pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
     MW.shell.show('screen-start');
   }
@@ -1991,14 +2007,16 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
         const G = MW.grownups;
         G.h3(el, 'Answer check');
         const r1 = G.row(el);
-        const modes = [['auto', 'As soon as the count is right'], ['tap', 'When your child taps Scruffles']];
+        const modes = [['tap', 'When your child taps Scruffles'], ['auto', 'As soon as the count is right']];
         const paint = function () {
           Array.prototype.forEach.call(r1.children, function (b, i) { b.classList.toggle('is-on', modes[i][0] === check()); });
         };
-        modes.forEach(function (m) { G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice'); });
+        modes.forEach(function (m) {
+          G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); MW.store.setting('checkPicked', true); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice');
+        });
         paint();
-        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No explaining needed, but your child never has to decide when to stop.', 'gu-note');
-        G.p(el, '<b>When your child taps Scruffles:</b> they put in as many MeeMee as they think, then tap Scruffles to check. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint. Show them once: there is no spoken instruction for it yet.', 'gu-note');
+        G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready.", and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
+        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No deciding when to stop, so it is easier but teaches less.', 'gu-note');
 
         G.h3(el, 'Wholes in play');
         const r2 = G.row(el);

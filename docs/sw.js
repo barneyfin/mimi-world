@@ -1,7 +1,7 @@
 // MeeMee World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
 // VERSION changes with every build that changes a file, so tablets pick up the new copy. A tablet saves the new
 // copy in the background the next time MeeMee World opens, then switches to it at the start screen (never mid-round).
-const VERSION = 'mimi-world-v0.3.2-b90e2108';
+const VERSION = 'mimi-world-v0.3.3-bcffcb5e';
 const FILES = [
   "./",
   "./index.html",
@@ -57,6 +57,7 @@ const FILES = [
   "./audio/voice/round-another.mp3",
   "./audio/voice/round-ready.mp3",
   "./audio/voice/round-rescued-all.mp3",
+  "./audio/voice/tap-scruffles.mp3",
   "./audio/voice/too-many.mp3"
 ];
 

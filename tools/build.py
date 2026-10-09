@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from gen_tokens import COLOURS, OPACITY, RADIUS, SHADOWS, SIZES, SPACING, TYPE_STYLES  # noqa: E402
 import gen_scenes  # noqa: E402
 
-VERSION = "0.3.2"
+VERSION = "0.3.3"
 KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "shell.js", "grownups.js"]
 
 

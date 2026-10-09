@@ -27,6 +27,9 @@
     MW.shell.watchSideways(function () { pause('sideways'); }, function () { resume('sideways'); });
     // The screen going off, or switching to another app, pauses the game; it carries on when it comes back.
     document.addEventListener('visibilitychange', function () { if (document.hidden) pause('hidden'); else resume('hidden'); });
+    // 9 October: "tap Scruffles to check" became the default. A tablet still on the old default moves to it once;
+    // a mode a grown-up picks in Settings from now on is kept.
+    if (!MW.store.setting('checkPicked') && MW.store.setting('check') !== 'tap') MW.store.setting('check', 'tap');
     MW.shell.registerOffline();
     MW.audio.preloadAll();
     MW.shell.show('screen-start');
@@ -171,6 +174,7 @@
     clearBoard(true);
     diagram.set(q);
     pod.face('thinking');
+    pod.lightsOff();                                         // never still flashing into the next question
     stars.set(st.qi);
     // the MeeMee already rescued: the given part(s), in their counting pattern
     ['left', 'right'].forEach(function (k) {
@@ -188,6 +192,8 @@
       st.counters.push(c);
     });
     st.prompt = promptFor(q);
+    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready."
+    if (check() === 'tap' && st.qi < 2) st.prompt = st.prompt.concat([['tap-scruffles']]);
     st.phase = 'asking';
     MW.log('question', JSON.stringify(q));
     await speak(st.prompt);
@@ -209,6 +215,7 @@
     const slots = diagram.slots(st.target, st.hinted && n <= st.answer ? st.answer : n);
     placed.forEach(function (c, i) { c.moveTo(slots[i].x, slots[i].y, slots[i].size, animate); });
     diagram.count(st.target, n);
+    pod.ready(check() === 'tap' && n > 0 && st.phase !== 'celebrate');
   }
   function check() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
 
@@ -350,7 +357,7 @@
     const c = MW.LAYOUT[st.target];
     MW.sparkles(fxLayer, c.x, c.y, c.r + 34);
     pod.face('got-it');
-    pod.celebrate();                                         // the ship's lights flash for about 2 s
+    pod.celebrate();                                         // the ship's lights flash for about 4 s
     MW.audio.sfx('chime');
     MW.log('success', JSON.stringify(q));
     await MW.wait(550);
@@ -405,6 +412,7 @@
     st.token++;
     st.phase = 'idle';
     MW.audio.hush();
+    pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
     MW.shell.show('screen-start');
   }
@@ -463,14 +471,16 @@
         const G = MW.grownups;
         G.h3(el, 'Answer check');
         const r1 = G.row(el);
-        const modes = [['auto', 'As soon as the count is right'], ['tap', 'When your child taps Scruffles']];
+        const modes = [['tap', 'When your child taps Scruffles'], ['auto', 'As soon as the count is right']];
         const paint = function () {
           Array.prototype.forEach.call(r1.children, function (b, i) { b.classList.toggle('is-on', modes[i][0] === check()); });
         };
-        modes.forEach(function (m) { G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice'); });
+        modes.forEach(function (m) {
+          G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); MW.store.setting('checkPicked', true); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice');
+        });
         paint();
-        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No explaining needed, but your child never has to decide when to stop.', 'gu-note');
-        G.p(el, '<b>When your child taps Scruffles:</b> they put in as many MeeMee as they think, then tap Scruffles to check. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint. Show them once: there is no spoken instruction for it yet.', 'gu-note');
+        G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready.", and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
+        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No deciding when to stop, so it is easier but teaches less.', 'gu-note');
 
         G.h3(el, 'Wholes in play');
         const r2 = G.row(el);

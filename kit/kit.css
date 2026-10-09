@@ -94,14 +94,17 @@ button { font-family: var(--font-andika); }
 .mw-pod svg, .mw-btn svg, .gu-btn svg { pointer-events: none; }
 .mw-pod:focus-visible { outline: 4px solid var(--mint); outline-offset: 4px; border-radius: 40px; }
 
-/* the rescue ship's lights: unlit until a right answer, then about 2 s of flashing (3 × 0.66 s; the beacon 2 × 1 s).
+/* the rescue ship's lights: unlit until a right answer, then about 4 s of flashing (6 × 0.66 s; the beacon 4 × 1 s).
    Only the small lights flash, each on and off 1.5 times a second, in three groups chasing round the rim. */
 .mw-ship-light, .mw-ship-glow, .mw-ship-beacon, .mw-ship-beacon-glow { opacity: 0; }
-.mw-pod.is-celebrating .mw-ship-light, .mw-pod.is-celebrating .mw-ship-beacon { animation: mw-ship-flash 0.66s steps(1, end) 3; }
-.mw-pod.is-celebrating .mw-ship-glow, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation: mw-ship-glow 0.66s steps(1, end) 3; }
-.mw-pod.is-celebrating .mw-ship-beacon, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation-duration: 1s; animation-iteration-count: 2; }
+.mw-pod.is-celebrating .mw-ship-light, .mw-pod.is-celebrating .mw-ship-beacon { animation: mw-ship-flash 0.66s steps(1, end) 6; }
+.mw-pod.is-celebrating .mw-ship-glow, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation: mw-ship-glow 0.66s steps(1, end) 6; }
+.mw-pod.is-celebrating .mw-ship-beacon, .mw-pod.is-celebrating .mw-ship-beacon-glow { animation-duration: 1s; animation-iteration-count: 4; }
 .mw-pod.is-celebrating .mw-ship-p1 { animation-delay: -0.22s; }
 .mw-pod.is-celebrating .mw-ship-p2 { animation-delay: -0.44s; }
+/* ready to check (tap mode, something in the circle): the lights glow steadily; nothing flashes */
+.mw-pod.is-ready .mw-ship-light, .mw-pod.is-ready .mw-ship-beacon { opacity: 1; }
+.mw-pod.is-ready .mw-ship-glow, .mw-pod.is-ready .mw-ship-beacon-glow { opacity: 0.3; }
 @keyframes mw-ship-flash { 0% { opacity: 1; } 50% { opacity: 0.15; } 100% { opacity: 0.15; } }
 @keyframes mw-ship-glow { 0% { opacity: 0.45; } 50% { opacity: 0; } 100% { opacity: 0; } }
 

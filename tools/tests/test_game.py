@@ -103,7 +103,7 @@ class Tablet:
         return await self.page.evaluate("MW.events.filter(e => e.type === 'say').map(e => e.detail)")
 
 
-async def open_tablet(p, name, vw, vh, dpr, extra_args=()):
+async def open_tablet(p, name, vw, vh, dpr, extra_args=(), mode="auto"):
     browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required", *extra_args])
     ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True)
     page = await ctx.new_page()
@@ -113,6 +113,8 @@ async def open_tablet(p, name, vw, vh, dpr, extra_args=()):
     page.on("request", lambda r: requests.append(r.url))
     await page.goto(ORIGIN + "/")
     await page.wait_for_load_state("load")
+    if mode:
+        await page.evaluate("MW.store.setting('check', %s); MW.store.setting('checkPicked', true)" % json.dumps(mode))
     cdp = await ctx.new_cdp_session(page)
     return browser, ctx, page, Tablet(page, cdp), problems, requests
 
@@ -152,19 +154,24 @@ async def play_round(t, name, shots=True):
         const l = getComputedStyle(pod.querySelector('.mw-ship-light')), b = getComputedStyle(pod.querySelector('.mw-ship-beacon'));
         return [pod.classList.contains('is-celebrating'), l.animationName, l.animationDuration, l.animationIterationCount,
                 b.animationDuration, b.animationIterationCount]; })()""")
-    check(f"{name}: the ship's lights flash after a right answer (0.66 s × 3, beacon 1 s × 2)",
-          lights == [True, "mw-ship-flash", "0.66s", "3", "1s", "2"], str(lights))
+    check(f"{name}: the ship's lights flash after a right answer (0.66 s × 6, beacon 1 s × 4)",
+          lights == [True, "mw-ship-flash", "0.66s", "6", "1s", "4"], str(lights))
     if shots:
         await asyncio.sleep(0.25)
         await page.screenshot(path=str(SHOTS / f"{name}-2a-lights.png"))
     await asyncio.sleep(2.6)
-    off = await page.evaluate("!document.querySelector('#screen-game .mw-pod').classList.contains('is-celebrating')")
-    check(f"{name}: the lights stop after about 2 seconds", off)
+    on = await page.evaluate("document.querySelector('#screen-game .mw-pod').classList.contains('is-celebrating')")
+    check(f"{name}: the lights are still going at about 3 seconds", on)
     if shots:
         await page.screenshot(path=str(SHOTS / f"{name}-2-celebrate.png"))
     eq = await page.inner_text("#screen-game .mw-equation")
     check(f"{name}: equation reads 3 + 4 = 7", eq.replace("\n", " ").split() == ["3", "+", "4", "=", "7"], eq)
+    await asyncio.sleep(1.4)
+    off = await page.evaluate("!document.querySelector('#screen-game .mw-pod').classList.contains('is-celebrating')")
+    check(f"{name}: the lights stop after about 4 seconds", off)
     s = await t.wait_phase(["asking", "open"], 15)
+    lit = await page.evaluate("document.querySelector('#screen-game .mw-pod').classList.contains('is-celebrating')")
+    check(f"{name}: the next question starts with the lights off", not lit)
     said = await t.said()
     check(f"{name}: question 1 spoken as pieces", "q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more" in said)
     check(f"{name}: equation spoken", "num-mid-3 and num-mid-4 make num-end-7" in said)
@@ -302,13 +309,21 @@ async def test_device(p, name, vw, vh, dpr):
 
 async def test_tap_mode(p):
     print("\n== tap-to-check mode ==")
-    browser, ctx, page, t, problems, _ = await open_tablet(p, "tap", 1280, 800, 1)
-    await page.evaluate("MW.store.setting('check', 'tap')")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "tap", 1280, 800, 1, mode=None)
+    check("tap: a new tablet checks by tapping Scruffles", await page.evaluate("MW.store.setting('check')") == "tap")
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
     await t.tap(900, 380)
     await t.wait_phase(["open"], 15)
+    said = await t.said()
+    check("tap: question 1 ends with 'Tap Scruffles when you're ready.'", "q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more tap-scruffles" in said, str(said[-2:]))
+    ready = await page.evaluate("document.querySelector('#screen-game .mw-pod').classList.contains('is-ready')")
+    check("tap: the ship's lights are off while the circle is empty", not ready)
     await t.fill(2, "right")
+    cue = await page.evaluate("""(() => { const pod = document.querySelector('#screen-game .mw-pod');
+        const l = getComputedStyle(pod.querySelector('.mw-ship-light'));
+        return [pod.classList.contains('is-ready'), l.opacity, l.animationName]; })()""")
+    check("tap: with MeeMee in the circle the lights glow steadily", cue == [True, "1", "none"], str(cue))
     await t.tap(1030, 300)                                   # tap Scruffles with 2 (too few)
     await asyncio.sleep(0.6)
     check("tap: too few says 'Let's look again.'", "again-look-again" in await t.said())
@@ -330,7 +345,34 @@ async def test_tap_mode(p):
     check("tap: four MeeMee and a tap on Scruffles completes it", s["phase"] == "celebrate", json.dumps(s))
     rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
     check("tap: saved with 3 wrong checks and the hint", rec["tries"] == 3 and rec["hint"] is True, json.dumps(rec))
+    s = await t.wait_phase(["asking", "open"], 15)
+    p2 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check("tap: question 2 ends with the line too", s["qi"] == 1 and "tap-scruffles" in p2, p2)
+    await t.wait_phase(["open"], 15)
+    await t.fill(5, "whole")
+    await t.tap(1030, 300)
+    await t.wait_phase(["celebrate"], 3)
+    s = await t.wait_phase(["asking", "open"], 15)
+    p3 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check("tap: from question 3 the line isn't said", s["qi"] == 2 and "tap-scruffles" not in p3, p3)
     check("tap: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_switch(p):
+    print("\n== tap-to-check becomes the default ==")
+    browser = await p.chromium.launch()
+    for saved, want, label in [
+            ({"v": 1, "music": True, "settings": {"check": "auto"}, "answers": [{"t": 1}]}, "tap", "a tablet on the old default moves to tap"),
+            ({"v": 1, "music": True, "settings": {"check": "auto", "checkPicked": True}, "answers": []}, "auto", "a mode picked in Settings is kept")]:
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800})
+        await ctx.add_init_script("localStorage.setItem('mimi-world', %s)" % json.dumps(json.dumps(saved)))
+        page = await ctx.new_page()
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        got = await page.evaluate("[MW.store.setting('check'), MW.store.get('answers').length]")
+        check(f"switch: {label}", got[0] == want and got[1] == len(saved["answers"]), str(got))
+        await ctx.close()
     await browser.close()
 
 
@@ -461,6 +503,7 @@ async def main():
         await test_device(p, "fire", 1046, 653, 1.22)
         await test_device(p, "doogee", 1280, 800, 2)
         await test_tap_mode(p)
+        await test_switch(p)
         await test_edge_cases(p)
         await test_portrait(p)
         await test_reduce_motion(p)

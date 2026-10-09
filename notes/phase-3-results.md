@@ -89,3 +89,11 @@ Barney chose round 3 of the mock-ups: the same colours and direction, drawn with
 - **Checks:** `test_game.py` 92 of 92 (new: the lights flash at 0.66 s × 3 and stop after about 2 seconds; they stay lit with reduce motion; no clip-path name is used twice), `test_update.py` 7 of 7.
 - **To check on the tablets:** drag smoothness on the Fire in Grown-ups › Checks, after a round or two.
 
+
+## 0.3.3 (9 October, evening): tap Scruffles, new recordings, longer ship lights
+
+- **Tap Scruffles to check is now the usual way.** The player puts in as many MeeMee as they think, then taps Scruffles. The first two questions of every round end with the new line, "Tap Scruffles when you're ready." While there is at least one MeeMee in the waiting circle, the ship's lights glow steadily (no flashing) as a cue to tap. Too many, too few and the hint work as before.
+- **Tablets already in use** move to tap-to-check once, on their next update. Progress is kept. A mode a grown-up picks in Grown-ups › Settings from now on is kept; "as soon as the count is right" is still there for an easier round.
+- **Barney re-recorded 43 of the 44 lines** with more expression, and recorded the new one. All 45 clips are mono 44.1 kHz with peaks at −1 dB or below. Each re-recorded clip was matched by machine against its old recording (same words: 43 of 43), and the build levels them all to the same loudness. "Zero" at the end of a sentence (`num-end-0`) kept its old recording; the game doesn't use zero yet.
+- **Ship lights last twice as long:** about 4 seconds after a right answer and on the end screen (six 0.66 s cycles; the beacon four 1 s cycles). The rate is unchanged, so the flashing rule still holds. The lights switch off when the next question starts or Home is tapped.
+- Checks: `test_game.py` 104 of 104 (new: a new tablet starts in tap mode; the line on questions 1 and 2 but not 3; the steady cue; the one-off switch and a picked mode kept; the longer lights), `test_update.py` 7 of 7.

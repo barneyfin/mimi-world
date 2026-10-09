@@ -229,8 +229,7 @@
       "id": "tap-scruffles",
       "group": "Checking",
       "words": "Tap Scruffles when you're ready.",
-      "how": "Friendly and clear, like showing someone a new button. Warm, not bossy.",
-      "pending": true
+      "how": "Friendly and clear, like showing someone a new button. Warm, not bossy."
     },
     {
       "id": "too-many",
