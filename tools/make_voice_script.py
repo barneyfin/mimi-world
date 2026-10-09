@@ -1,4 +1,4 @@
-"""Write voice/script.json: every clip Mimi Rescue needs (option A: pieces)."""
+"""Write voice/script.json: every clip MeeMee Rescue needs (option A: pieces)."""
 import json
 import pathlib
 
@@ -7,8 +7,12 @@ WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
 clips = []
 
 
-def add(group, cid, words, how):
-    clips.append({"id": cid, "group": group, "words": words, "how": how})
+def add(group, cid, words, how, pending=False):
+    """pending: on the recording page, but not used by the game until it has been recorded (the build skips it till then)."""
+    clip = {"id": cid, "group": group, "words": words, "how": how}
+    if pending:
+        clip["pending"] = True
+    clips.append(clip)
 
 
 for n, w in enumerate(WORDS):
@@ -37,21 +41,24 @@ add("Try again", "again-try-again", "Let's try again.", "Cheerful and calm, neve
 add("Try again", "again-look-again", "Let's look again.", "Cheerful and calm.")
 add("Try again", "again-count-with-me", "Count them with me.", "Inviting, as if counting side by side.")
 
+add("Checking", "tap-scruffles", "Tap Scruffles when you're ready.",
+    "Friendly and clear, like showing someone a new button. Warm, not bossy.", pending=True)
+
 add("Too many", "too-many", "That's too many. Take one back.", "Light, a little playful.")
 
 add("Rounds", "round-ready", "Ready for a rescue?", "Excited, inviting.")
-add("Rounds", "round-rescued-all", "You rescued all the Mimi!", "Big finish: proud and happy.")
+add("Rounds", "round-rescued-all", "You rescued all the MeeMee!", "Big finish: proud and happy.")
 add("Rounds", "round-another", "Another rescue?", "Inviting.")
 
-add("Map", "map-welcome", "Welcome to Mimi World!", "Warm welcome.")
-add("Map", "map-mimi-rescue", "Mimi Rescue!", "Announcing the game's name.")
+add("Map", "map-welcome", "Welcome to MeeMee World!", "Warm welcome.")
+add("Map", "map-mimi-rescue", "MeeMee Rescue!", "Announcing the game's name.")
 add("Map", "map-not-ready", "That planet isn't ready yet.", "Gentle, no disappointment.")
 
-assert len(clips) == 44, len(clips)
-assert len({c["id"] for c in clips}) == 44
+assert len(clips) == 45, len(clips)
+assert len({c["id"] for c in clips}) == 45
 
 script = {
-    "game": "Mimi Rescue",
+    "game": "MeeMee Rescue",
     "version": 1,
     "format": "WAV, mono, 44.1 kHz, 16-bit; silence trimmed; loudness normalised; peaks at most -1 dB",
     "clips": clips,

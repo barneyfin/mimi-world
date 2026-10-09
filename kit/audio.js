@@ -1,4 +1,4 @@
-/* Mimi World kit: sound.
+/* MeeMee World kit: sound.
    Voice lines built from Barney's recorded pieces, sound effects, and the looping music that dips under speech.
    All files are at one loudness reference (-20 LUFS, made by tools/make_audio.py), so mixing is plain gains.
 

@@ -1,4 +1,4 @@
-/* Mimi World kit: the grown-ups area.
+/* MeeMee World kit: the grown-ups area.
    Opened by holding the lock for 3 seconds. Written for adults: British English, sentence case, no exclamation marks.
    The kit provides "Checks" (this tablet, every voice clip, music, effects); a game adds its own sections. */
 (function () {
@@ -102,9 +102,9 @@
       ['Page version', MW.VERSION],
       ['Browser', browserName() + (andr ? ' · Android ' + andr : '')],
       ['Screen', screen.width + '×' + screen.height + ' at ' + (Math.round(dpr * 100) / 100) + 'x · page ' + innerWidth + '×' + innerHeight],
-      ['Mimi size', Math.round(80 * sc * dpr) + ' screen pixels wide (scale ' + sc.toFixed(2) + ')'],
+      ['MeeMee size', Math.round(80 * sc * dpr) + ' screen pixels wide (scale ' + sc.toFixed(2) + ')'],
       ['Touch', (navigator.maxTouchPoints || 0) + ((navigator.maxTouchPoints || 0) === 1 ? ' touch point' : ' touch points') + ' · last input ' + (MW.lastInput || '—')],
-      ['Drag smoothness', d ? d.fps + ' frames a second; slowest frame ' + d.worst + ' ms; ' + d.slow + ' slow of ' + d.n : 'Drag a Mimi first',
+      ['Drag smoothness', d ? d.fps + ' frames a second; slowest frame ' + d.worst + ' ms; ' + d.slow + ' slow of ' + d.n : 'Drag a MeeMee first',
         d ? (d.fps >= 50 && d.slow <= Math.max(2, d.n * 0.05)) : null],
       ['Opened in', MW.device.loadMs === null ? '—' : (MW.device.loadMs < 100 ? 'under 0.1 s' : (MW.device.loadMs / 1000).toFixed(1) + ' s'), MW.device.loadMs === null ? null : MW.device.loadMs <= 3000],
       ['Sound', a.state === 'running' ? 'On (' + a.rate + ' Hz)' : a.state, a.state === 'running'],

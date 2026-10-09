@@ -1,4 +1,4 @@
-/* Mimi World kit styles. Colours, sizes and type come only from tokens (generated from design/gen_tokens.py). */
+/* MeeMee World kit styles. Colours, sizes and type come only from tokens (generated from design/gen_tokens.py). */
 
 /* ---------------------------------------------------------------- page and stage */
 html, body {
@@ -61,7 +61,7 @@ button { font-family: var(--font-andika); }
 .mw-equation { opacity: 0; transition: opacity 300ms ease-out; pointer-events: none; }
 .mw-equation.is-shown { opacity: 1; }
 
-/* ---------------------------------------------------------------- the Mimi (counters) */
+/* ---------------------------------------------------------------- the MeeMee (counters) */
 .mw-counters .mw-mimi, .mw-mimi { position: absolute; left: 0; top: 0; width: var(--mimi-grab); height: var(--mimi-grab);
   margin: -60px 0 0 -60px; display: flex; align-items: center; justify-content: center; line-height: 0;
   pointer-events: none; will-change: transform; }
@@ -78,7 +78,7 @@ button { font-family: var(--font-andika); }
 @keyframes mw-hop { 0% { translate: 0 0; } 40% { translate: 0 -18px; } 100% { translate: 0 0; } }
 .mw-start-mimi { display: flex; gap: 16px; line-height: 0; }
 
-/* hint ghosts: where the missing Mimi would sit */
+/* hint ghosts: where the missing MeeMee would sit */
 .mw-ghost { position: absolute; box-sizing: border-box; border-radius: var(--radius-round);
   border: 3px dashed var(--mimi); opacity: 0.6; transition: background-color 200ms, opacity 200ms; }
 .mw-ghost.is-lit { background: rgba(140, 124, 214, 0.35); opacity: 1; }

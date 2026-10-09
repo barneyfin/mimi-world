@@ -1,4 +1,4 @@
-"""Make the web audio for Mimi World: voice clips, music and sound effects, into docs/audio/.
+"""Make the web audio for MeeMee World: voice clips, music and sound effects, into docs/audio/.
 
 Everything is brought to one loudness reference (-20 LUFS) so the game can mix by simple gains:
 voice plays at full level, effects a little under it, and music well under it (see kit/audio.js).
@@ -80,11 +80,15 @@ def read_wav(path):
 
 def make_voice():
     script = json.loads((VOICE / "script.json").read_text(encoding="utf-8"))
-    missing = [c["id"] for c in script["clips"] if not (VOICE / f"{c['id']}.wav").exists()]
+    have = [c for c in script["clips"] if (VOICE / f"{c['id']}.wav").exists()]
+    missing = [c["id"] for c in script["clips"] if c not in have and not c.get("pending")]
     if missing:
         raise SystemExit("Voice recordings missing (record them with docs/record/): " + ", ".join(missing))
-    clips = {}
     for c in script["clips"]:
+        if c not in have:
+            print(f"  waiting for a recording: {c['id']} (\"{c['words']}\"); the game doesn't use it yet")
+    clips = {}
+    for c in have:
         x = read_wav(VOICE / f"{c['id']}.wav")
         before = loudness(x)
         y, gain = to_level(x, REFERENCE)
@@ -138,7 +142,7 @@ def place(buf, x, at):
 
 
 def sfx_pop():
-    # a soft rising bubble: snaps a Mimi into place
+    # a soft rising bubble: snaps a MeeMee into place
     n = int(RATE * 0.12)
     t = np.arange(n) / RATE
     f = 420 + 380 * (1 - np.exp(-t / 0.02))
@@ -147,7 +151,7 @@ def sfx_pop():
 
 
 def sfx_whoosh():
-    # filtered noise sweeping down: a Mimi floating home
+    # filtered noise sweeping down: a MeeMee floating home
     n = int(RATE * 0.34)
     rng = np.random.default_rng(7)
     noise = rng.standard_normal(n)

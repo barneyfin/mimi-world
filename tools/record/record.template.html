@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Mimi Rescue · voice recording</title>
+<title>MeeMee Rescue · voice recording</title>
 <style>
   @font-face { font-family: Andika; src: url(data:font/woff2;base64,__FONT400__) format("woff2"); font-weight: 400; }
   @font-face { font-family: Andika; src: url(data:font/woff2;base64,__FONT700__) format("woff2"); font-weight: 700; }
@@ -59,8 +59,8 @@
 </head>
 <body>
 <main>
-  <h1>Mimi Rescue voice recording</h1>
-  <p class="lead">Record each line once, in a quiet room, at the same distance from your headset microphone. The page trims the silence, brings every clip to the same loudness and saves it straight into the Mimi World <b>voice</b> folder. Redo any line as often as you like.</p>
+  <h1>MeeMee Rescue voice recording</h1>
+  <p class="lead">Record each line once, in a quiet room, at the same distance from your headset microphone. The page trims the silence, brings every clip to the same loudness and saves it straight into the <b>voice</b> folder on your PC. Redo any line as often as you like.</p>
 
   <section class="card">
     <h2>1. Choose the voice folder</h2>
@@ -73,7 +73,7 @@
 
   <section class="card">
     <h2>2. Check the microphone</h2>
-    <p class="muted small">Say "Mimi World" at your normal speaking voice. The bar should reach the middle, and never turn peach.</p>
+    <p class="muted small">Say "MeeMee World" at your normal speaking voice. The bar should reach the middle, and never turn peach.</p>
     <div class="row-actions">
       <button class="btn" id="micBtn">Start microphone check</button>
       <div class="meter" id="meter"><i></i></div>
@@ -202,7 +202,7 @@
       var hasScript = false;
       try { await h.getFileHandle('script.json'); hasScript = true; } catch (e) {}
       if (!hasScript) {
-        $('folderStatus').innerHTML = '<span class="warn">That folder has no script.json, so it isn\'t the Mimi World voice folder. Choose <b>Mimi World › voice</b>.</span>';
+        $('folderStatus').innerHTML = '<span class="warn">That folder has no script.json, so it isn\'t the voice folder. Choose <b>Mimi World › voice</b>.</span>';
         return;
       }
       dir = h;

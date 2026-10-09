@@ -1,5 +1,5 @@
-/* Mimi Rescue (trial round, phase 3).
-   Five part–whole questions in Barney's voice. The player drags Mimi from the asteroid into the waiting circle.
+/* MeeMee Rescue (trial round, phase 3).
+   Five part–whole questions in Barney's voice. The player drags MeeMee from the asteroid into the waiting circle.
    Built only from the kit (kit/*.js); phase 4 adds the solar-system map, the crew screen and the progress grid. */
 (function () {
   'use strict';
@@ -38,7 +38,7 @@
 
   function buildStart() {
     const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'Mimi Rescue'));
+    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee Rescue'));
     const p = MW.pod(s, 240, 150, 420);
     p.el.disabled = true; p.el.tabIndex = -1;
     const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
@@ -172,14 +172,14 @@
     diagram.set(q);
     pod.face('thinking');
     stars.set(st.qi);
-    // the Mimi already rescued: the given part(s), in their counting pattern
+    // the MeeMee already rescued: the given part(s), in their counting pattern
     ['left', 'right'].forEach(function (k) {
       if (k === q.missing) return;
       diagram.slots(k, q[k]).forEach(function (p) {
         st.fixed.push(MW.counter(layer, { fixed: true, x: p.x, y: p.y, size: p.size }));
       });
     });
-    // ten Mimi waiting on the asteroid: more than any answer needs
+    // ten MeeMee waiting on the asteroid: more than any answer needs
     MW.LAYOUT.traySlots.forEach(function (p, i) {
       const c = MW.counter(layer, { x: p.x, y: p.y });
       c.home = p; c.where = 'tray'; c.slot = i;
@@ -233,7 +233,7 @@
       if (check() === 'auto' && inTarget().length === st.answer) success();
       return;
     }
-    // anywhere else: the Mimi floats back to its own spot on the asteroid
+    // anywhere else: the MeeMee floats back to its own spot on the asteroid
     const far = Math.hypot(x - c.home.x, y - c.home.y) > 70;
     floatHome(c);
     if (was === st.target) { tidy(true); MW.audio.sfx('whoosh'); MW.log('drop', 'out ' + inTarget().length); return; }
@@ -250,7 +250,7 @@
   // Tapping Scruffles: checks the answer in "tap" mode; otherwise asks the question again.
   function onPodTap() {
     if (st.paused || !(st.phase === 'open' || st.phase === 'asking')) return;
-    if (dragger && dragger.dragging()) return;              // one hand holding a Mimi, the other tapping
+    if (dragger && dragger.dragging()) return;              // one hand holding a MeeMee, the other tapping
     if (check() !== 'tap') { hearAgain(); return; }
     const n = inTarget().length;
     MW.log('check', n + ' of ' + st.answer);
@@ -258,7 +258,7 @@
     wrongTry(n > st.answer ? 'too-many' : 'too-few');
   }
 
-  // A wrong try: a wrong check (tap mode) or a Mimi dropped away from the waiting circle (a miss).
+  // A wrong try: a wrong check (tap mode) or a MeeMee dropped away from the waiting circle (a miss).
   // No red, no buzzer: Scruffles's try-again face, a calm line, and the hint after the second one.
   function wrongTry(kind) {
     if (kind === 'miss') st.misses++; else st.tries++;
@@ -285,7 +285,7 @@
     st.ghosts = MW.ghosts(ghostLayer, slots.slice(placed, st.answer));
     let lines, actions;
     if (q.missing === 'whole') {
-      // "Count them with me. One, two, three…": each Mimi in the parts hops as its number is said
+      // "Count them with me. One, two, three…": each MeeMee in the parts hops as its number is said
       const order = st.fixed.slice();
       lines = [['again-count-with-me']];
       actions = [null];
@@ -364,7 +364,7 @@
     MW.audio.sfx('twinkle');
     await MW.wait(800);
     if (!(await ok(token))) return;
-    // the rescued Mimi fly up into the pod
+    // the rescued MeeMee fly up into the pod
     inTarget().concat(st.fixed).forEach(function (m) {
       m.el.classList.add('is-rescued');
       if (!MW.reduceMotion) m.moveTo(1030 + (Math.random() * 60 - 30), 300, 30, true);   // reduce motion: just fade
@@ -384,7 +384,7 @@
     await MW.wait(300);
     await speak([['round-rescued-all']]);
     if (!(await ok(token))) return;
-    // the rescued Mimi hop once each, left to right
+    // the rescued MeeMee hop once each, left to right
     Array.prototype.forEach.call(endMimi.children, function (m, i) {
       setTimeout(function () { m.classList.remove('is-hop'); void m.getBoundingClientRect(); m.classList.add('is-hop'); }, i * 160);
     });
@@ -467,8 +467,8 @@
         };
         modes.forEach(function (m) { G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice'); });
         paint();
-        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of Mimi. No explaining needed, but your child never has to decide when to stop.', 'gu-note');
-        G.p(el, '<b>When your child taps Scruffles:</b> they put in as many Mimi as they think, then tap Scruffles to check. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint. Show them once: there is no spoken instruction for it yet.', 'gu-note');
+        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No explaining needed, but your child never has to decide when to stop.', 'gu-note');
+        G.p(el, '<b>When your child taps Scruffles:</b> they put in as many MeeMee as they think, then tap Scruffles to check. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint. Show them once: there is no spoken instruction for it yet.', 'gu-note');
 
         G.h3(el, 'Wholes in play');
         const r2 = G.row(el);

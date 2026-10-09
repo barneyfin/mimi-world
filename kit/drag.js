@@ -1,5 +1,5 @@
-/* Mimi World kit: counters and dragging.
-   A counter (a Mimi) is drawn at 80 stage px inside an invisible 120 px grab circle.
+/* MeeMee World kit: counters and dragging.
+   A counter (a MeeMee) is drawn at 80 stage px inside an invisible 120 px grab circle.
    One finger drags at a time; where grab circles overlap, the counter nearest the finger is picked up. */
 (function () {
   'use strict';
@@ -10,7 +10,7 @@
   // ---------------------------------------------------------------- counters
   MW.counter = function (layer, opts) {
     opts = opts || {};
-    const el = MW.make('div', 'mw-mimi' + (opts.fixed ? ' is-fixed' : ''), { role: 'img', 'aria-label': 'Mimi' });
+    const el = MW.make('div', 'mw-mimi' + (opts.fixed ? ' is-fixed' : ''), { role: 'img', 'aria-label': 'MeeMee' });
     const art = MW.art('mimi');
     el.appendChild(art);
     layer.appendChild(el);
@@ -28,7 +28,7 @@
     return c;
   };
 
-  // Counting patterns (design system: CountingPatterns): offsets from a circle's centre, and the Mimi size.
+  // Counting patterns (design system: CountingPatterns): offsets from a circle's centre, and the MeeMee size.
   MW.pattern = function (n) {
     if (n <= 0) return { size: BASE, pts: [] };
     if (n === 1) return { size: 80, pts: [[0, 0]] };

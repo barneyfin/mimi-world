@@ -1,4 +1,4 @@
-"""Build Mimi World into docs/ (the folder GitHub Pages publishes).
+"""Build MeeMee World into docs/ (the folder GitHub Pages publishes).
 
     python tools/build.py              everything: audio, pages, offline copy, icons, checks
     python tools/build.py --no-audio   reuse docs/audio/ as it is (faster; needs a previous full build)
@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from gen_tokens import COLOURS, OPACITY, RADIUS, SHADOWS, SIZES, SPACING, TYPE_STYLES  # noqa: E402
 import gen_scenes  # noqa: E402
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "shell.js", "grownups.js"]
 
 
@@ -61,7 +61,8 @@ def build_game(audio_manifest):
         "effects": {k: {"dur": v["dur"]} for k, v in audio_manifest["effects"].items()},
         "music": {"dur": audio_manifest["music"]["dur"], "fade": audio_manifest["music"]["fade"]},
     }
-    clips = [{"id": c["id"], "group": c["group"], "words": c["words"]} for c in script["clips"]]
+    # a clip still waiting for its recording (pending) stays off the game page
+    clips = [{"id": c["id"], "group": c["group"], "words": c["words"]} for c in script["clips"] if c["id"] in audio["voice"]]
     parts = {
         "__FONT400__": base64.b64encode((KIT / "Andika-400.woff2").read_bytes()).decode("ascii"),
         "__FONT700__": base64.b64encode((KIT / "Andika-700.woff2").read_bytes()).decode("ascii"),
@@ -158,7 +159,10 @@ def checks(page):
     script = json.loads((ROOT / "voice" / "script.json").read_text(encoding="utf-8"))
     for c in script["clips"]:
         if not (DOCS / "audio" / "voice" / f"{c['id']}.mp3").exists():
-            problems.append(f"no web audio for {c['id']}")
+            if c.get("pending"):
+                print(f"note: {c['id']} is waiting for its recording; the game doesn't use it yet")
+            else:
+                problems.append(f"no web audio for {c['id']}")
     if problems:
         raise SystemExit("Build checks failed:\n  " + "\n  ".join(problems))
 
@@ -178,7 +182,7 @@ def main():
         render_icons()
     cache, files = build_sw()
     checks(page)
-    print(f"Mimi World {VERSION}: index.html {len(page.encode('utf-8')) / 1024:.0f} KB, offline copy {cache} ({len(files)} files)")
+    print(f"MeeMee World {VERSION}: index.html {len(page.encode('utf-8')) / 1024:.0f} KB, offline copy {cache} ({len(files)} files)")
 
 
 if __name__ == "__main__":

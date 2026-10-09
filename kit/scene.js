@@ -1,4 +1,4 @@
-/* Mimi World kit: the pieces of a game screen.
+/* MeeMee World kit: the pieces of a game screen.
    The part–whole diagram, the asteroid tray, Scruffles's pod, progress stars, the equation, sparkles and hint ghosts.
    Positions follow the design system's GameScreen (1280x800 stage). */
 (function () {
@@ -65,7 +65,7 @@
         circles[k].setAttribute('aria-label', k === 'whole' ? 'The whole' : 'A part');
       });
     };
-    // The live count in the waiting circle: its pill shows the number of Mimi in it ("?" when empty).
+    // The live count in the waiting circle: its pill shows the number of MeeMee in it ("?" when empty).
     d.count = function (k, n) {
       if (k === 'whole') nums.whole.style.visibility = (n > 0 || circles.whole.classList.contains('is-hinting')) ? 'hidden' : '';
       else nums[k].textContent = n > 0 ? String(n) : '?';
@@ -176,7 +176,7 @@
     }
   };
 
-  // ---------------------------------------------------------------- hint ghosts: where the missing Mimi would go
+  // ---------------------------------------------------------------- hint ghosts: where the missing MeeMee would go
   MW.ghosts = function (parent, positions) {
     const els = positions.map(function (p) {
       const g = MW.make('div', 'mw-ghost');

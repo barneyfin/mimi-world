@@ -1,4 +1,4 @@
-"""Mimi World tokens: the single source for tokens.json and the colour classes in bundle.css."""
+"""MeeMee World tokens: the single source for tokens.json and the colour classes in bundle.css."""
 
 COLOURS = [
     # Ground
@@ -22,12 +22,12 @@ COLOURS = [
     # Grown-ups text
     ("text-2", "#B9BEE8", "Secondary text and captions for grown-ups on night (9.1:1) and night-raised (8.4:1)."),
     ("text-3", "#9DA2DF", "Labels, the grown-ups lock icon and its ring on night (6.8:1)."),
-    # The Mimi
-    ("mimi", "#8C7CD6", "Body of every Mimi, and the outer glow of lilac galaxies. 4.7:1 on night, 3.1:1 on the asteroid."),
-    ("mimi-outline", "#3E3380", "A Mimi's outline: 9.2:1 on moon circles."),
-    ("mimi-muzzle", "#C9BEF0", "A Mimi's muzzle."),
-    ("mimi-nose", "#F29BB0", "A Mimi's nose."),
-    ("mimi-eye", "{night}", "A Mimi's eyes."),
+    # The MeeMee
+    ("mimi", "#8C7CD6", "Body of every MeeMee, and the outer glow of lilac galaxies. 4.7:1 on night, 3.1:1 on the asteroid."),
+    ("mimi-outline", "#3E3380", "A MeeMee's outline: 9.2:1 on moon circles."),
+    ("mimi-muzzle", "#C9BEF0", "A MeeMee's muzzle."),
+    ("mimi-nose", "#F29BB0", "A MeeMee's nose."),
+    ("mimi-eye", "{night}", "A MeeMee's eyes."),
     # The crew
     ("scruffles-grey", "#8E909E", "Scruffles's grey cap, ears, back and tail (5.2:1 on night)."),
     ("cat-white", "#F7F5F2", "White fur on Scruffles and Snuffles, and the highlights in every eye."),
@@ -56,12 +56,12 @@ COLOURS = [
     ("galaxy", "#B9A6F2", "Inner glow of lilac galaxies (35% opacity)."),
     ("galaxy-peach", "#FFD3B5", "Inner glow of peach galaxies (28% opacity)."),
     ("galaxy-mint", "#B5EDE0", "Inner glow of mint galaxies (30% opacity)."),
-    ("asteroid", "#3A3474", "The asteroid tray where waiting Mimi sit."),
+    ("asteroid", "#3A3474", "The asteroid tray where waiting MeeMee sit."),
     ("asteroid-crater", "#2C2760", "Craters on the asteroid, and the empty slots in its ten-frame."),
 ]
 
 SPACING = [
-    ("space-xs", "8px", "Gap between buttons in a row; the gap between Mimi in a tight pattern."),
+    ("space-xs", "8px", "Gap between buttons in a row; the gap between MeeMee in a tight pattern."),
     ("space-s", "14px", "Gap between progress stars; padding inside a pill."),
     ("space-m", "24px", "Distance from the screen edge to any button (nothing the player taps sits closer)."),
     ("space-l", "32px", "Grown-ups panel padding; gap between the diagram and the tray."),
@@ -72,16 +72,16 @@ RADIUS = [
     ("radius-cell", "12px", "Cells in the grown-ups bond grid."),
     ("radius-panel", "28px", "The grown-ups panel and the equation card."),
     ("radius-pill", "35px", "Number pills (90 × 70)."),
-    ("radius-round", "50%", "Circles, Mimi grab areas and every button the player taps."),
+    ("radius-round", "50%", "Circles, MeeMee grab areas and every button the player taps."),
 ]
 
 SIZES = [
     ("stage-width", "1280px", "The stage every screen is drawn on; scaled to fit the tablet (0.82 on the Fire, 1.0 on the Doogee)."),
     ("stage-height", "800px", "Stage height (16:10, both tablets)."),
-    ("mimi-size", "80px", "A Mimi in the tray, while dragged, and in a part with 1–4 (about 11 mm on the Fire)."),
-    ("mimi-grab", "120px", "The invisible grab area around a Mimi (about 16 mm on the Fire)."),
-    ("mimi-mid", "56px", "A Mimi in a part holding 5 or 6."),
-    ("mimi-small", "46px", "A Mimi in a part holding 7–10. Placed Mimi only; they grow back to mimi-size when lifted."),
+    ("mimi-size", "80px", "A MeeMee in the tray, while dragged, and in a part with 1–4 (about 11 mm on the Fire)."),
+    ("mimi-grab", "120px", "The invisible grab area around a MeeMee (about 16 mm on the Fire)."),
+    ("mimi-mid", "56px", "A MeeMee in a part holding 5 or 6."),
+    ("mimi-small", "46px", "A MeeMee in a part holding 7–10. Placed MeeMee only; they grow back to mimi-size when lifted."),
     ("circle-whole", "230px", "Diameter of the whole circle."),
     ("circle-part", "250px", "Diameter of a part circle (about 34 mm on the Fire)."),
     ("rim", "7px", "Rim of whole and part circles."),
@@ -100,7 +100,7 @@ SHADOWS = [
     ("press-peach", "0 7px 0 #B9724E", "Solid shadow under peach buttons."),
     ("halo-mint", "0 0 0 12px rgba(127,217,196,0.14)", "Soft halo around given circles and pills."),
     ("ring-success", "0 0 0 16px rgba(255,180,138,0.3)", "The success ring around a circle the player has just completed."),
-    ("lift", "0 14px 8px rgba(0,0,0,0.45)", "Under a Mimi while it is dragged (used as a drop-shadow filter)."),
+    ("lift", "0 14px 8px rgba(0,0,0,0.45)", "Under a MeeMee while it is dragged (used as a drop-shadow filter)."),
 ]
 
 OPACITY = [
@@ -119,7 +119,7 @@ TYPE_STYLES = {
          "usage": "The numeral in a number pill under each part."},
     ],
     "For grown-ups": [
-        {"name": "title", "fontSize": "30px", "lineHeight": "36px", "fontWeight": 700, "sample": "Mimi Rescue progress",
+        {"name": "title", "fontSize": "30px", "lineHeight": "36px", "fontWeight": 700, "sample": "MeeMee Rescue progress",
          "usage": "Heading of the grown-ups area, in moon on night-raised."},
         {"name": "button-label", "fontSize": "22px", "lineHeight": "26px", "fontWeight": 700, "sample": "Close",
          "usage": "Words on grown-ups buttons."},

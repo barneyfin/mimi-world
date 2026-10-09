@@ -1,4 +1,4 @@
-/* Mimi World kit: the shell around every game.
+/* MeeMee World kit: the shell around every game.
    Screens, full screen and landscape on the first tap, "turn me sideways", the buttons the player taps,
    and the grown-ups lock (press and hold for 3 seconds). */
 (function () {

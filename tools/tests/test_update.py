@@ -11,6 +11,7 @@ import asyncio
 import functools
 import http.server
 import pathlib
+import re
 import shutil
 import sys
 import threading
@@ -22,6 +23,9 @@ DOCS = ROOT / "docs"
 SERVE = pathlib.Path(__file__).resolve().parent / "serve"
 PORT = 8792
 FAILS = []
+# the version just built, and two made-up newer ones the test publishes on top of it
+BUILT = re.search(r"VERSION: '([^']+)'", (DOCS / "index.html").read_text(encoding="utf-8")).group(1)
+NEWER1, NEWER2 = BUILT + "-next1", BUILT + "-next2"
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -38,10 +42,10 @@ def publish(src, version=None):
         shutil.rmtree(SERVE)
     shutil.copytree(src, SERVE)
     if version:
-        html = (SERVE / "index.html").read_text(encoding="utf-8").replace("VERSION: '0.3.0'", f"VERSION: '{version}'")
+        html = (SERVE / "index.html").read_text(encoding="utf-8").replace(f"VERSION: '{BUILT}'", f"VERSION: '{version}'")
         (SERVE / "index.html").write_text(html, encoding="utf-8")
         sw = (SERVE / "sw.js").read_text(encoding="utf-8")
-        sw = sw.replace("const VERSION = 'mimi-world-v0.3.0", f"const VERSION = 'mimi-world-v{version}")
+        sw = sw.replace(f"const VERSION = 'mimi-world-v{BUILT}-", f"const VERSION = 'mimi-world-v{version}-")
         (SERVE / "sw.js").write_text(sw, encoding="utf-8")
 
 
@@ -86,39 +90,39 @@ async def main(phase0):
             publish(DOCS)
             await page.reload()
             await page.evaluate("navigator.serviceWorker.getRegistration().then(r => r.update())")
-            v = await wait_version(page, "0.3.0", 20)
-            check("once the new version is saved, the open test page moves to the game", v == "0.3.0", v)
+            v = await wait_version(page, BUILT, 20)
+            check("once the new version is saved, the open test page moves to the game", v == BUILT, v)
             await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
 
             # 2. a newer version, tablet on the start screen
             await asyncio.sleep(2)
-            publish(DOCS, "0.3.1")
+            publish(DOCS, NEWER1)
             await page.reload()                                  # the page asks for updates itself 8 s after opening
-            v = await wait_version(page, "0.3.1", 25)
-            check("a newer version switches over at the start screen", v == "0.3.1", v)
+            v = await wait_version(page, NEWER1, 25)
+            check("a newer version switches over at the start screen", v == NEWER1, v)
 
             # 3. a newer version arrives mid-round: no interruption until Home
             await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
             await page.evaluate("MW.audio.unlock(); MW.rescue.start()")
             await asyncio.sleep(1)
             await asyncio.sleep(1)
-            publish(DOCS, "0.3.2")
+            publish(DOCS, NEWER2)
             await page.evaluate("navigator.serviceWorker.getRegistration().then(r => r.update())")
             await asyncio.sleep(6)
             v = await version(page)
             screen = await page.evaluate("MW.shell.screen")
-            check("mid-round, the page doesn't reload", v == "0.3.1" and screen == "screen-game", f"{v}, {screen}")
+            check("mid-round, the page doesn't reload", v == NEWER1 and screen == "screen-game", f"{v}, {screen}")
             check("the update is waiting", await page.evaluate("!!MW.shell.updateReady"))
             await page.evaluate("MW.rescue.home()")
-            v = await wait_version(page, "0.3.2", 15)
-            check("tapping Home switches to the newer version", v == "0.3.2", v)
+            v = await wait_version(page, NEWER2, 15)
+            check("tapping Home switches to the newer version", v == NEWER2, v)
 
             # offline afterwards
             await ctx.set_offline(True)
             await page.reload()
             await page.wait_for_load_state("load")
             await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-            check("works offline after the updates", await version(page) == "0.3.2")
+            check("works offline after the updates", await version(page) == NEWER2)
             await browser.close()
     finally:
         srv.shutdown()

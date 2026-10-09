@@ -1,4 +1,4 @@
-# Publishing Mimi World and opening it on the tablets
+# Publishing MeeMee World and opening it on the tablets
 
 This is the phase 0 guide. It takes about 30 minutes, in five parts:
 
@@ -36,7 +36,7 @@ Open **Windows PowerShell**: Start menu, type `PowerShell`, and press Enter.
 
 Type each command on its own, press Enter, and check the result before moving on.
 
-**Command 1.** Go into the Mimi World folder:
+**Command 1.** Go into the project folder (on the PC it's still called Mimi World):
 
 ```powershell
 cd "C:\Users\barne\Documents\Calude Code\Mimi World"
@@ -155,9 +155,9 @@ Refresh the GitHub page: your files should now be listed.
    - **Branch:** `main`, and in the second box choose `/docs`
    - Click **Save**.
 4. Wait 1 to 3 minutes, then refresh the page. A box at the top says **Your site is live at** `https://barneyfin.github.io/mimi-world/`.
-5. Open that address on your PC. You should see the night sky, a moon-coloured circle and three lilac Mimi on an asteroid. Try dragging one with the mouse.
+5. Open that address on your PC. You should see the night sky, a moon-coloured circle and three lilac MeeMee on an asteroid. Try dragging one with the mouse.
 
-This address is the one Mimi World keeps for good, so it only needs approving on the Fire once.
+This address is the one MeeMee World keeps for good, so it only needs approving on the Fire once.
 
 ---
 
@@ -170,7 +170,7 @@ Do both tablets. On each, follow the six steps in the page's **Results** panel (
 1. Open **Chrome** and type the address: `barneyfin.github.io/mimi-world`
 2. Follow the steps in the Results panel.
 3. To add it to the home screen: tap Chrome's **⋮** menu, then **Add to home screen** (it may say **Install app**), then **Install** or **Add**.
-4. Close Chrome, open Mimi World from its new home-screen icon, and try dragging again.
+4. Close Chrome, open MeeMee World from its new home-screen icon, and try dragging again.
 5. Turn Wi-Fi off, open it from the icon again, and open the Results panel.
 
 ### Fire HD 8 Kids (Amazon Kids profile)
@@ -186,18 +186,18 @@ Amazon changes these menus from time to time, so the names may differ slightly. 
 
 Then on the Fire, in your child's profile:
 
-5. Open the web browser (or the **Web** tab) and go to Mimi World.
+5. Open the web browser (or the **Web** tab) and go to MeeMee World.
 6. Follow the steps in the Results panel. The Kids browser may not offer full screen or "add to home screen". That's fine: just note it.
-7. Turn Wi-Fi off, open Mimi World again, and open the Results panel.
+7. Turn Wi-Fi off, open MeeMee World again, and open the Results panel.
 
 ### What to send Claude
 
 - A photo of the Results panel from each tablet, taken after step 5 of the panel's list.
-- Anything that felt wrong: the Mimi lagging behind your finger, a sound that didn't play, a menu you couldn't find.
+- Anything that felt wrong: the MeeMee lagging behind your finger, a sound that didn't play, a menu you couldn't find.
 
 ---
 
 ## Good to know
 
-- **The website is public.** Anyone with the address can open it, though nobody will find it by chance. It holds nothing personal, and nothing in Mimi World will ever say your child's name.
+- **The website is public.** Anyone with the address can open it, though nobody will find it by chance. It holds nothing personal, and nothing in MeeMee World will ever say your child's name.
 - **Updates.** When Claude changes the game, you commit and push as above (with a new CMn.txt). GitHub Pages updates in a minute or two. Each tablet saves the new version in the background when it next opens the game, then switches to it at the start screen.

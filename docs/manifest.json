@@ -1,6 +1,6 @@
 {
-  "name": "Mimi World",
-  "short_name": "Mimi World",
+  "name": "MeeMee World",
+  "short_name": "MeeMee World",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",

@@ -1,5 +1,5 @@
 {
-  "game": "Mimi Rescue",
+  "game": "MeeMee Rescue",
   "version": 1,
   "format": "WAV, mono, 44.1 kHz, 16-bit; silence trimmed; loudness normalised; peaks at most -1 dB",
   "clips": [
@@ -226,6 +226,13 @@
       "how": "Inviting, as if counting side by side."
     },
     {
+      "id": "tap-scruffles",
+      "group": "Checking",
+      "words": "Tap Scruffles when you're ready.",
+      "how": "Friendly and clear, like showing someone a new button. Warm, not bossy.",
+      "pending": true
+    },
+    {
       "id": "too-many",
       "group": "Too many",
       "words": "That's too many. Take one back.",
@@ -240,7 +247,7 @@
     {
       "id": "round-rescued-all",
       "group": "Rounds",
-      "words": "You rescued all the Mimi!",
+      "words": "You rescued all the MeeMee!",
       "how": "Big finish: proud and happy."
     },
     {
@@ -252,13 +259,13 @@
     {
       "id": "map-welcome",
       "group": "Map",
-      "words": "Welcome to Mimi World!",
+      "words": "Welcome to MeeMee World!",
       "how": "Warm welcome."
     },
     {
       "id": "map-mimi-rescue",
       "group": "Map",
-      "words": "Mimi Rescue!",
+      "words": "MeeMee Rescue!",
       "how": "Announcing the game's name."
     },
     {

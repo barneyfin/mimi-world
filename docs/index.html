@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#171A45">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Mimi World</title>
+<title>MeeMee World</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <style>
@@ -155,7 +155,7 @@
 .button-label{font-family:var(--font-andika);font-size:22px;line-height:26px;font-weight:700}
 .body{font-family:var(--font-andika);font-size:19px;line-height:27px;font-weight:400}
 .label{font-family:var(--font-andika);font-size:17px;line-height:22px;font-weight:400}
-/* Mimi World kit styles. Colours, sizes and type come only from tokens (generated from design/gen_tokens.py). */
+/* MeeMee World kit styles. Colours, sizes and type come only from tokens (generated from design/gen_tokens.py). */
 
 /* ---------------------------------------------------------------- page and stage */
 html, body {
@@ -218,7 +218,7 @@ button { font-family: var(--font-andika); }
 .mw-equation { opacity: 0; transition: opacity 300ms ease-out; pointer-events: none; }
 .mw-equation.is-shown { opacity: 1; }
 
-/* ---------------------------------------------------------------- the Mimi (counters) */
+/* ---------------------------------------------------------------- the MeeMee (counters) */
 .mw-counters .mw-mimi, .mw-mimi { position: absolute; left: 0; top: 0; width: var(--mimi-grab); height: var(--mimi-grab);
   margin: -60px 0 0 -60px; display: flex; align-items: center; justify-content: center; line-height: 0;
   pointer-events: none; will-change: transform; }
@@ -235,7 +235,7 @@ button { font-family: var(--font-andika); }
 @keyframes mw-hop { 0% { translate: 0 0; } 40% { translate: 0 -18px; } 100% { translate: 0 0; } }
 .mw-start-mimi { display: flex; gap: 16px; line-height: 0; }
 
-/* hint ghosts: where the missing Mimi would sit */
+/* hint ghosts: where the missing MeeMee would sit */
 .mw-ghost { position: absolute; box-sizing: border-box; border-radius: var(--radius-round);
   border: 3px dashed var(--mimi); opacity: 0.6; transition: background-color 200ms, opacity 200ms; }
 .mw-ghost.is-lit { background: rgba(140, 124, 214, 0.35); opacity: 1; }
@@ -314,9 +314,9 @@ button { font-family: var(--font-andika); }
 <body>
 <div id="stage">
   <div class="mw-layer" aria-hidden="true"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><path class="f-night-raised" d="M820 -40 C 960 -60, 1180 -20, 1300 60 L 1300 380 C 1180 330, 1020 300, 920 220 C 840 160, 760 -20, 820 -40 Z"/><g transform="translate(640 160) rotate(-18) scale(0.8)"><ellipse class="f-mimi" rx="48" ry="16" opacity="0.2"/><ellipse class="f-galaxy" rx="31" ry="10" opacity="0.35"/><ellipse class="f-moon" rx="13" ry="5" opacity="0.85"/><path class="s-galaxy" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M0 0 C 16 -10, 36 -9, 46 3"/><path class="s-galaxy" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M0 0 C -16 10, -36 9, -46 -3"/></g><g transform="translate(900 50) rotate(26) scale(0.6)"><ellipse class="f-peach" rx="48" ry="16" opacity="0.2"/><ellipse class="f-galaxy-peach" rx="31" ry="10" opacity="0.35"/><ellipse class="f-moon" rx="13" ry="5" opacity="0.85"/><path class="s-galaxy-peach" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M0 0 C 16 -10, 36 -9, 46 3"/><path class="s-galaxy-peach" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M0 0 C -16 10, -36 9, -46 -3"/></g><g transform="translate(70 300) rotate(-40) scale(0.62)"><ellipse class="f-mint" rx="48" ry="16" opacity="0.2"/><ellipse class="f-galaxy-mint" rx="31" ry="10" opacity="0.35"/><ellipse class="f-moon" rx="13" ry="5" opacity="0.85"/><path class="s-galaxy-mint" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M0 0 C 16 -10, 36 -9, 46 3"/><path class="s-galaxy-mint" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M0 0 C -16 10, -36 9, -46 -3"/></g><circle class="f-moon" cx="160" cy="300" r="2.2"/><circle class="f-moon" cx="250" cy="96" r="1.8"/><circle class="f-moon" cx="300" cy="320" r="1.4"/><circle class="f-moon" cx="40" cy="240" r="1.6"/><circle class="f-moon" cx="660" cy="120" r="2.2"/><circle class="f-moon" cx="720" cy="250" r="1.6"/><circle class="f-moon" cx="820" cy="30" r="1.8"/><circle class="f-moon" cx="1000" cy="40" r="2"/><circle class="f-moon" cx="1240" cy="600" r="2.2"/><circle class="f-moon" cx="680" cy="760" r="1.8"/><circle class="f-moon" cx="120" cy="560" r="2"/><circle class="f-moon" cx="590" cy="40" r="1.6"/><circle class="f-moon" cx="20" cy="640" r="2"/><circle class="f-moon" cx="1010" cy="460" r="1.6"/><circle class="f-moon" cx="760" cy="330" r="1.4"/><path class="f-spark" transform="translate(216 330) scale(1.0)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(735 190) scale(0.8)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><clipPath id="sky-a"><circle cx="60" cy="830" r="175"/></clipPath><g clip-path="url(#sky-a)"><g transform="rotate(-45 60 830)"><rect class="f-planet-indigo-dark" x="-115" y="655" width="350" height="350"/><rect class="f-planet-indigo" x="-115" y="655" width="350" height="235.9"/><rect class="f-planet-indigo-light" x="-115" y="655" width="350" height="105.0"/></g></g><g transform="rotate(-14 150 215)"><path class="s-mint-dark" fill="none" stroke-width="4.5" stroke-linecap="round" d="M97.52000000000001 215 A52.48 10.88 0 0 1 202.48 215"/></g><clipPath id="sky-b"><circle cx="150" cy="215" r="32"/></clipPath><g clip-path="url(#sky-b)"><g transform="rotate(-45 150 215)"><rect class="f-planet-peach-dark" x="118" y="183" width="64" height="64"/><rect class="f-planet-peach" x="118" y="183" width="64" height="43.1"/><rect class="f-planet-peach-light" x="118" y="183" width="64" height="19.2"/></g></g><g transform="rotate(-14 150 215)"><path class="s-mint" fill="none" stroke-width="4.5" stroke-linecap="round" d="M97.52000000000001 215 A52.48 10.88 0 0 0 202.48 215"/></g><clipPath id="sky-c"><circle cx="690" cy="300" r="18"/></clipPath><g clip-path="url(#sky-c)"><g transform="rotate(-45 690 300)"><rect class="f-planet-mint-dark" x="672" y="282" width="36" height="36"/><rect class="f-planet-mint" x="672" y="282" width="36" height="24.3"/><rect class="f-planet-mint-light" x="672" y="282" width="36" height="10.8"/></g></g></svg></div>
-  <section class="mw-screen" id="screen-start" aria-label="Mimi Rescue: start"></section>
-  <section class="mw-screen" id="screen-game" aria-label="Mimi Rescue"></section>
-  <section class="mw-screen" id="screen-end" aria-label="All the Mimi rescued"></section>
+  <section class="mw-screen" id="screen-start" aria-label="MeeMee Rescue: start"></section>
+  <section class="mw-screen" id="screen-game" aria-label="MeeMee Rescue"></section>
+  <section class="mw-screen" id="screen-end" aria-label="All the MeeMee rescued"></section>
 </div>
 
 <div class="mw-sideways" role="alert">
@@ -344,12 +344,12 @@ button { font-family: var(--font-andika); }
 <template id="art-icon-full"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 V8 H18 M30 8 H40 V18 M8 30 V40 H18 M30 40 H40 V30"/></svg></template>
 <template id="art-icon-tick"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 25 L20 35 L38 14"/></svg></template>
 <script>
-window.MW = { VERSION: '0.3.0' };
+window.MW = { VERSION: '0.3.1' };
 window.MW_AUDIO = {"voice":{"num-mid-0":{"dur":0.99},"num-mid-1":{"dur":0.71},"num-mid-2":{"dur":0.71},"num-mid-3":{"dur":0.97},"num-mid-4":{"dur":0.66},"num-mid-5":{"dur":1.04},"num-mid-6":{"dur":0.72},"num-mid-7":{"dur":0.67},"num-mid-8":{"dur":0.59},"num-mid-9":{"dur":0.84},"num-mid-10":{"dur":0.85},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.49},"num-end-2":{"dur":0.74},"num-end-3":{"dur":0.75},"num-end-4":{"dur":0.46},"num-end-5":{"dur":0.52},"num-end-6":{"dur":0.94},"num-end-7":{"dur":0.6},"num-end-8":{"dur":0.96},"num-end-9":{"dur":0.96},"num-end-10":{"dur":0.79},"and":{"dur":0.71},"make":{"dur":0.83},"q-lets-make":{"dur":1.72},"q-weve-got":{"dur":1.74},"q-how-many-more":{"dur":1.03},"q-how-many-altogether":{"dur":1.46},"q-count-on-from":{"dur":1.82},"praise-found-it":{"dur":0.97},"praise-thats-right":{"dur":0.9},"praise-super-counting":{"dur":1.19},"praise-brilliant-rescuing":{"dur":1.41},"praise-well-done":{"dur":0.7},"again-try-again":{"dur":1.24},"again-look-again":{"dur":1.32},"again-count-with-me":{"dur":1.46},"too-many":{"dur":2.07},"round-ready":{"dur":2.73},"round-rescued-all":{"dur":2.96},"round-another":{"dur":1.0},"map-welcome":{"dur":3.0},"map-mimi-rescue":{"dur":1.38},"map-not-ready":{"dur":2.22}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
-window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the Mimi!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to Mimi World!"},{"id":"map-mimi-rescue","group":"Map","words":"Mimi Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."}];
+window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."}];
 </script>
 <script>
-/* Mimi World kit: core.
+/* MeeMee World kit: core.
    The 1280x800 stage and its scaling, what each tablet remembers, and small helpers.
    Every other kit file adds to window.MW. */
 (function () {
@@ -487,7 +487,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 })();
 
-/* Mimi World kit: sound.
+/* MeeMee World kit: sound.
    Voice lines built from Barney's recorded pieces, sound effects, and the looping music that dips under speech.
    All files are at one loudness reference (-20 LUFS, made by tools/make_audio.py), so mixing is plain gains.
 
@@ -751,8 +751,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   }
 })();
 
-/* Mimi World kit: counters and dragging.
-   A counter (a Mimi) is drawn at 80 stage px inside an invisible 120 px grab circle.
+/* MeeMee World kit: counters and dragging.
+   A counter (a MeeMee) is drawn at 80 stage px inside an invisible 120 px grab circle.
    One finger drags at a time; where grab circles overlap, the counter nearest the finger is picked up. */
 (function () {
   'use strict';
@@ -763,7 +763,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   // ---------------------------------------------------------------- counters
   MW.counter = function (layer, opts) {
     opts = opts || {};
-    const el = MW.make('div', 'mw-mimi' + (opts.fixed ? ' is-fixed' : ''), { role: 'img', 'aria-label': 'Mimi' });
+    const el = MW.make('div', 'mw-mimi' + (opts.fixed ? ' is-fixed' : ''), { role: 'img', 'aria-label': 'MeeMee' });
     const art = MW.art('mimi');
     el.appendChild(art);
     layer.appendChild(el);
@@ -781,7 +781,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     return c;
   };
 
-  // Counting patterns (design system: CountingPatterns): offsets from a circle's centre, and the Mimi size.
+  // Counting patterns (design system: CountingPatterns): offsets from a circle's centre, and the MeeMee size.
   MW.pattern = function (n) {
     if (n <= 0) return { size: BASE, pts: [] };
     if (n === 1) return { size: 80, pts: [[0, 0]] };
@@ -878,7 +878,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 })();
 
-/* Mimi World kit: the pieces of a game screen.
+/* MeeMee World kit: the pieces of a game screen.
    The part–whole diagram, the asteroid tray, Scruffles's pod, progress stars, the equation, sparkles and hint ghosts.
    Positions follow the design system's GameScreen (1280x800 stage). */
 (function () {
@@ -945,7 +945,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
         circles[k].setAttribute('aria-label', k === 'whole' ? 'The whole' : 'A part');
       });
     };
-    // The live count in the waiting circle: its pill shows the number of Mimi in it ("?" when empty).
+    // The live count in the waiting circle: its pill shows the number of MeeMee in it ("?" when empty).
     d.count = function (k, n) {
       if (k === 'whole') nums.whole.style.visibility = (n > 0 || circles.whole.classList.contains('is-hinting')) ? 'hidden' : '';
       else nums[k].textContent = n > 0 ? String(n) : '?';
@@ -1056,7 +1056,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     }
   };
 
-  // ---------------------------------------------------------------- hint ghosts: where the missing Mimi would go
+  // ---------------------------------------------------------------- hint ghosts: where the missing MeeMee would go
   MW.ghosts = function (parent, positions) {
     const els = positions.map(function (p) {
       const g = MW.make('div', 'mw-ghost');
@@ -1072,7 +1072,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 })();
 
-/* Mimi World kit: the shell around every game.
+/* MeeMee World kit: the shell around every game.
    Screens, full screen and landscape on the first tap, "turn me sideways", the buttons the player taps,
    and the grown-ups lock (press and hold for 3 seconds). */
 (function () {
@@ -1247,7 +1247,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   };
 })();
 
-/* Mimi World kit: the grown-ups area.
+/* MeeMee World kit: the grown-ups area.
    Opened by holding the lock for 3 seconds. Written for adults: British English, sentence case, no exclamation marks.
    The kit provides "Checks" (this tablet, every voice clip, music, effects); a game adds its own sections. */
 (function () {
@@ -1351,9 +1351,9 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
       ['Page version', MW.VERSION],
       ['Browser', browserName() + (andr ? ' · Android ' + andr : '')],
       ['Screen', screen.width + '×' + screen.height + ' at ' + (Math.round(dpr * 100) / 100) + 'x · page ' + innerWidth + '×' + innerHeight],
-      ['Mimi size', Math.round(80 * sc * dpr) + ' screen pixels wide (scale ' + sc.toFixed(2) + ')'],
+      ['MeeMee size', Math.round(80 * sc * dpr) + ' screen pixels wide (scale ' + sc.toFixed(2) + ')'],
       ['Touch', (navigator.maxTouchPoints || 0) + ((navigator.maxTouchPoints || 0) === 1 ? ' touch point' : ' touch points') + ' · last input ' + (MW.lastInput || '—')],
-      ['Drag smoothness', d ? d.fps + ' frames a second; slowest frame ' + d.worst + ' ms; ' + d.slow + ' slow of ' + d.n : 'Drag a Mimi first',
+      ['Drag smoothness', d ? d.fps + ' frames a second; slowest frame ' + d.worst + ' ms; ' + d.slow + ' slow of ' + d.n : 'Drag a MeeMee first',
         d ? (d.fps >= 50 && d.slow <= Math.max(2, d.n * 0.05)) : null],
       ['Opened in', MW.device.loadMs === null ? '—' : (MW.device.loadMs < 100 ? 'under 0.1 s' : (MW.device.loadMs / 1000).toFixed(1) + ' s'), MW.device.loadMs === null ? null : MW.device.loadMs <= 3000],
       ['Sound', a.state === 'running' ? 'On (' + a.rate + ' Hz)' : a.state, a.state === 'running'],
@@ -1435,8 +1435,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   }
 })();
 
-/* Mimi Rescue (trial round, phase 3).
-   Five part–whole questions in Barney's voice. The player drags Mimi from the asteroid into the waiting circle.
+/* MeeMee Rescue (trial round, phase 3).
+   Five part–whole questions in Barney's voice. The player drags MeeMee from the asteroid into the waiting circle.
    Built only from the kit (kit/*.js); phase 4 adds the solar-system map, the crew screen and the progress grid. */
 (function () {
   'use strict';
@@ -1475,7 +1475,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
 
   function buildStart() {
     const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'Mimi Rescue'));
+    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee Rescue'));
     const p = MW.pod(s, 240, 150, 420);
     p.el.disabled = true; p.el.tabIndex = -1;
     const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
@@ -1609,14 +1609,14 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     diagram.set(q);
     pod.face('thinking');
     stars.set(st.qi);
-    // the Mimi already rescued: the given part(s), in their counting pattern
+    // the MeeMee already rescued: the given part(s), in their counting pattern
     ['left', 'right'].forEach(function (k) {
       if (k === q.missing) return;
       diagram.slots(k, q[k]).forEach(function (p) {
         st.fixed.push(MW.counter(layer, { fixed: true, x: p.x, y: p.y, size: p.size }));
       });
     });
-    // ten Mimi waiting on the asteroid: more than any answer needs
+    // ten MeeMee waiting on the asteroid: more than any answer needs
     MW.LAYOUT.traySlots.forEach(function (p, i) {
       const c = MW.counter(layer, { x: p.x, y: p.y });
       c.home = p; c.where = 'tray'; c.slot = i;
@@ -1670,7 +1670,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
       if (check() === 'auto' && inTarget().length === st.answer) success();
       return;
     }
-    // anywhere else: the Mimi floats back to its own spot on the asteroid
+    // anywhere else: the MeeMee floats back to its own spot on the asteroid
     const far = Math.hypot(x - c.home.x, y - c.home.y) > 70;
     floatHome(c);
     if (was === st.target) { tidy(true); MW.audio.sfx('whoosh'); MW.log('drop', 'out ' + inTarget().length); return; }
@@ -1687,7 +1687,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
   // Tapping Scruffles: checks the answer in "tap" mode; otherwise asks the question again.
   function onPodTap() {
     if (st.paused || !(st.phase === 'open' || st.phase === 'asking')) return;
-    if (dragger && dragger.dragging()) return;              // one hand holding a Mimi, the other tapping
+    if (dragger && dragger.dragging()) return;              // one hand holding a MeeMee, the other tapping
     if (check() !== 'tap') { hearAgain(); return; }
     const n = inTarget().length;
     MW.log('check', n + ' of ' + st.answer);
@@ -1695,7 +1695,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     wrongTry(n > st.answer ? 'too-many' : 'too-few');
   }
 
-  // A wrong try: a wrong check (tap mode) or a Mimi dropped away from the waiting circle (a miss).
+  // A wrong try: a wrong check (tap mode) or a MeeMee dropped away from the waiting circle (a miss).
   // No red, no buzzer: Scruffles's try-again face, a calm line, and the hint after the second one.
   function wrongTry(kind) {
     if (kind === 'miss') st.misses++; else st.tries++;
@@ -1722,7 +1722,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     st.ghosts = MW.ghosts(ghostLayer, slots.slice(placed, st.answer));
     let lines, actions;
     if (q.missing === 'whole') {
-      // "Count them with me. One, two, three…": each Mimi in the parts hops as its number is said
+      // "Count them with me. One, two, three…": each MeeMee in the parts hops as its number is said
       const order = st.fixed.slice();
       lines = [['again-count-with-me']];
       actions = [null];
@@ -1801,7 +1801,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     MW.audio.sfx('twinkle');
     await MW.wait(800);
     if (!(await ok(token))) return;
-    // the rescued Mimi fly up into the pod
+    // the rescued MeeMee fly up into the pod
     inTarget().concat(st.fixed).forEach(function (m) {
       m.el.classList.add('is-rescued');
       if (!MW.reduceMotion) m.moveTo(1030 + (Math.random() * 60 - 30), 300, 30, true);   // reduce motion: just fade
@@ -1821,7 +1821,7 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
     await MW.wait(300);
     await speak([['round-rescued-all']]);
     if (!(await ok(token))) return;
-    // the rescued Mimi hop once each, left to right
+    // the rescued MeeMee hop once each, left to right
     Array.prototype.forEach.call(endMimi.children, function (m, i) {
       setTimeout(function () { m.classList.remove('is-hop'); void m.getBoundingClientRect(); m.classList.add('is-hop'); }, i * 160);
     });
@@ -1904,8 +1904,8 @@ window.MW_SCRIPT = [{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"z
         };
         modes.forEach(function (m) { G.btn(r1, m[1], function () { MW.store.setting('check', m[0]); paint(); MW.log('setting', 'check ' + m[0]); }, 'gu-choice'); });
         paint();
-        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of Mimi. No explaining needed, but your child never has to decide when to stop.', 'gu-note');
-        G.p(el, '<b>When your child taps Scruffles:</b> they put in as many Mimi as they think, then tap Scruffles to check. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint. Show them once: there is no spoken instruction for it yet.', 'gu-note');
+        G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No explaining needed, but your child never has to decide when to stop.', 'gu-note');
+        G.p(el, '<b>When your child taps Scruffles:</b> they put in as many MeeMee as they think, then tap Scruffles to check. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint. Show them once: there is no spoken instruction for it yet.', 'gu-note');
 
         G.h3(el, 'Wholes in play');
         const r2 = G.row(el);

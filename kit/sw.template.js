@@ -1,6 +1,6 @@
-// Mimi World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
+// MeeMee World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
 // VERSION changes with every build that changes a file, so tablets pick up the new copy. A tablet saves the new
-// copy in the background the next time Mimi World opens, then switches to it at the start screen (never mid-round).
+// copy in the background the next time MeeMee World opens, then switches to it at the start screen (never mid-round).
 const VERSION = '__CACHE__';
 const FILES = __FILES__;
 
@@ -16,7 +16,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
-      // only Mimi World's own saved copies: other apps on the same site keep theirs
+      // only MeeMee World's own saved copies: other apps on the same site keep theirs
       const old = keys.filter((k) => k !== VERSION && k.indexOf('mimi-world-') === 0);
       // The phase 0 tablet test page (offline copies named mimi-world-v0.1.*) can't hear the message below,
       // so a tablet still showing it is moved straight to the new page.

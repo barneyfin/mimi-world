@@ -1,4 +1,4 @@
-/* Mimi World kit: core.
+/* MeeMee World kit: core.
    The 1280x800 stage and its scaling, what each tablet remembers, and small helpers.
    Every other kit file adds to window.MW. */
 (function () {

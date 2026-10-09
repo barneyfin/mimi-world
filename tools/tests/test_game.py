@@ -1,4 +1,4 @@
-"""Headless checks for Mimi World (phase 3): the trial round and the kit, on Fire and Doogee screen sizes.
+"""Headless checks for MeeMee World (phase 3): the trial round and the kit, on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -129,7 +129,7 @@ async def play_round(t, name, shots=True):
     # Q1 missing right part 4 (whole 7, given 3)
     await t.fill(2, "right")
     s = await t.state()
-    check(f"{name}: two Mimi dropped show 2 in the pill", s["placed"] == 2 and (await page.inner_text("#screen-game .mw-pill.is-waiting")) == "2")
+    check(f"{name}: two MeeMee dropped show 2 in the pill", s["placed"] == 2 and (await page.inner_text("#screen-game .mw-pill.is-waiting")) == "2")
     if shots:
         free = await t.tray_free()
         x0, y0 = await t.screen(*free[-1])
@@ -147,7 +147,7 @@ async def play_round(t, name, shots=True):
         check(f"{name}: a drop between circles floats back", s["placed"] == 2, json.dumps(s))
     await t.fill(2, "right")
     s = await t.wait_phase(["celebrate"], 3)
-    check(f"{name}: the fourth Mimi completes 3 + ? = 7", s["phase"] == "celebrate", json.dumps(s))
+    check(f"{name}: the fourth MeeMee completes 3 + ? = 7", s["phase"] == "celebrate", json.dumps(s))
     await asyncio.sleep(2.6)
     if shots:
         await page.screenshot(path=str(SHOTS / f"{name}-2-celebrate.png"))
@@ -172,13 +172,13 @@ async def play_round(t, name, shots=True):
     check(f"{name}: first miss says 'Let's try again'", "again-try-again" in said)
     check(f"{name}: second miss plays the count-with-me hint", any(x.startswith("again-count-with-me") for x in said))
     ghosts = await page.evaluate("document.querySelectorAll('.mw-ghost').length")
-    check(f"{name}: hint shows 5 ghost Mimi in the whole", ghosts == 5, str(ghosts))
+    check(f"{name}: hint shows 5 ghost MeeMee in the whole", ghosts == 5, str(ghosts))
     await asyncio.sleep(2.5)
     if shots:
         await page.screenshot(path=str(SHOTS / f"{name}-3-hint.png"))
     await t.fill(5, "whole")
     s = await t.wait_phase(["celebrate"], 3)
-    check(f"{name}: five Mimi in the whole completes 2 + 3 = ?", s["phase"] == "celebrate", json.dumps(s))
+    check(f"{name}: five MeeMee in the whole completes 2 + 3 = ?", s["phase"] == "celebrate", json.dumps(s))
     s = await t.wait_phase(["asking", "open"], 15)
 
     # Q3 missing left (? + 5 = 6): take one back out
@@ -192,7 +192,7 @@ async def play_round(t, name, shots=True):
     placed = await page.evaluate("MW.rescue.st.counters.filter(c => c.where === 'right').map(c => [c.x, c.y])")
     await t.drag(placed[0][0], placed[0][1], 1000, 300)
     s = await t.state()
-    check(f"{name}: dragging a Mimi back out leaves 1", s["placed"] == 1, json.dumps(s))
+    check(f"{name}: dragging a MeeMee back out leaves 1", s["placed"] == 1, json.dumps(s))
     await t.fill(4, "right")
     s = await t.wait_phase(["celebrate"], 3)
     check(f"{name}: 4 + ? = 9 completes at 5", s["phase"] == "celebrate", json.dumps(s))
@@ -205,7 +205,7 @@ async def play_round(t, name, shots=True):
     s = await t.state()
     check(f"{name}: round ends on the celebration screen", s["screen"] == "screen-end", json.dumps(s))
     said = await t.said()
-    check(f"{name}: 'You rescued all the Mimi!' plays", "round-rescued-all" in said)
+    check(f"{name}: 'You rescued all the MeeMee!' plays", "round-rescued-all" in said)
     if shots:
         await asyncio.sleep(1.5)
         await page.screenshot(path=str(SHOTS / f"{name}-4-end.png"))
@@ -299,7 +299,7 @@ async def test_tap_mode(p):
     check("tap: too few says 'Let's look again.'", "again-look-again" in await t.said())
     await t.fill(4, "right")                                 # 6 > 4
     s = await t.state()
-    check("tap: six Mimi can go in (no auto-complete)", s["placed"] == 6 and s["phase"] == "open", json.dumps(s))
+    check("tap: six MeeMee can go in (no auto-complete)", s["placed"] == 6 and s["phase"] == "open", json.dumps(s))
     await t.tap(1030, 300)
     await asyncio.sleep(0.6)
     check("tap: too many says 'That's too many. Take one back.'", "too-many" in await t.said())
@@ -312,7 +312,7 @@ async def test_tap_mode(p):
     await t.fill(1, "right")
     await t.tap(1030, 300)
     s = await t.wait_phase(["celebrate"], 3)
-    check("tap: four Mimi and a tap on Scruffles completes it", s["phase"] == "celebrate", json.dumps(s))
+    check("tap: four MeeMee and a tap on Scruffles completes it", s["phase"] == "celebrate", json.dumps(s))
     rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
     check("tap: saved with 3 wrong checks and the hint", rec["tries"] == 3 and rec["hint"] is True, json.dumps(rec))
     check("tap: no console errors", not problems, "; ".join(problems[:3]))
@@ -332,7 +332,7 @@ async def test_edge_cases(p):
     await t.tap(900, 380)
     await t.wait_phase(["open"], 15)
 
-    # picking a Mimi up keeps it fully visible (no fade-in replay)
+    # picking a MeeMee up keeps it fully visible (no fade-in replay)
     free = await t.tray_free()
     x0, y0 = await t.screen(*free[-1])
     await touch(t, "touchStart", [(1, (x0, y0))])
@@ -340,7 +340,7 @@ async def test_edge_cases(p):
     op = await page.evaluate("Math.min(...MW.rescue.st.counters.map(c => +getComputedStyle(c.el).opacity))")
     await touch(t, "touchEnd", [])
     await asyncio.sleep(0.4)
-    check("edge: a picked-up Mimi stays fully visible", op > 0.99, str(op))
+    check("edge: a picked-up MeeMee stays fully visible", op > 0.99, str(op))
 
     # two fingers on the lock, lifted quickly: nothing opens
     lx, ly = await t.screen(46, 754)
@@ -369,7 +369,7 @@ async def test_edge_cases(p):
     said = await t.said()
     check("edge: coming back asks the question again", not await page.evaluate("MW.rescue.st.paused") and said[n_before:][:1] == ["q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more"], str(said[n_before:]))
 
-    # Home while a Mimi is held, then the finger lifts: nothing is said on the start screen
+    # Home while a MeeMee is held, then the finger lifts: nothing is said on the start screen
     free = await t.tray_free()
     x0, y0 = await t.screen(*free[-1])
     x1, y1 = await t.screen(660, 120)
@@ -381,7 +381,7 @@ async def test_edge_cases(p):
     n_before = len(await t.said())
     await touch(t, "touchEnd", [])
     await asyncio.sleep(0.8)
-    check("edge: a Mimi let go after Home says nothing", len(await t.said()) == n_before, str((await t.said())[n_before:]))
+    check("edge: a MeeMee let go after Home says nothing", len(await t.said()) == n_before, str((await t.said())[n_before:]))
 
     # an interrupted hint comes back on the next wrong try
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
@@ -401,7 +401,7 @@ async def test_edge_cases(p):
     await asyncio.sleep(0.8)
     check("edge: the next miss gives the hint again", await page.evaluate("MW.rescue.st.hinted"))
 
-    # rescued Mimi that were dropped in fade out with the rest
+    # rescued MeeMee that were dropped in fade out with the rest
     await t.fill(4, "right")
     await t.wait_phase(["celebrate"], 3)
     for _ in range(80):
@@ -410,7 +410,7 @@ async def test_edge_cases(p):
         await asyncio.sleep(0.1)
     await asyncio.sleep(0.5)
     ops = await page.evaluate("Array.from(document.querySelectorAll('.mw-mimi.is-rescued')).map(e => Math.round(+getComputedStyle(e).opacity * 100) / 100)")
-    check("edge: every rescued Mimi is fading out (dropped ones too)", len(ops) == 7 and max(ops) < 0.5, str(ops))
+    check("edge: every rescued MeeMee is fading out (dropped ones too)", len(ops) == 7 and max(ops) < 0.5, str(ops))
     check("edge: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 

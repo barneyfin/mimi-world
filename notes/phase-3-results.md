@@ -66,3 +66,11 @@ Barney committed and pushed at 07:10. By 07:41 both tablets were on 0.3.0; the F
 3. **Question mix:** keep about 1 in 4 asking for the whole.
 4. **Sentence joins:** natural. Re-recording for more expression is optional.
 5. **The child's name:** taken out of the repository files. The website check now reads its names from `tools/private-names.txt`, which stays on the PC and is never committed. Older commits still contain the name; removing it from history would mean rewriting it.
+
+## 0.3.1 (9 October, evening)
+
+- **New spelling: MeeMee.** The little cats are now spelt MeeMee, and the titles are MeeMee World and MeeMee Rescue. Changed wherever people read it: the game, the grown-ups area, the app's name, the recording page, the README and the setup guide. The design system and the PRD follow with the older look. Unchanged: the web address, the folder on the PC, names inside the code, saved progress and the recordings (the name sounds the same). The notes above are left as they were written. The Doogee may ask once to accept the app's new name.
+- **The tap-Scruffles plan is signed off.** Its line, "Tap Scruffles when you're ready.", is now on the recording page, marked *pending*: the build leaves a pending line out of the game until it has been recorded. The game still checks as soon as the count is right; tap-Scruffles arrives in a later update with the recording.
+- **The older look** (round 3 of the mock-ups) was chosen. It comes in the next update.
+- Checks: `test_game.py` 83 of 83, `test_update.py` 7 of 7 (it now reads the version from the build instead of assuming 0.3.0).
+
