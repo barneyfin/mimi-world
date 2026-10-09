@@ -148,7 +148,18 @@ async def play_round(t, name, shots=True):
     await t.fill(2, "right")
     s = await t.wait_phase(["celebrate"], 3)
     check(f"{name}: the fourth MeeMee completes 3 + ? = 7", s["phase"] == "celebrate", json.dumps(s))
+    lights = await page.evaluate("""(() => { const pod = document.querySelector('#screen-game .mw-pod');
+        const l = getComputedStyle(pod.querySelector('.mw-ship-light')), b = getComputedStyle(pod.querySelector('.mw-ship-beacon'));
+        return [pod.classList.contains('is-celebrating'), l.animationName, l.animationDuration, l.animationIterationCount,
+                b.animationDuration, b.animationIterationCount]; })()""")
+    check(f"{name}: the ship's lights flash after a right answer (0.66 s × 3, beacon 1 s × 2)",
+          lights == [True, "mw-ship-flash", "0.66s", "3", "1s", "2"], str(lights))
+    if shots:
+        await asyncio.sleep(0.25)
+        await page.screenshot(path=str(SHOTS / f"{name}-2a-lights.png"))
     await asyncio.sleep(2.6)
+    off = await page.evaluate("!document.querySelector('#screen-game .mw-pod').classList.contains('is-celebrating')")
+    check(f"{name}: the lights stop after about 2 seconds", off)
     if shots:
         await page.screenshot(path=str(SHOTS / f"{name}-2-celebrate.png"))
     eq = await page.inner_text("#screen-game .mw-equation")
@@ -220,6 +231,10 @@ async def test_device(p, name, vw, vh, dpr):
     await asyncio.sleep(0.5)
     if name == "fire":
         await page.screenshot(path=str(SHOTS / f"{name}-0-start.png"))
+    dup = await page.evaluate("(() => { const ids = Array.from(document.querySelectorAll('[id]')).map(e => e.id); return ids.filter((x, i) => ids.indexOf(x) !== i); })()")
+    check(f"{name}: no id is used twice (each copy of a drawing has its own clip paths)", not dup, str(dup[:5]))
+    lost = await page.evaluate("Array.from(document.querySelectorAll('[clip-path]')).map(e => e.getAttribute('clip-path').slice(5, -1)).filter(id => !document.getElementById(id))")
+    check(f"{name}: every clip path a drawing uses is there", not lost, str(lost[:5]))
     await play_round(t, name, shots=True)
 
     # Music: on by default, dips under speech, off is remembered
@@ -434,6 +449,9 @@ async def test_reduce_motion(p):
     anim = await page.evaluate("getComputedStyle(document.getElementById('play')).animationName")
     check("reduce motion: the Play button doesn't pulse", anim == "none", anim)
     check("reduce motion: the kit knows", await page.evaluate("MW.reduceMotion"))
+    lit = await page.evaluate("""(() => { const pod = document.querySelector('#screen-start .mw-pod'); pod.classList.add('is-celebrating');
+        const l = getComputedStyle(pod.querySelector('.mw-ship-light')); return [l.animationName, l.opacity]; })()""")
+    check("reduce motion: the ship's lights stay lit instead of flashing", lit == ["none", "1"], str(lit))
     await browser.close()
 
 

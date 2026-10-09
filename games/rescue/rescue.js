@@ -13,7 +13,7 @@
   const st = { token: 0, paused: false, pauses: {}, hintTimers: [], phase: 'idle', round: null, qi: 0, q: null, target: null, answer: 0,
     counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [] };
   const R = MW.rescue = { st: st, nextRound: null };
-  let diagram, stars, equation, pod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger;
+  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger;
 
   // ---------------------------------------------------------------- set-up
   function init() {
@@ -78,7 +78,7 @@
     const s = MW.$('screen-end');
     endStars = MW.stars(s, 450, 40, 60);
     const mog = MW.make('div', 'mw-abs mw-crew', { style: 'left:70px;top:330px' }); mog.appendChild(MW.art('moggles')); s.appendChild(mog);
-    const p = MW.pod(s, 380, 130, 400); p.face('got-it'); p.el.disabled = true; p.el.tabIndex = -1;
+    const p = endPod = MW.pod(s, 380, 130, 400); p.face('got-it'); p.el.disabled = true; p.el.tabIndex = -1;
     const snu = MW.make('div', 'mw-abs mw-crew', { style: 'left:790px;top:330px' }); snu.appendChild(MW.art('snuffles')); s.appendChild(snu);
     endMimi = MW.make('div', 'mw-abs mw-start-mimi', { style: 'left:352px;top:600px' });
     for (let i = 0; i < 5; i++) endMimi.appendChild(MW.art('mimi'));
@@ -350,6 +350,7 @@
     const c = MW.LAYOUT[st.target];
     MW.sparkles(fxLayer, c.x, c.y, c.r + 34);
     pod.face('got-it');
+    pod.celebrate();                                         // the ship's lights flash for about 2 s
     MW.audio.sfx('chime');
     MW.log('success', JSON.stringify(q));
     await MW.wait(550);
@@ -381,6 +382,7 @@
     MW.shell.show('screen-end');
     endStars.set(ROUND, ROUND);
     MW.audio.sfx('tune');
+    endPod.celebrate();
     await MW.wait(300);
     await speak([['round-rescued-all']]);
     if (!(await ok(token))) return;

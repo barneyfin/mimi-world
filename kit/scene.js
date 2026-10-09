@@ -117,6 +117,16 @@
       });
       btn.setAttribute('data-face', name);
     };
+    // The ship's lights flash for about 2 seconds (kit.css). Small lights only, each under 2 flashes a second;
+    // with reduce motion they just stay lit for those 2 seconds.
+    let lightsOff = null;
+    pod.celebrate = function () {
+      clearTimeout(lightsOff);
+      btn.classList.remove('is-celebrating');
+      void btn.getBoundingClientRect();                    // so the flashing starts again from the beginning
+      btn.classList.add('is-celebrating');
+      lightsOff = setTimeout(function () { btn.classList.remove('is-celebrating'); }, 2100);
+    };
     pod.face('thinking');
     return pod;
   };

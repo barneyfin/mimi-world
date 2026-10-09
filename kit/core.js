@@ -112,10 +112,22 @@
     el.addEventListener('pointercancel', function () { down = null; });
     el.addEventListener('click', function (e) { if (e.detail === 0 && !el.disabled) fn(e); });
   };
+  // A copy of a drawing. Its ids (clip paths) get a number of their own, so the same drawing can be on the page twice.
+  let artCopies = 0;
   MW.art = function (name) {
     const t = document.getElementById('art-' + name);
     if (!t) throw new Error('No art called ' + name);
-    return t.content.firstElementChild.cloneNode(true);
+    const el = t.content.firstElementChild.cloneNode(true);
+    const named = el.querySelectorAll('[id]');
+    if (named.length) {
+      const n = ++artCopies, map = {};
+      Array.prototype.forEach.call(named, function (e) { map[e.id] = e.id + '-' + n; e.id = map[e.id]; });
+      Array.prototype.forEach.call(el.querySelectorAll('[clip-path]'), function (e) {
+        const m = /^url\(#([^)]+)\)$/.exec(e.getAttribute('clip-path'));
+        if (m && map[m[1]]) e.setAttribute('clip-path', 'url(#' + map[m[1]] + ')');
+      });
+    }
+    return el;
   };
   MW.wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   MW.pick = function (list) { return list[Math.floor(Math.random() * list.length)]; };
