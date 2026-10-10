@@ -22,6 +22,7 @@ One page holds every game (decided 10 October 2026): one bookmark, one approval 
 - **Every word is Barney's voice.** Each line is a recording listed in a `lines.json`; there is no synthetic speech. Sentences are built from pieces where that saves recording ("Moggles… is the… lookout."). A new line is marked pending until it is recorded, and the game skips it till then.
 - **Nothing punishes.** No timers, lives, scores or losing. A wrong answer is a try: a calm line ("Let's try again."), then a hint after the second try. No red, no buzzer.
 - **The class's way.** Words, diagrams, letter shapes and number sentences match how the child's class teaches them. Check against a homework sheet before calling a game done.
+- **Word lists in a data file.** A phonics game keeps its week-by-week word lists in a data file in its own folder, so a new half-term means editing that file and recording the new words, with no code change. Letters are shown in Andika, the kit's typeface, checked against the child's reading book (both decided 10 October 2026).
 - **No names in public.** The website and this repository are public, so neither ever names the child: not in a recording, a page, a file or a commit message. The build checks the pages against `tools/private-names.txt`, which stays on the PC and out of git.
 - **Invented names and art.** Scruffles, Moggles and Snuffles are the family's own cats; the MeeMee, the planets and the games are invented. Nothing from films, shows, apps or school schemes, and no character gets a helmet, hood, cloak or armour. If a drawing starts to resemble a famous character, change it.
 - **The kit's look.** Every colour is a token from the design system (no raw colours in a game; the build checks). Drawings are flat shapes with outlines, in the design system's style. Sound goes only through the kit (`MW.audio`), so every sound is at one loudness and the music dips under speech.
@@ -46,6 +47,4 @@ One page holds every game (decided 10 October 2026): one bookmark, one approval 
 These are Barney's to decide. Raise them when they become relevant; don't settle them alone.
 
 - **More than three planets.** The map has room for three games. A fourth needs a new map layout.
-- **Phonics letter shapes.** Andika is a beginner's typeface; check its letters against the child's reading books before the phonics game, and add a matching style if the school's differ.
-- **Word lists.** Tricky words change every half-term, so a parent needs an easy way to update them. How, is for the tricky-words game's PRD.
 - **Progress across tablets.** Kept separately on each tablet for now; sharing it would need an account or a sync, which the "nothing leaves the tablet" rule rules out today.

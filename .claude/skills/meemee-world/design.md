@@ -24,7 +24,7 @@ Use token names only (as classes `f-<token>` fill, `s-<token>` stroke, `bg-<toke
 
 Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l* and *1* clearly different. Bold for anything the child sees.
 
-- For the child: `numeral-whole` (140 px), `equation` (64 px), `numeral-part` (52 px). A phonics game sets its letters and words in Andika at a similar size, in `numeral` on `moon`. Check the letter shapes against the child's reading books (MEEMEE.md, Open decisions).
+- For the child: `numeral-whole` (140 px), `equation` (64 px), `numeral-part` (52 px). A phonics game sets its letters and words in Andika at a similar size, in `numeral` on `moon`. Andika stays for letters too (decided 10 October 2026); check its letter shapes against the child's reading book when the game is played (MEEMEE.md, Rules).
 - For grown-ups: `title` (30), `button-label` (22), `body` (19), `label` (17).
 
 ## Size and layout

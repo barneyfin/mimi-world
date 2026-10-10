@@ -1,0 +1,299 @@
+{
+  "about": "Every line the tricky-words game says. Ids start with the game's id (words-). A new line is \"pending\" until Barney has recorded it: it shows on the recording page, and the game skips it until then.",
+  "lines": [
+    {
+      "id": "words-name",
+      "group": "Map",
+      "words": "MeeMee Rockets!",
+      "how": "Announcing the game's name.",
+      "pending": true
+    },
+    {
+      "id": "words-round-ready",
+      "group": "Rounds",
+      "words": "Ready to launch some rockets?",
+      "how": "Excited, inviting.",
+      "pending": true
+    },
+    {
+      "id": "words-round-done",
+      "group": "Rounds",
+      "words": "You launched all the rockets!",
+      "how": "Big finish: proud and happy.",
+      "pending": true
+    },
+    {
+      "id": "words-round-another",
+      "group": "Rounds",
+      "words": "Another go?",
+      "how": "Inviting.",
+      "pending": true
+    },
+    {
+      "id": "words-find",
+      "group": "Find",
+      "words": "Find the word…",
+      "how": "Keep the voice up: a word follows (\"Find the word… one.\").",
+      "pending": true
+    },
+    {
+      "id": "words-that-word",
+      "group": "Find",
+      "words": "That word is…",
+      "how": "Light and kind, voice up: the word he tapped follows (\"That word is… my.\"). Never a telling-off.",
+      "pending": true
+    },
+    {
+      "id": "words-found-it",
+      "group": "Praise",
+      "words": "You found it!",
+      "how": "Pleased and warm.",
+      "pending": true
+    },
+    {
+      "id": "words-super-reading",
+      "group": "Praise",
+      "words": "Super reading!",
+      "how": "Pleased and warm.",
+      "pending": true
+    },
+    {
+      "id": "words-well-done",
+      "group": "Praise",
+      "words": "Well done!",
+      "how": "Pleased and warm.",
+      "pending": true
+    },
+    {
+      "id": "words-build",
+      "group": "Build",
+      "words": "Now build the word…",
+      "how": "Keep the voice up: the word follows (\"Now build the word… cartoon.\").",
+      "pending": true
+    },
+    {
+      "id": "words-you-built",
+      "group": "Build",
+      "words": "You built the word…",
+      "how": "Pleased, voice up: the word follows (\"You built the word… cartoon.\").",
+      "pending": true
+    },
+    {
+      "id": "words-tricky-bit",
+      "group": "Build",
+      "words": "That's the tricky bit.",
+      "how": "Friendly, pointing something out: said once a round, as a tricky part lands.",
+      "pending": true
+    },
+    {
+      "id": "words-try-again",
+      "group": "Trying again",
+      "words": "Let's try again.",
+      "how": "Cheerful and calm, never disappointed. After a first wrong tap or drop.",
+      "pending": true
+    },
+    {
+      "id": "words-look-together",
+      "group": "Trying again",
+      "words": "Let's look together.",
+      "how": "Warm, side by side: the hint after a second wrong try, as the right word or tile glows.",
+      "pending": true
+    },
+    {
+      "id": "words-w-all",
+      "group": "Week 5 words",
+      "words": "all",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… all.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-of",
+      "group": "Week 5 words",
+      "words": "of",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… of.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-one",
+      "group": "Week 5 words",
+      "words": "one",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… one.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-here",
+      "group": "Week 5 words",
+      "words": "here",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… here.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-magnet",
+      "group": "Week 5 words",
+      "words": "magnet",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-cartoon",
+      "group": "Week 5 words",
+      "words": "cartoon",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… cartoon.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-rabbit",
+      "group": "Week 5 words",
+      "words": "rabbit",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… rabbit.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-spray",
+      "group": "Week 5 words",
+      "words": "spray",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… spray.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-popcorn",
+      "group": "Week 5 words",
+      "words": "popcorn",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… popcorn.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-proud",
+      "group": "Week 5 words",
+      "words": "proud",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… proud.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-toy",
+      "group": "Week 5 words",
+      "words": "toy",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… toy.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-say",
+      "group": "Week 5 words",
+      "words": "say",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… say.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-go",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "go",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… go.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-my",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "my",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… my.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-into",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "into",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… into.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-out",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "out",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… out.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-what",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "what",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… what.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-she",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "she",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… she.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-me",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "me",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… me.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-love",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "love",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… love.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-they",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "they",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… they.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-some",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "some",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… some.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-were",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "were",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… were.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-sure",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "sure",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… sure.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-said",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "said",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… said.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-you",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "you",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… you.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-like",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "like",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… like.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-push",
+      "group": "Tricky words, weeks 1 to 4",
+      "words": "push",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… push.\").",
+      "pending": true
+    }
+  ]
+}
