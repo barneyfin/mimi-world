@@ -20,13 +20,15 @@
   const ROCKETS = { xs: [197, 490, 783], base: 693, at: [160, 560], panel: [49, 301.7, 222, 112.5], wordMax: 60 };   // art.py: ROCKET_AT, rocket_panel()
   const D = 104, GAP = 16, H = D + 84, NOSE = H * 0.82, BACK = [200, 70], NOSE_X = 12;   // the rocket on its side
   const SHIP = { x: 150, y: 195, right: 1250, slack: 34 };
-  const TRAY = { one: { x: 110, y: 520, h: 170, pad: 42, gap: 26, rows: [87] }, two: { x: 280, y: 418, h: 277, pad: 30, gap: 20, rows: [79, 203] },
-    oneRowMax: 640, right: 905, minW: 558 };
+  // The cargo tray: one place and size for every word, below the rocket and left of Scruffles. One row of tiles when
+  // they fit; two rows of up to five when they don't (harder letters always).
+  const TRAY = { x: 110, y: 462, w: 656, h: 290, pad: 28, gap: 20, perRow: 5, one: [150], two: [88, 212] };
   const POD = { find: [965, 337, 270], build: [951, 450, 290] };
 
   const BOOK = S.read(MW.wordsData || { weeks: [], words: {} });
   const st = { round: [], qi: 0, item: null, prompt: null, praise: [], timers: [], tapped: 0, drops: 0, hinted: false,
-    trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null };
+    trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null,
+    pool: null, week: null, repeat: null, pauses: 0 };
   const G = MW.wordsGame = { st: st, book: BOOK, nextRound: null };
   let findPod, buildPod, endPod, findStars, buildStars, endStars, findFx, buildFx, tileLayer, trayEl, shipLayer, dragger, again, endRockets;
 
@@ -35,7 +37,7 @@
     build: function () { buildFind(); buildBuild(); buildEnd(); },
     start: function () { startRound(); },
     sections: [{ id: 'words-progress', title: 'Words', render: renderProgress }],
-    onPause: function () { clearTimers(); if (dragger) dragger.cancel(); },
+    onPause: function () { st.pauses++; clearTimers(); if (dragger) dragger.cancel(); },
     onResume: function () {                                     // carry on: ask again
       if ((MW.shell.screen === FIND && W.st.phase === 'words-find') || (MW.shell.screen === BUILD && W.st.phase === 'words-build')) {
         findPod.face('thinking'); buildPod.face('thinking');
@@ -57,6 +59,9 @@
   function line(w) { return 'words-w-' + w; }
   // The words in play: the week's words and earlier weeks' tricky words, once their recordings are on the page.
   function inPlay() { return S.inPlay(BOOK, week()).filter(recorded); }
+  // A round keeps the words and the week it started with: a week picked in the grown-ups area starts with the next round.
+  function roundPool() { return st.pool || inPlay(); }
+  function roundWeek() { return st.week || week(); }
 
   // ---------------------------------------------------------------- the screens
   function buildFind() {
@@ -91,6 +96,7 @@
   function buildBuild() {
     const s = W.screen(BUILD, 'MeeMee Rockets: build the word');
     trayEl = MW.make('div', 'words-tray mw-abs', { 'aria-hidden': 'true' });
+    trayEl.style.left = TRAY.x + 'px'; trayEl.style.top = TRAY.y + 'px'; trayEl.style.width = TRAY.w + 'px'; trayEl.style.height = TRAY.h + 'px';
     trayEl.appendChild(MW.make('span', 'words-tray-light'));
     trayEl.appendChild(MW.make('span', 'words-tray-light words-tray-light--r'));
     s.appendChild(trayEl);
@@ -148,12 +154,16 @@
     const token = ++W.st.token;
     clearBoard();
     st.round = makeRound();
+    st.pool = inPlay();
+    st.week = week();
     st.qi = 0;
     st.trickySaid = false;
     st.praise = [];
     MW.log('words', 'round ' + JSON.stringify(st.round));
     if (!st.round.length) { MW.log('words', 'no words in play'); W.home(); return; }
     W.st.phase = 'words-starting';
+    await fontReady();                                         // measure the words in bold Andika itself, not a stand-in
+    if (token !== W.st.token) return;
     setFind(st.round[0]);
     MW.shell.show(FIND);
     await W.speak([['words-round-ready']]);
@@ -166,19 +176,32 @@
 
   // ---------------------------------------------------------------- Find
   function setFind(item) {
-    const words = S.choices(item.word, inPlay(), Math.random, 3);
+    const words = S.choices(item.word, roundPool(), Math.random, 3);
+    st.repeat = null;
     st.rockets.forEach(function (r, i) {
       r.word = words[i] || null;
       r.el.style.visibility = r.word ? '' : 'hidden';
       r.el.classList.remove('is-lit', 'is-hint');
       r.wordEl.textContent = r.word || '';
-      r.wordEl.style.fontSize = fit(r.word || '', ROCKETS.panel[2] - 28, ROCKETS.wordMax) + 'px';
       r.el.setAttribute('aria-label', r.word ? 'The word ' + r.word : 'A rocket');
     });
+    sizeWords();
+    // the bold type not loaded yet (it should be, after fontReady): size the words again once it has
+    if (!fontLoaded()) fontReady().then(sizeWords);
     findPod.face('thinking');
     findPod.lightsOff();
   }
-  // The biggest size (up to max) at which a word fits the panel, in the game's own type (Andika, bold).
+  function sizeWords() {
+    st.rockets.forEach(function (r) { r.wordEl.style.fontSize = fit(r.word || '', ROCKETS.panel[2] - 28, ROCKETS.wordMax) + 'px'; });
+  }
+  // The biggest size (up to max) at which a word fits the panel, in the game's own type (Andika, bold). It must be
+  // measured in Andika itself: until the bold type has loaded, the browser measures a stand-in that is narrower.
+  const FONT = '700 ' + ROCKETS.wordMax + 'px Andika';
+  function fontLoaded() { try { return !document.fonts || document.fonts.check(FONT); } catch (e) { return true; } }
+  function fontReady() {
+    try { if (document.fonts && document.fonts.load) return document.fonts.load(FONT).then(function () {}, function () {}); } catch (e) { /* no font loading API */ }
+    return Promise.resolve();
+  }
   let measurer = null;
   function fit(word, width, max) {
     if (!word) return max;
@@ -207,6 +230,8 @@
   function tapRocket(r) {
     if (W.st.paused || W.st.phase !== 'words-find' || !r.word) return;
     if (r.word === st.item.word) { found(r); return; }
+    // the same wrong rocket again while it is still saying "That word is… my.": one try, not two (a double tap)
+    if (st.repeat && st.repeat.r === r && performance.now() < st.repeat.until) { MW.log('words', 'tap ' + r.word + ' again (same try)'); return; }
     // a wrong tap: the word he tapped says itself, then "Let's try again." (and the question), or the hint
     st.tapped++;
     MW.log('words', 'tap ' + r.word + ' (wrong ' + st.tapped + ')');
@@ -219,7 +244,11 @@
       st.rockets.forEach(function (x) { if (x.word === st.item.word) x.el.classList.add('is-hint'); });
       MW.log('words', 'hint ' + st.item.word);
     }
-    W.speak(lines);
+    // repeat taps on this rocket count as this try until "That word is… my." has been said (or is cut short)
+    const repeat = st.repeat = { r: r, until: Infinity };
+    W.speak(lines, {
+      onStart: function (timeline) { const w = timeline[1]; repeat.until = performance.now() + (w.at + w.dur + 0.1) * 1000; }
+    }).then(function () { repeat.until = 0; });
   }
   function tryAgainFace(pod) {
     pod.face('try-again');
@@ -323,25 +352,21 @@
     return c;
   }
 
-  // The tray: one row while the tiles fit (up to five), otherwise two rows. Each tile keeps its own place in it.
+  // The tiles in the tray: one row while they fit (up to five); otherwise two rows of up to five, and always two for
+  // harder letters. Each tile keeps its own place in the tray; the tray itself never moves.
   function layTray(tiles) {
-    const ws = tiles.map(function (c) { return c.w; });
-    const rowWidth = function (list, gap) { return list.reduce(function (a, b) { return a + b; }, 0) + gap * Math.max(0, list.length - 1); };
-    const two = st.plan.mode === 'harder' || rowWidth(ws, TRAY.one.gap) > TRAY.oneRowMax;
-    const T = two ? TRAY.two : TRAY.one;
-    const rows = two ? [tiles.slice(0, Math.ceil(tiles.length / 2)), tiles.slice(Math.ceil(tiles.length / 2))] : [tiles];
-    const inner = Math.max.apply(null, rows.map(function (r) { return rowWidth(r.map(function (c) { return c.w; }), T.gap); }));
-    const w = Math.max(TRAY.minW, inner + 2 * T.pad);
-    let x = T.x;
-    if (x + w > TRAY.right) x = Math.max(TRAY.one.x, TRAY.right - w);
-    trayEl.style.left = x + 'px'; trayEl.style.top = T.y + 'px';
-    trayEl.style.width = w + 'px'; trayEl.style.height = T.h + 'px';
+    const inner = TRAY.w - 2 * TRAY.pad;
+    const rowWidth = function (row) { return row.reduce(function (a, c) { return a + c.w; }, 0) + TRAY.gap * Math.max(0, row.length - 1); };
+    const one = st.plan.mode !== 'harder' && tiles.length <= TRAY.perRow && rowWidth(tiles) <= inner;
+    const half = Math.ceil(tiles.length / 2);
+    const rows = one ? [tiles] : [tiles.slice(0, half), tiles.slice(half)];
+    const ys = one ? TRAY.one : TRAY.two;
     rows.forEach(function (row, ri) {
-      let cx = x + T.pad;
+      let x = TRAY.x + TRAY.pad;
       row.forEach(function (c) {
-        c.home = { x: cx + c.w / 2, y: T.y + T.rows[ri] };
+        c.home = { x: x + c.w / 2, y: TRAY.y + ys[ri] };
         c.moveTo(c.home.x, c.home.y, 0, false);
-        cx += c.w + T.gap;
+        x += c.w + TRAY.gap;
       });
     });
   }
@@ -353,7 +378,7 @@
   function showBuild(item) {
     st.item = item;
     clearBoard();
-    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, week()));
+    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek()));
     st.places = st.plan.places;
     st.next = 0;
     st.drops = 0;
@@ -441,8 +466,7 @@
       await W.speak([['words-tricky-bit']]);
       if (!(await W.ok(token))) return;
     }
-    await W.speak([['words-you-built', line(item.word)]]);
-    if (!(await W.ok(token))) return;
+    if (!(await sayThrough([['words-you-built', line(item.word)]], token))) return;
     setStars(buildStars, st.qi + 1);
     MW.audio.sfx('twinkle');
     await MW.wait(700);
@@ -455,6 +479,16 @@
       setFind(st.round[st.qi]);
       askFind();
     } else endRound(token);
+  }
+
+  // Say lines to the end: if a pause cuts them off, say them again once it is over. False if the player left.
+  async function sayThrough(lines, token) {
+    for (;;) {
+      const pauses = st.pauses;
+      const heard = await W.speak(lines);
+      if (!(await W.ok(token))) return false;
+      if (heard || st.pauses === pauses) return true;          // said, or can't be (not recorded yet): carry on
+    }
   }
 
   function record(item) {
@@ -507,7 +541,7 @@
     st.rockets.forEach(function (r) { r.el.classList.remove('is-lit', 'is-hint'); });
     [findPod, buildPod, endPod].forEach(function (p) { if (p) p.lightsOff(); });
     if (again) again.classList.remove('mw-pulse');
-    st.item = null; st.prompt = null;
+    st.item = null; st.prompt = null; st.pool = null; st.week = null; st.repeat = null;
   }
 
   // ---------------------------------------------------------------- grown-ups: the Words tab

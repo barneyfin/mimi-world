@@ -1222,6 +1222,13 @@ async def w_build(t):
         await w_place(t)
 
 
+async def w_tray(page):
+    """The cargo tray's place and size (stage px), and how many rows of tiles it holds."""
+    return await page.evaluate("""(() => { const e = document.querySelector('#screen-words-build .words-tray');
+        return { box: [e.offsetLeft, e.offsetTop, e.offsetWidth, e.offsetHeight],
+                 rows: new Set(MW.wordsGame.st.tiles.filter(c => !c.placed).map(c => Math.round(c.home.y))).size }; })()""")
+
+
 async def w_open(t, page, round_):
     """Play, then the MeeMee Rockets planet, with the round fixed."""
     await page.evaluate("MW.wordsGame.nextRound = %s" % json.dumps(round_))
@@ -1262,9 +1269,11 @@ async def test_words_round(p, name, vw, vh, dpr):
 
     # Hear-again, then three wrong taps
     await asyncio.sleep(0.6)
+    n = len(await t.said())
     await t.tap(*HEAR)
     await asyncio.sleep(0.3)
-    check(f"{name}: Hear-again in Find says the question again", (await t.said())[-1] == "words-find words-w-one", str((await t.said())[-1:]))
+    got = (await t.said())[n:]
+    check(f"{name}: Hear-again in Find says the question again, once", got == ["words-find words-w-one"], str(got))
     wrong = [r for r in rockets if r["word"] != "one"]
     await t.tap(wrong[0]["x"], 450)
     await asyncio.sleep(0.3)
@@ -1302,6 +1311,7 @@ async def test_words_round(p, name, vw, vh, dpr):
     # Build "one" in sound tiles: o · ne, both tricky (the whole word); two wrong drops and the hint
     s = await w_wait(page, ["words-build"])
     check(f"{name}: Build: 'one' from sound tiles o and ne", s["mode"] == "tiles" and s["places"] == ["o", "ne"], json.dumps(s))
+    trays = [await w_tray(page)]
     socks = await page.evaluate("Array.from(document.querySelectorAll('#screen-words-build .words-part')).filter(e => e.querySelector('[stroke-dasharray]')).map(e => Math.round(+e.getAttribute('width')))")
     check(f"{name}: a round porthole for o and an oval for ne", socks == [120, 168], str(socks))
     tiles = await w_tiles(page)
@@ -1309,9 +1319,11 @@ async def test_words_round(p, name, vw, vh, dpr):
     text = (await page.inner_text("#screen-words-build")).split()
     check(f"{name}: nothing to read on Build but the tiles", sorted(text) == ["ne", "o"], str(text))
     await asyncio.sleep(0.8)
+    n = len(await t.said())
     await t.tap(*HEAR)
     await asyncio.sleep(0.3)
-    check(f"{name}: Hear-again in Build says 'Now build the word… one.'", (await t.said())[-1] == "words-build words-w-one")
+    got = (await t.said())[n:]
+    check(f"{name}: Hear-again in Build says 'Now build the word… one.' again, once", got == ["words-build words-w-one"], str(got))
     await page.screenshot(path=str(SHOTS / f"{name}-words-4-build.png"))
     c = await w_drop_wrong(t)
     back = [x for x in await w_tiles(page) if x["text"] == c["text"]][0]
@@ -1320,6 +1332,11 @@ async def test_words_round(p, name, vw, vh, dpr):
     await w_drop_wrong(t)
     glow = [x["text"] for x in await w_tiles(page) if x["glow"]]
     check(f"{name}: the second wrong drop says 'Let's look together.' and the next tile glows", (await t.said())[-1] == "words-look-together" and glow == ["o"], str(glow))
+    ring = await page.evaluate("""(() => { const g = document.querySelector('.words-tile.is-glow .words-glow'); if (!g) return null; const r = g.firstElementChild;
+        return [getComputedStyle(g).display, (r.getAttribute('class') || '').split(' ').includes('s-spark'), r.getAttribute('opacity'), r.getAttribute('fill'),
+                +r.getAttribute('stroke-width'), getComputedStyle(g).animationName]; })()""")
+    check(f"{name}: the glow is a strong, steady spark ring (solid, not faded, not flashing)", ring is not None and ring[0] != "none" and ring[1] and ring[2] is None
+          and ring[3] == "none" and ring[4] >= 10 and ring[5] == "none", str(ring))
     await asyncio.sleep(0.6)
     await page.screenshot(path=str(SHOTS / f"{name}-words-5-build-hint.png"))
     await w_place(t)
@@ -1353,6 +1370,7 @@ async def test_words_round(p, name, vw, vh, dpr):
           and sorted(c["text"] for c in tiles) == sorted("sprayie") and sorted(c["text"] for c in tiles if c["spare"]) == ["e", "i"], str([c["text"] for c in tiles]))
     socks = await page.evaluate("Array.from(document.querySelectorAll('#screen-words-build .words-part')).filter(e => e.querySelector('[stroke-dasharray]')).length")
     check(f"{name}: five round portholes", socks == 5, str(socks))
+    trays.append(await w_tray(page))
     await w_place(t)
     sp = await w_drop_wrong(t, spare=True)
     back = [x for x in await w_tiles(page) if x["text"] == sp["text"] and x["spare"]][0]
@@ -1370,6 +1388,7 @@ async def test_words_round(p, name, vw, vh, dpr):
     await t.tap([r for r in await w_rockets(page) if r["word"] == "here"][0]["x"], 450)
     s = await w_wait(page, ["words-build"])
     check(f"{name}: 'here' from sound tiles h and ere", s["places"] == ["h", "ere"], json.dumps(s))
+    trays.append(await w_tray(page))
     await w_build(t)
     await w_wait(page, ["words-built"], 3)
     await w_wait_said(t, "words-you-built words-w-here")
@@ -1386,6 +1405,7 @@ async def test_words_round(p, name, vw, vh, dpr):
           s["mode"] == "harder" and len(tiles) == 10 and sorted(c["text"] for c in tiles if c["text"] in "popcornk") == sorted("popcornk")
           and len(extra) == 2 and len(set(extra)) == 2, str([c["text"] for c in tiles]))
     check(f"{name}: harder letters: the tray holds two rows", len({round(c["y"]) for c in tiles}) == 2, str(sorted({round(c["y"]) for c in tiles})))
+    trays.append(await w_tray(page))
     await page.screenshot(path=str(SHOTS / f"{name}-words-8-harder.png"))
     first_p = await w_place(t, which=1)                       # the other p: just as good
     check(f"{name}: a tile with the same letters is just as good (the other p)", (await w_state(page))["next"] == 1, str(first_p))
@@ -1397,6 +1417,13 @@ async def test_words_round(p, name, vw, vh, dpr):
     await asyncio.sleep(0.3)
     await t.tap([r for r in await w_rockets(page) if r["word"] == "my"][0]["x"], 450)
     await w_wait(page, ["words-build"])
+    trays.append(await w_tray(page))
+    boxes = [tuple(x["box"]) for x in trays]
+    check(f"{name}: the tray stays in one place for every word", len(set(boxes)) == 1, str(boxes))
+    b = boxes[0]
+    check(f"{name}: ... below the rocket and left of Scruffles", b[1] > 449 and b[0] + b[2] < 951 and b[1] + b[3] <= 776, str(b))
+    check(f"{name}: one row when the tiles fit, two rows when they don't (7 letters) and always for harder letters",
+          [x["rows"] for x in trays] == [1, 2, 1, 2, 1], str([x["rows"] for x in trays]))
     await w_build(t)
     rec = await page.evaluate("MW.wordsGame.answers().slice(-1)[0]")
     check(f"{name}: a word found and built with no wrong tap or drop is saved as right first time",
@@ -1759,20 +1786,217 @@ async def test_words_grownups(p):
     await browser.close()
 
 
-async def test_words_motion(p):
-    print("\n== MeeMee Rockets: reduce motion ==")
+async def test_words_first_find(p):
+    """Every word fits its plate on the very first Find after a fresh load (the bold type may not have loaded yet)."""
+    print("\n== MeeMee Rockets: words fit their plates on the first Find ==")
     browser = await p.chromium.launch()
-    ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, reduced_motion="reduce")
+    for name, vw, vh, dpr in (("fire", 1046, 653, 1.22), ("doogee", 1280, 800, 2)):
+        ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True)
+        problems, worst, bad = [], {}, []
+        page = await ctx.new_page()
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        words = await page.evaluate("MW.wordsGame.inPlay()")
+        await page.close()
+        for w in words:
+            page = await ctx.new_page()                    # a fresh page: a new visit, nothing in bold drawn yet
+            page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+            page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+            await page.goto(ORIGIN + "/")
+            await page.wait_for_load_state("load")
+            await page.evaluate("MW.wordsGame.nextRound = [%s]; MW.wordsGame.start()" % json.dumps(w))
+            await page.wait_for_function("MW.wordsGame.st.rockets.some(r => r.word === %s)" % json.dumps(w), timeout=5000)
+            await page.evaluate("document.fonts.ready.then(() => true)")
+            await asyncio.sleep(0.15)
+            got = await page.evaluate("""MW.wordsGame.st.rockets.filter(r => r.word).map(r => [r.word,
+                r.wordEl.getBoundingClientRect().width / MW.stage.scale, r.wordEl.parentNode.getBoundingClientRect().width / MW.stage.scale, parseFloat(r.wordEl.style.fontSize)])""")
+            for word, width, plate, size in got:
+                worst[word] = max(worst.get(word, 0), width)
+                if width > plate - 28 + 0.5:                 # 14 px clear of each end of the plate, inside its screws
+                    bad.append(f"{word}: {width:.0f} px at {size:.0f} px in a {plate:.0f} px plate")
+            await page.close()
+        check(f"words-first-find ({name}): every word fits its plate on the first Find of a fresh visit ({len(words)} visits)",
+              not bad and len(words) == 28 and all(w in worst for w in words), "; ".join(bad[:4]))
+        check(f"words-first-find ({name}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
+async def w_double_tap(t, sx, sy, gap=0.12):
+    """Two quick taps on the same place, gap seconds apart (a five-year-old's double tap)."""
+    x, y = await t.screen(sx, sy)
+    for k in range(2):
+        await touch(t, "touchStart", [(30 + k, (x, y))])
+        await asyncio.sleep(0.03)
+        await touch(t, "touchEnd", [])
+        if k == 0:
+            await asyncio.sleep(gap - 0.03)
+
+
+async def test_words_fixes(p):
+    """A double tap on one wrong rocket, a pause during "You built the word…", and the week changed mid-round."""
+    print("\n== MeeMee Rockets: double taps, pauses and the week mid-round ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "words-fixes", 1280, 800, 1, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    hide = "Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))"
+    show = "Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))"
+
+    # a quick double tap on one wrong rocket is one try; a tap on a different rocket still counts
+    await w_open(t, page, [{"word": "cartoon", "step": "tiles"}])
+    await w_wait_said(t, "words-find words-w-cartoon")
+    await asyncio.sleep(0.4)
+    wrong = [r for r in await w_rockets(page) if r["word"] != "cartoon"]
+    n = len(await t.said())
+    await w_double_tap(t, wrong[0]["x"], 450)
+    await asyncio.sleep(0.25)
+    s = await w_state(page)
+    hint = [r["word"] for r in await w_rockets(page) if r["hint"]]
+    check("words-fixes: a double tap on a wrong rocket is one wrong try (no hint)", s["tapped"] == 1 and not hint, json.dumps([s["tapped"], hint]))
+    check("words-fixes: ... and its line isn't cut off by a second one", (await t.said())[n:] == [f"words-that-word words-w-{wrong[0]['word']} words-try-again words-find words-w-cartoon"],
+          str((await t.said())[n:]))
+    await t.tap(wrong[1]["x"], 450)                        # while "That word is…" is still playing
+    await asyncio.sleep(0.3)
+    s = await w_state(page)
+    check("words-fixes: a tap on a different rocket while that line plays still counts", s["tapped"] == 2 and (await t.said())[-1] == f"words-that-word words-w-{wrong[1]['word']} words-look-together"
+          and [r["word"] for r in await w_rockets(page) if r["hint"]] == ["cartoon"], json.dumps(s))
+    for _ in range(80):
+        if not await page.evaluate("MW.audio.speaking()"):
+            break
+        await asyncio.sleep(0.1)
+    await asyncio.sleep(0.3)
+    await t.tap(wrong[1]["x"], 450)                        # the same rocket again once its line has finished: a try
+    await asyncio.sleep(0.3)
+    check("words-fixes: the same rocket tapped again after its line has finished counts", (await w_state(page))["tapped"] == 3)
+    await t.tap(*HOME)
+    await asyncio.sleep(1.2)
+
+    # a pause during "You built the word… toy.": it is said again before the next word
+    await w_open(t, page, [{"word": "toy", "step": "tiles"}, {"word": "say", "step": "tiles"}])
+    await asyncio.sleep(0.3)
+    await t.tap([r for r in await w_rockets(page) if r["word"] == "toy"][0]["x"], 450)
+    await w_wait(page, ["words-build"])
+    n = len(await t.said())
+    await w_build(t)
+    await w_wait_said(t, "words-you-built words-w-toy", after=n)
+    await asyncio.sleep(0.3)                               # partway through the line
+    await page.evaluate(hide)
+    await asyncio.sleep(1.2)
+    await page.evaluate(show)
+    await w_wait(page, ["words-find"], 15)
+    await w_wait_said(t, "words-find words-w-say", after=n)
+    said = (await t.said())[n:]
+    built = [i for i, x in enumerate(said) if x == "words-you-built words-w-toy"]
+    nxt = said.index("words-find words-w-say") if "words-find words-w-say" in said else -1
+    check("words-fixes: a pause during 'You built the word… toy.' says it again before the next word", len(built) == 2 and built[1] < nxt, str(said))
+    stars = await page.evaluate("Array.from(document.querySelectorAll('#screen-words-find .mw-stars svg')).map(s => s.dataset.state).join(',')")
+    check("words-fixes: ... and its star is earned", stars == "done,current", stars)
+    await t.tap(*HOME)
+    await asyncio.sleep(1.2)
+
+    # the week changed in the grown-ups area mid-round: this round keeps its words; the change starts with the next round
+    await page.evaluate("const g = MW.store.game('words'); g.week = 2; MW.store.save()")
+    week2 = set(await page.evaluate("MW.wordsGame.inPlay()"))
+    await w_open(t, page, [{"word": "what", "step": "tiles"}, {"word": "love", "step": "harder"}, {"word": "she", "step": "tiles"}])
+    await w_wait_said(t, "words-find words-w-what")
+    await t.tap(46, 754, 3.3)                              # the grown-ups lock
+    await page.evaluate("MW.grownups.show('words-progress')")
+    await asyncio.sleep(0.3)
+    box = await page.evaluate("""(() => { const b = Array.from(document.querySelectorAll('.words-week')).find(b => b.textContent === 'Week 5');
+        const r = b.getBoundingClientRect(); return [(r.left + r.width / 2 - MW.stage.offX) / MW.stage.scale, (r.top + r.height / 2 - MW.stage.offY) / MW.stage.scale]; })()""")
+    await t.tap(*box)
+    await asyncio.sleep(0.3)
+    await page.evaluate("MW.grownups.close()")
+    check("words-fixes: week 5 picked mid-round in the grown-ups area", await page.evaluate("MW.wordsGame.week()") == 5)
+    await asyncio.sleep(0.6)
+    await t.tap([r for r in await w_rockets(page) if r["word"] == "what"][0]["x"], 450)
+    await w_wait(page, ["words-build"])
+    await w_build(t)
+    others = []
+    for word in ("love", "she"):
+        await w_wait(page, ["words-find"], 20)
+        others += [r["word"] for r in await w_rockets(page) if r["word"] != word]
+        if word == "love":
+            await asyncio.sleep(0.3)
+            await t.tap([r for r in await w_rockets(page) if r["word"] == word][0]["x"], 450)
+            s = await w_wait(page, ["words-build"])
+            fill = [c["text"] for c in await w_tiles(page) if c["text"] not in "loveu"]
+            check("words-fixes: harder letters mid-round still fill from week 2's other words (what, she, me)",
+                  s["mode"] == "harder" and len(fill) == 5 and set(fill) <= set("whatsm"), str(fill))
+            await w_build(t)
+    check("words-fixes: the rest of the round's Finds still use week 2's words", others and set(others) <= week2, str(others))
+    await t.tap(*HOME)
+    await asyncio.sleep(1.0)
+    pl = await page.evaluate(WORDS_PLANET)
+    await t.tap(pl["x"], pl["y"])
+    await w_wait(page, ["words-find"])
+    pool = await page.evaluate("(MW.wordsGame.st.pool || []).length")
+    check("words-fixes: the next round uses week 5's words", pool == 28, str(pool))
+    check("words-fixes: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_words_motion(p):
+    """A real Find and Build with reduce motion on: nothing moves; things fade or change at once."""
+    print("\n== MeeMee Rockets: reduce motion ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    ctx = await browser.new_context(viewport={"width": 1046, "height": 653}, device_scale_factor=1.22, has_touch=True, is_mobile=True, reduced_motion="reduce")
     page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
     await page.goto(ORIGIN + "/")
     await page.wait_for_load_state("load")
-    got = await page.evaluate("""(() => { const s = document.createElement('div'); s.className = 'words-ship is-launch is-away'; document.body.appendChild(s);
-        const t = document.createElement('div'); t.className = 'words-tile is-moving'; document.body.appendChild(t);
-        const r = document.createElement('div'); r.className = 'words-end-rocket'; document.body.appendChild(r);
-        const out = [getComputedStyle(s).transform, getComputedStyle(t).transitionDuration, getComputedStyle(r).animationName];
-        s.remove(); t.remove(); r.remove(); return out; })()""")
-    check("words reduce motion: the rocket fades away instead of flying, tiles move instantly, end rockets fade in",
-          got == ["none", "0s", "words-fade"], str(got))
+    t = Tablet(page, await ctx.new_cdp_session(page))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    check("words reduce motion: the kit knows", await page.evaluate("MW.reduceMotion"))
+    await w_open(t, page, [{"word": "say", "step": "tiles"}])
+    await asyncio.sleep(0.3)
+    await t.tap([r for r in await w_rockets(page) if r["word"] == "say"][0]["x"], 450)
+    await asyncio.sleep(0.2)
+    got = await page.evaluate("(() => { const r = document.querySelector('.words-rocket.is-lit'); return r ? [getComputedStyle(r).transform, getComputedStyle(r).animationName] : null; })()")
+    check("words reduce motion: the right rocket lights its engines without moving", got == ["none", "none"], str(got))
+    await w_wait(page, ["words-build"])
+
+    async def drop_now(tile, x1, y1):
+        """Drag and let go, then read where the tile is drawn straight away (no waiting for a slide)."""
+        x0, y0 = await t.screen(tile["x"], tile["y"])
+        sx, sy = await t.screen(x1, y1)
+        await touch(t, "touchStart", [(40, (x0, y0))])
+        for k in range(1, 9):
+            await touch(t, "touchMove", [(40, (x0 + (sx - x0) * k / 8, y0 + (sy - y0) * k / 8))])
+            await asyncio.sleep(0.016)
+        await touch(t, "touchEnd", [])
+        await asyncio.sleep(0.03)
+        return await page.evaluate("""(t => { const c = MW.wordsGame.st.tiles.find(c => c.text === t); const r = c.el.getBoundingClientRect();
+            return [(r.left + r.width / 2 - MW.stage.offX) / MW.stage.scale, (r.top + r.height / 2 - MW.stage.offY) / MW.stage.scale,
+                    getComputedStyle(c.el).transitionDuration, c.home.x, c.home.y]; })(%s)""" % json.dumps(tile["text"]))
+
+    sx, sy = await w_slot(page)
+    ay = [c for c in await w_tiles(page) if c["text"] == "ay"][0]
+    got = await drop_now(ay, sx, sy)
+    check("words reduce motion: a wrong tile is back in its place at once (no float)", abs(got[0] - got[3]) < 2 and abs(got[1] - got[4]) < 2 and got[2] == "0s", str(got))
+    await asyncio.sleep(1.5)
+    s_tile = [c for c in await w_tiles(page) if c["text"] == "s"][0]
+    got = await drop_now(s_tile, sx, sy)
+    check("words reduce motion: the right tile is in its porthole at once (no slide)", abs(got[0] - sx) < 2 and abs(got[1] - sy) < 2, str(got))
+    await asyncio.sleep(0.3)
+    await w_place(t)
+    await w_wait(page, ["words-built"], 3)
+    await asyncio.sleep(0.8)
+    got = await page.evaluate("(() => { const s = document.querySelector('#screen-words-build .words-ship'); return [s.classList.contains('is-launch'), getComputedStyle(s).transform, getComputedStyle(s.querySelector('.words-fire')).display]; })()")
+    check("words reduce motion: the rocket's engines light but it doesn't tilt or move", got[0] and got[1] == "none" and got[2] != "none", str(got))
+    for _ in range(80):
+        if await page.evaluate("document.querySelector('#screen-words-build .words-ship').classList.contains('is-away')"):
+            break
+        await asyncio.sleep(0.1)
+    await asyncio.sleep(0.7)
+    got = await page.evaluate("(() => { const s = document.querySelector('#screen-words-build .words-ship'); return [getComputedStyle(s).transform, +getComputedStyle(s).opacity]; })()")
+    check("words reduce motion: then it fades away instead of flying off", got[0] == "none" and got[1] < 0.05, str(got))
+    await w_wait(page, ["words-done"], 15)
+    await asyncio.sleep(0.2)
+    got = await page.evaluate("Array.from(document.querySelectorAll('.words-end-rocket')).map(e => getComputedStyle(e).animationName)")
+    check("words reduce motion: the end of the round's rockets fade in instead of rising", got == ["words-fade"], str(got))
+    check("words reduce motion: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
 
@@ -1800,6 +2024,8 @@ async def main():
         await test_words_pause(p)
         await test_words_steps(p)
         await test_words_grownups(p)
+        await test_words_first_find(p)
+        await test_words_fixes(p)
         await test_words_motion(p)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]

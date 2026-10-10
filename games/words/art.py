@@ -5,7 +5,7 @@ The build calls templates() and puts each drawing on the page for MW.art(name). 
 Colours are tokens written as fill="@token" or stroke="@token"; tok() turns them into classes and stops the build on a
 raw colour. Parts that only show at certain moments are groups with a class the game's CSS switches on:
   words-fire   a standing rocket's engines (flame, lit lights, smoke): shown when the right word is tapped
-  words-glow   a tile's spark halo: shown on the hint tile
+  words-glow   a tile's spark ring: shown on the hint tile
   words-loose / words-set   a tile in the tray (its own frame) / a tile set in a porthole (only its glass shows)
 
 The rocket on its side (Build) is made of pieces the game puts together for each word, because its length depends on
@@ -347,12 +347,13 @@ def socket(k, d=D):
 
 def tile(k, d=D):
     """A porthole tile, w x d: round for one letter, an oval for a pair or three. The letters go on top as HTML.
-    Three groups: words-glow (the hint's spark halo), words-loose (a moon window in its own peach-dark frame, for the
+    Three groups: words-glow (the hint's spark ring), words-loose (a moon window in its own peach-dark frame, for the
     tray and dragging) and words-set (only the glass, once it sits in the rocket's own frame)."""
     w = tile_width(k, d)
     r = d / 2
     straight = w - d
-    glow = f'<rect x="-14" y="-14" width="{f(w + 28)}" height="{f(d + 28)}" rx="{f(r + 14)}" fill="@spark" opacity="0.4"/>'
+    # the hint: a solid spark ring 6 to 18 px outside the tile, like the ring round the right word in Find (steady)
+    glow = f'<rect x="-12" y="-12" width="{f(w + 24)}" height="{f(d + 24)}" rx="{f(r + 12)}" fill="none" stroke="@spark" stroke-width="12"/>'
     t = [f'<rect x="2" y="2" width="{f(w - 4)}" height="{f(d - 4)}" rx="{f(r - 2)}" fill="@peach-dark" stroke="@ink" stroke-width="4"/>',
          f'<rect x="7" y="7" width="{f(w - 14)}" height="{f(d - 14)}" rx="{f(r - 7)}" fill="none" stroke="@planet-peach" stroke-width="2.5"/>']
     pts = []
