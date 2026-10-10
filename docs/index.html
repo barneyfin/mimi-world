@@ -457,6 +457,88 @@ button { font-family: var(--font-andika); }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
 
+/* MeeMee Rockets' own styles. Colours only through tokens: var(--token), or the f-/s-/bg-/c- classes. */
+
+/* ---------------------------------------------------------------- Find: the rockets on the launch pad */
+.words-rocket { width: 270px; height: 553px; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; line-height: 0; }
+.words-rocket:focus-visible { outline: 4px solid var(--mint); outline-offset: 6px; border-radius: 28px; }
+.words-rocket svg { pointer-events: none; }
+.words-rocket-art { position: absolute; overflow: visible; }
+.words-rocket .words-fire { display: none; }
+.words-rocket.is-lit .words-fire { display: inline; }
+.words-panel { position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none;
+  border-radius: 16px; box-sizing: border-box; }
+.words-panel-word { font-family: var(--font-andika); font-weight: 700; line-height: 1; color: var(--numeral); padding-bottom: 8px; white-space: nowrap; }
+/* the hint: a steady spark ring round the right word (no flashing) */
+.words-rocket.is-hint .words-panel { outline: 12px solid var(--spark); outline-offset: 6px; }
+
+/* ---------------------------------------------------------------- Build: the rocket on its side, the tray and the tiles */
+.words-ship { position: absolute; transform-origin: 50% 50%; pointer-events: none; }
+.words-ship-inner { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.words-part { position: absolute; }
+.words-ship .words-fire { display: none; }
+.words-ship.is-launch .words-fire { display: inline; }
+.words-ship.is-launch { transform: translate(40px, -40px) rotate(-10deg); transition: transform 700ms cubic-bezier(.3, 0, .3, 1); }
+.words-ship.is-launch.is-away { transform: translate(1500px, -760px) rotate(-10deg); transition: transform 1300ms cubic-bezier(.5, 0, .9, .5); }
+
+.words-tray { position: absolute; box-sizing: border-box; border-radius: 26px; border: 4.5px solid var(--ink); overflow: hidden;
+  background: linear-gradient(to bottom, var(--asteroid-light) 0, var(--asteroid-light) 8%, var(--asteroid) 8%, var(--asteroid) 86%, var(--asteroid-crater) 86%); }
+.words-tray::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 12px;
+  background: repeating-linear-gradient(-50deg, var(--asteroid-deep) 0, var(--asteroid-deep) 12px, var(--peach) 12px, var(--peach) 20px); }
+.words-tray-light { position: absolute; left: 13px; bottom: 11px; width: 10px; height: 10px; border-radius: var(--radius-round);
+  background: var(--spark); border: 2px solid var(--ink); }
+.words-tray-light--r { left: auto; right: 13px; }
+
+.words-tile { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
+.words-tile.is-moving { transition: transform 260ms cubic-bezier(.2, .8, .2, 1); }
+.words-tile.is-lifted { z-index: 5; }
+.words-tile-body { position: relative; width: 100%; height: 100%; transition: transform 120ms ease-out; }
+.words-tile.is-lifted .words-tile-body { transform: scale(1.12); filter: drop-shadow(var(--lift)); }
+.words-tile-body svg { position: absolute; left: 0; top: 0; }
+.words-tile-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding-bottom: 8px;
+  font-family: var(--font-andika); font-weight: 700; font-size: 60px; line-height: 1; color: var(--numeral); white-space: nowrap; }
+/* the tricky part, marked the class's way (style B, chosen 10 October): the letters in darker peach */
+.words-tile.is-tricky .words-tile-text { color: var(--peach-dark); }
+.words-tile .words-glow, .words-tile .words-set { display: none; }
+.words-tile.is-glow .words-glow { display: inline; }
+.words-tile.is-set .words-loose { display: none; }
+.words-tile.is-set .words-set { display: inline; }
+
+/* ---------------------------------------------------------------- the end of a round: the launched rockets */
+.words-end-rockets { display: flex; gap: 24px; line-height: 0; }
+.words-end-rocket { width: 100px; height: 140px; animation: words-rise 900ms cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes words-rise { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: none; } }
+
+/* ---------------------------------------------------------------- grown-ups: the Words tab */
+.words-week { border-color: var(--night-button); background: transparent; }
+.words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
+.words-grid { display: grid; grid-template-columns: 158px 1fr; column-gap: 0; row-gap: 12px; align-items: start; margin: 14px 0 12px; max-width: 1120px; }
+.words-grid-label { color: var(--text-2); padding-top: 10px; }
+.words-grid-cells { display: flex; flex-wrap: wrap; gap: 10px; }
+.words-cell { box-sizing: border-box; height: 44px; min-width: 92px; padding: 0 14px; border-radius: var(--radius-cell);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 19px; font-weight: 700;
+  background: var(--night-button); color: var(--moon); border: 2px dashed var(--night-button); }
+.words-cell svg { flex: none; }
+.words-tag { font-size: 14px; font-weight: 700; }
+.words-cell.is-notyet { background: var(--night-raised); border: 2px solid var(--star-empty); color: var(--text-3); }
+.words-cell.is-tiles { border-color: var(--peach); }
+.words-cell.is-tiles .words-tag { color: var(--peach); }
+.words-cell.is-letters { border-color: var(--mint); }
+.words-cell.is-letters .words-tag { color: var(--mint); }
+.words-cell.is-harder { border-color: var(--spark); }
+.words-cell.is-harder .words-tag { color: var(--spark); }
+.words-cell.is-secure { background: var(--mint); border: 2px solid var(--mint); color: var(--numeral); }
+.words-legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 6px 0 12px; }
+
+/* ---------------------------------------------------------------- reduce motion: no movement, a fade or an instant change */
+@media (prefers-reduced-motion: reduce) {
+  .words-tile.is-moving, .words-tile-body { transition: none; }
+  .words-ship.is-launch { transform: none; transition: none; }
+  .words-ship.is-launch.is-away { transform: none; opacity: 0; transition: opacity 500ms ease-in; }
+  .words-end-rocket { animation: words-fade 600ms ease-out both; }
+}
+@keyframes words-fade { from { opacity: 0; } to { opacity: 1; } }
+
 </style>
 </head>
 <body>
@@ -484,7 +566,7 @@ button { font-family: var(--font-andika); }
 <template id="art-spark"><svg viewBox="-14 -14 28 28" aria-hidden="true"><path class="f-spark" transform="translate(0 0) scale(1.0)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/></svg></template>
 <template id="art-moggles"><svg width="240" height="313.8" viewBox="0 0 260 340" aria-hidden="true"><ellipse class="f-mint" cx="130" cy="332" rx="92" ry="8" opacity="0.16"/><path class="s-moggles-rim" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="30" stroke-linecap="round"/><path class="s-moggles-black" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="20" stroke-linecap="round"/><path class="s-fur-shade" d="M226 300 C 238 286, 240 266, 232 250 M214 312 C 228 306, 236 296, 240 284" fill="none" stroke-width="3" stroke-linecap="round"/><clipPath id="moggles-body"><path d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/></clipPath><path class="f-moggles-black" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/><g clip-path="url(#moggles-body)"><path class="s-fur-shade" d="M116 228 C 118 236, 122 242, 127 246 M144 228 C 142 236, 138 242, 133 246 M130 234 L130 252 M108 244 C 110 252, 114 258, 118 262 M152 244 C 150 252, 146 258, 142 262" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-fur-shade" d="M96 260 C 98 280, 102 300, 108 316 M164 260 C 162 280, 158 300, 152 316" fill="none" stroke-width="4" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><ellipse class="f-moggles-black s-moggles-rim" cx="110" cy="324" rx="20" ry="10" stroke-width="5"/><ellipse class="f-moggles-black s-moggles-rim" cx="150" cy="324" rx="20" ry="10" stroke-width="5"/><path class="s-fur-shade" d="M104 320 v6 M111 319 v7 M144 320 v6 M151 319 v7" stroke-width="2.4" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M182 98 L188 38 L142 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-moggles-ear" d="M176 88 L180 54 L154 74 Z"/><path class="s-ear-tuft" d="M174 86 L168 74 M170 88 L162 78" stroke-width="2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M78 98 L72 38 L118 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-moggles-ear" d="M84 88 L80 54 L106 74 Z"/><path class="s-ear-tuft" d="M86 86 L92 74 M90 88 L98 78" stroke-width="2" stroke-linecap="round"/><clipPath id="moggles-head"><path d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/></clipPath><path class="f-moggles-black" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/><g clip-path="url(#moggles-head)"><path class="s-fur-shade" d="M96 84 C 110 72, 150 72, 164 84" fill="none" stroke-width="5" stroke-linecap="round"/><path class="s-fur-shade" d="M118 70 L120 84 M130 68 L130 84 M142 70 L140 84" stroke-width="3" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><path class="f-peach s-ink" d="M82 182 C 106 198, 154 198, 178 182 L 182 202 C 156 220, 104 220, 78 202 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-peach-shade" d="M96 196 L102 206 M116 200 L120 212 M140 200 L138 212 M160 196 L154 206" stroke-width="3" stroke-linecap="round"/><path class="f-peach s-ink" d="M150 206 L 168 250 L 156 246 L 150 256 L 142 240 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-peach-shade" d="M150 222 L158 240" stroke-width="3" stroke-linecap="round"/><circle class="f-peach-shade s-ink" cx="148" cy="206" r="7" stroke-width="3"/><ellipse class="f-moggles-eye" cx="104" cy="118" rx="15" ry="13.5"/><ellipse class="s-moggles-eye-dark" cx="104" cy="119" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="104" cy="119" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="99" cy="112" r="3.6"/><circle class="f-highlight" cx="108" cy="124" r="1.6"/><path class="s-moggles-rim" d="M88 113 C 94 103, 114 103, 120 113" fill="none" stroke-width="3" stroke-linecap="round"/><ellipse class="f-moggles-eye" cx="156" cy="118" rx="15" ry="13.5"/><ellipse class="s-moggles-eye-dark" cx="156" cy="119" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="156" cy="119" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="151" cy="112" r="3.6"/><circle class="f-highlight" cx="160" cy="124" r="1.6"/><path class="s-moggles-rim" d="M140 113 C 146 103, 166 103, 172 113" fill="none" stroke-width="3" stroke-linecap="round"/><path class="f-nose-dark s-moggles-rim" d="M123 141 L137 141 L130 149 Z" stroke-width="2" stroke-linejoin="round"/><path class="s-moggles-rim" d="M120 156 C 124 162, 130 160, 130 151 C 130 160, 136 162, 140 156" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-text-3" d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></template>
 <template id="art-snuffles"><svg width="240" height="313.8" viewBox="0 0 260 340" aria-hidden="true"><ellipse class="f-mint" cx="130" cy="332" rx="92" ry="8" opacity="0.16"/><path class="s-moggles-rim" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="30" stroke-linecap="round"/><path class="s-moggles-black" d="M186 316 C 246 316, 252 248, 214 228" fill="none" stroke-width="20" stroke-linecap="round"/><path class="s-fur-shade" d="M226 300 C 238 286, 240 266, 232 250 M214 312 C 228 306, 236 296, 240 284" fill="none" stroke-width="3" stroke-linecap="round"/><clipPath id="snuffles-body"><path d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/></clipPath><path class="f-moggles-black" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z"/><g clip-path="url(#snuffles-body)"><path class="f-cat-white" d="M100 202 C 116 214, 144 214, 160 202 C 172 248, 160 298, 130 312 C 100 298, 88 248, 100 202 Z"/><path class="f-white-shade" d="M108 270 C 116 290, 144 290, 152 270 C 150 292, 142 304, 130 310 C 118 304, 110 292, 108 270 Z"/><path class="s-white-shade" d="M118 222 C 120 230, 124 234, 128 238 M142 222 C 140 230, 136 234, 132 238 M130 226 L130 242" fill="none" stroke-width="2.6" stroke-linecap="round"/></g><path class="s-moggles-rim" d="M74 326 C 60 280, 70 206, 130 190 C 190 206, 200 280, 186 326 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><rect class="f-cat-white" x="104" y="262" width="26" height="60" rx="12"/><rect class="f-moggles-black" x="104" y="284" width="26" height="22"/><rect class="s-ink" x="104" y="262" width="26" height="60" rx="12" fill="none" stroke-width="4"/><rect class="f-cat-white s-ink" x="132" y="262" width="26" height="60" rx="12" stroke-width="4"/><ellipse class="f-cat-white s-ink" cx="117" cy="324" rx="17" ry="9" stroke-width="4"/><ellipse class="f-cat-white s-ink" cx="145" cy="324" rx="17" ry="9" stroke-width="4"/><path class="s-white-shade" d="M112 320 v6 M118 320 v6 M140 320 v6 M146 320 v6" stroke-width="2.2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M182 98 L188 38 L142 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-snuffles-ear" d="M176 88 L180 54 L154 74 Z"/><path class="s-ear-tuft" d="M174 86 L168 74 M170 88 L162 78" stroke-width="2" stroke-linecap="round"/><path class="f-moggles-black s-moggles-rim" d="M78 98 L72 38 L118 72 Z" stroke-width="5" stroke-linejoin="round"/><path class="f-snuffles-ear" d="M84 88 L80 54 L106 74 Z"/><path class="s-ear-tuft" d="M86 86 L92 74 M90 88 L98 78" stroke-width="2" stroke-linecap="round"/><clipPath id="snuffles-head"><path d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/></clipPath><path class="f-moggles-black" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z"/><g clip-path="url(#snuffles-head)"><path class="s-fur-shade" d="M96 84 C 110 72, 150 72, 164 84" fill="none" stroke-width="5" stroke-linecap="round"/><path class="s-fur-shade" d="M118 70 L120 84 M130 68 L130 84 M142 70 L140 84" stroke-width="3" stroke-linecap="round"/><path class="f-cat-white" d="M130 76 C 134 96, 138 110, 142 118 C 154 128, 172 136, 170 154 C 166 172, 146 178, 130 178 C 114 178, 94 172, 90 154 C 88 136, 106 128, 118 118 C 122 110, 126 96, 130 76 Z"/><ellipse class="f-white-shade" cx="130" cy="180" rx="36" ry="12"/></g><path class="s-moggles-rim" d="M130 64 C 170 64, 196 92, 196 120 L 207 128 L 195 134 L 203 146 L 189 150 C 179 168, 157 180, 130 180 C 103 180, 81 168, 71 150 L 57 146 L 65 134 L 53 128 L 64 120 C 64 92, 90 64, 130 64 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><path class="f-mint s-ink" d="M86 184 C 108 198, 152 198, 174 184 L 177 200 C 152 216, 108 216, 83 200 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mint-deep" d="M92 192 C 112 204, 148 204, 168 192" fill="none" stroke-width="2.4"/><circle class="f-peach s-ink" cx="130" cy="214" r="10" stroke-width="3"/><path class="f-spark" d="M130 208 L132 212 L136 212.5 L133 215 L134 219 L130 217 L126 219 L127 215 L124 212.5 L128 212 Z"/><ellipse class="f-snuffles-eye" cx="106" cy="114" rx="15" ry="13.5"/><ellipse class="s-snuffles-eye-dark" cx="106" cy="115" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="106" cy="115" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="101" cy="108" r="3.6"/><circle class="f-highlight" cx="110" cy="120" r="1.6"/><path class="s-moggles-rim" d="M90 109 C 96 99, 116 99, 122 109" fill="none" stroke-width="3" stroke-linecap="round"/><ellipse class="f-snuffles-eye" cx="154" cy="114" rx="15" ry="13.5"/><ellipse class="s-snuffles-eye-dark" cx="154" cy="115" rx="10.5" ry="9.5" fill="none" stroke-width="2" opacity="0.6"/><ellipse class="f-ink" cx="154" cy="115" rx="4.6" ry="10.5"/><circle class="f-highlight" cx="149" cy="108" r="3.6"/><circle class="f-highlight" cx="158" cy="120" r="1.6"/><path class="s-moggles-rim" d="M138 109 C 144 99, 164 99, 170 109" fill="none" stroke-width="3" stroke-linecap="round"/><path class="f-nose-pink s-ink" d="M123 139 L137 139 L130 147 Z" stroke-width="2" stroke-linejoin="round"/><path class="s-ink" d="M120 154 C 124 160, 130 158, 130 149 C 130 158, 136 160, 140 154" fill="none" stroke-width="3" stroke-linecap="round"/><path class="s-text-3" d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></template>
-<template id="art-map"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="10" cy="298.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="59.7" cy="792.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="786.9" cy="32.8" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1213.1" cy="296.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1182.6" cy="363.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="243" cy="35.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1234.4" cy="710.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="161.3" cy="381.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1176.6" cy="705.4" r="0.9" opacity="0.5"/><circle class="f-moon" cx="495.2" cy="789.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="916.5" cy="788.3" r="0.9" opacity="0.5"/><circle class="f-moon" cx="795.5" cy="148.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="394.8" cy="87.4" r="1.1" opacity="0.6"/><circle class="f-galaxy-mint" cx="863" cy="714.2" r="2.2" opacity="0.95"/><circle class="f-moon" cx="24.1" cy="279.1" r="1" opacity="0.7"/><circle class="f-moon" cx="946.1" cy="51.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="50.1" cy="201.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="191.3" cy="125.1" r="1.4" opacity="0.9"/><circle class="f-galaxy-mint" cx="1161.7" cy="383.5" r="2.2" opacity="0.95"/><circle class="f-moon" cx="1123.7" cy="479.9" r="1" opacity="0.6"/><circle class="f-galaxy" cx="19" cy="546" r="1.8" opacity="0.95"/><circle class="f-moon" cx="1217.8" cy="337.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1035.8" cy="115.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="97.2" cy="99.8" r="0.9" opacity="0.7"/><circle class="f-moon" cx="793.7" cy="149.1" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="951.4" cy="50.7" r="1.9" opacity="0.95"/><circle class="f-moon" cx="86.5" cy="608" r="1.1" opacity="0.4"/><circle class="f-moon" cx="59.1" cy="312.4" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1208.3" cy="83.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="937.4" cy="768.1" r="1" opacity="0.5"/><circle class="f-moon" cx="716.9" cy="56.2" r="2" opacity="0.9"/><circle class="f-moon" cx="1265.4" cy="90.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="793.9" cy="21.6" r="1.7" opacity="0.9"/><circle class="f-moon" cx="67.9" cy="347.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1227.2" cy="73.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="1135.1" cy="620.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="317" cy="728.3" r="1" opacity="0.6"/><circle class="f-moon" cx="1228" cy="785.5" r="0.9" opacity="0.5"/><circle class="f-moon" cx="502.1" cy="120.6" r="0.7" opacity="0.5"/><circle class="f-moon" cx="1202.4" cy="591" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1212.2" cy="259.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="486.6" cy="747.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="361.8" cy="143.4" r="0.8" opacity="0.4"/><circle class="f-moon" cx="1224.3" cy="33.1" r="2" opacity="0.9"/><circle class="f-moon" cx="899.4" cy="21" r="0.7" opacity="0.6"/><circle class="f-moon" cx="15.6" cy="435" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1140.2" cy="297.6" r="1.1" opacity="0.6"/><circle class="f-moon" cx="677.3" cy="44.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1075.6" cy="735" r="1.4" opacity="0.9"/><circle class="f-moon" cx="744.1" cy="69.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="81.6" cy="648.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="96" cy="59.3" r="1" opacity="0.4"/><circle class="f-moon" cx="348.2" cy="52.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="834.2" cy="130.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="105.3" cy="657.9" r="0.7" opacity="0.5"/><circle class="f-moon" cx="632.2" cy="133.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1155.3" cy="541.4" r="1.1" opacity="0.7"/><circle class="f-galaxy-mint" cx="682.2" cy="721.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="471.3" cy="725.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="237.2" cy="773.9" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1217" cy="723.2" r="1" opacity="0.5"/><circle class="f-galaxy-peach" cx="732.4" cy="789.4" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1254.1" cy="589.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1263" cy="239.3" r="1" opacity="0.6"/><circle class="f-moon" cx="57.4" cy="682.7" r="1.1" opacity="0.5"/><circle class="f-moon" cx="207" cy="118.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="40.3" cy="728.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="917.2" cy="61.7" r="0.8" opacity="0.6"/><circle class="f-moon" cx="164.4" cy="710.8" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="170.7" cy="598.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="251" cy="117.1" r="1" opacity="0.5"/><circle class="f-moon" cx="162.3" cy="699.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="1226.1" cy="300.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="31.2" cy="512.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="745.3" cy="74.4" r="0.8" opacity="0.6"/><circle class="f-moon" cx="279.1" cy="43.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="147.7" cy="427.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="689.1" cy="73" r="1" opacity="0.4"/><circle class="f-moon" cx="847.3" cy="13.1" r="0.9" opacity="0.7"/><circle class="f-moon" cx="49.5" cy="398.8" r="1.9" opacity="0.9"/><circle class="f-galaxy" cx="741" cy="149.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1168" cy="236.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1046.5" cy="114.7" r="1.6" opacity="0.9"/><circle class="f-moon" cx="864.7" cy="720.4" r="1.1" opacity="0.6"/><circle class="f-galaxy" cx="656.1" cy="89.8" r="2" opacity="0.95"/><circle class="f-moon" cx="1164.1" cy="341.3" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1079" cy="120.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="862.9" cy="765.9" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1269.9" cy="264.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="1111.9" cy="710.1" r="2" opacity="0.9"/><circle class="f-moon" cx="657.6" cy="769.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="170.2" cy="310.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="67.5" cy="507.7" r="1" opacity="0.5"/><circle class="f-moon" cx="929.8" cy="97.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1247.9" cy="208.6" r="1.6" opacity="0.9"/><circle class="f-galaxy-mint" cx="177.3" cy="277.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="210.2" cy="78.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1233.9" cy="40.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="645.9" cy="39.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="300" cy="107" r="1.1" opacity="0.6"/><circle class="f-moon" cx="257.8" cy="143" r="1.6" opacity="0.9"/><circle class="f-moon" cx="381.8" cy="737.1" r="0.8" opacity="0.4"/><circle class="f-moon" cx="246.1" cy="759.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1189.8" cy="150.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="69.6" cy="306" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1152.9" cy="741.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="787.5" cy="13" r="2" opacity="0.9"/><circle class="f-moon" cx="8.4" cy="705.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1222.5" cy="76.9" r="1.2" opacity="0.7"/><circle class="f-moon" cx="816.7" cy="772.1" r="1.2" opacity="0.4"/><g transform="translate(1130 90) rotate(20) scale(0.8)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="1.4" r="1.1" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="4.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="15.8" cy="6.3" r="1.2" opacity="0.6"/><circle class="f-moon" cx="9.6" cy="8.5" r="1" opacity="0.9"/><circle class="f-moon" cx="5.8" cy="12" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-5" cy="13.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="12.6" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.2" cy="12.1" r="1.2" opacity="0.5"/><circle class="f-moon" cx="-35.8" cy="11.5" r="1.2" opacity="0.6"/><circle class="f-moon" cx="-13.2" cy="-2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="-15.9" cy="-4.5" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-16.1" cy="-7.2" r="1.5" opacity="0.5"/><circle class="f-moon" cx="-12.7" cy="-9" r="1" opacity="0.7"/><circle class="f-moon" cx="-4.6" cy="-11.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="3.9" cy="-13.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="-12.9" r="1.1" opacity="0.8"/><circle class="f-moon" cx="27.9" cy="-13.5" r="0.8" opacity="0.6"/><circle class="f-moon" cx="38.6" cy="-10.5" r="1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(140 120) rotate(-24) scale(0.62)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="16" cy="2.8" r="1.2" opacity="0.6"/><circle class="f-moon" cx="13.9" cy="4.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="14.2" cy="7.4" r="1" opacity="0.9"/><circle class="f-moon" cx="11.8" cy="9.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="3.3" cy="11.5" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-3.1" cy="13.2" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-16.4" cy="14" r="1.4" opacity="0.7"/><circle class="f-moon" cx="-27.9" cy="12.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-35.8" cy="10.9" r="1" opacity="0.8"/><circle class="f-moon" cx="-15.4" cy="-1.3" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-15.3" cy="-4" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="-7.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-10.6" cy="-10.1" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-6" cy="-11.1" r="1" opacity="0.6"/><circle class="f-moon" cx="4.2" cy="-13.6" r="1" opacity="0.9"/><circle class="f-moon" cx="15.6" cy="-14.4" r="1.4" opacity="0.5"/><circle class="f-moon" cx="25.6" cy="-11.9" r="1.3" opacity="0.6"/><circle class="f-moon" cx="37.1" cy="-11" r="0.9" opacity="0.9"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(150 700) rotate(-30) scale(0.7)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(860 90) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(470 700) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(1230 420) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(70 330) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="s-night-button" cx="640" cy="430" rx="200" ry="80" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="330" ry="135" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="600" ry="250" fill="none" stroke-width="3" stroke-dasharray="6 10"/><circle class="f-planet-indigo-light" cx="1117" cy="434" r="3"/><circle class="f-asteroid" cx="1102" cy="450" r="5"/><circle class="f-planet-indigo-light" cx="1091" cy="479" r="7"/><circle class="f-asteroid" cx="1086" cy="494" r="4"/><circle class="f-planet-indigo-light" cx="1051" cy="522" r="6"/><circle class="f-asteroid" cx="1022" cy="535" r="3"/><circle class="f-planet-indigo-light" cx="999" cy="560" r="5"/><circle class="f-asteroid" cx="947" cy="569" r="7"/><circle class="f-planet-indigo-light" cx="902" cy="590" r="4"/><circle class="f-asteroid" cx="865" cy="595" r="6"/><circle class="f-planet-indigo-light" cx="802" cy="612" r="3"/><circle class="f-asteroid" cx="747" cy="611" r="5"/><circle class="f-planet-indigo-light" cx="704" cy="623" r="7"/><circle class="f-asteroid" cx="635" cy="617" r="4"/><circle class="f-planet-indigo-light" cx="578" cy="623" r="6"/><circle class="f-asteroid" cx="535" cy="611" r="3"/><circle class="f-planet-indigo-light" cx="468" cy="612" r="5"/><circle class="f-asteroid" cx="248" cy="319" r="5"/><circle class="f-planet-indigo-light" cx="283" cy="308" r="7"/><circle class="f-asteroid" cx="335" cy="285" r="4"/><circle class="f-planet-indigo-light" cx="368" cy="278" r="6"/><circle class="f-asteroid" cx="417" cy="259" r="3"/><circle class="f-planet-indigo-light" cx="480" cy="256" r="5"/><circle class="f-asteroid" cx="523" cy="243" r="7"/><circle class="f-planet-indigo-light" cx="578" cy="245" r="4"/><circle class="f-asteroid" cx="647" cy="237" r="6"/><circle class="f-planet-indigo-light" cx="692" cy="245" r="3"/><circle class="f-asteroid" cx="747" cy="243" r="5"/><circle class="f-planet-indigo-light" cx="814" cy="256" r="7"/><circle class="f-asteroid" cx="853" cy="259" r="4"/><circle class="f-planet-indigo-light" cx="902" cy="278" r="6"/><circle class="f-asteroid" cx="959" cy="285" r="3"/><circle class="f-planet-indigo-light" cx="987" cy="308" r="5"/><circle class="f-asteroid" cx="1022" cy="319" r="7"/><circle class="f-planet-indigo-light" cx="1063" cy="346" r="4"/><circle class="f-asteroid" cx="1074" cy="360" r="6"/><circle class="f-planet-indigo-light" cx="1091" cy="389" r="3"/><circle class="f-asteroid" cx="1114" cy="404" r="5"/><circle class="f-peach" cx="640" cy="430" r="112" opacity="0.10"/><circle class="f-peach" cx="640" cy="430" r="86" opacity="0.16"/><clipPath id="map-sun"><circle cx="640" cy="430" r="64"/></clipPath><g clip-path="url(#map-sun)"><g transform="rotate(-45 640 430)"><rect class="f-planet-peach-6" x="576" y="366" width="128" height="128"/><rect class="f-planet-peach-dark" x="576" y="366" width="128" height="110.1"/><rect class="f-planet-peach-4" x="576" y="366" width="128" height="92.2"/><rect class="f-planet-peach" x="576" y="366" width="128" height="70.4"/><rect class="f-planet-peach-2" x="576" y="366" width="128" height="46.1"/><rect class="f-planet-peach-light" x="576" y="366" width="128" height="23"/></g></g><circle class="s-planet-peach-light" cx="640" cy="430" r="66.5" fill="none" stroke-width="3" opacity="0.28"/><circle class="s-mint" cx="330" cy="300" r="78" fill="none" stroke-width="10" opacity="0.3"/><g transform="rotate(-14 330 300)"><path class="s-mint-deep" d="M228.5 300 A101.5 22 0 0 1 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-deeper" d="M242.7 300 A87.3 19 0 0 1 417.3 300" fill="none" stroke-width="2.9" stroke-linecap="round"/></g><clipPath id="map-rescue"><circle cx="330" cy="300" r="58"/></clipPath><g clip-path="url(#map-rescue)"><g transform="rotate(-45 330 300)"><rect class="f-planet-mint-dark" x="272" y="242" width="116" height="116"/><rect class="f-planet-mint-4" x="272" y="242" width="116" height="83.5"/><rect class="f-planet-mint" x="272" y="242" width="116" height="63.8"/><rect class="f-planet-mint-2" x="272" y="242" width="116" height="41.8"/><rect class="f-planet-mint-light" x="272" y="242" width="116" height="20.9"/></g><ellipse class="f-shadow" cx="347.4" cy="320.3" rx="7" ry="5.4" opacity="0.16"/><ellipse class="f-highlight" cx="346.1" cy="319" rx="5" ry="3.5" opacity="0.07"/><ellipse class="f-shadow" cx="309.7" cy="305.8" rx="4.6" ry="3.6" opacity="0.16"/><ellipse class="f-highlight" cx="308.9" cy="305" rx="3.3" ry="2.3" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="330" cy="300" r="60.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#map-rescue)"><g transform="rotate(-14 330 300)"><path class="s-shadow" d="M233.6 302.9 A96.4 19.8 0 0 0 426.4 302.9" fill="none" stroke-width="7" opacity="0.18"/></g></g><g transform="rotate(-14 330 300)"><path class="s-mint" d="M228.5 300 A101.5 22 0 0 0 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-light" d="M220.4 300 A109.6 23.8 0 0 0 439.6 300" fill="none" stroke-width="3.5" stroke-linecap="round"/><path class="s-mint-deep" d="M242.7 300 A87.3 19 0 0 0 417.3 300" fill="none" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/></g><clipPath id="map-moon"><circle cx="232" cy="232" r="14"/></clipPath><g clip-path="url(#map-moon)"><g transform="rotate(-45 232 232)"><rect class="f-planet-peach-4" x="218" y="218" width="28" height="28"/><rect class="f-planet-peach" x="218" y="218" width="28" height="15.4"/><rect class="f-planet-peach-2" x="218" y="218" width="28" height="10.1"/><rect class="f-planet-peach-light" x="218" y="218" width="28" height="5"/></g></g><g opacity="0.45"><clipPath id="map-l0"><circle cx="1010" cy="560" r="46"/></clipPath><g clip-path="url(#map-l0)"><g transform="rotate(-45 1010 560)"><rect class="f-planet-indigo-6" x="964" y="514" width="92" height="92"/><rect class="f-planet-indigo-dark" x="964" y="514" width="92" height="79.1"/><rect class="f-planet-indigo-4" x="964" y="514" width="92" height="66.2"/><rect class="f-planet-indigo" x="964" y="514" width="92" height="50.6"/><rect class="f-planet-indigo-2" x="964" y="514" width="92" height="33.1"/><rect class="f-planet-indigo-light" x="964" y="514" width="92" height="16.6"/></g><ellipse class="f-shadow" cx="1019.2" cy="546.2" rx="6.4" ry="5" opacity="0.16"/><ellipse class="f-highlight" cx="1018" cy="545" rx="4.6" ry="3.2" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="1010" cy="560" r="48.5" fill="none" stroke-width="3" opacity="0.28"/><clipPath id="map-l1"><circle cx="1150" cy="250" r="30"/></clipPath><g clip-path="url(#map-l1)"><g transform="rotate(-45 1150 250)"><rect class="f-planet-peach-dark" x="1120" y="220" width="60" height="60"/><rect class="f-planet-peach-4" x="1120" y="220" width="60" height="43.2"/><rect class="f-planet-peach" x="1120" y="220" width="60" height="33"/><rect class="f-planet-peach-2" x="1120" y="220" width="60" height="21.6"/><rect class="f-planet-peach-light" x="1120" y="220" width="60" height="10.8"/></g></g><circle class="s-planet-peach-light" cx="1150" cy="250" r="32.5" fill="none" stroke-width="3" opacity="0.28"/></g><ellipse class="f-mint" cx="250" cy="598" rx="210" ry="26" opacity="0.12"/><ellipse class="s-mint" cx="250" cy="598" rx="210" ry="26" fill="none" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round" opacity="0.7"/></svg></template>
+<template id="art-map"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="10" cy="298.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="59.7" cy="792.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="786.9" cy="32.8" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1213.1" cy="296.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1182.6" cy="363.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="243" cy="35.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1234.4" cy="710.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="161.3" cy="381.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1176.6" cy="705.4" r="0.9" opacity="0.5"/><circle class="f-moon" cx="495.2" cy="789.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="916.5" cy="788.3" r="0.9" opacity="0.5"/><circle class="f-moon" cx="795.5" cy="148.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="394.8" cy="87.4" r="1.1" opacity="0.6"/><circle class="f-galaxy-mint" cx="863" cy="714.2" r="2.2" opacity="0.95"/><circle class="f-moon" cx="24.1" cy="279.1" r="1" opacity="0.7"/><circle class="f-moon" cx="946.1" cy="51.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="50.1" cy="201.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="191.3" cy="125.1" r="1.4" opacity="0.9"/><circle class="f-galaxy-mint" cx="1161.7" cy="383.5" r="2.2" opacity="0.95"/><circle class="f-moon" cx="1123.7" cy="479.9" r="1" opacity="0.6"/><circle class="f-galaxy" cx="19" cy="546" r="1.8" opacity="0.95"/><circle class="f-moon" cx="1217.8" cy="337.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1035.8" cy="115.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="97.2" cy="99.8" r="0.9" opacity="0.7"/><circle class="f-moon" cx="793.7" cy="149.1" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="951.4" cy="50.7" r="1.9" opacity="0.95"/><circle class="f-moon" cx="86.5" cy="608" r="1.1" opacity="0.4"/><circle class="f-moon" cx="59.1" cy="312.4" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1208.3" cy="83.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="937.4" cy="768.1" r="1" opacity="0.5"/><circle class="f-moon" cx="716.9" cy="56.2" r="2" opacity="0.9"/><circle class="f-moon" cx="1265.4" cy="90.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="793.9" cy="21.6" r="1.7" opacity="0.9"/><circle class="f-moon" cx="67.9" cy="347.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1227.2" cy="73.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="1135.1" cy="620.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="317" cy="728.3" r="1" opacity="0.6"/><circle class="f-moon" cx="1228" cy="785.5" r="0.9" opacity="0.5"/><circle class="f-moon" cx="502.1" cy="120.6" r="0.7" opacity="0.5"/><circle class="f-moon" cx="1202.4" cy="591" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1212.2" cy="259.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="486.6" cy="747.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="361.8" cy="143.4" r="0.8" opacity="0.4"/><circle class="f-moon" cx="1224.3" cy="33.1" r="2" opacity="0.9"/><circle class="f-moon" cx="899.4" cy="21" r="0.7" opacity="0.6"/><circle class="f-moon" cx="15.6" cy="435" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1140.2" cy="297.6" r="1.1" opacity="0.6"/><circle class="f-moon" cx="677.3" cy="44.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1075.6" cy="735" r="1.4" opacity="0.9"/><circle class="f-moon" cx="744.1" cy="69.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="81.6" cy="648.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="96" cy="59.3" r="1" opacity="0.4"/><circle class="f-moon" cx="348.2" cy="52.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="834.2" cy="130.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="105.3" cy="657.9" r="0.7" opacity="0.5"/><circle class="f-moon" cx="632.2" cy="133.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1155.3" cy="541.4" r="1.1" opacity="0.7"/><circle class="f-galaxy-mint" cx="682.2" cy="721.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="471.3" cy="725.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="237.2" cy="773.9" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1217" cy="723.2" r="1" opacity="0.5"/><circle class="f-galaxy-peach" cx="732.4" cy="789.4" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1254.1" cy="589.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1263" cy="239.3" r="1" opacity="0.6"/><circle class="f-moon" cx="57.4" cy="682.7" r="1.1" opacity="0.5"/><circle class="f-moon" cx="207" cy="118.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="40.3" cy="728.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="917.2" cy="61.7" r="0.8" opacity="0.6"/><circle class="f-moon" cx="164.4" cy="710.8" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="170.7" cy="598.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="251" cy="117.1" r="1" opacity="0.5"/><circle class="f-moon" cx="162.3" cy="699.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="1226.1" cy="300.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="31.2" cy="512.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="745.3" cy="74.4" r="0.8" opacity="0.6"/><circle class="f-moon" cx="279.1" cy="43.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="147.7" cy="427.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="689.1" cy="73" r="1" opacity="0.4"/><circle class="f-moon" cx="847.3" cy="13.1" r="0.9" opacity="0.7"/><circle class="f-moon" cx="49.5" cy="398.8" r="1.9" opacity="0.9"/><circle class="f-galaxy" cx="741" cy="149.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1168" cy="236.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1046.5" cy="114.7" r="1.6" opacity="0.9"/><circle class="f-moon" cx="864.7" cy="720.4" r="1.1" opacity="0.6"/><circle class="f-galaxy" cx="656.1" cy="89.8" r="2" opacity="0.95"/><circle class="f-moon" cx="1164.1" cy="341.3" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1079" cy="120.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="862.9" cy="765.9" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1269.9" cy="264.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="1111.9" cy="710.1" r="2" opacity="0.9"/><circle class="f-moon" cx="657.6" cy="769.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="170.2" cy="310.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="67.5" cy="507.7" r="1" opacity="0.5"/><circle class="f-moon" cx="929.8" cy="97.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1247.9" cy="208.6" r="1.6" opacity="0.9"/><circle class="f-galaxy-mint" cx="177.3" cy="277.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="210.2" cy="78.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1233.9" cy="40.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="645.9" cy="39.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="300" cy="107" r="1.1" opacity="0.6"/><circle class="f-moon" cx="257.8" cy="143" r="1.6" opacity="0.9"/><circle class="f-moon" cx="381.8" cy="737.1" r="0.8" opacity="0.4"/><circle class="f-moon" cx="246.1" cy="759.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1189.8" cy="150.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="69.6" cy="306" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1152.9" cy="741.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="787.5" cy="13" r="2" opacity="0.9"/><circle class="f-moon" cx="8.4" cy="705.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1222.5" cy="76.9" r="1.2" opacity="0.7"/><circle class="f-moon" cx="816.7" cy="772.1" r="1.2" opacity="0.4"/><g transform="translate(1130 90) rotate(20) scale(0.8)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="1.4" r="1.1" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="4.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="15.8" cy="6.3" r="1.2" opacity="0.6"/><circle class="f-moon" cx="9.6" cy="8.5" r="1" opacity="0.9"/><circle class="f-moon" cx="5.8" cy="12" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-5" cy="13.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="12.6" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.2" cy="12.1" r="1.2" opacity="0.5"/><circle class="f-moon" cx="-35.8" cy="11.5" r="1.2" opacity="0.6"/><circle class="f-moon" cx="-13.2" cy="-2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="-15.9" cy="-4.5" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-16.1" cy="-7.2" r="1.5" opacity="0.5"/><circle class="f-moon" cx="-12.7" cy="-9" r="1" opacity="0.7"/><circle class="f-moon" cx="-4.6" cy="-11.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="3.9" cy="-13.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="-12.9" r="1.1" opacity="0.8"/><circle class="f-moon" cx="27.9" cy="-13.5" r="0.8" opacity="0.6"/><circle class="f-moon" cx="38.6" cy="-10.5" r="1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(140 120) rotate(-24) scale(0.62)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="16" cy="2.8" r="1.2" opacity="0.6"/><circle class="f-moon" cx="13.9" cy="4.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="14.2" cy="7.4" r="1" opacity="0.9"/><circle class="f-moon" cx="11.8" cy="9.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="3.3" cy="11.5" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-3.1" cy="13.2" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-16.4" cy="14" r="1.4" opacity="0.7"/><circle class="f-moon" cx="-27.9" cy="12.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-35.8" cy="10.9" r="1" opacity="0.8"/><circle class="f-moon" cx="-15.4" cy="-1.3" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-15.3" cy="-4" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="-7.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-10.6" cy="-10.1" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-6" cy="-11.1" r="1" opacity="0.6"/><circle class="f-moon" cx="4.2" cy="-13.6" r="1" opacity="0.9"/><circle class="f-moon" cx="15.6" cy="-14.4" r="1.4" opacity="0.5"/><circle class="f-moon" cx="25.6" cy="-11.9" r="1.3" opacity="0.6"/><circle class="f-moon" cx="37.1" cy="-11" r="0.9" opacity="0.9"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(150 700) rotate(-30) scale(0.7)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(860 90) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(470 700) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(1230 420) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(70 330) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="s-night-button" cx="640" cy="430" rx="200" ry="80" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="330" ry="135" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="600" ry="250" fill="none" stroke-width="3" stroke-dasharray="6 10"/><circle class="f-planet-indigo-light" cx="1117" cy="434" r="3"/><circle class="f-asteroid" cx="1102" cy="450" r="5"/><circle class="f-planet-indigo-light" cx="1091" cy="479" r="7"/><circle class="f-asteroid" cx="1086" cy="494" r="4"/><circle class="f-planet-indigo-light" cx="1051" cy="522" r="6"/><circle class="f-asteroid" cx="1022" cy="535" r="3"/><circle class="f-planet-indigo-light" cx="999" cy="560" r="5"/><circle class="f-asteroid" cx="947" cy="569" r="7"/><circle class="f-planet-indigo-light" cx="902" cy="590" r="4"/><circle class="f-asteroid" cx="865" cy="595" r="6"/><circle class="f-planet-indigo-light" cx="802" cy="612" r="3"/><circle class="f-asteroid" cx="747" cy="611" r="5"/><circle class="f-planet-indigo-light" cx="704" cy="623" r="7"/><circle class="f-asteroid" cx="635" cy="617" r="4"/><circle class="f-planet-indigo-light" cx="578" cy="623" r="6"/><circle class="f-asteroid" cx="535" cy="611" r="3"/><circle class="f-planet-indigo-light" cx="468" cy="612" r="5"/><circle class="f-asteroid" cx="248" cy="319" r="5"/><circle class="f-planet-indigo-light" cx="283" cy="308" r="7"/><circle class="f-asteroid" cx="335" cy="285" r="4"/><circle class="f-planet-indigo-light" cx="368" cy="278" r="6"/><circle class="f-asteroid" cx="417" cy="259" r="3"/><circle class="f-planet-indigo-light" cx="480" cy="256" r="5"/><circle class="f-asteroid" cx="523" cy="243" r="7"/><circle class="f-planet-indigo-light" cx="578" cy="245" r="4"/><circle class="f-asteroid" cx="647" cy="237" r="6"/><circle class="f-planet-indigo-light" cx="692" cy="245" r="3"/><circle class="f-asteroid" cx="747" cy="243" r="5"/><circle class="f-planet-indigo-light" cx="814" cy="256" r="7"/><circle class="f-asteroid" cx="853" cy="259" r="4"/><circle class="f-planet-indigo-light" cx="902" cy="278" r="6"/><circle class="f-asteroid" cx="959" cy="285" r="3"/><circle class="f-planet-indigo-light" cx="987" cy="308" r="5"/><circle class="f-asteroid" cx="1022" cy="319" r="7"/><circle class="f-planet-indigo-light" cx="1063" cy="346" r="4"/><circle class="f-asteroid" cx="1074" cy="360" r="6"/><circle class="f-planet-indigo-light" cx="1091" cy="389" r="3"/><circle class="f-asteroid" cx="1114" cy="404" r="5"/><circle class="f-peach" cx="640" cy="430" r="112" opacity="0.10"/><circle class="f-peach" cx="640" cy="430" r="86" opacity="0.16"/><clipPath id="map-sun"><circle cx="640" cy="430" r="64"/></clipPath><g clip-path="url(#map-sun)"><g transform="rotate(-45 640 430)"><rect class="f-planet-peach-6" x="576" y="366" width="128" height="128"/><rect class="f-planet-peach-dark" x="576" y="366" width="128" height="110.1"/><rect class="f-planet-peach-4" x="576" y="366" width="128" height="92.2"/><rect class="f-planet-peach" x="576" y="366" width="128" height="70.4"/><rect class="f-planet-peach-2" x="576" y="366" width="128" height="46.1"/><rect class="f-planet-peach-light" x="576" y="366" width="128" height="23"/></g></g><circle class="s-planet-peach-light" cx="640" cy="430" r="66.5" fill="none" stroke-width="3" opacity="0.28"/><circle class="s-mint" cx="330" cy="300" r="78" fill="none" stroke-width="10" opacity="0.3"/><g transform="rotate(-14 330 300)"><path class="s-mint-deep" d="M228.5 300 A101.5 22 0 0 1 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-deeper" d="M242.7 300 A87.3 19 0 0 1 417.3 300" fill="none" stroke-width="2.9" stroke-linecap="round"/></g><clipPath id="map-rescue"><circle cx="330" cy="300" r="58"/></clipPath><g clip-path="url(#map-rescue)"><g transform="rotate(-45 330 300)"><rect class="f-planet-mint-dark" x="272" y="242" width="116" height="116"/><rect class="f-planet-mint-4" x="272" y="242" width="116" height="83.5"/><rect class="f-planet-mint" x="272" y="242" width="116" height="63.8"/><rect class="f-planet-mint-2" x="272" y="242" width="116" height="41.8"/><rect class="f-planet-mint-light" x="272" y="242" width="116" height="20.9"/></g><ellipse class="f-shadow" cx="347.4" cy="320.3" rx="7" ry="5.4" opacity="0.16"/><ellipse class="f-highlight" cx="346.1" cy="319" rx="5" ry="3.5" opacity="0.07"/><ellipse class="f-shadow" cx="309.7" cy="305.8" rx="4.6" ry="3.6" opacity="0.16"/><ellipse class="f-highlight" cx="308.9" cy="305" rx="3.3" ry="2.3" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="330" cy="300" r="60.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#map-rescue)"><g transform="rotate(-14 330 300)"><path class="s-shadow" d="M233.6 302.9 A96.4 19.8 0 0 0 426.4 302.9" fill="none" stroke-width="7" opacity="0.18"/></g></g><g transform="rotate(-14 330 300)"><path class="s-mint" d="M228.5 300 A101.5 22 0 0 0 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-light" d="M220.4 300 A109.6 23.8 0 0 0 439.6 300" fill="none" stroke-width="3.5" stroke-linecap="round"/><path class="s-mint-deep" d="M242.7 300 A87.3 19 0 0 0 417.3 300" fill="none" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/></g><clipPath id="map-moon"><circle cx="232" cy="232" r="14"/></clipPath><g clip-path="url(#map-moon)"><g transform="rotate(-45 232 232)"><rect class="f-planet-peach-4" x="218" y="218" width="28" height="28"/><rect class="f-planet-peach" x="218" y="218" width="28" height="15.4"/><rect class="f-planet-peach-2" x="218" y="218" width="28" height="10.1"/><rect class="f-planet-peach-light" x="218" y="218" width="28" height="5"/></g></g><circle class="s-mint" cx="1010" cy="560" r="66" fill="none" stroke-width="10" opacity="0.3"/><clipPath id="map-p1"><circle cx="1010" cy="560" r="46"/></clipPath><g clip-path="url(#map-p1)"><g transform="rotate(-45 1010 560)"><rect class="f-planet-indigo-6" x="964" y="514" width="92" height="92"/><rect class="f-planet-indigo-dark" x="964" y="514" width="92" height="79.1"/><rect class="f-planet-indigo-4" x="964" y="514" width="92" height="66.2"/><rect class="f-planet-indigo" x="964" y="514" width="92" height="50.6"/><rect class="f-planet-indigo-2" x="964" y="514" width="92" height="33.1"/><rect class="f-planet-indigo-light" x="964" y="514" width="92" height="16.6"/></g><ellipse class="f-shadow" cx="1019.2" cy="546.2" rx="6.4" ry="5" opacity="0.16"/><ellipse class="f-highlight" cx="1018" cy="545" rx="4.6" ry="3.2" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="1010" cy="560" r="48.5" fill="none" stroke-width="3" opacity="0.28"/><g opacity="0.45"><clipPath id="map-l0"><circle cx="1150" cy="250" r="30"/></clipPath><g clip-path="url(#map-l0)"><g transform="rotate(-45 1150 250)"><rect class="f-planet-peach-dark" x="1120" y="220" width="60" height="60"/><rect class="f-planet-peach-4" x="1120" y="220" width="60" height="43.2"/><rect class="f-planet-peach" x="1120" y="220" width="60" height="33"/><rect class="f-planet-peach-2" x="1120" y="220" width="60" height="21.6"/><rect class="f-planet-peach-light" x="1120" y="220" width="60" height="10.8"/></g></g><circle class="s-planet-peach-light" cx="1150" cy="250" r="32.5" fill="none" stroke-width="3" opacity="0.28"/></g><ellipse class="f-mint" cx="250" cy="598" rx="210" ry="26" opacity="0.12"/><ellipse class="s-mint" cx="250" cy="598" rx="210" ry="26" fill="none" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round" opacity="0.7"/></svg></template>
 <template id="art-crew"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="1042" cy="224.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1158.4" cy="153" r="1.8" opacity="0.9"/><circle class="f-galaxy-peach" cx="675.8" cy="356.9" r="1.6" opacity="0.95"/><circle class="f-moon" cx="1039.7" cy="227" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1102.3" cy="257.6" r="2" opacity="0.9"/><circle class="f-moon" cx="1262" cy="58.2" r="1" opacity="0.6"/><circle class="f-moon" cx="709.8" cy="312.6" r="1.9" opacity="0.9"/><circle class="f-moon" cx="86.3" cy="79.5" r="1.4" opacity="0.9"/><circle class="f-moon" cx="622.4" cy="13.6" r="1.1" opacity="0.5"/><circle class="f-galaxy-peach" cx="852.5" cy="198.1" r="1.9" opacity="0.95"/><circle class="f-moon" cx="896.3" cy="134.6" r="1" opacity="0.4"/><circle class="f-moon" cx="931" cy="370.6" r="1" opacity="0.4"/><circle class="f-moon" cx="418" cy="89.2" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1060.1" cy="348" r="2" opacity="0.9"/><circle class="f-moon" cx="749.9" cy="409" r="1.8" opacity="0.9"/><circle class="f-moon" cx="920.5" cy="185.6" r="0.8" opacity="0.6"/><circle class="f-moon" cx="1268.4" cy="541.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="181.1" cy="37.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="295.1" cy="94.8" r="1.1" opacity="0.6"/><circle class="f-moon" cx="26.8" cy="11.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="420.4" cy="107" r="0.9" opacity="0.5"/><circle class="f-moon" cx="110" cy="166" r="0.8" opacity="0.5"/><circle class="f-moon" cx="696.8" cy="368.6" r="1.5" opacity="0.9"/><circle class="f-moon" cx="35.7" cy="68" r="0.9" opacity="0.4"/><circle class="f-moon" cx="16.9" cy="359.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="290.6" cy="39.3" r="1.2" opacity="0.5"/><circle class="f-moon" cx="58.5" cy="193.2" r="1.7" opacity="0.9"/><circle class="f-moon" cx="1007" cy="310.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="796.6" cy="154.6" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1036.3" cy="229.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="800.9" cy="190.9" r="2" opacity="0.9"/><circle class="f-moon" cx="1021.9" cy="355.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="206.7" cy="178.1" r="0.8" opacity="0.5"/><circle class="f-moon" cx="128.9" cy="112.7" r="1.2" opacity="0.7"/><circle class="f-moon" cx="631.9" cy="405.2" r="1" opacity="0.5"/><circle class="f-galaxy" cx="365" cy="367.1" r="1.9" opacity="0.95"/><circle class="f-moon" cx="23.8" cy="139.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="398.8" cy="245.6" r="1.6" opacity="0.9"/><circle class="f-moon" cx="325.5" cy="348.1" r="0.9" opacity="0.6"/><circle class="f-moon" cx="256.2" cy="346" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1048.6" cy="212.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1083.3" cy="232.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="412.2" cy="91.2" r="1.8" opacity="0.9"/><circle class="f-galaxy-peach" cx="1022.2" cy="282.5" r="1.6" opacity="0.95"/><circle class="f-galaxy" cx="856.2" cy="210.3" r="1.8" opacity="0.95"/><circle class="f-moon" cx="497.5" cy="120.3" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1023" cy="282.6" r="1.6" opacity="0.9"/><circle class="f-moon" cx="851.2" cy="6.9" r="1.2" opacity="0.5"/><circle class="f-moon" cx="238.1" cy="124.2" r="0.8" opacity="0.4"/><circle class="f-moon" cx="757.3" cy="344.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="223.8" cy="222.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="148.2" cy="60" r="0.8" opacity="0.4"/><circle class="f-moon" cx="163.4" cy="377" r="0.7" opacity="0.6"/><circle class="f-moon" cx="712.3" cy="345.8" r="1" opacity="0.4"/><circle class="f-moon" cx="246.8" cy="124" r="1.1" opacity="0.7"/><circle class="f-moon" cx="828" cy="122" r="0.8" opacity="0.5"/><circle class="f-moon" cx="1237.3" cy="110.8" r="0.8" opacity="0.5"/><circle class="f-moon" cx="434.4" cy="405" r="1.1" opacity="0.4"/><circle class="f-moon" cx="142.8" cy="99.2" r="0.8" opacity="0.5"/><circle class="f-moon" cx="485.8" cy="277.3" r="1" opacity="0.5"/><circle class="f-moon" cx="396.7" cy="210.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="726.5" cy="343.9" r="1.7" opacity="0.9"/><circle class="f-galaxy-peach" cx="896.3" cy="161.2" r="2.1" opacity="0.95"/><circle class="f-moon" cx="437.4" cy="303.8" r="1.5" opacity="0.9"/><circle class="f-moon" cx="396.5" cy="298.3" r="0.8" opacity="0.6"/><circle class="f-moon" cx="398.6" cy="51.1" r="2" opacity="0.9"/><circle class="f-moon" cx="111.5" cy="179.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1133.2" cy="10.9" r="0.9" opacity="0.7"/><circle class="f-moon" cx="93.5" cy="168.3" r="1.7" opacity="0.9"/><circle class="f-moon" cx="28.6" cy="389.3" r="1.8" opacity="0.9"/><g transform="translate(200 140) rotate(-20) scale(0.7)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.1" cy="1.5" r="1.3" opacity="0.5"/><circle class="f-moon" cx="16.1" cy="4.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="12.9" cy="6.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="10.6" cy="9.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="5" cy="12.3" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-2.4" cy="12" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-16.2" cy="12.6" r="1" opacity="0.9"/><circle class="f-moon" cx="-27.5" cy="12.9" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-37.4" cy="9.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="-14.1" cy="-2.3" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.1" cy="-4.8" r="1.4" opacity="0.8"/><circle class="f-moon" cx="-15.8" cy="-6.7" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-10" cy="-9.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="-4.8" cy="-10.9" r="0.9" opacity="0.7"/><circle class="f-moon" cx="2.4" cy="-12.5" r="1.4" opacity="0.8"/><circle class="f-moon" cx="16.3" cy="-13.7" r="1.4" opacity="0.8"/><circle class="f-moon" cx="26.6" cy="-12.8" r="1.5" opacity="0.9"/><circle class="f-moon" cx="37.5" cy="-10.4" r="0.8" opacity="0.8"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(980 300) rotate(18) scale(0.55)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="3.1" r="0.9" opacity="0.8"/><circle class="f-moon" cx="14.3" cy="3.9" r="1.6" opacity="0.6"/><circle class="f-moon" cx="15.3" cy="6.7" r="1.2" opacity="0.7"/><circle class="f-moon" cx="9.7" cy="9.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="2.6" cy="10.9" r="1.1" opacity="0.9"/><circle class="f-moon" cx="-4.8" cy="12.1" r="1" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="13.6" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-26.9" cy="13.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-36" cy="10.9" r="0.9" opacity="0.5"/><circle class="f-moon" cx="-13" cy="-2.2" r="1" opacity="0.9"/><circle class="f-moon" cx="-15.6" cy="-3.9" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-15.3" cy="-6.1" r="0.9" opacity="0.8"/><circle class="f-moon" cx="-12.5" cy="-8.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-3.1" cy="-11.4" r="1" opacity="0.6"/><circle class="f-moon" cx="4.4" cy="-12.8" r="0.9" opacity="0.9"/><circle class="f-moon" cx="14.8" cy="-13" r="1" opacity="0.6"/><circle class="f-moon" cx="24.3" cy="-13" r="1" opacity="0.7"/><circle class="f-moon" cx="37.1" cy="-10.1" r="1.5" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(380 240) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(860 110) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="f-night-raised" cx="300" cy="372" rx="200" ry="22"/><ellipse class="s-night-button" cx="300" cy="372" rx="200" ry="22" fill="none" stroke-width="3"/><ellipse class="s-mint" cx="220" cy="368" rx="64" ry="11" fill="none" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.7"/><ellipse class="s-mint" cx="380" cy="368" rx="64" ry="11" fill="none" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.7"/></svg></template>
 <template id="art-held-telescope"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g></svg></template>
 <template id="art-job-lookout"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><path class="s-ink" d="M34 66 L22 90 M38 66 L40 92 M42 64 L58 88" stroke-width="4" stroke-linecap="round"/><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g><circle class="f-ink" cx="40" cy="64" r="4.5"/></svg></template>
@@ -503,11 +585,26 @@ button { font-family: var(--font-andika); }
 <template id="art-icon-play"><svg width="48" height="48" viewBox="0 0 48 48" fill="currentColor" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 10 L38 24 L17 38 Z"/></svg></template>
 <template id="art-icon-full"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 18 V8 H18 M30 8 H40 V18 M8 30 V40 H18 M30 40 H40 V30"/></svg></template>
 <template id="art-icon-tick"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 25 L20 35 L38 14"/></svg></template>
+<template id="art-words-badge"><svg width="56" height="56" viewBox="0 0 100 100" aria-hidden="true"><path class="f-planet-peach-2 s-ink" d="M30 62 C 20 68, 16 78, 16 88 L34 80 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-planet-peach-4 s-ink" d="M70 62 C 80 68, 84 78, 84 88 L66 80 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-steel s-ink" d="M40 82 L60 82 L64 92 L36 92 Z" stroke-width="3" stroke-linejoin="round"/><clipPath id="words-bdg-b"><rect x="32" y="38" width="36" height="46" rx="5"/></clipPath><g clip-path="url(#words-bdg-b)"><rect class="f-mint-light" x="31.5" y="38" width="5.7" height="46"/><rect class="f-mint" x="36.2" y="38" width="17.9" height="46"/><rect class="f-mint-dark" x="53.1" y="38" width="10" height="46"/><rect class="f-mint-deep" x="62.1" y="38" width="6.4" height="46"/><rect class="f-peach-shade" x="32" y="72" width="36" height="12"/></g><rect class="s-ink" x="32" y="38" width="36" height="46" rx="5" fill="none" stroke-width="4"/><clipPath id="words-bdg-c"><path d="M32 40 C 33 26, 42 14, 50 8 C 58 14, 67 26, 68 40 Z"/></clipPath><g clip-path="url(#words-bdg-c)"><rect class="f-planet-peach-light" x="31.5" y="8" width="6.8" height="34"/><rect class="f-planet-peach-2" x="37.3" y="8" width="15" height="34"/><rect class="f-planet-peach" x="51.3" y="8" width="10" height="34"/><rect class="f-planet-peach-4" x="60.3" y="8" width="8.2" height="34"/></g><path class="s-ink" d="M32 40 C 33 26, 42 14, 50 8 C 58 14, 67 26, 68 40 Z" fill="none" stroke-width="4" stroke-linejoin="round"/><circle class="f-peach-dark s-ink" cx="50" cy="54" r="9" stroke-width="3"/><circle class="f-glass s-ink" cx="50" cy="54" r="5.5" stroke-width="2"/><path class="s-cat-white" d="M47 52 C 48 50, 50 49, 52 49" fill="none" stroke-width="1.8" stroke-linecap="round"/></svg></template>
+<template id="art-words-rocket"><svg width="320" height="600" viewBox="0 0 320 600" overflow="visible" aria-hidden="true"><ellipse class="f-shadow" cx="160" cy="564" rx="175" ry="9" opacity="0.18"/><clipPath id="words-up-fin-1"><path d="M60 348.2 C 22.5 383.8, 5 466.6, 7.5 560 L55 560 C 55 503.8, 60 482.9, 70 472.5 Z"/></clipPath><path class="f-planet-peach-2" d="M60 348.2 C 22.5 383.8, 5 466.6, 7.5 560 L55 560 C 55 503.8, 60 482.9, 70 472.5 Z"/><g clip-path="url(#words-up-fin-1)"><rect class="f-peach-dark" x="-5" y="538" width="70" height="22"/><path class="s-mint-light" d="M42.5 383.8 C 22.5 419.2, 17.5 457.7, 20 536" fill="none" stroke-width="7.5" stroke-linecap="round"/></g><path class="s-ink" d="M60 348.2 C 22.5 383.8, 5 466.6, 7.5 560 L55 560 C 55 503.8, 60 482.9, 70 472.5 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><rect class="f-steel s-ink" x="17" y="548" width="26" height="16" rx="4" stroke-width="3"/><clipPath id="words-up-fin1"><path d="M260 348.2 C 297.5 383.8, 315 466.6, 312.5 560 L265 560 C 265 503.8, 260 482.9, 250 472.5 Z"/></clipPath><path class="f-planet-peach-4" d="M260 348.2 C 297.5 383.8, 315 466.6, 312.5 560 L265 560 C 265 503.8, 260 482.9, 250 472.5 Z"/><g clip-path="url(#words-up-fin1)"><rect class="f-peach-dark" x="255" y="538" width="70" height="22"/><path class="s-mint-light" d="M277.5 383.8 C 297.5 419.2, 302.5 457.7, 300 536" fill="none" stroke-width="7.5" stroke-linecap="round"/></g><path class="s-ink" d="M260 348.2 C 297.5 383.8, 315 466.6, 312.5 560 L265 560 C 265 503.8, 260 482.9, 250 472.5 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><rect class="f-steel s-ink" x="277" y="548" width="26" height="16" rx="4" stroke-width="3"/><clipPath id="words-up-noz"><path d="M120 470.5 L200 470.5 L217.5 512.1 L102.5 512.1 Z"/></clipPath><g clip-path="url(#words-up-noz)"><rect class="f-steel" x="102" y="470.5" width="41.2" height="41.6"/><rect class="f-scruffles-grey" x="142.2" y="470.5" width="47" height="41.6"/><rect class="f-steel-dark" x="188.2" y="470.5" width="29.8" height="41.6"/></g><path class="s-ink" d="M120 470.5 L200 470.5 L217.5 512.1 L102.5 512.1 Z" fill="none" stroke-width="4" stroke-linejoin="round"/><path class="s-ink" d="M118 480.5 L202 480.5" stroke-width="2" opacity="0.4"/><g class="words-fire"><path class="f-peach" d="M99.6 510.1 C 93.6 541.5, 138.9 566, 160 580 C 181.1 566, 226.4 541.5, 220.4 510.1 Z"/><path class="f-spark" d="M120.2 510.1 C 116.2 532.7, 146.1 550.4, 160 560.4 C 173.9 550.4, 203.8 532.7, 199.8 510.1 Z"/><path class="f-highlight" d="M141.9 510.1 C 140.1 523.3, 153.7 533.6, 160 539.4 C 166.3 533.6, 179.9 523.3, 178.1 510.1 Z"/></g><clipPath id="words-up-body"><path d="M35 176.7 L285 176.7 L285 458.5 Q 285 472.5 271 472.5 L49 472.5 Q 35 472.5 35 458.5 Z"/></clipPath><g clip-path="url(#words-up-body)"><rect class="f-mint-light" x="34.5" y="176.7" width="33.5" height="295.8"/><rect class="f-mint" x="67" y="176.7" width="118.5" height="295.8"/><rect class="f-mint-dark" x="184.5" y="176.7" width="63.5" height="295.8"/><rect class="f-mint-deep" x="247" y="176.7" width="38.5" height="295.8"/><rect class="f-planet-peach-2" x="34.5" y="430.8" width="33.5" height="41.7"/><rect class="f-planet-peach" x="67" y="430.8" width="118.5" height="41.7"/><rect class="f-peach-shade" x="184.5" y="430.8" width="63.5" height="41.7"/><rect class="f-planet-peach-6" x="247" y="430.8" width="38.5" height="41.7"/><path class="s-ink" d="M35 430.8 H285" stroke-width="3"/><path class="s-ink" d="M35 293.3 H285" stroke-width="2" opacity="0.3"/><path class="s-ink" d="M35 439.2 H285" stroke-width="2" opacity="0.3"/><circle class="f-mint-deeper" cx="50" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="81.2" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="112.5" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="143.8" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="175" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="206.2" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="237.5" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="268.8" cy="197.5" r="2.4"/><circle class="f-mint-deeper" cx="50" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="81.2" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="112.5" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="143.8" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="175" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="206.2" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="237.5" cy="449.2" r="2.4"/><circle class="f-mint-deeper" cx="268.8" cy="449.2" r="2.4"/><path class="s-cat-white" d="M52.5 210.7 L52.5 418.8" stroke-width="7.5" stroke-linecap="round" opacity="0.45"/></g><circle class="f-peach-dark s-ink" cx="70" cy="451.7" r="8" stroke-width="2.5"/><circle class="f-peach" cx="70" cy="451.7" r="5.5"/><circle class="f-highlight" cx="68" cy="449.7" r="1.5" opacity="0.8"/><circle class="f-peach-dark s-ink" cx="115" cy="451.7" r="8" stroke-width="2.5"/><circle class="f-peach" cx="115" cy="451.7" r="5.5"/><circle class="f-highlight" cx="113" cy="449.7" r="1.5" opacity="0.8"/><circle class="f-peach-dark s-ink" cx="205" cy="451.7" r="8" stroke-width="2.5"/><circle class="f-peach" cx="205" cy="451.7" r="5.5"/><circle class="f-highlight" cx="203" cy="449.7" r="1.5" opacity="0.8"/><circle class="f-peach-dark s-ink" cx="250" cy="451.7" r="8" stroke-width="2.5"/><circle class="f-peach" cx="250" cy="451.7" r="5.5"/><circle class="f-highlight" cx="248" cy="449.7" r="1.5" opacity="0.8"/><g class="words-fire"><circle class="f-spark" cx="70" cy="451.7" r="5.5"/><circle class="f-spark" cx="70" cy="451.7" r="15" opacity="0.35"/><circle class="f-spark" cx="115" cy="451.7" r="5.5"/><circle class="f-spark" cx="115" cy="451.7" r="15" opacity="0.35"/><circle class="f-spark" cx="205" cy="451.7" r="5.5"/><circle class="f-spark" cx="205" cy="451.7" r="15" opacity="0.35"/><circle class="f-spark" cx="250" cy="451.7" r="5.5"/><circle class="f-spark" cx="250" cy="451.7" r="15" opacity="0.35"/></g><path class="s-ink" d="M35 176.7 L285 176.7 L285 458.5 Q 285 472.5 271 472.5 L49 472.5 Q 35 472.5 35 458.5 Z" fill="none" stroke-width="6" stroke-linejoin="round"/><clipPath id="words-up-cf"><path d="M151.2 441.2 L168.8 441.2 L175 560 L145 560 Z"/></clipPath><g clip-path="url(#words-up-cf)"><rect class="f-planet-peach-2" x="144.5" y="441.2" width="16" height="118.8"/><rect class="f-planet-peach-4" x="159.5" y="441.2" width="16" height="118.8"/><rect class="f-peach-dark" x="145" y="538" width="30" height="22"/></g><path class="s-ink" d="M151.2 441.2 L168.8 441.2 L175 560 L145 560 Z" fill="none" stroke-width="4.5" stroke-linejoin="round"/><rect class="f-steel s-ink" x="147" y="548" width="26" height="16" rx="4" stroke-width="3"/><clipPath id="words-up-cone"><path d="M35 176.7 C 42.5 90.7, 110 29.8, 160 20.4 C 210 29.8, 277.5 90.7, 285 176.7 Z"/></clipPath><g clip-path="url(#words-up-cone)"><rect class="f-planet-peach-light" x="34.5" y="20.4" width="41" height="156.2"/><rect class="f-planet-peach-2" x="74.5" y="20.4" width="98.5" height="156.2"/><rect class="f-planet-peach" x="172" y="20.4" width="63.5" height="156.2"/><rect class="f-planet-peach-4" x="234.5" y="20.4" width="51" height="156.2"/><path class="s-ink" d="M35 111 C 110 98.5, 210 98.5, 285 111" fill="none" stroke-width="2" opacity="0.3"/><path class="s-cat-white" d="M85 145.4 C 90 98.5, 115 59.5, 145 36" fill="none" stroke-width="7.5" stroke-linecap="round" opacity="0.5"/></g><path class="s-ink" d="M35 176.7 C 42.5 90.7, 110 29.8, 160 20.4 C 210 29.8, 277.5 90.7, 285 176.7 Z" fill="none" stroke-width="6" stroke-linejoin="round"/><rect class="f-mint-dark s-ink" x="31" y="167.7" width="258" height="18" rx="6" stroke-width="4"/><circle class="f-mint-deeper" cx="55" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="85" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="115" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="145" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="175" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="205" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="235" cy="176.7" r="2.2"/><circle class="f-mint-deeper" cx="265" cy="176.7" r="2.2"/><circle class="f-peach-dark s-ink" cx="160" cy="18.4" r="9" stroke-width="3.5"/><circle class="f-peach" cx="160" cy="18.4" r="5"/><g class="words-fire"><circle class="f-spark" cx="160" cy="18.4" r="5"/></g><circle class="f-highlight" cx="157.5" cy="15.9" r="1.6" opacity="0.8"/><circle class="f-peach-dark s-ink" cx="160" cy="237.1" r="46.4" stroke-width="4"/><circle class="s-planet-peach" cx="160" cy="237.1" r="40.4" fill="none" stroke-width="3"/><circle class="f-ink" cx="198.3" cy="252.9" r="2"/><circle class="f-ink" cx="175.8" cy="275.3" r="2"/><circle class="f-ink" cx="144.2" cy="275.3" r="2"/><circle class="f-ink" cx="121.7" cy="252.9" r="2"/><circle class="f-ink" cx="121.7" cy="221.2" r="2"/><circle class="f-ink" cx="144.2" cy="198.8" r="2"/><circle class="f-ink" cx="175.8" cy="198.8" r="2"/><circle class="f-ink" cx="198.3" cy="221.2" r="2"/><clipPath id="words-up-win"><circle cx="160" cy="237.1" r="35.4"/></clipPath><circle class="f-night" cx="160" cy="237.1" r="35.4"/><g clip-path="url(#words-up-win)"><svg x="129.5" y="219.4" class="mw-mimi-art" width="60.916666666666664" height="60.916666666666664" viewBox="0 0 80 80" aria-hidden="true"><path class="f-mimi s-mimi-outline" d="M14 32 L12 6 L33 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi s-mimi-outline" d="M66 32 L68 6 L47 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi-muzzle" d="M17 25 L16 13 L27 21 Z"/><path class="f-mimi-muzzle" d="M63 25 L64 13 L53 21 Z"/><path class="f-mimi s-mimi-outline" d="M9 45 C 9 28, 23 17, 40 17 C 57 17, 71 28, 71 45 C 73 47, 72 51, 70 52 C 67 64, 55 73, 40 73 C 25 73, 13 64, 10 52 C 8 51, 7 47, 9 45 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mimi-shade" d="M26 24 C 31 21, 36 21, 40 23 C 44 21, 49 21, 54 24" fill="none" stroke-width="2.4" stroke-linecap="round"/><path class="f-mimi-shade" d="M15 56 C 22 66, 32 70, 40 70 C 48 70, 58 66, 65 56 C 58 62, 50 64, 40 64 C 30 64, 22 62, 15 56 Z" opacity="0.7"/><ellipse class="f-mimi-muzzle" cx="40" cy="55" rx="14" ry="10"/><circle class="f-mimi-eye" cx="29" cy="41" r="5.4"/><circle class="f-mimi-eye" cx="51" cy="41" r="5.4"/><circle class="f-highlight" cx="27.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="49.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="30.6" cy="43" r="0.9"/><circle class="f-highlight" cx="52.6" cy="43" r="0.9"/><path class="f-mimi-nose" d="M37 51 L43 51 L40 54.5 Z"/><path class="s-mimi-outline" d="M36.5 58 C 38 59.6, 40 59.6, 40 57 C 40 59.6, 42 59.6, 43.5 58" fill="none" stroke-width="1.6" stroke-linecap="round"/><path class="s-mimi-outline" d="M28 55 L18 53 M28 58 L19 60 M52 55 L62 53 M52 58 L61 60" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/></svg><circle class="f-glass" cx="160" cy="237.1" r="35.4" opacity="0.22"/><path class="s-cat-white" d="M138 230 C 140.5 215.8, 149.4 209.5, 160 208" fill="none" stroke-width="5" stroke-linecap="round" opacity="0.7"/></g><circle class="s-ink" cx="160" cy="237.1" r="35.4" fill="none" stroke-width="4"/><rect class="f-mint-deeper" x="49" y="306.7" width="222" height="112.5" rx="16" opacity="0.6"/><rect class="f-moon s-ink" x="49" y="301.7" width="222" height="112.5" rx="16" stroke-width="4"/><path class="s-moon-dim" d="M63 405.2 H257" stroke-width="6" stroke-linecap="round"/><circle class="f-steel s-ink" cx="61" cy="313.7" r="4.2" stroke-width="1.8"/><path class="s-ink" d="M58.6 316.1 L63.4 311.3" stroke-width="1.4"/><circle class="f-steel s-ink" cx="259" cy="313.7" r="4.2" stroke-width="1.8"/><path class="s-ink" d="M256.6 316.1 L261.4 311.3" stroke-width="1.4"/><circle class="f-steel s-ink" cx="61" cy="402.2" r="4.2" stroke-width="1.8"/><path class="s-ink" d="M58.6 404.6 L63.4 399.8" stroke-width="1.4"/><circle class="f-steel s-ink" cx="259" cy="402.2" r="4.2" stroke-width="1.8"/><path class="s-ink" d="M256.6 404.6 L261.4 399.8" stroke-width="1.4"/><g class="words-fire"><g opacity="0.9"><circle class="f-moon-dim s-ink" cx="14" cy="552.5" r="21.6" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="54.5" cy="554" r="19.8" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="35" cy="543.5" r="30" stroke-width="3"/><path class="s-white-shade" d="M12.5 561.5 C 26 572, 47 572, 62 561.5" fill="none" stroke-width="6.6" stroke-linecap="round"/><circle class="f-highlight" cx="26" cy="534.5" r="5.4" opacity="0.8"/></g><g opacity="0.9"><circle class="f-moon-dim s-ink" cx="86" cy="567" r="14.4" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="113" cy="568" r="13.2" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="100" cy="561" r="20" stroke-width="3"/><path class="s-white-shade" d="M85 573 C 94 580, 108 580, 118 573" fill="none" stroke-width="4.4" stroke-linecap="round"/><circle class="f-highlight" cx="94" cy="555" r="3.6" opacity="0.8"/></g><g opacity="0.9"><circle class="f-moon-dim s-ink" cx="246.8" cy="555.9" r="18.7" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="281.9" cy="557.2" r="17.2" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="265" cy="548.1" r="26" stroke-width="3"/><path class="s-white-shade" d="M245.5 563.7 C 257.2 572.8, 275.4 572.8, 288.4 563.7" fill="none" stroke-width="5.7" stroke-linecap="round"/><circle class="f-highlight" cx="257.2" cy="540.3" r="4.7" opacity="0.8"/></g></g></svg></template>
+<template id="art-words-pad"><svg width="1280" height="800" viewBox="0 0 1280 800" overflow="visible" aria-hidden="true"><path class="s-asteroid" d="M120 723 L138 812 M180 723 L162 812 M124 757 L176 757 M130 757 L170 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M120 723 L138 812 M180 723 L162 812" stroke-width="2" opacity="0.6"/><path class="s-asteroid" d="M240 723 L258 812 M300 723 L282 812 M244 757 L296 757 M250 757 L290 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M240 723 L258 812 M300 723 L282 812" stroke-width="2" opacity="0.6"/><path class="s-asteroid" d="M360 723 L378 812 M420 723 L402 812 M364 757 L416 757 M370 757 L410 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M360 723 L378 812 M420 723 L402 812" stroke-width="2" opacity="0.6"/><path class="s-asteroid" d="M480 723 L498 812 M540 723 L522 812 M484 757 L536 757 M490 757 L530 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M480 723 L498 812 M540 723 L522 812" stroke-width="2" opacity="0.6"/><path class="s-asteroid" d="M600 723 L618 812 M660 723 L642 812 M604 757 L656 757 M610 757 L650 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M600 723 L618 812 M660 723 L642 812" stroke-width="2" opacity="0.6"/><path class="s-asteroid" d="M720 723 L738 812 M780 723 L762 812 M724 757 L776 757 M730 757 L770 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M720 723 L738 812 M780 723 L762 812" stroke-width="2" opacity="0.6"/><path class="s-asteroid" d="M840 723 L858 812 M900 723 L882 812 M844 757 L896 757 M850 757 L890 795" stroke-width="7" stroke-linecap="round"/><path class="s-asteroid-light" d="M840 723 L858 812 M900 723 L882 812" stroke-width="2" opacity="0.6"/><clipPath id="words-pad-deck"><path d="M64 693 H928 Q 942 693 942 707 V715 Q 942 723 934 723 H58 Q 50 723 50 715 V707 Q 50 693 64 693 Z"/></clipPath><g clip-path="url(#words-pad-deck)"><rect class="f-asteroid-light" x="50" y="692.5" width="892" height="7.6"/><rect class="f-asteroid" x="50" y="699.1" width="892" height="13"/><rect class="f-asteroid-crater" x="50" y="711.1" width="892" height="12.4"/><rect class="f-asteroid-deep" x="50" y="711" width="892" height="12"/><path class="f-peach" d="M58 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M88 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M118 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M148 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M178 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M208 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M238 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M268 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M298 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M328 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M358 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M388 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M418 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M448 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M478 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M508 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M538 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M568 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M598 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M628 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M658 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M688 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M718 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M748 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M778 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M808 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M838 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M868 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M898 711 l12 0 l-10 12 l-12 0 Z"/><path class="f-peach" d="M928 711 l12 0 l-10 12 l-12 0 Z"/></g><path class="s-ink" d="M64 693 H928 Q 942 693 942 707 V715 Q 942 723 934 723 H58 Q 50 723 50 715 V707 Q 50 693 64 693 Z" fill="none" stroke-width="4.5"/><path class="s-mint-light" d="M60 696 H932" stroke-width="2" opacity="0.35"/><circle class="f-spark s-ink" cx="84" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="82.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="196" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="194.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="308" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="306.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="420" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="418.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="532" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="530.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="644" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="642.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="756" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="754.5" cy="700.5" r="1.3"/><circle class="f-spark s-ink" cx="868" cy="702" r="4.5" stroke-width="2"/><circle class="f-highlight" cx="866.5" cy="700.5" r="1.3"/></svg></template>
+<template id="art-words-ship-back"><svg width="330" height="328" viewBox="0 0 330 328" overflow="visible" aria-hidden="true"><clipPath id="words-back-fin-1"><path d="M320 74 C 270 56, 218 20, 186 4 L206 74 Z"/></clipPath><path class="f-planet-peach-2" d="M320 74 C 270 56, 218 20, 186 4 L206 74 Z"/><g clip-path="url(#words-back-fin-1)"><path class="s-mint-light" d="M292 66 C 256 50, 222 30, 200 16" fill="none" stroke-width="8" stroke-linecap="round"/></g><path class="s-ink" d="M320 74 C 270 56, 218 20, 186 4 L206 74 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><clipPath id="words-back-fin1"><path d="M320 254 C 270 272, 218 308, 186 324 L206 254 Z"/></clipPath><path class="f-planet-peach-4" d="M320 254 C 270 272, 218 308, 186 324 L206 254 Z"/><g clip-path="url(#words-back-fin1)"><path class="s-mint-light" d="M292 262 C 256 278, 222 298, 200 312" fill="none" stroke-width="8" stroke-linecap="round"/></g><path class="s-ink" d="M320 254 C 270 272, 218 308, 186 324 L206 254 Z" fill="none" stroke-width="5" stroke-linejoin="round"/><g class="words-fire"><path class="f-peach" d="M156 111.4 C 88.5 103.5, 36 145.6, 6 164 C 36 182.4, 88.5 224.5, 156 216.6 Z"/><path class="f-spark" d="M156 129.3 C 106 124, 67.2 151.8, 45 164 C 67.2 176.2, 106 204, 156 198.7 Z"/><path class="f-highlight" d="M156 148.2 C 125.6 145.8, 102 158.5, 88.5 164 C 102 169.5, 125.6 182.2, 156 179.8 Z"/><g opacity="0.9"><circle class="f-moon-dim s-ink" cx="26.2" cy="239.1" r="24.5" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="72.1" cy="240.8" r="22.4" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="50" cy="228.9" r="34" stroke-width="3"/><path class="s-white-shade" d="M24.5 249.3 C 39.8 261.2, 63.6 261.2, 80.6 249.3" fill="none" stroke-width="7.5" stroke-linecap="round"/><circle class="f-highlight" cx="39.8" cy="218.7" r="6.1" opacity="0.8"/></g><g opacity="0.9"><circle class="f-moon-dim s-ink" cx="85.8" cy="295.9" r="18.7" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="120.9" cy="297.2" r="17.2" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="104" cy="288.1" r="26" stroke-width="3"/><path class="s-white-shade" d="M84.5 303.7 C 96.2 312.8, 114.4 312.8, 127.4 303.7" fill="none" stroke-width="5.7" stroke-linecap="round"/><circle class="f-highlight" cx="96.2" cy="280.3" r="4.7" opacity="0.8"/></g><g opacity="0.9"><circle class="f-moon-dim s-ink" cx="-26.8" cy="177.6" r="17.3" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="5.6" cy="178.8" r="15.8" stroke-width="3"/><circle class="f-moon-dim s-ink" cx="-10" cy="170.4" r="24" stroke-width="3"/><path class="s-white-shade" d="M-28 184.8 C -17.2 193.2, -0.4 193.2, 11.6 184.8" fill="none" stroke-width="5.3" stroke-linecap="round"/><circle class="f-highlight" cx="-17.2" cy="163.2" r="4.3" opacity="0.8"/></g></g><clipPath id="words-back-noz"><path d="M202 126.4 L160 107.6 L160 220.4 L202 201.6 Z"/></clipPath><g clip-path="url(#words-back-noz)"><rect class="f-steel" x="160" y="107.1" width="44" height="34.8"/><rect class="f-scruffles-grey" x="160" y="140.9" width="44" height="48.4"/><rect class="f-steel-dark" x="160" y="188.3" width="44" height="32.6"/></g><path class="s-ink" d="M202 126.4 L160 107.6 L160 220.4 L202 201.6 Z" fill="none" stroke-width="4" stroke-linejoin="round"/><ellipse class="f-steel-dark s-ink" cx="160" cy="164" rx="7" ry="56.4" stroke-width="3.5"/></svg></template>
+<template id="art-words-ship-hull"><svg width="1400" height="188" viewBox="0 0 1400 188" aria-hidden="true"><clipPath id="words-hull"><path d="M10 0 H1400 V188 H10 Q 0 188 0 178 V10 Q 0 0 10 0 Z"/></clipPath><g clip-path="url(#words-hull)"><rect class="f-mint-light" x="0" y="-0.5" width="1400" height="29.2"/><rect class="f-mint" x="0" y="27.7" width="1400" height="85.6"/><rect class="f-mint-dark" x="0" y="112.3" width="1400" height="46.1"/><rect class="f-mint-deep" x="0" y="157.4" width="1400" height="31.1"/><rect class="f-peach-dark" x="0" y="162" width="1400" height="12"/><rect class="f-planet-peach" x="0" y="162" width="1400" height="4"/><circle class="f-mint-deeper" cx="24" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="54" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="84" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="114" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="144" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="174" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="204" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="234" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="264" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="294" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="324" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="354" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="384" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="414" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="444" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="474" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="504" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="534" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="564" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="594" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="624" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="654" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="684" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="714" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="744" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="774" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="804" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="834" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="864" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="894" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="924" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="954" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="984" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1014" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1044" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1074" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1104" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1134" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1164" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1194" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1224" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1254" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1284" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1314" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1344" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="24" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="54" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="84" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="114" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="144" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="174" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="204" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="234" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="264" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="294" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="324" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="354" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="384" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="414" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="444" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="474" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="504" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="534" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="564" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="594" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="624" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="654" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="684" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="714" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="744" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="774" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="804" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="834" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="864" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="894" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="924" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="954" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="984" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1014" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1044" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1074" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1104" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1134" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1164" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1194" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1224" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1254" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1284" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1314" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1344" cy="150" r="2.4" opacity="0.8"/><path class="s-cat-white" d="M20 28 H1400" stroke-width="6" stroke-linecap="round" opacity="0.4"/><path class="s-ink" d="M60 0 V188" stroke-width="2" opacity="0.3"/></g><path class="s-ink" d="M10 0 H1400 V188 H10 Q 0 188 0 178 V10 Q 0 0 10 0 Z" fill="none" stroke-width="6" stroke-linejoin="round"/></svg></template>
+<template id="art-words-ship-nose"><svg width="176.2" height="188" viewBox="0 0 176.2 188" overflow="visible" aria-hidden="true"><clipPath id="words-nose"><path d="M12 0 C 96.8 2, 158.5 52.6, 166.2 94 C 158.5 135.4, 96.8 186, 12 188 Z"/></clipPath><g clip-path="url(#words-nose)"><rect class="f-planet-peach-light" x="12" y="-0.5" width="154.2" height="38.6"/><rect class="f-planet-peach-2" x="12" y="37.1" width="154.2" height="66.8"/><rect class="f-planet-peach" x="12" y="102.9" width="154.2" height="48"/><rect class="f-planet-peach-4" x="12" y="149.9" width="154.2" height="38.6"/><path class="s-cat-white" d="M22 22 C 73.7 24, 119.9 56.4, 141.5 71.4" fill="none" stroke-width="6" stroke-linecap="round" opacity="0.5"/></g><path class="s-ink" d="M12 0 C 96.8 2, 158.5 52.6, 166.2 94 C 158.5 135.4, 96.8 186, 12 188 Z" fill="none" stroke-width="6" stroke-linejoin="round"/><rect class="f-mint-dark s-ink" x="3" y="-4" width="18" height="196" rx="6" stroke-width="4"/><circle class="f-mint-deeper" cx="12" cy="14" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="40.7" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="67.3" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="94" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="120.7" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="147.3" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="174" r="2.2"/><circle class="f-peach-dark s-ink" cx="76.7" cy="94" r="40" stroke-width="4"/><circle class="f-night" cx="76.7" cy="94" r="32"/><clipPath id="words-nose-win"><circle cx="76.7" cy="94" r="32"/></clipPath><g clip-path="url(#words-nose-win)"><svg x="49.3" y="78" class="mw-mimi-art" width="54.9712" height="54.9712" viewBox="0 0 80 80" aria-hidden="true"><path class="f-mimi s-mimi-outline" d="M14 32 L12 6 L33 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi s-mimi-outline" d="M66 32 L68 6 L47 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi-muzzle" d="M17 25 L16 13 L27 21 Z"/><path class="f-mimi-muzzle" d="M63 25 L64 13 L53 21 Z"/><path class="f-mimi s-mimi-outline" d="M9 45 C 9 28, 23 17, 40 17 C 57 17, 71 28, 71 45 C 73 47, 72 51, 70 52 C 67 64, 55 73, 40 73 C 25 73, 13 64, 10 52 C 8 51, 7 47, 9 45 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mimi-shade" d="M26 24 C 31 21, 36 21, 40 23 C 44 21, 49 21, 54 24" fill="none" stroke-width="2.4" stroke-linecap="round"/><path class="f-mimi-shade" d="M15 56 C 22 66, 32 70, 40 70 C 48 70, 58 66, 65 56 C 58 62, 50 64, 40 64 C 30 64, 22 62, 15 56 Z" opacity="0.7"/><ellipse class="f-mimi-muzzle" cx="40" cy="55" rx="14" ry="10"/><circle class="f-mimi-eye" cx="29" cy="41" r="5.4"/><circle class="f-mimi-eye" cx="51" cy="41" r="5.4"/><circle class="f-highlight" cx="27.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="49.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="30.6" cy="43" r="0.9"/><circle class="f-highlight" cx="52.6" cy="43" r="0.9"/><path class="f-mimi-nose" d="M37 51 L43 51 L40 54.5 Z"/><path class="s-mimi-outline" d="M36.5 58 C 38 59.6, 40 59.6, 40 57 C 40 59.6, 42 59.6, 43.5 58" fill="none" stroke-width="1.6" stroke-linecap="round"/><path class="s-mimi-outline" d="M28 55 L18 53 M28 58 L19 60 M52 55 L62 53 M52 58 L61 60" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/></svg><circle class="f-glass" cx="76.7" cy="94" r="32" opacity="0.22"/><path class="s-cat-white" d="M57.6 87.6 C 60.8 74.8, 68.8 68.4, 78.3 67.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.7"/></g><circle class="s-ink" cx="76.7" cy="94" r="32" fill="none" stroke-width="3.5"/></svg></template>
+<template id="art-words-rocket-mini"><svg width="100" height="140" viewBox="0 0 100 140" overflow="visible" aria-hidden="true"><path class="f-peach" d="M37 90 C 35.7 108, 45.5 122, 50 130 C 54.5 122, 64.3 108, 63 90 Z"/><path class="f-spark" d="M41.4 90 C 40.6 103, 47 113, 50 118.8 C 53 113, 59.4 103, 58.6 90 Z"/><path class="f-highlight" d="M46.1 90 C 45.7 97.6, 48.6 103.4, 50 106.8 C 51.4 103.4, 54.3 97.6, 53.9 90 Z"/><path class="f-planet-peach-2 s-ink" d="M30 62 C 20 68, 16 78, 16 88 L34 80 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-planet-peach-4 s-ink" d="M70 62 C 80 68, 84 78, 84 88 L66 80 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-steel s-ink" d="M40 82 L60 82 L64 92 L36 92 Z" stroke-width="3" stroke-linejoin="round"/><clipPath id="words-mini-b"><rect x="32" y="38" width="36" height="46" rx="5"/></clipPath><g clip-path="url(#words-mini-b)"><rect class="f-mint-light" x="31.5" y="38" width="5.7" height="46"/><rect class="f-mint" x="36.2" y="38" width="17.9" height="46"/><rect class="f-mint-dark" x="53.1" y="38" width="10" height="46"/><rect class="f-mint-deep" x="62.1" y="38" width="6.4" height="46"/><rect class="f-peach-shade" x="32" y="72" width="36" height="12"/></g><rect class="s-ink" x="32" y="38" width="36" height="46" rx="5" fill="none" stroke-width="4"/><clipPath id="words-mini-c"><path d="M32 40 C 33 26, 42 14, 50 8 C 58 14, 67 26, 68 40 Z"/></clipPath><g clip-path="url(#words-mini-c)"><rect class="f-planet-peach-light" x="31.5" y="8" width="6.8" height="34"/><rect class="f-planet-peach-2" x="37.3" y="8" width="15" height="34"/><rect class="f-planet-peach" x="51.3" y="8" width="10" height="34"/><rect class="f-planet-peach-4" x="60.3" y="8" width="8.2" height="34"/></g><path class="s-ink" d="M32 40 C 33 26, 42 14, 50 8 C 58 14, 67 26, 68 40 Z" fill="none" stroke-width="4" stroke-linejoin="round"/><circle class="f-peach-dark s-ink" cx="50" cy="54" r="9" stroke-width="3"/><circle class="f-glass s-ink" cx="50" cy="54" r="5.5" stroke-width="2"/><path class="s-cat-white" d="M47 52 C 48 50, 50 49, 52 49" fill="none" stroke-width="1.8" stroke-linecap="round"/></svg></template>
+<template id="art-words-socket-1"><svg width="120" height="120" viewBox="0 0 120 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="120" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="110" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="111.7" cy="81.4" r="2"/><circle class="f-ink" cx="81.4" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="81.4" cy="8.3" r="2"/><circle class="f-ink" cx="111.7" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="104" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="88" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
+<template id="art-words-tile-1"><svg width="104" height="104" viewBox="0 0 104 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="f-spark" x="-14" y="-14" width="132" height="132" rx="66" opacity="0.4"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="100" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="90" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="94.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="69.6" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="69.6" cy="9.5" r="2.2"/><circle class="f-ink" cx="94.5" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="83.2" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H72.8" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="101" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H72.8" stroke-width="5" stroke-linecap="round"/></g></svg></template>
+<template id="art-words-socket-2"><svg width="167.8" height="120" viewBox="0 0 167.8 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="167.8" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="157.8" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="159.6" cy="81.4" r="2"/><circle class="f-ink" cx="129.3" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="129.3" cy="8.3" r="2"/><circle class="f-ink" cx="159.6" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="151.8" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="135.8" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
+<template id="art-words-tile-2"><svg width="151.8" height="104" viewBox="0 0 151.8 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="f-spark" x="-14" y="-14" width="179.8" height="132" rx="66" opacity="0.4"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="147.8" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="137.8" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="142.3" cy="69.6" r="2.2"/><circle class="f-ink" cx="117.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="117.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="142.3" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="131" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H120.6" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="148.8" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H120.6" stroke-width="5" stroke-linecap="round"/></g></svg></template>
+<template id="art-words-socket-3"><svg width="215.7" height="120" viewBox="0 0 215.7 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="215.7" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="205.7" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="207.4" cy="81.4" r="2"/><circle class="f-ink" cx="177.1" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="177.1" cy="8.3" r="2"/><circle class="f-ink" cx="207.4" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="199.7" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="183.7" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
+<template id="art-words-tile-3"><svg width="199.7" height="104" viewBox="0 0 199.7 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="f-spark" x="-14" y="-14" width="227.7" height="132" rx="66" opacity="0.4"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="195.7" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="185.7" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="190.2" cy="69.6" r="2.2"/><circle class="f-ink" cx="165.3" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="165.3" cy="9.5" r="2.2"/><circle class="f-ink" cx="190.2" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="178.9" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H168.5" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="196.7" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H168.5" stroke-width="5" stroke-linecap="round"/></g></svg></template>
+<template id="art-words-socket-4"><svg width="263.5" height="120" viewBox="0 0 263.5 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="263.5" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="253.5" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="255.3" cy="81.4" r="2"/><circle class="f-ink" cx="225" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="225" cy="8.3" r="2"/><circle class="f-ink" cx="255.3" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="247.5" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="231.5" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
+<template id="art-words-tile-4"><svg width="247.5" height="104" viewBox="0 0 247.5 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="f-spark" x="-14" y="-14" width="275.5" height="132" rx="66" opacity="0.4"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="243.5" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="233.5" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="238" cy="69.6" r="2.2"/><circle class="f-ink" cx="213.1" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="213.1" cy="9.5" r="2.2"/><circle class="f-ink" cx="238" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="226.7" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H216.3" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="244.5" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H216.3" stroke-width="5" stroke-linecap="round"/></g></svg></template>
 <script>
 window.MW = { VERSION: '0.5.0' };
-window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
-window.MW_GAMES = [{"id":"rescue","name":"MeeMee Rescue","planet":0,"badge":"mimi","say":"map-mimi-rescue"}];
-window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"}];
+window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
+window.MW_GAMES = [{"id":"rescue","name":"MeeMee Rescue","planet":0,"badge":"mimi","say":"map-mimi-rescue"},{"id":"words","name":"MeeMee Rockets","planet":1,"badge":"words-badge","say":"words-name"}];
+window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"words-name","group":"Map","words":"MeeMee Rockets!"},{"id":"words-round-ready","group":"Rounds","words":"Ready to launch some rockets?"},{"id":"words-round-done","group":"Rounds","words":"You launched all the rockets!"},{"id":"words-round-another","group":"Rounds","words":"Another go?"},{"id":"words-find","group":"Find","words":"Find the word…"},{"id":"words-that-word","group":"Find","words":"That word is…"},{"id":"words-found-it","group":"Praise","words":"You found it!"},{"id":"words-super-reading","group":"Praise","words":"Super reading!"},{"id":"words-well-done","group":"Praise","words":"Well done!"},{"id":"words-build","group":"Build","words":"Now build the word…"},{"id":"words-you-built","group":"Build","words":"You built the word…"},{"id":"words-tricky-bit","group":"Build","words":"That's the tricky bit."},{"id":"words-try-again","group":"Trying again","words":"Let's try again."},{"id":"words-look-together","group":"Trying again","words":"Let's look together."},{"id":"words-w-all","group":"Week 5 words","words":"all"},{"id":"words-w-of","group":"Week 5 words","words":"of"},{"id":"words-w-one","group":"Week 5 words","words":"one"},{"id":"words-w-here","group":"Week 5 words","words":"here"},{"id":"words-w-magnet","group":"Week 5 words","words":"magnet"},{"id":"words-w-cartoon","group":"Week 5 words","words":"cartoon"},{"id":"words-w-rabbit","group":"Week 5 words","words":"rabbit"},{"id":"words-w-spray","group":"Week 5 words","words":"spray"},{"id":"words-w-popcorn","group":"Week 5 words","words":"popcorn"},{"id":"words-w-proud","group":"Week 5 words","words":"proud"},{"id":"words-w-toy","group":"Week 5 words","words":"toy"},{"id":"words-w-say","group":"Week 5 words","words":"say"},{"id":"words-w-go","group":"Tricky words, weeks 1 to 4","words":"go"},{"id":"words-w-my","group":"Tricky words, weeks 1 to 4","words":"my"},{"id":"words-w-into","group":"Tricky words, weeks 1 to 4","words":"into"},{"id":"words-w-out","group":"Tricky words, weeks 1 to 4","words":"out"},{"id":"words-w-what","group":"Tricky words, weeks 1 to 4","words":"what"},{"id":"words-w-she","group":"Tricky words, weeks 1 to 4","words":"she"},{"id":"words-w-me","group":"Tricky words, weeks 1 to 4","words":"me"},{"id":"words-w-love","group":"Tricky words, weeks 1 to 4","words":"love"},{"id":"words-w-they","group":"Tricky words, weeks 1 to 4","words":"they"},{"id":"words-w-some","group":"Tricky words, weeks 1 to 4","words":"some"},{"id":"words-w-were","group":"Tricky words, weeks 1 to 4","words":"were"},{"id":"words-w-sure","group":"Tricky words, weeks 1 to 4","words":"sure"},{"id":"words-w-said","group":"Tricky words, weeks 1 to 4","words":"said"},{"id":"words-w-you","group":"Tricky words, weeks 1 to 4","words":"you"},{"id":"words-w-like","group":"Tricky words, weeks 1 to 4","words":"like"},{"id":"words-w-push","group":"Tricky words, weeks 1 to 4","words":"push"}];
 </script>
 <script>
 /* MeeMee World kit: core.
@@ -2909,6 +3006,842 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // ---------------------------------------------------------------- test hooks
   R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = W.home; R.map = W.home; R.makeRound = makeRound;
   R.crew = function () { return W.crewScreen; };
+})();
+
+</script>
+<script>
+/* ---- games/words ---- */
+/* MeeMee Rockets: the words. The one file to edit for a new half-term (no code changes).
+
+   weeks       each week of the class's list: its tricky words, then its other words (the sounded-out ones).
+   startWeek   the week in play until a grown-up picks another in the grown-ups area (Words tab).
+   harderTray  how many tiles the tray holds in harder letters: the word's letters, its spares, then letters from
+               the week's other words.
+   words       every word, with:
+     tiles     its sound tiles, left to right, with a space between them: 'c ar t oo n'. Letters that make one
+               sound ('ar', 'ay', 'ere') are one tile. Square brackets mark the tricky part: 'h [ere]'.
+               A split pair marks both its tiles ('s [o] m [e]'); a whole tricky word marks every tile ('[o] [ne]').
+     spares    the extra letters for letters mode, with a space between them: 'i e'. A spare may repeat a letter
+               of the word (the extra e in 'she').
+     says      what the tricky part says (for grown-ups; the game doesn't show it).
+
+   Every word also needs its line in lines.json ("words-w-" and the word, such as "words-w-magnet"), recorded on the
+   recording page. A word whose recording isn't there yet stays out of play until it is. */
+(function () {
+  'use strict';
+  window.MW.wordsData = {
+    startWeek: 5,
+    harderTray: 10,
+    weeks: [
+      { week: 1, tricky: ['go', 'my', 'into', 'out'], other: [] },
+      { week: 2, tricky: ['what', 'she', 'me', 'love'], other: [] },
+      { week: 3, tricky: ['they', 'some', 'were', 'sure'], other: [] },
+      { week: 4, tricky: ['said', 'you', 'like', 'push'], other: [] },
+      { week: 5, tricky: ['all', 'of', 'one', 'here'], other: ['magnet', 'cartoon', 'rabbit', 'spray', 'popcorn', 'proud', 'toy', 'say'] }
+    ],
+    words: {
+      // week 5
+      all: { tiles: '[a] ll', spares: 'o', says: 'a says "or"' },
+      of: { tiles: 'o [f]', spares: 'v', says: 'f says "v"' },
+      one: { tiles: '[o] [ne]', spares: 'w', says: 'the whole word: o says "w-u", ne says "n"' },
+      here: { tiles: 'h [ere]', spares: 'a', says: 'ere says "ear"' },
+      magnet: { tiles: 'm a g n e t', spares: 'i' },
+      cartoon: { tiles: 'c ar t oo n', spares: 'k' },
+      rabbit: { tiles: 'r a b b i t', spares: 'd' },
+      spray: { tiles: 's p r ay', spares: 'i e' },
+      popcorn: { tiles: 'p o p c or n', spares: 'k' },
+      proud: { tiles: 'p r ou d', spares: 'w' },
+      toy: { tiles: 't oy', spares: 'i' },
+      say: { tiles: 's ay', spares: 'i' },
+      // week 1
+      go: { tiles: 'g [o]', spares: 'a', says: 'o says "oa"' },
+      my: { tiles: 'm [y]', spares: 'i', says: 'y says "igh"' },
+      into: { tiles: 'i n t [o]', spares: 'u', says: 'o says "oo"' },
+      out: { tiles: '[ou] t', spares: 'w', says: 'ou says "ow"' },
+      // week 2
+      what: { tiles: '[wh] [a] t', spares: 'o', says: 'wh says "w", a says "o"' },
+      she: { tiles: 'sh [e]', spares: 'e', says: 'e says "ee"' },
+      me: { tiles: 'm [e]', spares: 'e', says: 'e says "ee"' },
+      love: { tiles: 'l [o] [ve]', spares: 'u', says: 'o says "u", ve says "v"' },
+      // week 3
+      they: { tiles: 'th [ey]', spares: 'a', says: 'ey says "ai"' },
+      some: { tiles: 's [o] m [e]', spares: 'u', says: 'o-e says "u" (a split pair)' },
+      were: { tiles: 'w [ere]', spares: 'u', says: 'ere says "ur"' },
+      sure: { tiles: '[s] [ure]', spares: 'h', says: 'the whole word: s says "sh"' },
+      // week 4
+      said: { tiles: 's [ai] d', spares: 'e', says: 'ai says "e"' },
+      you: { tiles: 'y [ou]', spares: 'o', says: 'ou says "oo"' },
+      like: { tiles: 'l [i] k [e]', spares: 'c', says: 'i-e says "igh" (a split pair)' },
+      push: { tiles: 'p [u] sh', spares: 'o', says: 'u says "oo", as in book' }
+    }
+  };
+})();
+
+/* MeeMee Rockets: the words file read into a form the game uses, each word's step, and which words go into a round.
+
+   Each word's step (decided 10 October):
+     notyet    never asked;
+     tiles     built from sound tiles ('c ar t oo n'), until it is right first time on three different days;
+     letters   then built from single letters with its spares, three more days;
+     harder    then from single letters with the tray filled to 10 tiles, three more days;
+     secure    right first time in harder letters too. Secure words come back for review, in harder letters.
+   Right first time: found and built with no wrong tap, no wrong drop and no hint. A wrong try restarts that step's
+   three days; a word never goes back a step.
+   A round: five different words (or every word in play, if fewer), one or two secure ones for review and the rest
+   not yet secure, as MeeMee Rescue picks its bonds. The words in play are the chosen week's words plus the tricky
+   words of the weeks before it.
+   Pure functions of the words file and the saved answers, so they are easy to test. */
+(function () {
+  'use strict';
+  const MW = window.MW;
+  const S = MW.wordSteps = {};
+
+  S.STEPS = ['notyet', 'tiles', 'letters', 'harder', 'secure'];
+  S.NAMES = { notyet: 'Not yet', tiles: 'Sound tiles', letters: 'Letters', harder: 'Harder letters', secure: 'Secure' };
+  function rank(step) { return S.STEPS.indexOf(step); }
+
+  function day(t) {
+    const d = new Date(t);
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();      // the tablet's own calendar day
+  }
+  S.day = day;
+  function shuffle(list, rand) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  S.shuffle = shuffle;
+
+  // ---------------------------------------------------------------- the words file
+  // 'h [ere]' -> [{ text: 'h', tricky: false }, { text: 'ere', tricky: true }]
+  S.tiles = function (spec) {
+    return String(spec).trim().split(/\s+/).map(function (t) {
+      const m = /^\[([a-z]+)\]$/.exec(t);
+      return m ? { text: m[1], tricky: true } : { text: t, tricky: false };
+    });
+  };
+  // Every word with its week, whether it is one of that week's tricky words, its tiles, letters and spares.
+  // Problems in the file (a word with no tiles, tiles that don't spell it) are listed, not thrown, so the tests and
+  // the grown-ups area can say what is wrong.
+  S.read = function (data) {
+    const out = { words: {}, order: [], weeks: [], problems: [], harderTray: +data.harderTray || 10, startWeek: +data.startWeek || 1 };
+    (data.weeks || []).forEach(function (wk) {
+      const n = +wk.week;
+      out.weeks.push({ week: n, tricky: (wk.tricky || []).slice(), other: (wk.other || []).slice() });
+      [['tricky', true], ['other', false]].forEach(function (kind) {
+        (wk[kind[0]] || []).forEach(function (w) {
+          const spec = (data.words || {})[w];
+          if (!spec || !spec.tiles) { out.problems.push(w + ': no tiles in the words file'); return; }
+          if (out.words[w]) { out.problems.push(w + ': in two weeks'); return; }
+          const tiles = S.tiles(spec.tiles);
+          if (tiles.map(function (t) { return t.text; }).join('') !== w) out.problems.push(w + ': its tiles spell ' + tiles.map(function (t) { return t.text; }).join(''));
+          if (!/^[a-z]+$/.test(w)) out.problems.push(w + ': only lower-case letters, please');
+          const letters = [];
+          tiles.forEach(function (t) { t.text.split('').forEach(function (ch) { letters.push({ text: ch, tricky: t.tricky }); }); });
+          const spares = String(spec.spares || '').trim().split(/\s+/).filter(Boolean);
+          spares.forEach(function (s) { if (!/^[a-z]$/.test(s)) out.problems.push(w + ': the spare ' + s + ' should be one letter'); });
+          out.words[w] = { word: w, week: n, tricky: kind[1], tiles: tiles, letters: letters, spares: spares, says: spec.says || '' };
+          out.order.push(w);
+        });
+      });
+    });
+    out.weeks.sort(function (a, b) { return a.week - b.week; });
+    if (!out.weeks.some(function (wk) { return wk.week === out.startWeek; }) && out.weeks.length) out.startWeek = out.weeks[out.weeks.length - 1].week;
+    return out;
+  };
+
+  // The words in play for a week: that week's words (tricky, then other) and the tricky words of the weeks before it.
+  S.inPlay = function (book, week) {
+    const out = [];
+    book.weeks.forEach(function (wk) {
+      if (wk.week === week) out.push.apply(out, wk.tricky.concat(wk.other));
+    });
+    book.weeks.forEach(function (wk) {
+      if (wk.week < week) out.push.apply(out, wk.tricky);
+    });
+    return out.filter(function (w) { return book.words[w]; });
+  };
+
+  // ---------------------------------------------------------------- steps
+  S.firstTime = function (a) { return !a.tapped && !a.drops && !a.hint; };
+  // answers: [{ t, w, step, tapped, drops, hint }] -> { word: { step, days: [...], answers: n } }
+  S.statuses = function (answers) {
+    const by = {};
+    (answers || []).filter(function (a) {
+      return a && typeof a.t === 'number' && typeof a.w === 'string';
+    }).sort(function (x, y) { return x.t - y.t; }).forEach(function (a) {
+      const s = by[a.w] || (by[a.w] = { step: 'tiles', days: [], answers: 0 });
+      s.answers++;
+      // an answer saved at a later step than the replay has reached (older answers were trimmed): carry on from there
+      if (rank(a.step) > rank(s.step)) { s.step = a.step; s.days = []; }
+      if (s.step === 'secure') return;                      // a word never goes back a step
+      if (S.firstTime(a)) { const d = day(a.t); if (s.days.indexOf(d) < 0) s.days.push(d); }
+      else s.days = [];
+      if (s.days.length >= 3) { s.step = S.STEPS[rank(s.step) + 1]; s.days = []; }
+    });
+    return by;
+  };
+  S.step = function (map, w) { return map[w] ? map[w].step : 'notyet'; };
+  // How a word is built at each step: sound tiles until it is secure with them, then letters, then harder letters.
+  S.mode = function (step) { return step === 'letters' ? 'letters' : (step === 'harder' || step === 'secure') ? 'harder' : 'tiles'; };
+
+  // ---------------------------------------------------------------- a round
+  // opts: { words: the words in play, answers, size: 5, rand } -> [{ word, step }]
+  S.pickRound = function (opts) {
+    const rand = opts.rand || Math.random;
+    const size = Math.min(opts.size || 5, opts.words.length);
+    const map = S.statuses(opts.answers);
+    const secure = shuffle(opts.words.filter(function (w) { return S.step(map, w) === 'secure'; }), rand);
+    const work = shuffle(opts.words.filter(function (w) { return S.step(map, w) !== 'secure'; }), rand);
+    let nSecure = Math.min(rand() < 0.5 ? 1 : 2, secure.length);
+    const nWork = Math.min(size - nSecure, work.length);
+    nSecure = Math.min(size - nWork, secure.length);         // too few to practise: more secure ones
+    const chosen = shuffle(secure.slice(0, nSecure).concat(work.slice(0, nWork)), rand);
+    return chosen.map(function (w) { const s = S.step(map, w); return { word: w, step: s === 'notyet' ? 'tiles' : s }; });
+  };
+
+  // Find: the word asked for and two others from the words in play, in a random order.
+  S.choices = function (word, words, rand, n) {
+    rand = rand || Math.random;
+    const others = shuffle(words.filter(function (w) { return w !== word; }), rand).slice(0, (n || 3) - 1);
+    return shuffle([word].concat(others), rand);
+  };
+
+  // Build: the places in the rocket and the tiles in the tray, for a word at a step.
+  //   tiles    one tile per sound ('ay'), no spares;
+  //   letters  one tile per letter, with the word's spares;
+  //   harder   as letters, then the tray filled up to book.harderTray with letters from the week's other words
+  //            (fill: the words to take them from, in order of preference), each a letter not already in the tray.
+  // -> { mode, places: [{ text, tricky }], tray: [{ text, tricky, spare }] } (the tray shuffled)
+  S.plan = function (book, word, step, fill, rand) {
+    rand = rand || Math.random;
+    const e = book.words[word];
+    const mode = S.mode(step);
+    const places = (mode === 'tiles' ? e.tiles : e.letters).map(function (t) { return { text: t.text, tricky: t.tricky }; });
+    const tray = places.map(function (p) { return { text: p.text, tricky: p.tricky, spare: false }; });
+    if (mode !== 'tiles') e.spares.forEach(function (s) { tray.push({ text: s, tricky: false, spare: true }); });
+    if (mode === 'harder') {
+      const have = {};
+      tray.forEach(function (t) { have[t.text] = true; });
+      (fill || []).forEach(function (group) {
+        const letters = [];
+        group.filter(function (w) { return w !== word && book.words[w]; }).forEach(function (w) {
+          w.split('').forEach(function (ch) { if (!have[ch] && letters.indexOf(ch) < 0) letters.push(ch); });
+        });
+        shuffle(letters, rand).forEach(function (ch) {
+          if (tray.length >= book.harderTray || have[ch]) return;
+          have[ch] = true;
+          tray.push({ text: ch, tricky: false, spare: true });
+        });
+      });
+    }
+    return { mode: mode, places: places, tray: shuffle(tray, rand) };
+  };
+  // Where harder letters' extra letters come from, in order: the other words of the week in play, then the other
+  // words in play, then any word in the file (only needed when a week has very few letters).
+  S.fillFrom = function (book, week) {
+    const wk = book.weeks.filter(function (x) { return x.week === week; })[0];
+    return [wk ? wk.tricky.concat(wk.other) : [], S.inPlay(book, week), book.order];
+  };
+
+  // Every question the game can ask for a week: each word in play, to find and to build at each step.
+  S.allQuestions = function (book, week) {
+    const out = [];
+    S.inPlay(book, week).forEach(function (w) {
+      out.push({ word: w, kind: 'find' });
+      ['tiles', 'letters', 'harder'].forEach(function (m) { out.push({ word: w, kind: 'build', mode: m }); });
+    });
+    return out;
+  };
+})();
+
+/* MeeMee Rockets: the tricky-words game (the test build).
+   A round is five words. Each word is found, then built, and earns a star:
+     Find   three rockets on the launch pad, each with a word. "Find the word… one." He taps one.
+     Build  the word's rocket lies on its side with empty portholes; its tiles are loose in the tray. "Now build the
+            word… one." He drags the tiles into the portholes, left to right. The last tile launches the rocket.
+   The words, their tiles and spares are in words.js; each word's step and how rounds are chosen in steps.js.
+   It joins the world with MW.world.game below: the world gives it the start screen, the map, pausing, Home and the
+   grown-ups area (its Words tab is at the end of this file). */
+(function () {
+  'use strict';
+  const MW = window.MW;
+  const W = MW.world;
+  const S = MW.wordSteps;
+  const ID = 'words';
+  const FIND = 'screen-words-find', BUILD = 'screen-words-build', END = 'screen-words-end';
+  const ROUND = 5;
+  const PRAISE = ['words-found-it', 'words-super-reading', 'words-well-done'];
+
+  // Where things go (stage px), from the round 6 boards. The drawings' own sizes are in art.py.
+  const ROCKETS = { xs: [197, 490, 783], base: 693, at: [160, 560], panel: [49, 301.7, 222, 112.5], wordMax: 60 };   // art.py: ROCKET_AT, rocket_panel()
+  const D = 104, GAP = 16, H = D + 84, NOSE = H * 0.82, BACK = [200, 70], NOSE_X = 12;   // the rocket on its side
+  const SHIP = { x: 150, y: 195, right: 1250, slack: 34 };
+  const TRAY = { one: { x: 110, y: 520, h: 170, pad: 42, gap: 26, rows: [87] }, two: { x: 280, y: 418, h: 277, pad: 30, gap: 20, rows: [79, 203] },
+    oneRowMax: 640, right: 905, minW: 558 };
+  const POD = { find: [965, 337, 270], build: [951, 450, 290] };
+
+  const BOOK = S.read(MW.wordsData || { weeks: [], words: {} });
+  const st = { round: [], qi: 0, item: null, prompt: null, praise: [], timers: [], tapped: 0, drops: 0, hinted: false,
+    trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null };
+  const G = MW.wordsGame = { st: st, book: BOOK, nextRound: null };
+  let findPod, buildPod, endPod, findStars, buildStars, endStars, findFx, buildFx, tileLayer, trayEl, shipLayer, dragger, again, endRockets;
+
+  W.game({
+    id: ID,
+    build: function () { buildFind(); buildBuild(); buildEnd(); },
+    start: function () { startRound(); },
+    sections: [{ id: 'words-progress', title: 'Words', render: renderProgress }],
+    onPause: function () { clearTimers(); if (dragger) dragger.cancel(); },
+    onResume: function () {                                     // carry on: ask again
+      if ((MW.shell.screen === FIND && W.st.phase === 'words-find') || (MW.shell.screen === BUILD && W.st.phase === 'words-build')) {
+        findPod.face('thinking'); buildPod.face('thinking');
+        W.speak(st.prompt);
+      }
+    },
+    onHome: leave
+  });
+
+  // ---------------------------------------------------------------- saved data (this game's own, on the tablet)
+  // Read without creating it, so a tablet that has never played keeps nothing for this game.
+  function saved() { const g = MW.store.get('games') || {}; return g[ID] || {}; }
+  function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
+  function week() {
+    const w = +saved().week;
+    return BOOK.weeks.some(function (x) { return x.week === w; }) ? w : BOOK.startWeek;
+  }
+  function recorded(w) { return !!((MW.audio.manifest || {}).voice || {})[line(w)]; }
+  function line(w) { return 'words-w-' + w; }
+  // The words in play: the week's words and earlier weeks' tricky words, once their recordings are on the page.
+  function inPlay() { return S.inPlay(BOOK, week()).filter(recorded); }
+
+  // ---------------------------------------------------------------- the screens
+  function buildFind() {
+    const s = W.screen(FIND, 'MeeMee Rockets: find the word');
+    const pad = MW.art('words-pad'); pad.classList.add('mw-layer'); s.appendChild(pad);
+    st.rockets = ROCKETS.xs.map(function (cx, i) {
+      const b = MW.make('button', 'words-rocket mw-abs', { type: 'button', 'aria-label': 'A rocket' });
+      b.style.left = (cx - 135) + 'px'; b.style.top = '140px';
+      const art = MW.art('words-rocket');
+      art.setAttribute('class', 'words-rocket-art');
+      art.style.left = (135 - ROCKETS.at[0]) + 'px'; art.style.top = (ROCKETS.base - ROCKETS.at[1] - 140) + 'px';
+      b.appendChild(art);
+      const p = ROCKETS.panel;
+      const panel = MW.make('span', 'words-panel');
+      panel.style.left = (p[0] + 135 - ROCKETS.at[0]) + 'px'; panel.style.top = (p[1] + ROCKETS.base - ROCKETS.at[1] - 140) + 'px';
+      panel.style.width = p[2] + 'px'; panel.style.height = p[3] + 'px';
+      const word = MW.make('span', 'words-panel-word');
+      panel.appendChild(word);
+      b.appendChild(panel);
+      s.appendChild(b);
+      const r = { el: b, wordEl: word, word: null, cx: cx, i: i };
+      MW.onTap(b, function () { tapRocket(r); });
+      return r;
+    });
+    findPod = MW.pod(s, POD.find[0], POD.find[1], POD.find[2]);
+    MW.onTap(findPod.el, hearAgain);
+    findStars = MW.stars(s, 517, 34);
+    findFx = MW.make('div', 'mw-layer mw-fill'); s.appendChild(findFx);
+    MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
+  }
+
+  function buildBuild() {
+    const s = W.screen(BUILD, 'MeeMee Rockets: build the word');
+    trayEl = MW.make('div', 'words-tray mw-abs', { 'aria-hidden': 'true' });
+    trayEl.appendChild(MW.make('span', 'words-tray-light'));
+    trayEl.appendChild(MW.make('span', 'words-tray-light words-tray-light--r'));
+    s.appendChild(trayEl);
+    shipLayer = MW.make('div', 'mw-layer mw-fill'); s.appendChild(shipLayer);
+    buildPod = MW.pod(s, POD.build[0], POD.build[1], POD.build[2]);
+    MW.onTap(buildPod.el, function () { if (!(dragger && dragger.dragging())) hearAgain(); });
+    buildStars = MW.stars(s, 517, 34);
+    tileLayer = MW.make('div', 'mw-layer mw-fill words-tiles'); s.appendChild(tileLayer);
+    buildFx = MW.make('div', 'mw-layer mw-fill'); s.appendChild(buildFx);
+    MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
+    dragger = MW.dragger(s, {
+      counters: function () { return st.tiles.filter(function (c) { return !c.placed; }); },
+      enabled: function () { return !W.st.paused && W.st.phase === 'words-build' && MW.shell.screen === BUILD; },
+      onPick: function (c) { MW.log('pick', c.text); },
+      onDrop: onDrop,
+      grab: 100                                                // ovals are up to 200 px wide
+    });
+  }
+
+  function buildEnd() {
+    const s = W.screen(END, 'All the rockets launched');
+    endStars = MW.stars(s, 450, 40, 60);
+    endPod = MW.pod(s, 380, 120, 400); endPod.face('got-it'); endPod.el.disabled = true; endPod.el.tabIndex = -1;
+    endRockets = MW.make('div', 'mw-abs words-end-rockets', { style: 'left:300px;top:590px' });
+    s.appendChild(endRockets);
+    again = MW.make('button', 'mw-btn mw-btn--play mw-abs', { type: 'button', 'aria-label': 'Another go', id: 'words-again', style: 'left:1080px;top:420px' });
+    const icon = MW.art('icon-play'); icon.setAttribute('width', 84); icon.setAttribute('height', 84);
+    again.appendChild(icon);
+    MW.onTap(again, function () { if (W.st.phase === 'words-done') { MW.audio.unlock(); MW.shell.fullscreen(); startRound(); } });
+    s.appendChild(again);
+    MW.shell.buttons(s, ['home', 'music'], { home: W.home });
+  }
+
+  function setStars(stars, done) {
+    const n = st.round.length || ROUND;
+    stars.set(done, n);
+    stars.el.style.left = Math.round(640 - (38 * n + 14 * (n - 1)) / 2) + 'px';   // centred, however many words
+  }
+
+  // ---------------------------------------------------------------- a round
+  function makeRound() {
+    if (G.nextRound) {
+      const r = G.nextRound; G.nextRound = null;
+      const map = S.statuses(answers());
+      return r.map(function (x) {
+        const w = typeof x === 'string' ? x : x.word;
+        const s = (typeof x === 'object' && x.step) || S.step(map, w);
+        return { word: w, step: s === 'notyet' ? 'tiles' : s };
+      });
+    }
+    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND });
+  }
+
+  async function startRound() {
+    const token = ++W.st.token;
+    clearBoard();
+    st.round = makeRound();
+    st.qi = 0;
+    st.trickySaid = false;
+    st.praise = [];
+    MW.log('words', 'round ' + JSON.stringify(st.round));
+    if (!st.round.length) { MW.log('words', 'no words in play'); W.home(); return; }
+    W.st.phase = 'words-starting';
+    setFind(st.round[0]);
+    MW.shell.show(FIND);
+    await W.speak([['words-round-ready']]);
+    if (!(await W.ok(token))) return;
+    askFind();
+  }
+
+  function clearTimers() { st.timers.forEach(clearTimeout); st.timers = []; }
+  function later(token, ms, fn) { st.timers.push(setTimeout(function () { if (token === W.st.token) fn(); }, ms)); }
+
+  // ---------------------------------------------------------------- Find
+  function setFind(item) {
+    const words = S.choices(item.word, inPlay(), Math.random, 3);
+    st.rockets.forEach(function (r, i) {
+      r.word = words[i] || null;
+      r.el.style.visibility = r.word ? '' : 'hidden';
+      r.el.classList.remove('is-lit', 'is-hint');
+      r.wordEl.textContent = r.word || '';
+      r.wordEl.style.fontSize = fit(r.word || '', ROCKETS.panel[2] - 28, ROCKETS.wordMax) + 'px';
+      r.el.setAttribute('aria-label', r.word ? 'The word ' + r.word : 'A rocket');
+    });
+    findPod.face('thinking');
+    findPod.lightsOff();
+  }
+  // The biggest size (up to max) at which a word fits the panel, in the game's own type (Andika, bold).
+  let measurer = null;
+  function fit(word, width, max) {
+    if (!word) return max;
+    measurer = measurer || document.createElement('canvas').getContext('2d');
+    measurer.font = '700 ' + max + 'px Andika';
+    const w = measurer.measureText(word).width;
+    return w > width ? Math.floor(max * width / w) : max;
+  }
+
+  // Ask the round's next word: Find first. (showFind sets the screen up; the tests use it on its own too.)
+  async function askFind() {
+    showFind(st.round[st.qi]);
+    await W.speak(st.prompt);
+  }
+  function showFind(item) {
+    st.item = item;
+    st.tapped = 0; st.drops = 0; st.hinted = false;
+    if (!st.rockets.some(function (r) { return r.word === item.word; })) setFind(item);
+    MW.shell.show(FIND);
+    setStars(findStars, st.qi);
+    st.prompt = [['words-find', line(item.word)]];
+    W.st.phase = 'words-find';
+    MW.log('words', 'find ' + item.word + ' among ' + st.rockets.map(function (r) { return r.word; }).join(' '));
+  }
+
+  function tapRocket(r) {
+    if (W.st.paused || W.st.phase !== 'words-find' || !r.word) return;
+    if (r.word === st.item.word) { found(r); return; }
+    // a wrong tap: the word he tapped says itself, then "Let's try again." (and the question), or the hint
+    st.tapped++;
+    MW.log('words', 'tap ' + r.word + ' (wrong ' + st.tapped + ')');
+    tryAgainFace(findPod);
+    const lines = [['words-that-word', line(r.word)]];
+    if (st.tapped === 1) lines.push(['words-try-again'], st.prompt[0]);
+    else if (st.tapped === 2) {
+      lines.push(['words-look-together']);
+      st.hinted = true;
+      st.rockets.forEach(function (x) { if (x.word === st.item.word) x.el.classList.add('is-hint'); });
+      MW.log('words', 'hint ' + st.item.word);
+    }
+    W.speak(lines);
+  }
+  function tryAgainFace(pod) {
+    pod.face('try-again');
+    const token = W.st.token, qi = st.qi;
+    later(token, 1600, function () { if (qi === st.qi && (W.st.phase === 'words-find' || W.st.phase === 'words-build')) pod.face('thinking'); });
+  }
+
+  async function found(r) {
+    const token = W.st.token;
+    W.st.phase = 'words-found';
+    MW.log('words', 'found ' + r.word);
+    r.el.classList.remove('is-hint');
+    r.el.classList.add('is-lit');                             // the engines light
+    MW.audio.sfx('chime');
+    findPod.face('got-it');
+    findPod.celebrate();
+    MW.sparkles(findFx, r.cx, 420, 175);
+    await MW.wait(550);
+    if (!(await W.ok(token))) return;
+    st.praise = st.praise.length ? st.praise : MW.shuffle(PRAISE);
+    await W.speak([[st.praise.pop()]]);
+    if (!(await W.ok(token))) return;
+    await MW.wait(300);
+    if (!(await W.ok(token))) return;
+    askBuild();
+  }
+
+  // ---------------------------------------------------------------- Build
+  function tileW(k) { return k === 1 ? D : D + (k - 1) * 0.46 * D; }
+  function kOf(text, mode) { return mode === 'tiles' ? Math.min(text.length, 4) : 1; }
+
+  function clearBoard() {
+    if (dragger) dragger.cancel();
+    clearTimers();
+    st.tiles.forEach(function (c) { c.remove(); });
+    st.tiles = []; st.places = []; st.next = 0; st.plan = null;
+    if (st.ship) { st.ship.el.remove(); st.ship = null; }
+  }
+
+  // The rocket on its side, made for this word: the back, as much hull as its portholes need, the nose, a socket per
+  // place. Scaled down only if a long word would run off the stage.
+  function makeShip(places, mode) {
+    const widths = places.map(function (p) { return tileW(kOf(p.text, mode)); });
+    const L = widths.reduce(function (a, b) { return a + b; }, 0) + GAP * (widths.length - 1) + 96;
+    const scale = Math.min(1, (SHIP.right - SHIP.x) / (L + NOSE));
+    const el = MW.make('div', 'words-ship mw-abs');
+    el.style.left = SHIP.x + 'px'; el.style.top = SHIP.y + 'px';
+    el.style.width = ((L + NOSE) * scale) + 'px'; el.style.height = (H * scale) + 'px';
+    const inner = MW.make('div', 'words-ship-inner');
+    inner.style.transform = 'scale(' + scale + ')';
+    el.appendChild(inner);
+    const back = MW.art('words-ship-back');
+    back.setAttribute('class', 'words-part'); back.style.left = (-BACK[0]) + 'px'; back.style.top = (-BACK[1]) + 'px';
+    inner.appendChild(back);
+    const hull = MW.art('words-ship-hull');
+    hull.setAttribute('class', 'words-part');
+    hull.setAttribute('width', L + 4); hull.setAttribute('height', H + 8);
+    hull.setAttribute('viewBox', '-4 -4 ' + (L + 4) + ' ' + (H + 8));
+    hull.style.left = '-4px'; hull.style.top = '-4px';
+    inner.appendChild(hull);
+    const nose = MW.art('words-ship-nose');
+    nose.setAttribute('class', 'words-part'); nose.style.left = (L - NOSE_X) + 'px'; nose.style.top = '0px';
+    inner.appendChild(nose);
+    const slots = [];
+    let x = 78;
+    widths.forEach(function (w, i) {
+      const sock = MW.art('words-socket-' + kOf(places[i].text, mode));
+      sock.setAttribute('class', 'words-part'); sock.style.left = (x - 8) + 'px'; sock.style.top = (H / 2 - D / 2 - 8) + 'px';
+      inner.appendChild(sock);
+      slots.push({ x: x + w / 2, y: H / 2 });                // its middle, in the rocket's own units
+      x += w + GAP;
+    });
+    shipLayer.appendChild(el);
+    return { el: el, inner: inner, scale: scale, L: L, slots: slots,
+      box: { x: SHIP.x, y: SHIP.y, w: (L + NOSE) * scale, h: H * scale } };
+  }
+  function onShip(x, y) {
+    const b = st.ship.box;
+    return x >= b.x - SHIP.slack && x <= b.x + b.w + SHIP.slack && y >= b.y - SHIP.slack && y <= b.y + b.h + SHIP.slack;
+  }
+
+  function makeTile(t, k) {
+    const w = tileW(k);
+    const el = MW.make('div', 'words-tile' + (t.tricky ? ' is-tricky' : ''), { role: 'img', 'aria-label': t.text });
+    el.style.width = w + 'px'; el.style.height = D + 'px';
+    el.style.marginLeft = (-w / 2) + 'px'; el.style.marginTop = (-D / 2) + 'px';
+    const body = MW.make('div', 'words-tile-body');
+    body.appendChild(MW.art('words-tile-' + k));
+    body.appendChild(MW.make('span', 'words-tile-text', null, MW.esc(t.text)));
+    el.appendChild(body);
+    tileLayer.appendChild(el);
+    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null };
+    c.moveTo = function (x, y, size, animate) {
+      c.x = x; c.y = y;
+      el.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
+      el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    };
+    c.lift = function (on) { c.lifted = !!on; el.classList.toggle('is-lifted', !!on); };
+    c.glow = function (on) { el.classList.toggle('is-glow', !!on); };
+    c.remove = function () { if (el.parentNode) el.parentNode.removeChild(el); };
+    return c;
+  }
+
+  // The tray: one row while the tiles fit (up to five), otherwise two rows. Each tile keeps its own place in it.
+  function layTray(tiles) {
+    const ws = tiles.map(function (c) { return c.w; });
+    const rowWidth = function (list, gap) { return list.reduce(function (a, b) { return a + b; }, 0) + gap * Math.max(0, list.length - 1); };
+    const two = st.plan.mode === 'harder' || rowWidth(ws, TRAY.one.gap) > TRAY.oneRowMax;
+    const T = two ? TRAY.two : TRAY.one;
+    const rows = two ? [tiles.slice(0, Math.ceil(tiles.length / 2)), tiles.slice(Math.ceil(tiles.length / 2))] : [tiles];
+    const inner = Math.max.apply(null, rows.map(function (r) { return rowWidth(r.map(function (c) { return c.w; }), T.gap); }));
+    const w = Math.max(TRAY.minW, inner + 2 * T.pad);
+    let x = T.x;
+    if (x + w > TRAY.right) x = Math.max(TRAY.one.x, TRAY.right - w);
+    trayEl.style.left = x + 'px'; trayEl.style.top = T.y + 'px';
+    trayEl.style.width = w + 'px'; trayEl.style.height = T.h + 'px';
+    rows.forEach(function (row, ri) {
+      let cx = x + T.pad;
+      row.forEach(function (c) {
+        c.home = { x: cx + c.w / 2, y: T.y + T.rows[ri] };
+        c.moveTo(c.home.x, c.home.y, 0, false);
+        cx += c.w + T.gap;
+      });
+    });
+  }
+
+  async function askBuild() {
+    showBuild(st.item);
+    await W.speak(st.prompt);
+  }
+  function showBuild(item) {
+    st.item = item;
+    clearBoard();
+    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, week()));
+    st.places = st.plan.places;
+    st.next = 0;
+    st.drops = 0;
+    st.ship = makeShip(st.places, st.plan.mode);
+    st.tiles = st.plan.tray.map(function (t) { return makeTile(t, kOf(t.text, st.plan.mode)); });
+    layTray(st.tiles);
+    buildPod.face('thinking');
+    buildPod.lightsOff();
+    MW.shell.show(BUILD);
+    setStars(buildStars, st.qi);
+    st.prompt = [['words-build', line(item.word)]];
+    W.st.phase = 'words-build';
+    MW.log('words', 'build ' + item.word + ' ' + st.plan.mode + ': ' + st.plan.tray.map(function (t) { return t.text; }).join(' '));
+  }
+
+  function onDrop(c, x, y, cancelled) {
+    if (st.tiles.indexOf(c) < 0 || c.placed) return;           // left over from a word that has ended
+    if (cancelled || W.st.paused || W.st.phase !== 'words-build') { floatHome(c); return; }
+    if (!onShip(x, y)) {                                        // not on the word: back to the tray, not a try
+      const far = Math.hypot(x - c.home.x, y - c.home.y) > 70;
+      floatHome(c);
+      if (far) MW.audio.sfx('whoosh');
+      return;
+    }
+    const need = st.places[st.next];
+    if (c.text === need.text) { place(c, x, y); return; }    // a tile with the same letters is just as good
+    floatHome(c);
+    MW.audio.sfx('whoosh');
+    wrongDrop(c);
+  }
+  function floatHome(c) { c.moveTo(c.home.x, c.home.y, 0, true); }
+
+  function wrongDrop(c) {
+    st.drops++;
+    MW.log('words', 'drop ' + c.text + ' (wrong ' + st.drops + (c.spare ? ', a spare' : '') + ')');
+    tryAgainFace(buildPod);
+    if (st.drops === 1) { W.speak([['words-try-again']]); return; }
+    // the second wrong drop: "Let's look together." and the next tile glows; after that, each wrong drop lights it again
+    st.hinted = true;
+    hintTile();
+    if (st.drops === 2) W.speak([['words-look-together']]);
+  }
+  function hintTile() {
+    const need = st.places[st.next];
+    const free = st.tiles.filter(function (t) { return !t.placed && t.text === need.text; });
+    const pick = free.filter(function (t) { return t.tricky === need.tricky; })[0] || free[0];
+    st.tiles.forEach(function (t) { t.glow(t === pick); });
+    if (pick) MW.log('words', 'hint ' + pick.text);
+  }
+
+  function place(c, x, y) {
+    const i = st.next;
+    const ship = st.ship, slot = ship.slots[i], need = st.places[i];
+    c.placed = true; c.draggable = false;
+    st.tiles.forEach(function (t) { t.glow(false); });
+    MW.audio.sfx('pop');
+    // into the rocket: from where it was dropped to its porthole (it now moves with the rocket)
+    ship.inner.appendChild(c.el);
+    c.el.classList.add('is-set');
+    c.el.classList.toggle('is-tricky', need.tricky);          // the place's marking (a same-letter spare takes it)
+    c.moveTo((x - SHIP.x) / ship.scale, (y - SHIP.y) / ship.scale, 0, false);
+    void c.el.offsetWidth;
+    c.moveTo(slot.x, slot.y, 0, true);
+    st.next++;
+    MW.log('words', 'place ' + c.text + ' ' + st.next + ' of ' + st.places.length);
+    const tricky = need.tricky && !st.trickySaid;
+    if (tricky) st.trickySaid = true;                          // "That's the tricky bit." once a round
+    if (st.next === st.places.length) { built(tricky); return; }
+    if (tricky) W.speak([['words-tricky-bit']]);
+  }
+
+  async function built(tricky) {
+    const token = W.st.token, item = st.item;
+    W.st.phase = 'words-built';
+    clearTimers();
+    record(item);
+    buildPod.face('got-it');
+    buildPod.celebrate();
+    MW.audio.sfx('chime');
+    await MW.wait(280);                                         // the last tile settles, then the engines light
+    if (!(await W.ok(token))) return;
+    st.ship.el.classList.add('is-launch');
+    MW.sparkles(buildFx, SHIP.x + st.ship.box.w / 2, SHIP.y + st.ship.box.h / 2 - 40, Math.min(330, st.ship.box.w / 2));
+    if (tricky) {
+      await W.speak([['words-tricky-bit']]);
+      if (!(await W.ok(token))) return;
+    }
+    await W.speak([['words-you-built', line(item.word)]]);
+    if (!(await W.ok(token))) return;
+    setStars(buildStars, st.qi + 1);
+    MW.audio.sfx('twinkle');
+    await MW.wait(700);
+    if (!(await W.ok(token))) return;
+    st.ship.el.classList.add('is-away');                       // off it goes
+    await MW.wait(1300);
+    if (!(await W.ok(token))) return;
+    st.qi++;
+    if (st.qi < st.round.length) {
+      setFind(st.round[st.qi]);
+      askFind();
+    } else endRound(token);
+  }
+
+  function record(item) {
+    const a = { t: Date.now(), w: item.word, step: item.step, mode: st.plan.mode, tapped: st.tapped, drops: st.drops, hint: st.hinted };
+    const g = MW.store.game(ID);
+    g.answers = Array.isArray(g.answers) ? g.answers : [];
+    g.answers.push(a);
+    if (g.answers.length > 3000) g.answers.splice(0, g.answers.length - 3000);
+    MW.store.save();
+    MW.log('words', 'built ' + JSON.stringify(a));
+  }
+
+  // ---------------------------------------------------------------- the end of a round
+  async function endRound(token) {
+    W.st.phase = 'words-done';
+    clearBoard();
+    MW.shell.show(END);
+    const n = st.round.length;
+    endStars.set(n, n);
+    endStars.el.style.left = Math.round(640 - (60 * n + 14 * (n - 1)) / 2) + 'px';
+    endRockets.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const r = MW.make('div', 'words-end-rocket');
+      r.appendChild(MW.art('words-rocket-mini'));
+      r.style.animationDelay = (i * 160) + 'ms';
+      endRockets.appendChild(r);
+    }
+    endRockets.style.left = Math.round(580 - (100 * n + 24 * (n - 1)) / 2) + 'px';
+    again.classList.remove('mw-pulse');
+    MW.audio.sfx('tune');
+    endPod.celebrate();
+    await MW.wait(300);
+    if (!(await W.ok(token))) return;
+    await W.speak([['words-round-done']]);
+    if (!(await W.ok(token))) return;
+    await MW.wait(500);
+    if (!(await W.ok(token))) return;
+    again.classList.add('mw-pulse');                           // tap here for another go
+    await W.speak([['words-round-another']]);
+  }
+
+  function hearAgain() {
+    if (W.st.paused) return;
+    if (W.st.phase === 'words-find' || W.st.phase === 'words-build') W.speak(st.prompt);
+  }
+
+  // Home (from any screen, this game's or the world's): put everything away. The world has moved the token on.
+  function leave() {
+    clearBoard();
+    st.rockets.forEach(function (r) { r.el.classList.remove('is-lit', 'is-hint'); });
+    [findPod, buildPod, endPod].forEach(function (p) { if (p) p.lightsOff(); });
+    if (again) again.classList.remove('mw-pulse');
+    st.item = null; st.prompt = null;
+  }
+
+  // ---------------------------------------------------------------- grown-ups: the Words tab
+  const TAGS = { tiles: 'ay', letters: 'a·y', harder: 'a·y+' };
+  function cell(step, text) {
+    const c = MW.make('span', 'words-cell is-' + step);
+    if (step === 'secure') {
+      const tick = MW.art('icon-tick'); tick.setAttribute('width', 16); tick.setAttribute('height', 16);
+      c.appendChild(tick);
+    } else if (TAGS[step]) c.appendChild(MW.make('span', 'words-tag', null, TAGS[step]));
+    c.appendChild(document.createTextNode(text));
+    return c;
+  }
+  function weeksText(list) {
+    if (list.length === 1) return 'Week ' + list[0];
+    const run = list.every(function (w, i) { return i === 0 || w === list[i - 1] + 1; });
+    return 'Weeks ' + (run ? list[0] + ' to ' + list[list.length - 1] : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]);
+  }
+  function renderProgress(el) {
+    const GU = MW.grownups;
+    const map = S.statuses(answers());
+    const wk = week();
+    GU.h3(el, 'Week in play');
+    const r = GU.row(el);
+    BOOK.weeks.forEach(function (x) {
+      GU.btn(r, 'Week ' + x.week, function () {
+        const g = MW.store.game(ID); g.week = x.week; MW.store.save();
+        MW.log('words', 'week ' + x.week);
+        GU.show('words-progress');
+      }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+    });
+    const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
+    GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+
+    const grid = MW.make('div', 'words-grid');
+    const row = function (label, words) {
+      if (!words.length) return;
+      grid.appendChild(MW.make('div', 'words-grid-label label', null, MW.esc(label)));
+      const cells = MW.make('div', 'words-grid-cells');
+      words.forEach(function (w) { cells.appendChild(cell(S.step(map, w), w)); });
+      grid.appendChild(cells);
+    };
+    const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
+    row('Tricky words', now.tricky);
+    row('Week ' + wk + ' words', now.other);
+    row('Earlier weeks', [].concat.apply([], BOOK.weeks.filter(function (x) { return x.week < wk; }).map(function (x) { return x.tricky; })));
+    row('Later weeks', [].concat.apply([], BOOK.weeks.filter(function (x) { return x.week > wk; }).map(function (x) { return x.tricky.concat(x.other); })));
+    el.appendChild(grid);
+    const legend = MW.make('div', 'words-legend');
+    S.STEPS.forEach(function (s) { legend.appendChild(cell(s, S.NAMES[s])); });
+    el.appendChild(legend);
+    GU.p(el, 'Each word is built with <b>sound tiles</b> until it is right first time (no wrong tap or drop, no hint) on three different days. '
+      + 'Then it moves to <b>letters</b>: one tile per letter, with a spare or two; then to <b>harder letters</b>, with the tray filled to '
+      + BOOK.harderTray + ' tiles. Three more days right first time at each step; after harder letters it is <b>secure</b>. '
+      + 'Each round has five words, mostly ones that need work.' + (BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : ''), 'gu-note');
+    const waiting = BOOK.order.filter(function (w) { return !recorded(w); });
+    if (waiting.length) GU.p(el, 'Waiting for a recording, so not in play yet: ' + MW.esc(waiting.join(', ')) + '.', 'gu-note');
+    if (BOOK.problems.length) GU.p(el, 'To fix in the words file (games/words/words.js): ' + MW.esc(BOOK.problems.join('; ')) + '.', 'gu-note');
+    const n = answers().length;
+    GU.p(el, n ? 'Words built on this tablet: ' + n + '.' : 'No words built on this tablet yet.', 'gu-note');
+    const clear = GU.row(el);
+    let armed = 0;
+    GU.btn(clear, 'Clear this tablet\'s progress', function (b) {
+      if (Date.now() - armed < 4000) {
+        const g = MW.store.game(ID); delete g.answers; MW.store.save();   // this game's answers only; the week stays
+        MW.log('words', 'progress cleared');
+        GU.show('words-progress');
+      } else {
+        armed = Date.now(); b.textContent = 'Tap again to clear';
+        setTimeout(function () { b.textContent = 'Clear this tablet\'s progress'; }, 4000);
+      }
+    }, 'gu-quiet');
+  }
+
+  // ---------------------------------------------------------------- test hooks
+  G.start = startRound; G.showFind = showFind; G.showBuild = showBuild; G.setFind = setFind; G.drop = onDrop; G.tapRocket = tapRocket; G.home = W.home; G.makeRound = makeRound;
+  G.inPlay = inPlay; G.week = week; G.answers = answers;
 })();
 
 </script>

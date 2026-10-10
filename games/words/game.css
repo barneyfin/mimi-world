@@ -1,0 +1,81 @@
+/* MeeMee Rockets' own styles. Colours only through tokens: var(--token), or the f-/s-/bg-/c- classes. */
+
+/* ---------------------------------------------------------------- Find: the rockets on the launch pad */
+.words-rocket { width: 270px; height: 553px; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; line-height: 0; }
+.words-rocket:focus-visible { outline: 4px solid var(--mint); outline-offset: 6px; border-radius: 28px; }
+.words-rocket svg { pointer-events: none; }
+.words-rocket-art { position: absolute; overflow: visible; }
+.words-rocket .words-fire { display: none; }
+.words-rocket.is-lit .words-fire { display: inline; }
+.words-panel { position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none;
+  border-radius: 16px; box-sizing: border-box; }
+.words-panel-word { font-family: var(--font-andika); font-weight: 700; line-height: 1; color: var(--numeral); padding-bottom: 8px; white-space: nowrap; }
+/* the hint: a steady spark ring round the right word (no flashing) */
+.words-rocket.is-hint .words-panel { outline: 12px solid var(--spark); outline-offset: 6px; }
+
+/* ---------------------------------------------------------------- Build: the rocket on its side, the tray and the tiles */
+.words-ship { position: absolute; transform-origin: 50% 50%; pointer-events: none; }
+.words-ship-inner { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.words-part { position: absolute; }
+.words-ship .words-fire { display: none; }
+.words-ship.is-launch .words-fire { display: inline; }
+.words-ship.is-launch { transform: translate(40px, -40px) rotate(-10deg); transition: transform 700ms cubic-bezier(.3, 0, .3, 1); }
+.words-ship.is-launch.is-away { transform: translate(1500px, -760px) rotate(-10deg); transition: transform 1300ms cubic-bezier(.5, 0, .9, .5); }
+
+.words-tray { position: absolute; box-sizing: border-box; border-radius: 26px; border: 4.5px solid var(--ink); overflow: hidden;
+  background: linear-gradient(to bottom, var(--asteroid-light) 0, var(--asteroid-light) 8%, var(--asteroid) 8%, var(--asteroid) 86%, var(--asteroid-crater) 86%); }
+.words-tray::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 12px;
+  background: repeating-linear-gradient(-50deg, var(--asteroid-deep) 0, var(--asteroid-deep) 12px, var(--peach) 12px, var(--peach) 20px); }
+.words-tray-light { position: absolute; left: 13px; bottom: 11px; width: 10px; height: 10px; border-radius: var(--radius-round);
+  background: var(--spark); border: 2px solid var(--ink); }
+.words-tray-light--r { left: auto; right: 13px; }
+
+.words-tile { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
+.words-tile.is-moving { transition: transform 260ms cubic-bezier(.2, .8, .2, 1); }
+.words-tile.is-lifted { z-index: 5; }
+.words-tile-body { position: relative; width: 100%; height: 100%; transition: transform 120ms ease-out; }
+.words-tile.is-lifted .words-tile-body { transform: scale(1.12); filter: drop-shadow(var(--lift)); }
+.words-tile-body svg { position: absolute; left: 0; top: 0; }
+.words-tile-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding-bottom: 8px;
+  font-family: var(--font-andika); font-weight: 700; font-size: 60px; line-height: 1; color: var(--numeral); white-space: nowrap; }
+/* the tricky part, marked the class's way (style B, chosen 10 October): the letters in darker peach */
+.words-tile.is-tricky .words-tile-text { color: var(--peach-dark); }
+.words-tile .words-glow, .words-tile .words-set { display: none; }
+.words-tile.is-glow .words-glow { display: inline; }
+.words-tile.is-set .words-loose { display: none; }
+.words-tile.is-set .words-set { display: inline; }
+
+/* ---------------------------------------------------------------- the end of a round: the launched rockets */
+.words-end-rockets { display: flex; gap: 24px; line-height: 0; }
+.words-end-rocket { width: 100px; height: 140px; animation: words-rise 900ms cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes words-rise { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: none; } }
+
+/* ---------------------------------------------------------------- grown-ups: the Words tab */
+.words-week { border-color: var(--night-button); background: transparent; }
+.words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
+.words-grid { display: grid; grid-template-columns: 158px 1fr; column-gap: 0; row-gap: 12px; align-items: start; margin: 14px 0 12px; max-width: 1120px; }
+.words-grid-label { color: var(--text-2); padding-top: 10px; }
+.words-grid-cells { display: flex; flex-wrap: wrap; gap: 10px; }
+.words-cell { box-sizing: border-box; height: 44px; min-width: 92px; padding: 0 14px; border-radius: var(--radius-cell);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 19px; font-weight: 700;
+  background: var(--night-button); color: var(--moon); border: 2px dashed var(--night-button); }
+.words-cell svg { flex: none; }
+.words-tag { font-size: 14px; font-weight: 700; }
+.words-cell.is-notyet { background: var(--night-raised); border: 2px solid var(--star-empty); color: var(--text-3); }
+.words-cell.is-tiles { border-color: var(--peach); }
+.words-cell.is-tiles .words-tag { color: var(--peach); }
+.words-cell.is-letters { border-color: var(--mint); }
+.words-cell.is-letters .words-tag { color: var(--mint); }
+.words-cell.is-harder { border-color: var(--spark); }
+.words-cell.is-harder .words-tag { color: var(--spark); }
+.words-cell.is-secure { background: var(--mint); border: 2px solid var(--mint); color: var(--numeral); }
+.words-legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 6px 0 12px; }
+
+/* ---------------------------------------------------------------- reduce motion: no movement, a fade or an instant change */
+@media (prefers-reduced-motion: reduce) {
+  .words-tile.is-moving, .words-tile-body { transition: none; }
+  .words-ship.is-launch { transform: none; transition: none; }
+  .words-ship.is-launch.is-away { transform: none; opacity: 0; transition: opacity 500ms ease-in; }
+  .words-end-rocket { animation: words-fade 600ms ease-out both; }
+}
+@keyframes words-fade { from { opacity: 0; } to { opacity: 1; } }

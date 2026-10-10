@@ -1,7 +1,7 @@
 // MeeMee World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
 // VERSION changes with every build that changes a file, so tablets pick up the new copy. A tablet saves the new
 // copy in the background the next time MeeMee World opens, then switches to it at the start screen (never mid-round).
-const VERSION = 'mimi-world-v0.5.0-a3b9851c';
+const VERSION = 'mimi-world-v0.5.0-fc129645';
 const FILES = [
   "./",
   "./index.html",
@@ -67,7 +67,49 @@ const FILES = [
   "./audio/voice/round-ready.mp3",
   "./audio/voice/round-rescued-all.mp3",
   "./audio/voice/tap-scruffles.mp3",
-  "./audio/voice/too-many.mp3"
+  "./audio/voice/too-many.mp3",
+  "./audio/voice/words-build.mp3",
+  "./audio/voice/words-find.mp3",
+  "./audio/voice/words-found-it.mp3",
+  "./audio/voice/words-look-together.mp3",
+  "./audio/voice/words-name.mp3",
+  "./audio/voice/words-round-another.mp3",
+  "./audio/voice/words-round-done.mp3",
+  "./audio/voice/words-round-ready.mp3",
+  "./audio/voice/words-super-reading.mp3",
+  "./audio/voice/words-that-word.mp3",
+  "./audio/voice/words-tricky-bit.mp3",
+  "./audio/voice/words-try-again.mp3",
+  "./audio/voice/words-w-all.mp3",
+  "./audio/voice/words-w-cartoon.mp3",
+  "./audio/voice/words-w-go.mp3",
+  "./audio/voice/words-w-here.mp3",
+  "./audio/voice/words-w-into.mp3",
+  "./audio/voice/words-w-like.mp3",
+  "./audio/voice/words-w-love.mp3",
+  "./audio/voice/words-w-magnet.mp3",
+  "./audio/voice/words-w-me.mp3",
+  "./audio/voice/words-w-my.mp3",
+  "./audio/voice/words-w-of.mp3",
+  "./audio/voice/words-w-one.mp3",
+  "./audio/voice/words-w-out.mp3",
+  "./audio/voice/words-w-popcorn.mp3",
+  "./audio/voice/words-w-proud.mp3",
+  "./audio/voice/words-w-push.mp3",
+  "./audio/voice/words-w-rabbit.mp3",
+  "./audio/voice/words-w-said.mp3",
+  "./audio/voice/words-w-say.mp3",
+  "./audio/voice/words-w-she.mp3",
+  "./audio/voice/words-w-some.mp3",
+  "./audio/voice/words-w-spray.mp3",
+  "./audio/voice/words-w-sure.mp3",
+  "./audio/voice/words-w-they.mp3",
+  "./audio/voice/words-w-toy.mp3",
+  "./audio/voice/words-w-were.mp3",
+  "./audio/voice/words-w-what.mp3",
+  "./audio/voice/words-w-you.mp3",
+  "./audio/voice/words-well-done.mp3",
+  "./audio/voice/words-you-built.mp3"
 ];
 
 self.addEventListener('install', (event) => {

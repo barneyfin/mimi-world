@@ -1,0 +1,9 @@
+{
+  "id": "words",
+  "name": "MeeMee Rockets",
+  "planet": 1,
+  "badge": "words-badge",
+  "say": "words-name",
+  "scripts": ["words.js", "steps.js", "game.js"],
+  "about": "The tricky-words game. planet: 1 is the indigo planet; badge: the rocket on its badge (art.py); say: the line said when its planet is tapped; scripts: words.js is the word lists (the one file to edit for a new half-term), steps.js the steps and how rounds are chosen, game.js the game."
+}

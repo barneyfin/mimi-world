@@ -270,6 +270,216 @@
    "dur": 1.76,
    "lufs_before": -21.6,
    "gain_db": 1.6
+  },
+  "words-name": {
+   "dur": 1.97,
+   "lufs_before": -21.9,
+   "gain_db": 1.9
+  },
+  "words-round-ready": {
+   "dur": 2.73,
+   "lufs_before": -18.9,
+   "gain_db": -1.1
+  },
+  "words-round-done": {
+   "dur": 1.99,
+   "lufs_before": -19.4,
+   "gain_db": -0.6
+  },
+  "words-round-another": {
+   "dur": 0.79,
+   "lufs_before": -20.8,
+   "gain_db": 0.8
+  },
+  "words-find": {
+   "dur": 2.14,
+   "lufs_before": -18.7,
+   "gain_db": -1.3
+  },
+  "words-that-word": {
+   "dur": 2.27,
+   "lufs_before": -18.7,
+   "gain_db": -1.3
+  },
+  "words-found-it": {
+   "dur": 1.02,
+   "lufs_before": -18.1,
+   "gain_db": -1.9
+  },
+  "words-super-reading": {
+   "dur": 1.17,
+   "lufs_before": -18.3,
+   "gain_db": -1.7
+  },
+  "words-well-done": {
+   "dur": 1.02,
+   "lufs_before": -18.4,
+   "gain_db": -1.6
+  },
+  "words-build": {
+   "dur": 2.51,
+   "lufs_before": -19.2,
+   "gain_db": -0.8
+  },
+  "words-you-built": {
+   "dur": 2.05,
+   "lufs_before": -18.7,
+   "gain_db": -1.3
+  },
+  "words-tricky-bit": {
+   "dur": 1.85,
+   "lufs_before": -23.5,
+   "gain_db": 3.5
+  },
+  "words-try-again": {
+   "dur": 1.11,
+   "lufs_before": -18.7,
+   "gain_db": -1.3
+  },
+  "words-look-together": {
+   "dur": 1.36,
+   "lufs_before": -19.4,
+   "gain_db": -0.6
+  },
+  "words-w-all": {
+   "dur": 0.88,
+   "lufs_before": -18.8,
+   "gain_db": -1.2
+  },
+  "words-w-of": {
+   "dur": 0.65,
+   "lufs_before": -19.0,
+   "gain_db": -1.0
+  },
+  "words-w-one": {
+   "dur": 0.83,
+   "lufs_before": -17.1,
+   "gain_db": -2.9
+  },
+  "words-w-here": {
+   "dur": 1.0,
+   "lufs_before": -19.5,
+   "gain_db": -0.5
+  },
+  "words-w-magnet": {
+   "dur": 1.51,
+   "lufs_before": -21.3,
+   "gain_db": 1.3
+  },
+  "words-w-cartoon": {
+   "dur": 1.43,
+   "lufs_before": -19.4,
+   "gain_db": -0.6
+  },
+  "words-w-rabbit": {
+   "dur": 1.52,
+   "lufs_before": -20.4,
+   "gain_db": 0.4
+  },
+  "words-w-spray": {
+   "dur": 1.34,
+   "lufs_before": -17.7,
+   "gain_db": -2.3
+  },
+  "words-w-popcorn": {
+   "dur": 1.32,
+   "lufs_before": -20.5,
+   "gain_db": 0.5
+  },
+  "words-w-proud": {
+   "dur": 1.03,
+   "lufs_before": -18.4,
+   "gain_db": -1.6
+  },
+  "words-w-toy": {
+   "dur": 0.51,
+   "lufs_before": -19.0,
+   "gain_db": -1.0
+  },
+  "words-w-say": {
+   "dur": 1.23,
+   "lufs_before": -19.0,
+   "gain_db": -1.0
+  },
+  "words-w-go": {
+   "dur": 0.68,
+   "lufs_before": -18.5,
+   "gain_db": -1.5
+  },
+  "words-w-my": {
+   "dur": 0.85,
+   "lufs_before": -17.6,
+   "gain_db": -2.4
+  },
+  "words-w-into": {
+   "dur": 0.75,
+   "lufs_before": -19.7,
+   "gain_db": -0.3
+  },
+  "words-w-out": {
+   "dur": 0.82,
+   "lufs_before": -21.2,
+   "gain_db": 1.2
+  },
+  "words-w-what": {
+   "dur": 0.8,
+   "lufs_before": -21.4,
+   "gain_db": 1.4
+  },
+  "words-w-she": {
+   "dur": 0.92,
+   "lufs_before": -18.2,
+   "gain_db": -1.8
+  },
+  "words-w-me": {
+   "dur": 1.02,
+   "lufs_before": -18.5,
+   "gain_db": -1.5
+  },
+  "words-w-love": {
+   "dur": 0.79,
+   "lufs_before": -18.6,
+   "gain_db": -1.4
+  },
+  "words-w-they": {
+   "dur": 0.86,
+   "lufs_before": -18.6,
+   "gain_db": -1.4
+  },
+  "words-w-some": {
+   "dur": 0.9,
+   "lufs_before": -19.6,
+   "gain_db": -0.4
+  },
+  "words-w-were": {
+   "dur": 0.87,
+   "lufs_before": -18.4,
+   "gain_db": -1.6
+  },
+  "words-w-sure": {
+   "dur": 0.92,
+   "lufs_before": -19.0,
+   "gain_db": -1.0
+  },
+  "words-w-said": {
+   "dur": 0.97,
+   "lufs_before": -21.4,
+   "gain_db": 1.4
+  },
+  "words-w-you": {
+   "dur": 0.73,
+   "lufs_before": -19.2,
+   "gain_db": -0.8
+  },
+  "words-w-like": {
+   "dur": 0.91,
+   "lufs_before": -20.4,
+   "gain_db": 0.4
+  },
+  "words-w-push": {
+   "dur": 0.74,
+   "lufs_before": -21.1,
+   "gain_db": 1.1
   }
  },
  "music": {
