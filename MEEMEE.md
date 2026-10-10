@@ -18,7 +18,7 @@ One page holds every game (decided 10 October 2026): one bookmark, one approval 
 ## Rules for every game
 
 - **The player is five.** Two tablets, always held sideways: a Fire HD 8 Kids (opened from a bookmark in an Amazon Kids profile) and a Doogee T30 Pro. Touch only: tap and drag, one finger at a time. Played alone or with a parent.
-- **Nothing to read.** The only text on a game screen is numerals and, in a phonics game, the letters and words being practised. Every instruction is spoken, and Hear-again repeats it.
+- **Nothing to read.** The only text on a game screen is numerals and, in a phonics game, the letters and words being practised. A title banner may show the set's or a game's name, always spoken with it (decided 10 October 2026). Every instruction is spoken, and Hear-again repeats it.
 - **Every word is Barney's voice.** Each line is a recording listed in a `lines.json`; there is no synthetic speech. Sentences are built from pieces where that saves recording ("Moggles… is the… lookout."). A new line is marked pending until it is recorded, and the game skips it till then.
 - **Nothing punishes.** No timers, lives, scores or losing. A wrong answer is a try: a calm line ("Let's try again."), then a hint after the second try. No red, no buzzer.
 - **The class's way.** Words, diagrams, letter shapes and number sentences match how the child's class teaches them. Check against a homework sheet before calling a game done.

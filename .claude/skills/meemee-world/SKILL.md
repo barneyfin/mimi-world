@@ -59,7 +59,7 @@ python tools/tests/test_build.py            # the build's own checks
 
 ## Rules that are not optional
 
-- **Nothing to read, everything spoken.** No words on a game screen except numerals and the letters or words being practised. Every instruction is a line in `lines.json`, in Barney's voice; Hear-again repeats the current one.
+- **Nothing to read, everything spoken.** No words on a game screen except numerals and the letters or words being practised. The one exception is the kit's title banner, which shows the set's or a game's name while it is spoken (MEEMEE.md); a game never adds words of its own. Every instruction is a line in `lines.json`, in Barney's voice; Hear-again repeats the current one.
 - **No timers, lives, scores or losing.** A wrong answer gets a calm line; the second gets a hint. No red, no buzzer, no sad faces.
 - **Join the world; don't rebuild it.** A game never makes its own start screen, map, Home behaviour, pause handling or grown-ups lock. Home is `MW.world.home`; pausing comes to the game through `onPause` and `onResume`.
 - **Respect the world's token.** Anything that waits (speech, a timer, a celebration) checks the token it started with (`MW.world.ok(token)`), so nothing happens after the player has left.
