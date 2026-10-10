@@ -1,0 +1,9 @@
+{
+  "id": "rescue",
+  "name": "MeeMee Rescue",
+  "planet": 0,
+  "badge": "mimi",
+  "say": "map-mimi-rescue",
+  "scripts": ["bonds.js", "moments.js", "rescue.js"],
+  "about": "Number bonds to 10 on the part-whole diagram. planet: 0 is the ringed mint planet; badge: the drawing on its badge; say: the line said when its planet is tapped; scripts: its code, in loading order."
+}

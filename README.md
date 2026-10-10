@@ -2,23 +2,29 @@
 
 Maths and phonics games for a five-year-old, set in space with the family's three cats: Scruffles (the hero), Moggles and Snuffles. The MeeMee are the lost kittens they rescue.
 
-- **MeeMee Rescue** (phase 4 in progress): number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. On the crew screen the player gives Moggles and Snuffles their jobs (lookout, engineer, navigator, cook), and each job has a moment in a round. Grown-ups see which bonds are secure.
-- Tricky-words game: next.
+- **MeeMee Rescue**: number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. On the crew screen the player gives Moggles and Snuffles their jobs (lookout, engineer, navigator, cook), and each job has a moment in a round. Grown-ups see which bonds are secure.
+- Tricky-words game: next (its first version starts with week 5's words).
 
 Live at https://barneyfin.github.io/mimi-world/ (the recording page is at /mimi-world/record/).
+
+**The rules for every game are in [MEEMEE.md](MEEMEE.md).** Claude Code builds games with the `meemee-world` skill (`.claude/skills/meemee-world/`); `CLAUDE.md` points it there.
 
 ## What's where
 
 | Path | What it is |
 | --- | --- |
-| `docs/` | The website that GitHub Pages publishes. **Built by `tools/build.py`: don't edit it by hand.** |
-| `kit/` | The MeeMee World code kit: stage and scaling, sound, dragging, the part–whole diagram and other screen pieces, the home map, the crew screen, the shell (screens, full screen, buttons, grown-ups lock), the grown-ups area, the offline copy, styles and fonts (Andika, under the SIL Open Font Licence in `kit/Andika-OFL.txt`). |
-| `games/rescue/` | MeeMee Rescue: the page template, the bonds and how rounds are chosen (`bonds.js`), the crew's job moments (`moments.js`), and the game itself (`rescue.js`). |
+| `MEEMEE.md` | The rules for every MeeMee World game, and how a new one gets made. |
+| `docs/` | The website that GitHub Pages publishes: one page with every game. **Built by `tools/build.py`: don't edit it by hand.** |
+| `kit/` | The MeeMee World code kit. `world.js` is the world shell every game joins: the start screen, the home map (a planet per game), the crew screen, pausing, the grown-ups area and updates. Also: stage and scaling, sound, dragging, the screen pieces, the offline copy, styles, the page template, the world's own voice lines (`lines.json`) and fonts (Andika, under the SIL Open Font Licence in `kit/Andika-OFL.txt`). |
+| `games/<id>/` | One game: `game.json` (its name, planet, badge and spoken name), `lines.json` (every line it says), its scripts, and optionally `art.py` and `game.css`. |
+| `games/rescue/` | MeeMee Rescue: the bonds and how rounds are chosen (`bonds.js`), the crew's job moments (`moments.js`), and the game itself (`rescue.js`). The worked example for new games. |
+| `games/_template/` | The starting point for a new game (a tiny "starter" game; the build skips it). |
 | `design/` | The drawings and colours from the MeeMee World design system (`gen_art.py`, `gen_tokens.py`), and the scenes built from them (`gen_scenes.py`). |
-| `voice/` | Barney's recordings (WAV) and the script they follow. |
+| `voice/` | Barney's recordings (WAV, one per line). `script.json` lists every line of every game; the build writes it from the `lines.json` files. |
 | `music/` | "Paws in the Milky Way", Barney's track, as made. The build makes the looping web copy. |
-| `tools/` | The build, the audio maker, the recording page's template, and the tests. |
-| `notes/` | Results of each phase's checks, and `all-questions.md`: every question the game can ask (made by the tests). |
+| `tools/` | The build and its checks, the audio maker, the recording page's template, and the tests. |
+| `notes/` | Results of each phase's checks, and `all-questions.md`: every question MeeMee Rescue can ask (made by the tests). |
+| `.claude/skills/meemee-world/` | The Claude Code skill: rules and checklist, the look, and the kit's reference. |
 | `SETUP-HOSTING.md` | Step-by-step: publish `docs/` with GitHub Pages and open it on both tablets. |
 
 The plan (PRD) lives in Claude, in the "MeeMee World PRD — kit and MeeMee Rescue" doc. The look is defined in the MeeMee World design system: https://claude.ai/artifact/7u4TCYp4hQ3ia695MpegK7
@@ -28,14 +34,17 @@ The plan (PRD) lives in Claude, in the "MeeMee World PRD — kit and MeeMee Resc
 Claude runs the build; you don't need to. It needs Python 3.10+, ffmpeg, and the packages numpy, scipy, pyloudnorm and playwright.
 
 ```
-python tools/build.py              # everything: audio, pages, offline copy, icons, checks
+python tools/build.py              # everything: voice script, audio, pages, offline copy, icons, checks
 python tools/build.py --no-audio   # reuse docs/audio as it is
 python tools/tests/test_game.py    # the headless checks (Fire and Doogee screen sizes)
+python tools/tests/test_build.py   # the build's own checks, each broken on purpose
 ```
 
-The build stops if a recording in `voice/script.json` is missing, if a page would load anything from outside the site, if anything repeats faster than once a second, or if a page says a name listed in `tools/private-names.txt` (kept on the PC, never committed).
+The build stops if a line in any `lines.json` has no recording and isn't marked pending, if a page would load anything from outside the site, if anything repeats faster than once a second, if a page says a name listed in `tools/private-names.txt` (kept on the PC, never committed), or if a game breaks the rules a build can see (a raw colour, its own sound code, a `game.json` that doesn't add up, names without the game's id in front).
 
 ## Rules that already apply
+
+The full list is in [MEEMEE.md](MEEMEE.md). In short:
 
 - Played on two tablets, held sideways: Fire HD 8 Kids (Amazon Kids profile, opened from a bookmark) and Doogee T30 Pro. The first tap goes full screen.
 - Everything is invented. No characters, pictures, sounds or fonts copied from shows, apps or school schemes.

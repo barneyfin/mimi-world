@@ -1,0 +1,9 @@
+{
+  "id": "starter",
+  "name": "Starter game",
+  "planet": 1,
+  "badge": "starter-badge",
+  "say": "starter-name",
+  "scripts": ["game.js"],
+  "about": "Copy this folder to games/<id>/ and change every 'starter' to the new id. planet: 0 ringed mint (MeeMee Rescue's), 1 indigo, 2 small peach; badge: the drawing on the planet's badge; say: the line said when the planet is tapped; scripts: the game's code, in loading order."
+}

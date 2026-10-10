@@ -1,8 +1,11 @@
-/* MeeMee Rescue (phase 4).
-   Play opens the home map (kit/map.js); the MeeMee Rescue planet starts a round of five part–whole questions in
-   Barney's voice, chosen from the bonds that need work (bonds.js). The player drags MeeMee from the asteroid into the
-   waiting circle. Grown-ups see the progress grid. The crew screen (kit/crew.js) gives Moggles and Snuffles their
-   jobs, and each job has its moment in a round (moments.js). Built from the kit (kit/*.js). */
+/* MeeMee Rescue: number bonds to 10 on the part–whole diagram (phases 3 to 5).
+   The first MeeMee World game, and the worked example for new ones. It joins the world (kit/world.js) with
+   MW.world.game below; the world gives it the start screen, the map, the crew screen, pausing and the grown-ups area.
+   Its planet starts a round of five part–whole questions in Barney's voice, chosen from the bonds that need work
+   (bonds.js). The player drags MeeMee from the asteroid into the waiting circle. Each crew job has its moment in a
+   round (moments.js). Grown-ups see the progress grid.
+   Older than the rules for new games, so some names don't have the game's prefix: its screens are screen-game and
+   screen-end, its voice lines have no "rescue-" in front, and its saved answers and settings sit at the top level. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -12,111 +15,38 @@
   const E = function (n) { return 'num-end-' + n; };
   const OTHER = { left: 'right', right: 'left' };
 
-  const st = { token: 0, paused: false, pauses: {}, hintTimers: [], phase: 'idle', round: null, qi: 0, q: null, target: null, answer: 0,
-    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], welcomed: false, check: null };
+  const W = MW.world;
+  const st = { hintTimers: [], round: null, qi: 0, q: null, target: null, answer: 0,
+    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], check: null };
+  // the token, the phase and pausing belong to the world (one of each for the page); st reads and writes them there
+  ['token', 'phase', 'paused'].forEach(function (k) {
+    Object.defineProperty(st, k, { enumerable: true, get: function () { return W.st[k]; }, set: function (v) { W.st[k] = v; } });
+  });
   const R = MW.rescue = { st: st, nextRound: null };
-  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, map, tray, crewScreen, moments;
+  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, tray, moments;
   const endCats = {};
+  const speak = W.speak, ok = W.ok;
 
-  // ---------------------------------------------------------------- set-up
-  function init() {
-    const stageEl = MW.$('stage');
-    MW.stage.init(stageEl);
-    buildStart();
-    buildMap();
-    buildCrew();
-    buildGame();
-    buildEnd();
-    moments = MW.moments({ game: MW.$('screen-game'), tray: tray.el, over: ghostLayer, stars: stars, end: MW.$('screen-end'), endCats: endCats });
-    MW.shell.gate(stageEl, openGrownups);
-    MW.grownups.init(stageEl, { title: 'Grown-ups', sections: [progressSection(), settingsSection()], onClose: function () { resume('grown-ups'); } });
-    MW.shell.watchSideways(function () { pause('sideways'); }, function () { resume('sideways'); });
-    // The screen going off, or switching to another app, pauses the game; it carries on when it comes back.
-    document.addEventListener('visibilitychange', function () { if (document.hidden) pause('hidden'); else resume('hidden'); });
-    // 9 October: "tap Scruffles to check" became the default. A tablet still on the old default moves to it once;
-    // a mode a grown-up picks in Settings from now on is kept.
-    if (!MW.store.setting('checkPicked') && MW.store.setting('check') !== 'tap') MW.store.setting('check', 'tap');
-    MW.shell.registerOffline();
-    MW.audio.preloadAll();
-    MW.shell.show('screen-start');
-    window.addEventListener('load', function () {
-      const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-      MW.device.loadMs = nav ? Math.round(nav.loadEventStart || performance.now()) : Math.round(performance.now());
-    });
-  }
-
-  function buildStart() {
-    const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee World'));
-    const p = MW.pod(s, 240, 150, 420);
-    p.el.disabled = true; p.el.tabIndex = -1;
-    const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
-    const icon = MW.art('icon-play'); icon.setAttribute('width', 84); icon.setAttribute('height', 84);
-    play.appendChild(icon);
-    MW.onTap(play, function () { MW.audio.unlock(); MW.shell.fullscreen(); goMap(); });
-    // If a browser didn't count the finger lifting as a tap for full screen, the click that follows tries again.
-    play.addEventListener('click', function () { MW.audio.unlock(); if (MW.device.fullOk === false) MW.shell.fullscreen(); });
-    s.appendChild(play);
-    const row = MW.make('div', 'mw-abs mw-start-mimi', { style: 'left:770px;top:520px' });
-    for (let i = 0; i < 3; i++) row.appendChild(MW.art('mimi'));
-    s.appendChild(row);
-    MW.shell.buttons(s, ['music'], {});
-  }
-
-  // The home map: "Welcome to MeeMee World!" the first time in a visit; the MeeMee Rescue planet starts a round.
-  function buildMap() {
-    const s = MW.$('screen-map');
-    map = MW.map(s, { onRescue: openRescue, onLocked: notReady, onCrew: openCrew });
-    MW.shell.buttons(s, ['music'], {});
-  }
-  function goMap() {
-    st.token++;
-    st.phase = 'map';
-    st.check = null;
-    MW.audio.hush();                                          // nothing from the last screen carries on over the map
-    if (crewScreen) crewScreen.dragger.cancel();
-    if (moments) moments.clear();
-    map.setCrew(MW.crew.jobs());
-    MW.shell.show('screen-map');
-    if (!st.welcomed) { st.welcomed = true; speak([['map-welcome']]); }
-    if (!MW.crew.ready()) map.callCrew();                    // no jobs yet: the cats hop, to say "tap us"
-  }
-
-  // The crew screen: "Let's give the crew their jobs!" The player drags each cat onto a job.
-  function buildCrew() {
-    crewScreen = MW.crew.screen(MW.$('screen-crew'), {
-      speak: speak,
-      onHome: goMap,
-      enabled: function () { return !st.paused && MW.shell.screen === 'screen-crew'; }
-    });
-  }
-  function openCrew() {
-    if (st.phase !== 'map' || st.paused) return;
-    st.token++;
-    st.phase = 'crew';
-    MW.log('map', 'crew');
-    MW.shell.show('screen-crew');
-    crewScreen.enter();
-  }
-  async function openRescue() {
-    if (st.phase !== 'map' || st.paused) return;
-    st.phase = 'opening';
-    const token = ++st.token;
-    map.bounce();
-    MW.log('map', 'rescue');
-    await speak([['map-mimi-rescue']]);
-    if (token !== st.token) return;
-    if (st.paused) { st.phase = 'map'; return; }             // the grown-ups area opened (or the screen went off) meanwhile
-    startRound();
-  }
-  function notReady() {
-    if (st.phase !== 'map' || st.paused) return;
-    MW.log('map', 'locked');
-    speak([['map-not-ready']]);
-  }
+  // ---------------------------------------------------------------- joining the world
+  W.game({
+    id: 'rescue',
+    build: function () {
+      buildGame();
+      buildEnd();
+      moments = MW.moments({ game: MW.$('screen-game'), tray: tray.el, over: ghostLayer, stars: stars, end: MW.$('screen-end'), endCats: endCats });
+      // 9 October: "tap Scruffles to check" became the default. A tablet still on the old default moves to it once;
+      // a mode a grown-up picks in Settings from now on is kept.
+      if (!MW.store.setting('checkPicked') && MW.store.setting('check') !== 'tap') MW.store.setting('check', 'tap');
+    },
+    start: function () { startRound(); },
+    sections: [progressSection(), settingsSection()],
+    onPause: function () { clearHint(); if (dragger) dragger.cancel(); },
+    onResume: function () { if (MW.shell.screen === 'screen-game' && (st.phase === 'open' || st.phase === 'asking')) speak(st.prompt); },
+    onHome: leave
+  });
 
   function buildGame() {
-    const s = MW.$('screen-game');
+    const s = W.screen('screen-game', 'MeeMee Rescue');
     diagram = MW.diagram(s);
     // the ship goes in before the asteroid (they don't overlap), so the lookout can peek out between them
     pod = MW.pod(s, MW.LAYOUT.pod.x, MW.LAYOUT.pod.y, MW.LAYOUT.pod.w);
@@ -127,7 +57,7 @@
     ghostLayer = MW.make('div', 'mw-layer mw-fill'); s.appendChild(ghostLayer);
     layer = MW.make('div', 'mw-layer mw-fill mw-counters'); s.appendChild(layer);
     fxLayer = MW.make('div', 'mw-layer mw-fill mw-fx'); s.appendChild(fxLayer);
-    MW.shell.buttons(s, ['home', 'music', 'hear'], { home: goHome, hear: hearAgain });
+    MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
     dragger = MW.dragger(s, {
       counters: function () { return st.counters; },
       enabled: function () { return !st.paused && (st.phase === 'asking' || st.phase === 'open'); },
@@ -137,7 +67,7 @@
   }
 
   function buildEnd() {
-    const s = MW.$('screen-end');
+    const s = W.screen('screen-end', 'All the MeeMee rescued');
     endStars = MW.stars(s, 450, 40, 60);
     const mog = MW.make('div', 'mw-abs mw-crew', { style: 'left:70px;top:330px' }); mog.appendChild(endCats.moggles = MW.crew.cat('moggles', 240)); s.appendChild(mog);
     const p = endPod = MW.pod(s, 380, 130, 400); p.face('got-it'); p.el.disabled = true; p.el.tabIndex = -1;
@@ -150,40 +80,7 @@
     play.appendChild(icon);
     MW.onTap(play, function () { MW.audio.unlock(); MW.shell.fullscreen(); startRound(); });
     s.appendChild(play);
-    MW.shell.buttons(s, ['home', 'music'], { home: goHome });
-  }
-
-  // ---------------------------------------------------------------- pausing
-  // Reasons: the grown-ups area is open, the tablet is upright, or the page is hidden (screen off, another app).
-  // The game carries on only when none is left, and then asks the question again.
-  function pause(why) {
-    st.pauses[why] = true;
-    st.paused = true;
-    clearHint();
-    MW.audio.hush();
-    if (dragger) dragger.cancel();
-    if (crewScreen) crewScreen.dragger.cancel();            // a cat held when the screen goes off goes back to its place
-    MW.log('pause', why);
-  }
-  function resume(why) {
-    if (!st.pauses[why]) return;
-    delete st.pauses[why];
-    if (Object.keys(st.pauses).length) return;
-    st.paused = false;
-    MW.log('resume', why);
-    if (MW.shell.screen === 'screen-game' && (st.phase === 'open' || st.phase === 'asking')) speak(st.prompt);
-    else if (MW.shell.screen === 'screen-crew' && st.phase === 'crew') crewScreen.intro();
-  }
-  function openGrownups() { pause('grown-ups'); MW.grownups.openPanel(); }
-  // Wait while paused; false if the player has left this round meanwhile.
-  async function ok(token) {
-    while (st.paused) await MW.wait(200);
-    return token === st.token;
-  }
-  async function speak(lines, opts) {
-    const token = st.token;
-    if (!(await ok(token))) return false;
-    return MW.audio.say(lines, opts);
+    MW.shell.buttons(s, ['home', 'music'], { home: W.home });
   }
 
   // ---------------------------------------------------------------- a round
@@ -478,15 +375,15 @@
     if (st.paused) return;
     if (st.phase === 'open' || st.phase === 'asking') { clearHint(); speak(st.prompt); }
   }
-  function goHome() {
+  // Home (from any screen, this game's or the world's): put everything away. The world has moved on the token,
+  // so speech and timers from the round stop themselves.
+  function leave() {
     clearHint();
     if (dragger) dragger.cancel();
-    st.token++;
-    st.phase = 'idle';
-    MW.audio.hush();
+    st.check = null;
     pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
-    goMap();                                                  // (and the crew's moments go)
+    if (moments) moments.clear();
   }
 
   // ---------------------------------------------------------------- grown-ups: progress and settings
@@ -613,7 +510,6 @@
   }
 
   // ---------------------------------------------------------------- test hooks
-  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = goHome; R.map = goMap; R.makeRound = makeRound; R.crew = function () { return crewScreen; };
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = W.home; R.map = W.home; R.makeRound = makeRound;
+  R.crew = function () { return W.crewScreen; };
 })();

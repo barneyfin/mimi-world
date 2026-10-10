@@ -21,8 +21,7 @@ __KIT_CSS__
   <section class="mw-screen" id="screen-start" aria-label="MeeMee World: start"></section>
   <section class="mw-screen" id="screen-map" aria-label="MeeMee World"></section>
   <section class="mw-screen" id="screen-crew" aria-label="The crew's jobs"></section>
-  <section class="mw-screen" id="screen-game" aria-label="MeeMee Rescue"></section>
-  <section class="mw-screen" id="screen-end" aria-label="All the MeeMee rescued"></section>
+  <!-- each game adds its own screens here (MW.world.screen) -->
 </div>
 
 <div class="mw-sideways" role="alert">
@@ -39,6 +38,7 @@ __ART__
 <script>
 window.MW = { VERSION: '__VERSION__' };
 window.MW_AUDIO = __AUDIO__;
+window.MW_GAMES = __GAMES__;
 window.MW_SCRIPT = __SCRIPT__;
 </script>
 <script>

@@ -48,3 +48,9 @@ Built from round 4 of the design canvas, which Barney approved that evening.
 - **Checks:** `test_game.py` 236 of 236 (new: the crew screen at both screen sizes, with drags, swaps, a pause mid-drag and the jobs remembered; each moment, where it sits and when it goes; no moments without jobs), `test_update.py` 7 of 7.
 - **To check on the tablets:** dragging the cats on the crew screen, on both tablets; whether each moment reads clearly in a real round, and whether any one gets in the way.
 
+
+## The gate (started 9 October)
+
+- **Criterion 3, the game matches the class:** met on 9 October. Barney compared `notes/all-questions.md` with the child's maths homework. The diagram, the words, the missing-number sign and the order of the number sentence all match, and the child understands them.
+- **Criterion 1, a round on his own on each tablet:** to do.
+- **Criterion 7, the progress grid makes sense after a week of play:** to do.

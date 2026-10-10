@@ -31,7 +31,7 @@ ROUND = [
 CENTRES = {"whole": (380, 205), "left": (210, 470), "right": (550, 470)}
 PLAY = (900, 380)                     # the Play button on the start screen
 RESCUE = (330, 300)                   # the MeeMee Rescue planet on the map
-LOCKED = (1010, 560)                  # a planet still to come
+EMPTY_PLANETS = "MW.LAYOUT.map.planets.filter((p, i) => !MW.world.games.some(g => g.planet === i))"   # planets with no game yet
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -573,15 +573,22 @@ async def test_map(p):
     sizes = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-planet')).map(b => b.offsetWidth)")
     check("map: every planet is a big target (at least 120 stage px)", sizes and min(sizes) >= 120, str(sizes))
     await asyncio.sleep(1.5)
-    await t.tap(*LOCKED)
-    await asyncio.sleep(0.3)
-    said = await t.said()
-    check("map: a locked planet says 'That planet isn't ready yet.'", said[-1:] == ["map-not-ready"] and await page.evaluate("MW.shell.screen") == "screen-map", str(said[-2:]))
-    await asyncio.sleep(1.5)
-    await t.tap(1150, 250)
-    await asyncio.sleep(0.3)
-    check("map: so does the other one", (await t.said())[-1:] == ["map-not-ready"])
-    await asyncio.sleep(1.5)
+    empty = await page.evaluate(EMPTY_PLANETS)
+    if empty:
+        await t.tap(empty[0]["x"], empty[0]["y"])
+        await asyncio.sleep(0.3)
+        said = await t.said()
+        check("map: a locked planet says 'That planet isn't ready yet.'", said[-1:] == ["map-not-ready"] and await page.evaluate("MW.shell.screen") == "screen-map", str(said[-2:]))
+        await asyncio.sleep(1.5)
+    else:
+        check("map: a locked planet says 'That planet isn't ready yet.'", True, "skipped: every planet has a game")
+    if len(empty) > 1:
+        await t.tap(empty[1]["x"], empty[1]["y"])
+        await asyncio.sleep(0.3)
+        check("map: so does the other one", (await t.said())[-1:] == ["map-not-ready"])
+        await asyncio.sleep(1.5)
+    else:
+        check("map: so does the other one", True, "skipped: fewer than two planets still to come")
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
     await t.tap(368 + 42, 166 + 42)                          # the MeeMee badge
     s = await t.wait_phase(["asking", "open"])
@@ -1025,6 +1032,114 @@ async def test_moments(p):
     await browser.close()
 
 
+
+# ---------------------------------------------------------------- 0.5.0: the world and its games
+async def test_carryover(p):
+    print("\n== a tablet's saved data from 0.4.1 carries over ==")
+    browser = await p.chromium.launch()
+    answers = secure_answers([(7, 3), (2, 1)]) + [ans(T0, 5, 1, first=False)]
+    ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True)
+    saved = {"v": 1, "music": False, "settings": {"check": "auto", "checkPicked": True, "wholes": [2, 3, 4, 5, 6, 7],
+                                                 "crew": {"moggles": "cook", "snuffles": "engineer"}}, "answers": answers}
+    await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
+                              % json.dumps(json.dumps(saved)))
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(ORIGIN + "/")
+    await page.wait_for_load_state("load")
+    got = await page.evaluate("""({ music: MW.audio.music.isOn(), check: MW.store.setting('check'), wholes: MW.store.setting('wholes'),
+        jobs: MW.crew.jobs(), answers: MW.store.get('answers').length,
+        secure: Object.values(MW.bonds.statuses(MW.store.get('answers'))).filter(s => s.status === 'secure').length })""")
+    check("carry-over: music off, answer check and wholes in play kept", got["music"] is False and got["check"] == "auto" and got["wholes"] == [2, 3, 4, 5, 6, 7], json.dumps(got))
+    check("carry-over: the crew's jobs kept", got["jobs"] == {"moggles": "cook", "snuffles": "engineer"}, json.dumps(got["jobs"]))
+    check("carry-over: every answer kept, and the bonds secure before are secure now", got["answers"] == len(answers) and got["secure"] == 2, json.dumps(got))
+    await page.evaluate("const g = MW.store.game('starter'); g.rounds = 3; MW.store.save()")
+    after = await page.evaluate("JSON.parse(localStorage.getItem('mimi-world'))")
+    check("carry-over: a newer game's saved data sits beside the old, without disturbing it",
+          after["games"] == {"starter": {"rounds": 3}} and len(after["answers"]) == len(answers) and after["settings"]["crew"]["moggles"] == "cook", json.dumps(after["games"]))
+    check("carry-over: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+TPL_PORT = 8793
+
+
+async def test_template(p):
+    print("\n== a new game joins the world (the template) ==")
+    import shutil
+    import subprocess
+    sys.path.insert(0, str(ROOT / "tools"))
+    import games as G
+    taken = {g.get("planet") for g in G.load()}
+    free = [i for i in range(G.PLANETS) if i not in taken]
+    if not free:
+        check("template: a new game joins the world", True, "skipped: every planet has a game")
+        return
+    here = pathlib.Path(__file__).resolve().parent
+    out, src = here / "serve-template", here / "serve-template-src" / "starter"
+    if src.parent.exists():
+        shutil.rmtree(src.parent)
+    shutil.copytree(ROOT / "games" / "_template", src, ignore=shutil.ignore_patterns("__pycache__"))
+    gj = json.loads((src / "game.json").read_text(encoding="utf-8"))
+    gj["planet"] = free[0]
+    (src / "game.json").write_text(json.dumps(gj), encoding="utf-8")
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "build.py"), "--no-audio", "--out", str(out), "--extra-game", str(src)],
+                       capture_output=True, text=True)
+    check("template: builds into a test copy with no problems", r.returncode == 0 and "Starter game" in r.stdout, (r.stdout + r.stderr)[-300:])
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", TPL_PORT), functools.partial(Quiet, directory=str(out)))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    ctx = await browser.new_context(viewport={"width": 1046, "height": 653}, device_scale_factor=1.22, has_touch=True, is_mobile=True)
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(f"http://127.0.0.1:{TPL_PORT}/")
+    await page.wait_for_load_state("load")
+    t = Tablet(page, await ctx.new_cdp_session(page))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    planets = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-planet')).map(b => b.getAttribute('aria-label'))")
+    locks = await page.evaluate("document.querySelectorAll('#screen-map .mw-planet-lock').length")
+    check("template: its planet is on the map, MeeMee Rescue's is still first, the rest still to come",
+          planets[0] == "MeeMee Rescue" and planets[free[0]] == "Starter game" and locks == G.PLANETS - len(taken) - 1, json.dumps([planets, locks]))
+    await asyncio.sleep(1.2)
+    await page.screenshot(path=str(SHOTS / "template-1-map.png"))
+    pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % free[0])
+    await t.tap(pl["x"], pl["y"])
+    ok = await t.wait_screen("screen-starter-play")
+    said = await t.said()
+    check("template: tapping its planet says its name and opens its screen", ok and "starter-name" in said, str(said[-3:]))
+    await asyncio.sleep(0.3)
+    await page.screenshot(path=str(SHOTS / "template-2-screen.png"))
+    for _ in range(3):
+        await t.tap(640, 400)
+        await asyncio.sleep(0.25)
+    back = await t.wait_screen("screen-map", 5)
+    check("template: three taps on the star finish it and go home", back and await page.evaluate("MW.store.game('starter').rounds") == 1)
+    await asyncio.sleep(0.5)
+    await t.tap(pl["x"], pl["y"])
+    await t.wait_screen("screen-starter-play")
+    await t.tap(66, 62)
+    check("template: Home on its screen goes back to the map", await t.wait_screen("screen-map", 5))
+    await asyncio.sleep(0.5)
+    rp = await page.evaluate("MW.LAYOUT.map.planets[0]")
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(rp["x"], rp["y"])
+    s = await t.wait_phase(["asking", "open"])
+    check("template: MeeMee Rescue still plays beside it", s["screen"] == "screen-game", json.dumps(s))
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('starter-progress')")
+    await asyncio.sleep(0.3)
+    text = await page.inner_text(".gu-body")
+    check("template: its tab in the grown-ups area shows its saved data", "Rounds finished on this tablet: 1." in text, text[:80])
+    check("template: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+    srv.shutdown()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -1039,6 +1154,8 @@ async def main():
         await test_crew(p)
         await test_crew(p, "crew-fire", 1046, 653, 1.22)
         await test_moments(p)
+        await test_carryover(p)
+        await test_template(p)
         await test_edge_cases(p)
         await test_portrait(p)
         await test_reduce_motion(p)

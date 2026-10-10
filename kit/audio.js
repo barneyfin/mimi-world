@@ -113,6 +113,9 @@
     const token = speech.token;
     const ids = [].concat.apply([], sentences);
     MW.log('say', ids.join(' '));
+    // a line that isn't recorded yet (not on the page) is skipped, so a game can be built before its recordings
+    const unrecorded = ids.filter(function (id) { return !(manifest.voice || {})[id]; });
+    if (unrecorded.length) { MW.log('audio-fail', 'not recorded yet: ' + unrecorded.join(', ')); return Promise.resolve(false); }
     return A.ready(ids.map(function (id) { return 'voice/' + id; })).then(function () {
       if (token !== speech.token) return false;
       if (!A.running()) return false;

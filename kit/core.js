@@ -32,8 +32,10 @@
 
   // ---------------------------------------------------------------- what this tablet remembers
   // One localStorage entry. Browser storage can be cleared, so this is a convenience, not a record.
+  // music and settings are the world's (and MeeMee Rescue's settings, from before phase 5); answers are MeeMee
+  // Rescue's; games.<id> is each newer game's own saved data (MW.store.game).
   const KEY = 'mimi-world';
-  const DEFAULTS = { v: 1, music: true, settings: { check: 'tap', wholes: [2, 3, 4, 5, 6, 7, 8, 9, 10] }, answers: [] };
+  const DEFAULTS = { v: 1, music: true, settings: { check: 'tap', wholes: [2, 3, 4, 5, 6, 7, 8, 9, 10] }, answers: [], games: {} };
   let data = null;
   function load() {
     if (data) return data;
@@ -44,6 +46,7 @@
       if (typeof saved.music === 'boolean') data.music = saved.music;
       if (saved.settings) Object.assign(data.settings, saved.settings);
       if (Array.isArray(saved.answers)) data.answers = saved.answers;
+      if (saved.games && typeof saved.games === 'object' && !Array.isArray(saved.games)) data.games = saved.games;
     }
     return data;
   }
@@ -59,6 +62,15 @@
       s[k] = v; save(); return v;
     },
     setMusic: function (on) { load().music = !!on; save(); },
+    // A game's own saved data: an object it can change freely, then MW.store.save() to keep the change.
+    game: function (id) {
+      const g = load().games;
+      if (!g[id] || typeof g[id] !== 'object' || Array.isArray(g[id])) g[id] = {};
+      return g[id];
+    },
+    // Forget a game's saved data (for its own "clear this tablet's progress" button).
+    clearGame: function (id) { delete load().games[id]; save(); },
+    save: function () { load(); save(); return MW.store.ok; },
     recordAnswer: function (a) {
       const d = load();
       d.answers.push(a);
@@ -122,9 +134,16 @@
     if (named.length) {
       const n = ++artCopies, map = {};
       Array.prototype.forEach.call(named, function (e) { map[e.id] = e.id + '-' + n; e.id = map[e.id]; });
-      Array.prototype.forEach.call(el.querySelectorAll('[clip-path]'), function (e) {
-        const m = /^url\(#([^)]+)\)$/.exec(e.getAttribute('clip-path'));
-        if (m && map[m[1]]) e.setAttribute('clip-path', 'url(#' + map[m[1]] + ')');
+      // every reference to them: clip-path, mask, filter, fill or stroke url(#…), and <use href="#…">
+      Array.prototype.forEach.call(el.querySelectorAll('*'), function (e) {
+        Array.prototype.forEach.call(e.attributes, function (a) {
+          if (a.value.indexOf('url(#') >= 0) {
+            const v = a.value.replace(/url\(#([^)]+)\)/g, function (all, id) { return map[id] ? 'url(#' + map[id] + ')' : all; });
+            if (v !== a.value) e.setAttribute(a.name, v);
+          } else if ((a.name === 'href' || a.name === 'xlink:href') && a.value.charAt(0) === '#' && map[a.value.slice(1)]) {
+            e.setAttribute(a.name, '#' + map[a.value.slice(1)]);
+          }
+        });
       });
     }
     return el;

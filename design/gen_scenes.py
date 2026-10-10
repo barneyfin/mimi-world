@@ -14,17 +14,20 @@ def sky(uid="sky"):
     return '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true">' + sky_art(uid) + '</svg>'
 
 
-# The home map (phase 4): where things sit on the 1280 x 800 stage. kit/map.js puts its buttons over these.
+# The home map (phase 4; a planet per game from phase 5): where things sit on the 1280 x 800 stage. kit/map.js puts
+# its buttons over these. A game names its planet (0, 1 or 2) in its game.json.
 MAP = {
-    "rescue": (330, 300, 58),                  # MeeMee Rescue: the ringed mint planet
-    "locked": [(1010, 560, 46, "indigo"), (1150, 250, 30, "peach")],   # games still to come
+    "planets": [(330, 300, 58, "mint"),       # 0: the ringed mint planet with a moon (MeeMee Rescue)
+                (1010, 560, 46, "indigo"),    # 1
+                (1150, 250, 30, "peach")],    # 2
     "sun": (640, 430, 64),
     "crew_spot": (250, 598),
 }
 
 
-def map_art(uid="map"):
-    """The home map: an alien solar system. Its own night ground, so it covers the game screens' sky."""
+def map_art(uid="map", taken=(0,)):
+    """The home map: an alien solar system. Its own night ground, so it covers the game screens' sky.
+    taken: the planets that have a game, drawn lit with a halo; the others are dimmed (still to come)."""
     sky = (nebula() + starfield(21, 110, [(180, 150, 940, 560)]) + galaxy(1130, 90, 20, 0.8, "lilac", 4)
            + galaxy(140, 120, -24, 0.62, "peach", 6) + galaxy(150, 700, -30, 0.7, "mint", 9)
            + cross_star(860, 90, 0.8) + cross_star(470, 700, 0.7) + spark(1230, 420, 0.7) + spark(70, 330, 0.6))
@@ -39,19 +42,29 @@ def map_art(uid="map"):
         if 140 < x < 520 and 330 < y < 600:
             continue                           # the crew's corner stays clear
         belt += f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{3 + (i * 7 % 5)}" fill="@{"asteroid" if i % 2 else "planet-indigo-light"}"/>'
-    rx, ry, rr = MAP["rescue"]
     cx, cy = MAP["crew_spot"]
+
+    def lit(i):
+        x, y, r, ramp = MAP["planets"][i]
+        halo = tok(f'<circle cx="{x}" cy="{y}" r="{r + 20}" fill="none" stroke="@mint" stroke-width="10" opacity="0.3"/>')
+        if i == 0:   # the ringed planet, with craters and a little moon
+            return (halo + planet(x, y, r, ramp, f"{uid}-rescue", bands=5, ring=True, craters=[(0.3, 0.35, 0.12), (-0.35, 0.1, 0.08)])
+                    + planet(x - 98, y - 68, 14, "peach", f"{uid}-moon", bands=4, rim=False))
+        return halo + planet(x, y, r, ramp, f"{uid}-p{i}", bands=6 if r > 40 else 5, craters=[(0.2, -0.3, 0.14)] if r > 40 else ())
+
+    def dim(k, i):
+        x, y, r, ramp = MAP["planets"][i]
+        return planet(x, y, r, ramp, f"{uid}-l{k}", bands=6 if r > 40 else 5, craters=[(0.2, -0.3, 0.14)] if r > 40 else ())
+
+    empty = [i for i in range(len(MAP["planets"])) if i not in taken]
     return (
         '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true">'
         + tok('<rect width="1280" height="800" fill="@night"/>') + sky
         + tok(orbits + belt
               + f'<circle cx="{sx}" cy="{sy}" r="112" fill="@peach" opacity="0.10"/><circle cx="{sx}" cy="{sy}" r="86" fill="@peach" opacity="0.16"/>')
         + planet(sx, sy, sr, "peach", f"{uid}-sun", bands=6)
-        + tok(f'<circle cx="{rx}" cy="{ry}" r="{rr + 20}" fill="none" stroke="@mint" stroke-width="10" opacity="0.3"/>')
-        + planet(rx, ry, rr, "mint", f"{uid}-rescue", bands=5, ring=True, craters=[(0.3, 0.35, 0.12), (-0.35, 0.1, 0.08)])
-        + planet(rx - 98, ry - 68, 14, "peach", f"{uid}-moon", bands=4, rim=False)
-        + '<g opacity="0.45">' + "".join(planet(x, y, r, ramp, f"{uid}-l{i}", bands=6 if r > 40 else 5, craters=[(0.2, -0.3, 0.14)] if r > 40 else ())
-                                         for i, (x, y, r, ramp) in enumerate(MAP["locked"])) + '</g>'
+        + "".join(lit(i) for i in sorted(taken))
+        + ('<g opacity="0.45">' + "".join(dim(k, i) for k, i in enumerate(empty)) + '</g>' if empty else '')
         + tok(f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="@mint" opacity="0.12"/>'
               f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="none" stroke="@mint" stroke-width="3" stroke-dasharray="2 12" '
               'stroke-linecap="round" opacity="0.7"/>')
@@ -89,9 +102,14 @@ def spark_svg():
     return '<svg viewBox="-14 -14 28 28" aria-hidden="true">' + spark(0, 0) + '</svg>'
 
 
-def templates():
+def templates(taken=(0,), extra=None):
     """Every drawing the kit clones at run time, as <template id="art-NAME"> elements.
-    MW.art gives each copy's ids (clip paths) a number of its own, so a drawing can be on screen more than once."""
+    MW.art gives each copy's ids (clip paths) a number of its own, so a drawing can be on screen more than once.
+    taken: the map's planets that have a game. extra: the games' own drawings, {name: svg}."""
+    return "\n".join(f'<template id="art-{k}">{v}</template>' for k, v in art_dict(taken, extra).items())
+
+
+def art_dict(taken=(0,), extra=None):
     art = {
         "mimi": mimi(80),
         "pod": pod_faces(400),
@@ -99,7 +117,7 @@ def templates():
         "spark": spark_svg(),
         "moggles": moggles(240),
         "snuffles": snuffles(240),
-        "map": map_art(),
+        "map": map_art(taken=taken),
         "crew": crew_art(),
         "held-telescope": held_telescope(100),
     }
@@ -108,4 +126,8 @@ def templates():
         art["badge-" + job] = job_badge(job, 56)
     for name in ICONS:
         art["icon-" + name] = icon(name, 48, 4.5, fill_play=(name == "play"))
-    return "\n".join(f'<template id="art-{k}">{v}</template>' for k, v in art.items())
+    for name, svg in (extra or {}).items():
+        if name in art:
+            raise ValueError(f"a game's drawing is called {name}, which the kit already uses")
+        art[name] = svg
+    return art

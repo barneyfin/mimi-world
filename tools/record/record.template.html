@@ -38,6 +38,7 @@
   .meter > i { display: block; height: 100%; width: 0; background: var(--mint); }
   .meter.hot > i { background: var(--peach); }
   .progress { font-weight: 700; }
+  .game-head { margin: 40px 0 4px; font-size: 26px; font-weight: 700; color: var(--moon); border-bottom: 3px solid var(--night-button); padding-bottom: 6px; }
   .group { margin: 26px 0 8px; font-size: 19px; font-weight: 700; color: var(--text-2); }
   .clip { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; align-items: center;
           background: var(--night-raised); border: 3px solid transparent; border-radius: 18px; padding: 14px 18px; margin-bottom: 10px; }
@@ -128,8 +129,13 @@
 
   // ---------------------------------------------------------------- list
   var list = $('list');
-  var lastGroup = null;
+  var lastGroup = null, lastGame = null;
   clips.forEach(function (c, i) {
+    // each game's lines under its own heading (the world's own lines first)
+    if (c.game && c.game !== lastGame) {
+      var h = document.createElement('h2'); h.className = 'game-head'; h.textContent = c.game; list.appendChild(h);
+      lastGame = c.game; lastGroup = null;
+    }
     if (c.group !== lastGroup) {
       var g = document.createElement('div'); g.className = 'group'; g.textContent = c.group; list.appendChild(g);
       lastGroup = c.group;

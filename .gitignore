@@ -7,6 +7,8 @@ tools/private-names.txt
 # Made by the tests and the build tools
 tools/tests/shots/
 tools/tests/serve/
+tools/tests/serve-template/
+tools/tests/serve-template-src/
 __pycache__/
 
 # Windows clutter

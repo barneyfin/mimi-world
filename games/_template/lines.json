@@ -1,0 +1,26 @@
+{
+  "about": "Every line the game says. Ids start with the game's id. A new line is \"pending\" until Barney has recorded it: it shows on the recording page, and the game skips it until then.",
+  "lines": [
+    {
+      "id": "starter-name",
+      "group": "Map",
+      "words": "Star game!",
+      "how": "Announcing the game's name.",
+      "pending": true
+    },
+    {
+      "id": "starter-tap",
+      "group": "Playing",
+      "words": "Tap the star!",
+      "how": "Friendly and clear.",
+      "pending": true
+    },
+    {
+      "id": "starter-done",
+      "group": "Playing",
+      "words": "You did it!",
+      "how": "Pleased and warm.",
+      "pending": true
+    }
+  ]
+}

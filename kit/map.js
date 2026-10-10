@@ -1,17 +1,22 @@
-/* MeeMee World kit: the home map (phase 4).
+/* MeeMee World kit: the home map (phase 4; a planet per game from phase 5).
    An alien solar system: each game is a planet. The drawing is the "map" art (design/gen_scenes.py, whose MAP holds
-   the same positions); this file puts the buttons over it. Tapping a game's planet says its name and opens it;
-   a planet still to come says "That planet isn't ready yet." The crew wait by Scruffles's ship, wearing their job
-   badges; tapping them opens the crew screen (kit/crew.js). */
+   the same positions, and draws a game's planet lit and an empty one dimmed); this file puts the buttons over it.
+   Three planets: 0 the ringed mint planet (MeeMee Rescue), 1 the indigo planet, 2 the small peach planet. A game says
+   which is its own in its game.json. Tapping a game's planet (or its badge) opens it; an empty planet says
+   "That planet isn't ready yet." The crew wait by Scruffles's ship, wearing their job badges; tapping them opens the
+   crew screen (kit/crew.js). */
 (function () {
   'use strict';
   const MW = window.MW;
 
   const M = MW.LAYOUT.map = {
-    rescue: { x: 330, y: 300, tap: 180 },                     // tap area at least 120 stage px across (design system)
-    badge: { x: 368, y: 166, d: 84 },
-    locked: [{ x: 1010, y: 560, tap: 130, lock: { x: 1056, y: 470, d: 60, icon: 30 } },
-      { x: 1150, y: 250, tap: 120, lock: { x: 1186, y: 196, d: 50, icon: 24 } }],
+    // tap: the tap area across (at least 120 stage px, design system); badge: where a game's picture sits;
+    // lock: what an empty planet shows instead
+    planets: [
+      { x: 330, y: 300, tap: 180, badge: { x: 368, y: 166, d: 84, pic: 56 }, lock: { x: 368, y: 190, d: 60, icon: 30 } },
+      { x: 1010, y: 560, tap: 130, badge: { x: 1040, y: 446, d: 84, pic: 56 }, lock: { x: 1056, y: 470, d: 60, icon: 30 } },
+      { x: 1150, y: 250, tap: 120, badge: { x: 1172, y: 158, d: 72, pic: 48 }, lock: { x: 1186, y: 196, d: 50, icon: 24 } }
+    ],
     ship: { x: 155, y: 400, w: 190 },
     crew: [{ who: 'moggles', x: 44, y: 456, w: 112 }, { who: 'snuffles', x: 344, y: 456, w: 112 }],
     crewTap: { x: 34, y: 392, w: 432, h: 236 }                // the ship and both cats
@@ -19,9 +24,9 @@
 
   function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
 
-  // opts: { onRescue: fn, onLocked: fn, onCrew: fn }
+  // opts: { games: [{ planet, badge, name, onOpen }], onLocked: fn, onCrew: fn }
   MW.map = function (parent, opts) {
-    const map = {};
+    const map = { badges: {} };
     const art = MW.art('map');
     art.setAttribute('class', 'mw-layer');
     parent.appendChild(art);
@@ -52,36 +57,37 @@
     // no jobs yet: the cats hop, to say "tap us"
     map.callCrew = function () { map.crew.moggles.hop(0); map.crew.snuffles.hop(180); };
 
-    // MeeMee Rescue: the planet and its badge are one big button
-    const r = M.rescue;
-    const rescue = place(MW.make('button', 'mw-planet mw-abs', { type: 'button', 'aria-label': 'MeeMee Rescue' }), r.x - r.tap / 2, r.y - r.tap / 2);
-    rescue.style.width = rescue.style.height = r.tap + 'px';
-    parent.appendChild(rescue);
-    const badge = place(MW.make('button', 'mw-planet-badge mw-abs', { type: 'button', 'aria-label': 'MeeMee Rescue' }), M.badge.x, M.badge.y);
-    badge.style.width = badge.style.height = M.badge.d + 'px';
-    const mm = MW.art('mimi'); mm.setAttribute('width', 56); mm.setAttribute('height', 56);
-    badge.appendChild(mm);
-    parent.appendChild(badge);
-    [rescue, badge].forEach(function (b) { MW.onTap(b, function () { if (opts.onRescue) opts.onRescue(); }); });
-    map.rescue = rescue; map.badge = badge;
-
-    // planets still to come: dimmed, with a lock
-    map.locked = M.locked.map(function (l) {
-      const b = place(MW.make('button', 'mw-planet mw-abs', { type: 'button', 'aria-label': 'A planet that isn\'t ready yet' }), l.x - l.tap / 2, l.y - l.tap / 2);
-      b.style.width = b.style.height = l.tap + 'px';
+    // the planets: a game's is one big button with its badge; an empty one is dimmed, with a lock
+    map.planets = M.planets.map(function (p, i) {
+      const g = (opts.games || []).filter(function (x) { return x.planet === i; })[0];
+      const b = place(MW.make('button', 'mw-planet mw-abs', { type: 'button', 'aria-label': g ? g.name : 'A planet that isn\'t ready yet' }), p.x - p.tap / 2, p.y - p.tap / 2);
+      b.style.width = b.style.height = p.tap + 'px';
       parent.appendChild(b);
-      const lock = place(MW.make('div', 'mw-planet-lock mw-abs'), l.lock.x, l.lock.y);
-      lock.style.width = lock.style.height = l.lock.d + 'px';
-      const icon = MW.art('icon-lock'); icon.setAttribute('width', l.lock.icon); icon.setAttribute('height', l.lock.icon);
-      lock.appendChild(icon);
-      parent.appendChild(lock);
-      MW.onTap(b, function () { if (opts.onLocked) opts.onLocked(); });
-      MW.onTap(lock, function () { if (opts.onLocked) opts.onLocked(); });
+      const go = function () { if (g) { if (g.onOpen) g.onOpen(); } else if (opts.onLocked) opts.onLocked(); };
+      MW.onTap(b, go);
+      if (g) {
+        const badge = place(MW.make('button', 'mw-planet-badge mw-abs', { type: 'button', 'aria-label': g.name }), p.badge.x, p.badge.y);
+        badge.style.width = badge.style.height = p.badge.d + 'px';
+        const pic = MW.art(g.badge); pic.setAttribute('width', p.badge.pic); pic.setAttribute('height', p.badge.pic);
+        badge.appendChild(pic);
+        parent.appendChild(badge);
+        MW.onTap(badge, go);
+        map.badges[i] = badge;
+      } else {
+        const lock = place(MW.make('div', 'mw-planet-lock mw-abs'), p.lock.x, p.lock.y);
+        lock.style.width = lock.style.height = p.lock.d + 'px';
+        const icon = MW.art('icon-lock'); icon.setAttribute('width', p.lock.icon); icon.setAttribute('height', p.lock.icon);
+        lock.appendChild(icon);
+        parent.appendChild(lock);
+        MW.onTap(lock, go);
+      }
       return b;
     });
 
-    // a little bounce on the badge when its planet is chosen
-    map.bounce = function () {
+    // a little bounce on a planet's badge when it is chosen
+    map.bounce = function (i) {
+      const badge = map.badges[i];
+      if (!badge) return;
       badge.classList.remove('is-hop'); void badge.getBoundingClientRect(); badge.classList.add('is-hop');
     };
     return map;

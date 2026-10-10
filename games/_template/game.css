@@ -1,0 +1,5 @@
+/* The starter game's own styles. Colours only through tokens: var(--token), or the f-/s-/bg-/c- classes. */
+.starter-star { padding: 0; margin: 0; border: 0; background: transparent; line-height: 0; border-radius: var(--radius-round); cursor: pointer; }
+.starter-star:focus-visible { outline: 4px solid var(--mint); outline-offset: 6px; }
+.starter-star.is-hop { animation: mw-hop 420ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .starter-star.is-hop { animation: none; } }
