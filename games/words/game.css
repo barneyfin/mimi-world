@@ -21,6 +21,12 @@
 .words-ship.is-launch .words-fire { display: inline; }
 .words-ship.is-launch { transform: translate(40px, -40px) rotate(-10deg); transition: transform 700ms cubic-bezier(.3, 0, .3, 1); }
 .words-ship.is-launch.is-away { transform: translate(1500px, -760px) rotate(-10deg); transition: transform 1300ms cubic-bezier(.5, 0, .9, .5); }
+/* the launch lights (LaunchLights card): off (peach-shade) while the word is built; as the engines light, each is on for
+   a third of a second and off for two thirds, once a second, its group starting 0, 1/3 or 2/3 of a second in (the game
+   sets each light's delay), so the lights chase from the back to the nose. Small lights: within the flash-safety rule. */
+.words-lamp-on { opacity: 0; }
+.words-ship.is-launch .words-lamp-on { animation: words-lamp 1000ms steps(1, end) infinite; }
+@keyframes words-lamp { 0% { opacity: 1; } 33.333% { opacity: 0; } 100% { opacity: 0; } }
 
 .words-tray { position: absolute; box-sizing: border-box; border-radius: 26px; border: 4.5px solid var(--ink); overflow: hidden;
   background: linear-gradient(to bottom, var(--asteroid-light) 0, var(--asteroid-light) 8%, var(--asteroid) 8%, var(--asteroid) 86%, var(--asteroid-crater) 86%); }
@@ -50,6 +56,15 @@
 .words-end-rocket { width: 100px; height: 140px; animation: words-rise 900ms cubic-bezier(.2, .8, .2, 1) both; }
 @keyframes words-rise { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: none; } }
 
+/* ---------------------------------------------------------------- the crew's job moments (moments.js; the kit's moment styles do the rest) */
+.words-moment-flip { position: absolute; transform: scaleX(-1); }       /* the board's cats facing left */
+.words-moment-held { line-height: 0; }
+.words-moment-flip .words-moment-held { position: absolute; }
+.words-spanner { line-height: 0; }                                       /* turned as on the board (the game sets it) */
+.words-spanner-swing { transform-origin: 74% 74%; }                      /* held by its ring */
+.words-spanner-swing.is-tapping { animation: words-spanner-tap 1000ms ease-in-out 2; }
+@keyframes words-spanner-tap { 0%, 100% { transform: none; } 50% { transform: rotate(-14deg); } }
+
 /* ---------------------------------------------------------------- grown-ups: the Words tab */
 .words-week { border-color: var(--night-button); background: transparent; }
 .words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
@@ -77,5 +92,7 @@
   .words-ship.is-launch { transform: none; transition: none; }
   .words-ship.is-launch.is-away { transform: none; opacity: 0; transition: opacity 500ms ease-in; }
   .words-end-rocket { animation: words-fade 600ms ease-out both; }
+  .words-ship.is-launch .words-lamp-on { animation: none; opacity: 1; }   /* every light lit and steady */
+  .words-spanner-swing.is-tapping { animation: none; }
 }
 @keyframes words-fade { from { opacity: 0; } to { opacity: 1; } }

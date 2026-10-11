@@ -40,11 +40,11 @@ Data a grown-up edits without touching code (a phonics game's week-by-week word 
 /* MeeMee Rockets: the words. The one file to edit for a new half-term (no code changes). … */
 (function () {
   'use strict';
-  window.MW.wordsData = { startWeek: 5, weeks: [ … ], words: { … } };
+  window.MW.wordsData = { startWeek: 5, harderTray: 10, weeks: [ … ], sounds: { … }, words: { … } };
 })();
 ```
 
-with `"scripts": ["words.js", "steps.js", "game.js"]`. The game's own scripts load after it and read `MW.wordsData` (check it's there: `MW.wordsData || { weeks: [], words: {} }`). Explain the file's format in a comment at its top, for whoever edits it next; check what's in it when the game loads and list any problems in the game's grown-ups tab rather than failing. The build checks it like any of the game's scripts (raw colours, sound, `</script>`). Name the object after the game (`MW.<id>Data`).
+with `"scripts": ["words.js", "steps.js", "moments.js", "game.js"]`. The game's own scripts load after it and read `MW.wordsData` (check it's there: `MW.wordsData || { weeks: [], words: {} }`). Explain the file's format in a comment at its top, for whoever edits it next; check what's in it when the game loads and list any problems in the game's grown-ups tab rather than failing. The build checks it like any of the game's scripts (raw colours, sound, `</script>`). Name the object after the game (`MW.<id>Data`).
 
 ## Joining the world: `MW.world.game(def)`
 
@@ -167,7 +167,7 @@ When the game itself starts something new (another round from its end screen, a 
 
 ## The crew: `MW.crew`
 
-`MW.crew.jobs()` (`{ moggles: 'lookout' | 'engineer' | 'navigator' | 'cook' | null, snuffles: … }`), `MW.crew.who(job)` (the cat with that job, or `null`), `MW.crew.ready()`, `MW.crew.cat(who, width)` (a cat drawing with `.setJob(job)` for its badge and `.hop(delay)`). The world owns the crew screen; a game may give a job a short wordless moment (see `games/rescue/moments.js`), never over the thing being worked on.
+`MW.crew.jobs()` (`{ moggles: 'lookout' | 'engineer' | 'navigator' | 'cook' | null, snuffles: … }`), `MW.crew.who(job)` (the cat with that job, or `null`), `MW.crew.ready()`, `MW.crew.cat(who, width)` (a cat drawing with `.setJob(job)` for its badge and `.hop(delay)`). The world owns the crew screen; a game may give a job a short wordless moment (see `games/rescue/moments.js`; MeeMee Rockets has its own, `games/words/moments.js`, on its own screens), never over the thing being worked on.
 
 ## Saving: `MW.store`
 

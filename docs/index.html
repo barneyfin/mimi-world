@@ -533,6 +533,12 @@ button { font-family: var(--font-andika); }
 .words-ship.is-launch .words-fire { display: inline; }
 .words-ship.is-launch { transform: translate(40px, -40px) rotate(-10deg); transition: transform 700ms cubic-bezier(.3, 0, .3, 1); }
 .words-ship.is-launch.is-away { transform: translate(1500px, -760px) rotate(-10deg); transition: transform 1300ms cubic-bezier(.5, 0, .9, .5); }
+/* the launch lights (LaunchLights card): off (peach-shade) while the word is built; as the engines light, each is on for
+   a third of a second and off for two thirds, once a second, its group starting 0, 1/3 or 2/3 of a second in (the game
+   sets each light's delay), so the lights chase from the back to the nose. Small lights: within the flash-safety rule. */
+.words-lamp-on { opacity: 0; }
+.words-ship.is-launch .words-lamp-on { animation: words-lamp 1000ms steps(1, end) infinite; }
+@keyframes words-lamp { 0% { opacity: 1; } 33.333% { opacity: 0; } 100% { opacity: 0; } }
 
 .words-tray { position: absolute; box-sizing: border-box; border-radius: 26px; border: 4.5px solid var(--ink); overflow: hidden;
   background: linear-gradient(to bottom, var(--asteroid-light) 0, var(--asteroid-light) 8%, var(--asteroid) 8%, var(--asteroid) 86%, var(--asteroid-crater) 86%); }
@@ -562,6 +568,15 @@ button { font-family: var(--font-andika); }
 .words-end-rocket { width: 100px; height: 140px; animation: words-rise 900ms cubic-bezier(.2, .8, .2, 1) both; }
 @keyframes words-rise { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: none; } }
 
+/* ---------------------------------------------------------------- the crew's job moments (moments.js; the kit's moment styles do the rest) */
+.words-moment-flip { position: absolute; transform: scaleX(-1); }       /* the board's cats facing left */
+.words-moment-held { line-height: 0; }
+.words-moment-flip .words-moment-held { position: absolute; }
+.words-spanner { line-height: 0; }                                       /* turned as on the board (the game sets it) */
+.words-spanner-swing { transform-origin: 74% 74%; }                      /* held by its ring */
+.words-spanner-swing.is-tapping { animation: words-spanner-tap 1000ms ease-in-out 2; }
+@keyframes words-spanner-tap { 0%, 100% { transform: none; } 50% { transform: rotate(-14deg); } }
+
 /* ---------------------------------------------------------------- grown-ups: the Words tab */
 .words-week { border-color: var(--night-button); background: transparent; }
 .words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
@@ -589,6 +604,8 @@ button { font-family: var(--font-andika); }
   .words-ship.is-launch { transform: none; transition: none; }
   .words-ship.is-launch.is-away { transform: none; opacity: 0; transition: opacity 500ms ease-in; }
   .words-end-rocket { animation: words-fade 600ms ease-out both; }
+  .words-ship.is-launch .words-lamp-on { animation: none; opacity: 1; }   /* every light lit and steady */
+  .words-spanner-swing.is-tapping { animation: none; }
 }
 @keyframes words-fade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -648,6 +665,7 @@ button { font-family: var(--font-andika); }
 <template id="art-words-ship-hull"><svg width="1400" height="188" viewBox="0 0 1400 188" aria-hidden="true"><clipPath id="words-hull"><path d="M10 0 H1400 V188 H10 Q 0 188 0 178 V10 Q 0 0 10 0 Z"/></clipPath><g clip-path="url(#words-hull)"><rect class="f-mint-light" x="0" y="-0.5" width="1400" height="29.2"/><rect class="f-mint" x="0" y="27.7" width="1400" height="85.6"/><rect class="f-mint-dark" x="0" y="112.3" width="1400" height="46.1"/><rect class="f-mint-deep" x="0" y="157.4" width="1400" height="31.1"/><rect class="f-peach-dark" x="0" y="162" width="1400" height="12"/><rect class="f-planet-peach" x="0" y="162" width="1400" height="4"/><circle class="f-mint-deeper" cx="24" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="54" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="84" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="114" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="144" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="174" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="204" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="234" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="264" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="294" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="324" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="354" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="384" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="414" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="444" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="474" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="504" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="534" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="564" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="594" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="624" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="654" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="684" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="714" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="744" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="774" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="804" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="834" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="864" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="894" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="924" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="954" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="984" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1014" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1044" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1074" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1104" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1134" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1164" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1194" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1224" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1254" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1284" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1314" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="1344" cy="14" r="2.4"/><circle class="f-mint-deeper" cx="24" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="54" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="84" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="114" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="144" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="174" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="204" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="234" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="264" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="294" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="324" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="354" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="384" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="414" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="444" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="474" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="504" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="534" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="564" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="594" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="624" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="654" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="684" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="714" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="744" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="774" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="804" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="834" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="864" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="894" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="924" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="954" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="984" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1014" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1044" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1074" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1104" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1134" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1164" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1194" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1224" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1254" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1284" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1314" cy="150" r="2.4" opacity="0.8"/><circle class="f-mint-deeper" cx="1344" cy="150" r="2.4" opacity="0.8"/><path class="s-cat-white" d="M20 28 H1400" stroke-width="6" stroke-linecap="round" opacity="0.4"/><path class="s-ink" d="M60 0 V188" stroke-width="2" opacity="0.3"/></g><path class="s-ink" d="M10 0 H1400 V188 H10 Q 0 188 0 178 V10 Q 0 0 10 0 Z" fill="none" stroke-width="6" stroke-linejoin="round"/></svg></template>
 <template id="art-words-ship-nose"><svg width="176.2" height="188" viewBox="0 0 176.2 188" overflow="visible" aria-hidden="true"><clipPath id="words-nose"><path d="M12 0 C 96.8 2, 158.5 52.6, 166.2 94 C 158.5 135.4, 96.8 186, 12 188 Z"/></clipPath><g clip-path="url(#words-nose)"><rect class="f-planet-peach-light" x="12" y="-0.5" width="154.2" height="38.6"/><rect class="f-planet-peach-2" x="12" y="37.1" width="154.2" height="66.8"/><rect class="f-planet-peach" x="12" y="102.9" width="154.2" height="48"/><rect class="f-planet-peach-4" x="12" y="149.9" width="154.2" height="38.6"/><path class="s-cat-white" d="M22 22 C 73.7 24, 119.9 56.4, 141.5 71.4" fill="none" stroke-width="6" stroke-linecap="round" opacity="0.5"/></g><path class="s-ink" d="M12 0 C 96.8 2, 158.5 52.6, 166.2 94 C 158.5 135.4, 96.8 186, 12 188 Z" fill="none" stroke-width="6" stroke-linejoin="round"/><rect class="f-mint-dark s-ink" x="3" y="-4" width="18" height="196" rx="6" stroke-width="4"/><circle class="f-mint-deeper" cx="12" cy="14" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="40.7" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="67.3" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="94" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="120.7" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="147.3" r="2.2"/><circle class="f-mint-deeper" cx="12" cy="174" r="2.2"/><circle class="f-peach-dark s-ink" cx="76.7" cy="94" r="40" stroke-width="4"/><circle class="f-night" cx="76.7" cy="94" r="32"/><clipPath id="words-nose-win"><circle cx="76.7" cy="94" r="32"/></clipPath><g clip-path="url(#words-nose-win)"><svg x="49.3" y="78" class="mw-mimi-art" width="54.9712" height="54.9712" viewBox="0 0 80 80" aria-hidden="true"><path class="f-mimi s-mimi-outline" d="M14 32 L12 6 L33 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi s-mimi-outline" d="M66 32 L68 6 L47 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi-muzzle" d="M17 25 L16 13 L27 21 Z"/><path class="f-mimi-muzzle" d="M63 25 L64 13 L53 21 Z"/><path class="f-mimi s-mimi-outline" d="M9 45 C 9 28, 23 17, 40 17 C 57 17, 71 28, 71 45 C 73 47, 72 51, 70 52 C 67 64, 55 73, 40 73 C 25 73, 13 64, 10 52 C 8 51, 7 47, 9 45 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mimi-shade" d="M26 24 C 31 21, 36 21, 40 23 C 44 21, 49 21, 54 24" fill="none" stroke-width="2.4" stroke-linecap="round"/><path class="f-mimi-shade" d="M15 56 C 22 66, 32 70, 40 70 C 48 70, 58 66, 65 56 C 58 62, 50 64, 40 64 C 30 64, 22 62, 15 56 Z" opacity="0.7"/><ellipse class="f-mimi-muzzle" cx="40" cy="55" rx="14" ry="10"/><circle class="f-mimi-eye" cx="29" cy="41" r="5.4"/><circle class="f-mimi-eye" cx="51" cy="41" r="5.4"/><circle class="f-highlight" cx="27.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="49.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="30.6" cy="43" r="0.9"/><circle class="f-highlight" cx="52.6" cy="43" r="0.9"/><path class="f-mimi-nose" d="M37 51 L43 51 L40 54.5 Z"/><path class="s-mimi-outline" d="M36.5 58 C 38 59.6, 40 59.6, 40 57 C 40 59.6, 42 59.6, 43.5 58" fill="none" stroke-width="1.6" stroke-linecap="round"/><path class="s-mimi-outline" d="M28 55 L18 53 M28 58 L19 60 M52 55 L62 53 M52 58 L61 60" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/></svg><circle class="f-glass" cx="76.7" cy="94" r="32" opacity="0.22"/><path class="s-cat-white" d="M57.6 87.6 C 60.8 74.8, 68.8 68.4, 78.3 67.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.7"/></g><circle class="s-ink" cx="76.7" cy="94" r="32" fill="none" stroke-width="3.5"/></svg></template>
 <template id="art-words-rocket-mini"><svg width="100" height="140" viewBox="0 0 100 140" overflow="visible" aria-hidden="true"><path class="f-peach" d="M37 90 C 35.7 108, 45.5 122, 50 130 C 54.5 122, 64.3 108, 63 90 Z"/><path class="f-spark" d="M41.4 90 C 40.6 103, 47 113, 50 118.8 C 53 113, 59.4 103, 58.6 90 Z"/><path class="f-highlight" d="M46.1 90 C 45.7 97.6, 48.6 103.4, 50 106.8 C 51.4 103.4, 54.3 97.6, 53.9 90 Z"/><path class="f-planet-peach-2 s-ink" d="M30 62 C 20 68, 16 78, 16 88 L34 80 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-planet-peach-4 s-ink" d="M70 62 C 80 68, 84 78, 84 88 L66 80 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-steel s-ink" d="M40 82 L60 82 L64 92 L36 92 Z" stroke-width="3" stroke-linejoin="round"/><clipPath id="words-mini-b"><rect x="32" y="38" width="36" height="46" rx="5"/></clipPath><g clip-path="url(#words-mini-b)"><rect class="f-mint-light" x="31.5" y="38" width="5.7" height="46"/><rect class="f-mint" x="36.2" y="38" width="17.9" height="46"/><rect class="f-mint-dark" x="53.1" y="38" width="10" height="46"/><rect class="f-mint-deep" x="62.1" y="38" width="6.4" height="46"/><rect class="f-peach-shade" x="32" y="72" width="36" height="12"/></g><rect class="s-ink" x="32" y="38" width="36" height="46" rx="5" fill="none" stroke-width="4"/><clipPath id="words-mini-c"><path d="M32 40 C 33 26, 42 14, 50 8 C 58 14, 67 26, 68 40 Z"/></clipPath><g clip-path="url(#words-mini-c)"><rect class="f-planet-peach-light" x="31.5" y="8" width="6.8" height="34"/><rect class="f-planet-peach-2" x="37.3" y="8" width="15" height="34"/><rect class="f-planet-peach" x="51.3" y="8" width="10" height="34"/><rect class="f-planet-peach-4" x="60.3" y="8" width="8.2" height="34"/></g><path class="s-ink" d="M32 40 C 33 26, 42 14, 50 8 C 58 14, 67 26, 68 40 Z" fill="none" stroke-width="4" stroke-linejoin="round"/><circle class="f-peach-dark s-ink" cx="50" cy="54" r="9" stroke-width="3"/><circle class="f-glass s-ink" cx="50" cy="54" r="5.5" stroke-width="2"/><path class="s-cat-white" d="M47 52 C 48 50, 50 49, 52 49" fill="none" stroke-width="1.8" stroke-linecap="round"/></svg></template>
+<template id="art-words-lamp"><svg width="46" height="46" viewBox="-23 -23 46 46" overflow="visible" aria-hidden="true"><g class="words-lamp-off"><circle class="f-peach-shade s-ink" cx="0" cy="0" r="9.5" stroke-width="3"/><circle class="f-highlight" cx="-3" cy="-3" r="2" opacity="0.5"/></g><g class="words-lamp-on"><circle class="f-spark" cx="0" cy="0" r="23" opacity="0.2"/><circle class="f-spark" cx="0" cy="0" r="17" opacity="0.45"/><circle class="f-spark s-ink" cx="0" cy="0" r="9.5" stroke-width="3"/><circle class="f-highlight" cx="-3" cy="-3" r="2.2" opacity="0.9"/></g></svg></template>
 <template id="art-words-socket-1"><svg width="120" height="120" viewBox="0 0 120 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="120" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="110" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="111.7" cy="81.4" r="2"/><circle class="f-ink" cx="81.4" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="81.4" cy="8.3" r="2"/><circle class="f-ink" cx="111.7" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="104" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="88" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
 <template id="art-words-tile-1"><svg width="104" height="104" viewBox="0 0 104 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="s-spark" x="-12" y="-12" width="128" height="128" rx="64" fill="none" stroke-width="12"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="100" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="90" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="94.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="69.6" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="69.6" cy="9.5" r="2.2"/><circle class="f-ink" cx="94.5" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="83.2" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H72.8" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="101" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H72.8" stroke-width="5" stroke-linecap="round"/></g></svg></template>
 <template id="art-words-socket-2"><svg width="167.8" height="120" viewBox="0 0 167.8 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="167.8" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="157.8" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="159.6" cy="81.4" r="2"/><circle class="f-ink" cx="129.3" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="129.3" cy="8.3" r="2"/><circle class="f-ink" cx="159.6" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="151.8" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="135.8" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
@@ -658,7 +676,7 @@ button { font-family: var(--font-andika); }
 <template id="art-words-tile-4"><svg width="247.5" height="104" viewBox="0 0 247.5 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="s-spark" x="-12" y="-12" width="271.5" height="128" rx="64" fill="none" stroke-width="12"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="243.5" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="233.5" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="238" cy="69.6" r="2.2"/><circle class="f-ink" cx="213.1" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="213.1" cy="9.5" r="2.2"/><circle class="f-ink" cx="238" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="226.7" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H216.3" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="244.5" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H216.3" stroke-width="5" stroke-linecap="round"/></g></svg></template>
 <script>
 window.MW = { VERSION: '0.6.0' };
-window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"rescue-find-number":{"dur":1.75},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74},"words-w-feel":{"dur":1.1},"words-w-food":{"dur":1.13},"words-w-sort":{"dur":1.21},"words-w-down":{"dur":0.94},"words-w-right":{"dur":1.09},"words-w-hard":{"dur":0.93},"words-w-took":{"dur":0.76},"words-w-hear":{"dur":0.72},"words-w-misses":{"dur":1.2},"words-w-chain":{"dur":0.95},"words-w-queen":{"dur":1.0},"words-w-chair":{"dur":0.9},"words-w-year":{"dur":1.03},"words-w-cobweb":{"dur":1.24},"words-w-goats":{"dur":0.84},"words-w-farmyard":{"dur":1.37},"words-w-green":{"dur":0.96},"words-w-brown":{"dur":0.97},"words-w-train":{"dur":0.94},"words-w-thinks":{"dur":1.01},"words-w-drum":{"dur":0.83},"words-w-splat":{"dur":1.13},"words-w-paint":{"dur":0.78},"words-w-frog":{"dur":0.72},"words-w-day":{"dur":0.72},"words-w-cloud":{"dur":1.32},"words-w-boy":{"dur":0.77},"words-w-read":{"dur":1.13},"words-w-play":{"dur":0.8},"words-w-sound":{"dur":1.2},"words-w-joy":{"dur":0.98},"words-w-treat":{"dur":0.8},"words-s-a":{"dur":0.48},"words-s-b":{"dur":0.36},"words-s-d":{"dur":0.38},"words-s-e":{"dur":0.36},"words-s-f":{"dur":0.72},"words-s-g":{"dur":0.39},"words-s-h":{"dur":0.34},"words-s-i":{"dur":0.39},"words-s-j":{"dur":0.46},"words-s-k":{"dur":0.42},"words-s-l":{"dur":0.68},"words-s-m":{"dur":0.71},"words-s-n":{"dur":0.78},"words-s-o":{"dur":0.43},"words-s-p":{"dur":0.39},"words-s-r":{"dur":0.72},"words-s-s":{"dur":0.7},"words-s-t":{"dur":0.35},"words-s-u":{"dur":0.33},"words-s-v":{"dur":0.9},"words-s-w":{"dur":0.34},"words-s-y":{"dur":0.4},"words-s-ai":{"dur":0.8},"words-s-air":{"dur":0.85},"words-s-ar":{"dur":0.91},"words-s-ch":{"dur":0.42},"words-s-ear":{"dur":0.63},"words-s-ee":{"dur":1.28},"words-s-igh":{"dur":0.88},"words-s-oa":{"dur":0.83},"words-s-oo-long":{"dur":0.77},"words-s-oo-short":{"dur":0.35},"words-s-or":{"dur":0.64},"words-s-ow":{"dur":0.82},"words-s-oy":{"dur":0.57},"words-s-qu":{"dur":0.38},"words-s-sh":{"dur":0.56},"words-s-th":{"dur":0.64},"words-s-th-voiced":{"dur":0.87},"words-s-ur":{"dur":0.74},"words-s-ure":{"dur":0.67},"words-s-wu":{"dur":0.49}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
+window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"rescue-find-number":{"dur":1.75},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74},"words-w-feel":{"dur":1.1},"words-w-food":{"dur":1.13},"words-w-sort":{"dur":1.21},"words-w-down":{"dur":0.94},"words-w-right":{"dur":1.09},"words-w-hard":{"dur":0.93},"words-w-took":{"dur":0.76},"words-w-hear":{"dur":0.72},"words-w-misses":{"dur":1.2},"words-w-chain":{"dur":0.95},"words-w-queen":{"dur":1.0},"words-w-chair":{"dur":0.9},"words-w-year":{"dur":1.03},"words-w-cobweb":{"dur":1.24},"words-w-goats":{"dur":0.84},"words-w-farmyard":{"dur":1.37},"words-w-green":{"dur":0.96},"words-w-brown":{"dur":0.97},"words-w-train":{"dur":0.94},"words-w-thinks":{"dur":1.01},"words-w-drum":{"dur":0.83},"words-w-splat":{"dur":1.13},"words-w-paint":{"dur":0.78},"words-w-frog":{"dur":0.72},"words-w-day":{"dur":0.72},"words-w-cloud":{"dur":1.32},"words-w-boy":{"dur":0.77},"words-w-read":{"dur":1.13},"words-w-play":{"dur":0.8},"words-w-sound":{"dur":1.2},"words-w-joy":{"dur":0.98},"words-w-treat":{"dur":0.8},"words-s-a":{"dur":0.48},"words-s-b":{"dur":0.36},"words-s-d":{"dur":0.38},"words-s-e":{"dur":0.36},"words-s-f":{"dur":0.72},"words-s-g":{"dur":0.39},"words-s-h":{"dur":0.34},"words-s-i":{"dur":0.39},"words-s-j":{"dur":0.46},"words-s-k":{"dur":0.42},"words-s-l":{"dur":0.68},"words-s-m":{"dur":0.71},"words-s-n":{"dur":0.78},"words-s-o":{"dur":0.43},"words-s-p":{"dur":0.39},"words-s-r":{"dur":0.72},"words-s-s":{"dur":0.7},"words-s-t":{"dur":0.35},"words-s-u":{"dur":0.33},"words-s-v":{"dur":0.9},"words-s-w":{"dur":0.34},"words-s-y":{"dur":0.4},"words-s-ai":{"dur":0.8},"words-s-air":{"dur":0.85},"words-s-ar":{"dur":0.91},"words-s-ch":{"dur":0.42},"words-s-ear":{"dur":0.63},"words-s-ee":{"dur":0.96},"words-s-igh":{"dur":0.88},"words-s-oa":{"dur":0.83},"words-s-oo-long":{"dur":0.77},"words-s-oo-short":{"dur":0.35},"words-s-or":{"dur":0.64},"words-s-ow":{"dur":0.82},"words-s-oy":{"dur":0.57},"words-s-qu":{"dur":0.38},"words-s-sh":{"dur":0.56},"words-s-th":{"dur":0.64},"words-s-th-voiced":{"dur":0.87},"words-s-ur":{"dur":0.74},"words-s-ure":{"dur":0.67},"words-s-wu":{"dur":0.49}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
 window.MW_GAMES = [{"id":"rescue","name":"MeeMee Rescue","planet":0,"badge":"mimi","say":"map-mimi-rescue"},{"id":"words","name":"MeeMee Rockets","planet":1,"badge":"words-badge","say":"words-name"}];
 window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"rescue-find-number","group":"Numbers mode","words":"Find the number."},{"id":"words-name","group":"Map","words":"MeeMee Rockets!"},{"id":"words-round-ready","group":"Rounds","words":"Ready to launch some rockets?"},{"id":"words-round-done","group":"Rounds","words":"You launched all the rockets!"},{"id":"words-round-another","group":"Rounds","words":"Another go?"},{"id":"words-find","group":"Find","words":"Find the word…"},{"id":"words-that-word","group":"Find","words":"That word is…"},{"id":"words-found-it","group":"Praise","words":"You found it!"},{"id":"words-super-reading","group":"Praise","words":"Super reading!"},{"id":"words-well-done","group":"Praise","words":"Well done!"},{"id":"words-build","group":"Build","words":"Now build the word…"},{"id":"words-you-built","group":"Build","words":"You built the word…"},{"id":"words-tricky-bit","group":"Build","words":"That's the tricky bit."},{"id":"words-try-again","group":"Trying again","words":"Let's try again."},{"id":"words-look-together","group":"Trying again","words":"Let's look together."},{"id":"words-w-all","group":"Week 5 words","words":"all"},{"id":"words-w-of","group":"Week 5 words","words":"of"},{"id":"words-w-one","group":"Week 5 words","words":"one"},{"id":"words-w-here","group":"Week 5 words","words":"here"},{"id":"words-w-magnet","group":"Week 5 words","words":"magnet"},{"id":"words-w-cartoon","group":"Week 5 words","words":"cartoon"},{"id":"words-w-rabbit","group":"Week 5 words","words":"rabbit"},{"id":"words-w-spray","group":"Week 5 words","words":"spray"},{"id":"words-w-popcorn","group":"Week 5 words","words":"popcorn"},{"id":"words-w-proud","group":"Week 5 words","words":"proud"},{"id":"words-w-toy","group":"Week 5 words","words":"toy"},{"id":"words-w-say","group":"Week 5 words","words":"say"},{"id":"words-w-go","group":"Tricky words, weeks 1 to 4","words":"go"},{"id":"words-w-my","group":"Tricky words, weeks 1 to 4","words":"my"},{"id":"words-w-into","group":"Tricky words, weeks 1 to 4","words":"into"},{"id":"words-w-out","group":"Tricky words, weeks 1 to 4","words":"out"},{"id":"words-w-what","group":"Tricky words, weeks 1 to 4","words":"what"},{"id":"words-w-she","group":"Tricky words, weeks 1 to 4","words":"she"},{"id":"words-w-me","group":"Tricky words, weeks 1 to 4","words":"me"},{"id":"words-w-love","group":"Tricky words, weeks 1 to 4","words":"love"},{"id":"words-w-they","group":"Tricky words, weeks 1 to 4","words":"they"},{"id":"words-w-some","group":"Tricky words, weeks 1 to 4","words":"some"},{"id":"words-w-were","group":"Tricky words, weeks 1 to 4","words":"were"},{"id":"words-w-sure","group":"Tricky words, weeks 1 to 4","words":"sure"},{"id":"words-w-said","group":"Tricky words, weeks 1 to 4","words":"said"},{"id":"words-w-you","group":"Tricky words, weeks 1 to 4","words":"you"},{"id":"words-w-like","group":"Tricky words, weeks 1 to 4","words":"like"},{"id":"words-w-push","group":"Tricky words, weeks 1 to 4","words":"push"},{"id":"words-w-feel","group":"Other words, weeks 1 to 4","words":"feel"},{"id":"words-w-food","group":"Other words, weeks 1 to 4","words":"food"},{"id":"words-w-sort","group":"Other words, weeks 1 to 4","words":"sort"},{"id":"words-w-down","group":"Other words, weeks 1 to 4","words":"down"},{"id":"words-w-right","group":"Other words, weeks 1 to 4","words":"right"},{"id":"words-w-hard","group":"Other words, weeks 1 to 4","words":"hard"},{"id":"words-w-took","group":"Other words, weeks 1 to 4","words":"took"},{"id":"words-w-hear","group":"Other words, weeks 1 to 4","words":"hear"},{"id":"words-w-misses","group":"Other words, weeks 1 to 4","words":"misses"},{"id":"words-w-chain","group":"Other words, weeks 1 to 4","words":"chain"},{"id":"words-w-queen","group":"Other words, weeks 1 to 4","words":"queen"},{"id":"words-w-chair","group":"Other words, weeks 1 to 4","words":"chair"},{"id":"words-w-year","group":"Other words, weeks 1 to 4","words":"year"},{"id":"words-w-cobweb","group":"Other words, weeks 1 to 4","words":"cobweb"},{"id":"words-w-goats","group":"Other words, weeks 1 to 4","words":"goats"},{"id":"words-w-farmyard","group":"Other words, weeks 1 to 4","words":"farmyard"},{"id":"words-w-green","group":"Other words, weeks 1 to 4","words":"green"},{"id":"words-w-brown","group":"Other words, weeks 1 to 4","words":"brown"},{"id":"words-w-train","group":"Other words, weeks 1 to 4","words":"train"},{"id":"words-w-thinks","group":"Other words, weeks 1 to 4","words":"thinks"},{"id":"words-w-drum","group":"Other words, weeks 1 to 4","words":"drum"},{"id":"words-w-splat","group":"Other words, weeks 1 to 4","words":"splat"},{"id":"words-w-paint","group":"Other words, weeks 1 to 4","words":"paint"},{"id":"words-w-frog","group":"Other words, weeks 1 to 4","words":"frog"},{"id":"words-w-day","group":"Other words, weeks 1 to 4","words":"day"},{"id":"words-w-cloud","group":"Other words, weeks 1 to 4","words":"cloud"},{"id":"words-w-boy","group":"Other words, weeks 1 to 4","words":"boy"},{"id":"words-w-read","group":"Other words, weeks 1 to 4","words":"read"},{"id":"words-w-play","group":"Other words, weeks 1 to 4","words":"play"},{"id":"words-w-sound","group":"Other words, weeks 1 to 4","words":"sound"},{"id":"words-w-joy","group":"Other words, weeks 1 to 4","words":"joy"},{"id":"words-w-treat","group":"Other words, weeks 1 to 4","words":"treat"},{"id":"words-s-a","group":"Tile sounds","words":"a"},{"id":"words-s-b","group":"Tile sounds","words":"b"},{"id":"words-s-d","group":"Tile sounds","words":"d"},{"id":"words-s-e","group":"Tile sounds","words":"e"},{"id":"words-s-f","group":"Tile sounds","words":"f"},{"id":"words-s-g","group":"Tile sounds","words":"g"},{"id":"words-s-h","group":"Tile sounds","words":"h"},{"id":"words-s-i","group":"Tile sounds","words":"i"},{"id":"words-s-j","group":"Tile sounds","words":"j"},{"id":"words-s-k","group":"Tile sounds","words":"k (for c and k)"},{"id":"words-s-l","group":"Tile sounds","words":"l"},{"id":"words-s-m","group":"Tile sounds","words":"m"},{"id":"words-s-n","group":"Tile sounds","words":"n"},{"id":"words-s-o","group":"Tile sounds","words":"o"},{"id":"words-s-p","group":"Tile sounds","words":"p"},{"id":"words-s-r","group":"Tile sounds","words":"r"},{"id":"words-s-s","group":"Tile sounds","words":"s"},{"id":"words-s-t","group":"Tile sounds","words":"t"},{"id":"words-s-u","group":"Tile sounds","words":"u"},{"id":"words-s-v","group":"Tile sounds","words":"v"},{"id":"words-s-w","group":"Tile sounds","words":"w"},{"id":"words-s-y","group":"Tile sounds","words":"y, as in yes"},{"id":"words-s-ai","group":"Tile sounds","words":"ai, as in rain"},{"id":"words-s-air","group":"Tile sounds","words":"air, as in chair"},{"id":"words-s-ar","group":"Tile sounds","words":"ar, as in hard"},{"id":"words-s-ch","group":"Tile sounds","words":"ch"},{"id":"words-s-ear","group":"Tile sounds","words":"ear, as in hear"},{"id":"words-s-ee","group":"Tile sounds","words":"ee, as in feel"},{"id":"words-s-igh","group":"Tile sounds","words":"igh, as in right"},{"id":"words-s-oa","group":"Tile sounds","words":"oa, as in goat"},{"id":"words-s-oo-long","group":"Tile sounds","words":"oo, as in food"},{"id":"words-s-oo-short","group":"Tile sounds","words":"oo, as in took"},{"id":"words-s-or","group":"Tile sounds","words":"or, as in sort"},{"id":"words-s-ow","group":"Tile sounds","words":"ow, as in down"},{"id":"words-s-oy","group":"Tile sounds","words":"oy, as in boy"},{"id":"words-s-qu","group":"Tile sounds","words":"kw (qu)"},{"id":"words-s-sh","group":"Tile sounds","words":"sh"},{"id":"words-s-th","group":"Tile sounds","words":"th, as in thinks"},{"id":"words-s-th-voiced","group":"Tile sounds","words":"th, as in they"},{"id":"words-s-ur","group":"Tile sounds","words":"ur, as in turn"},{"id":"words-s-ure","group":"Tile sounds","words":"ure, as in sure"},{"id":"words-s-wu","group":"Tile sounds","words":"w-u, as at the start of one"}];
 </script>
@@ -3568,40 +3586,57 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 /* ---- games/words ---- */
 /* MeeMee Rockets: the words. The one file to edit for a new half-term (no code changes).
 
-   weeks       each week of the class's list: its tricky words, then its other words (the sounded-out ones).
+   weeks       each week of the class's list: its tricky words, then its other words (the sounded-out ones). The Words
+               tab offers each week, then all of them together, named from the first and last weeks here ("Weeks 1–5").
    startWeek   the week in play until a grown-up picks another in the grown-ups area (Words tab).
    harderTray  how many tiles the tray holds in harder letters: the word's letters, its spares, then letters from
-               the week's other words.
+               other words (the week in play's; with every week in play, the word's own week's first).
+   sounds      what each tile says when it is picked up in the sound tiles step: its usual sound, as a sound id. Each
+               id is a recording: the line "words-s-" and the id in lines.json ("ai" is "words-s-ai"), recorded on the
+               recording page. Letters that make one sound share it: c and k both say "k"; ai, ay and ey say "ai".
+               oo has no usual sound (it says "oo" as in food, or "oo" as in took): each word with oo says which.
    words       every word, with:
      tiles     its sound tiles, left to right, with a space between them: 'c ar t oo n'. Letters that make one
                sound ('ar', 'ay', 'ere') are one tile. Square brackets mark the tricky part: 'h [ere]'.
                A split pair marks both its tiles ('s [o] m [e]'); a whole tricky word marks every tile ('[o] [ne]').
-     spares    the extra letters for letters mode, with a space between them: 'i e'. A spare may repeat a letter
-               of the word (the extra e in 'she').
+     sounds    the tiles that say something other than their usual sound in this word, as { tile: sound id }:
+               { ere: 'ear' }. Every tricky tile says what it says in this word ("ai" in "said" says "e"), so each
+               tricky tile is listed here. '-' is a tile that says nothing (the e of a split pair: in "some" the o
+               says the pair's sound, "u", and the e says nothing).
+     spares    the extra letters for letters mode, with a space between them: 'i e'. Pick letters the word doesn't
+               have. A spare that repeats a letter of the word is just as good as the word's own letter, so it isn't
+               a wrong choice ("you" keeps o, decided 10 October 2026).
      says      what the tricky part says (for grown-ups; the game doesn't show it).
 
    Every word also needs its line in lines.json ("words-w-" and the word, such as "words-w-magnet"), recorded on the
-   recording page. A word whose recording isn't there yet stays out of play until it is. */
+   recording page. A word whose recording isn't there yet stays out of play until it is, and a tile whose sound isn't
+   recorded yet is quiet. The grown-ups' Words tab lists both, and anything in this file that doesn't add up. */
 (function () {
   'use strict';
   window.MW.wordsData = {
     startWeek: 5,
     harderTray: 10,
     weeks: [
-      { week: 1, tricky: ['go', 'my', 'into', 'out'], other: [] },
-      { week: 2, tricky: ['what', 'she', 'me', 'love'], other: [] },
-      { week: 3, tricky: ['they', 'some', 'were', 'sure'], other: [] },
-      { week: 4, tricky: ['said', 'you', 'like', 'push'], other: [] },
+      { week: 1, tricky: ['go', 'my', 'into', 'out'], other: ['feel', 'food', 'sort', 'down', 'right', 'hard', 'took', 'hear'] },
+      { week: 2, tricky: ['what', 'she', 'me', 'love'], other: ['misses', 'chain', 'queen', 'chair', 'year', 'cobweb', 'goats', 'farmyard'] },
+      { week: 3, tricky: ['they', 'some', 'were', 'sure'], other: ['green', 'brown', 'train', 'thinks', 'drum', 'splat', 'paint', 'frog'] },
+      { week: 4, tricky: ['said', 'you', 'like', 'push'], other: ['day', 'cloud', 'boy', 'read', 'play', 'sound', 'joy', 'treat'] },
       { week: 5, tricky: ['all', 'of', 'one', 'here'], other: ['magnet', 'cartoon', 'rabbit', 'spray', 'popcorn', 'proud', 'toy', 'say'] }
     ],
+    sounds: {
+      a: 'a', b: 'b', c: 'k', d: 'd', e: 'e', f: 'f', g: 'g', h: 'h', i: 'i', j: 'j', k: 'k', l: 'l', m: 'm',
+      n: 'n', o: 'o', p: 'p', r: 'r', s: 's', t: 't', u: 'u', v: 'v', w: 'w', y: 'y',
+      ai: 'ai', air: 'air', ar: 'ar', ay: 'ai', ch: 'ch', ea: 'ee', ear: 'ear', ee: 'ee', igh: 'igh', ll: 'l',
+      oa: 'oa', or: 'or', ou: 'ow', ow: 'ow', oy: 'oy', qu: 'qu', sh: 'sh', ss: 's', th: 'th', ure: 'ure'
+    },
     words: {
       // week 5
-      all: { tiles: '[a] ll', spares: 'o', says: 'a says "or"' },
-      of: { tiles: 'o [f]', spares: 'v', says: 'f says "v"' },
-      one: { tiles: '[o] [ne]', spares: 'w', says: 'the whole word: o says "w-u", ne says "n"' },
-      here: { tiles: 'h [ere]', spares: 'a', says: 'ere says "ear"' },
+      all: { tiles: '[a] ll', sounds: { a: 'or' }, spares: 'o', says: 'a says "or"' },
+      of: { tiles: 'o [f]', sounds: { f: 'v' }, spares: 'v', says: 'f says "v"' },
+      one: { tiles: '[o] [ne]', sounds: { o: 'wu', ne: 'n' }, spares: 'w', says: 'the whole word: o says "w-u", ne says "n"' },
+      here: { tiles: 'h [ere]', sounds: { ere: 'ear' }, spares: 'a', says: 'ere says "ear"' },
       magnet: { tiles: 'm a g n e t', spares: 'i' },
-      cartoon: { tiles: 'c ar t oo n', spares: 'k' },
+      cartoon: { tiles: 'c ar t oo n', sounds: { oo: 'oo-long' }, spares: 'k' },
       rabbit: { tiles: 'r a b b i t', spares: 'd' },
       spray: { tiles: 's p r ay', spares: 'i e' },
       popcorn: { tiles: 'p o p c or n', spares: 'k' },
@@ -3609,25 +3644,57 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       toy: { tiles: 't oy', spares: 'i' },
       say: { tiles: 's ay', spares: 'i' },
       // week 1
-      go: { tiles: 'g [o]', spares: 'a', says: 'o says "oa"' },
-      my: { tiles: 'm [y]', spares: 'i', says: 'y says "igh"' },
-      into: { tiles: 'i n t [o]', spares: 'u', says: 'o says "oo"' },
-      out: { tiles: '[ou] t', spares: 'w', says: 'ou says "ow"' },
+      go: { tiles: 'g [o]', sounds: { o: 'oa' }, spares: 'a', says: 'o says "oa"' },
+      my: { tiles: 'm [y]', sounds: { y: 'igh' }, spares: 'i', says: 'y says "igh"' },
+      into: { tiles: 'i n t [o]', sounds: { o: 'oo-long' }, spares: 'u', says: 'o says "oo"' },
+      out: { tiles: '[ou] t', sounds: { ou: 'ow' }, spares: 'w', says: 'ou says "ow"' },
+      feel: { tiles: 'f ee l', spares: 'a' },
+      food: { tiles: 'f oo d', sounds: { oo: 'oo-long' }, spares: 'u' },
+      sort: { tiles: 's or t', spares: 'a' },
+      down: { tiles: 'd ow n', spares: 'u' },
+      right: { tiles: 'r igh t', spares: 'y' },
+      hard: { tiles: 'h ar d', spares: 'b' },
+      took: { tiles: 't oo k', sounds: { oo: 'oo-short' }, spares: 'c' },
+      hear: { tiles: 'h ear', spares: 'i' },
       // week 2
-      what: { tiles: '[wh] [a] t', spares: 'o', says: 'wh says "w", a says "o"' },
-      she: { tiles: 'sh [e]', spares: 'e', says: 'e says "ee"' },
-      me: { tiles: 'm [e]', spares: 'e', says: 'e says "ee"' },
-      love: { tiles: 'l [o] [ve]', spares: 'u', says: 'o says "u", ve says "v"' },
+      what: { tiles: '[wh] [a] t', sounds: { wh: 'w', a: 'o' }, spares: 'o', says: 'wh says "w", a says "o"' },
+      she: { tiles: 'sh [e]', sounds: { e: 'ee' }, spares: 'c', says: 'e says "ee"' },
+      me: { tiles: 'm [e]', sounds: { e: 'ee' }, spares: 'n', says: 'e says "ee"' },
+      love: { tiles: 'l [o] [ve]', sounds: { o: 'u', ve: 'v' }, spares: 'u', says: 'o says "u", ve says "v"' },
+      misses: { tiles: 'm i ss e s', spares: 'z' },
+      chain: { tiles: 'ch ai n', spares: 'y' },
+      queen: { tiles: 'qu ee n', spares: 'w' },
+      chair: { tiles: 'ch air', spares: 'e' },
+      year: { tiles: 'y ear', spares: 'i' },
+      cobweb: { tiles: 'c o b w e b', spares: 'd' },
+      goats: { tiles: 'g oa t s', spares: 'w' },
+      farmyard: { tiles: 'f ar m y ar d', spares: 'b' },
       // week 3
-      they: { tiles: 'th [ey]', spares: 'a', says: 'ey says "ai"' },
-      some: { tiles: 's [o] m [e]', spares: 'u', says: 'o-e says "u" (a split pair)' },
-      were: { tiles: 'w [ere]', spares: 'u', says: 'ere says "ur"' },
-      sure: { tiles: '[s] [ure]', spares: 'h', says: 'the whole word: s says "sh"' },
+      they: { tiles: 'th [ey]', sounds: { th: 'th-voiced', ey: 'ai' }, spares: 'a', says: 'ey says "ai"' },
+      some: { tiles: 's [o] m [e]', sounds: { o: 'u', e: '-' }, spares: 'u', says: 'o-e says "u" (a split pair)' },
+      were: { tiles: 'w [ere]', sounds: { ere: 'ur' }, spares: 'u', says: 'ere says "ur"' },
+      sure: { tiles: '[s] [ure]', sounds: { s: 'sh', ure: 'ure' }, spares: 'h', says: 'the whole word: s says "sh"' },
+      green: { tiles: 'g r ee n', spares: 'a' },
+      brown: { tiles: 'b r ow n', spares: 'u' },
+      train: { tiles: 't r ai n', spares: 'y' },
+      thinks: { tiles: 'th i n k s', spares: 'f' },
+      drum: { tiles: 'd r u m', spares: 'b' },
+      splat: { tiles: 's p l a t', spares: 'e' },
+      paint: { tiles: 'p ai n t', spares: 'e' },
+      frog: { tiles: 'f r o g', spares: 'a' },
       // week 4
-      said: { tiles: 's [ai] d', spares: 'e', says: 'ai says "e"' },
-      you: { tiles: 'y [ou]', spares: 'o', says: 'ou says "oo"' },
-      like: { tiles: 'l [i] k [e]', spares: 'c', says: 'i-e says "igh" (a split pair)' },
-      push: { tiles: 'p [u] sh', spares: 'o', says: 'u says "oo", as in book' }
+      said: { tiles: 's [ai] d', sounds: { ai: 'e' }, spares: 'e', says: 'ai says "e"' },
+      you: { tiles: 'y [ou]', sounds: { ou: 'oo-long' }, spares: 'o', says: 'ou says "oo"' },
+      like: { tiles: 'l [i] k [e]', sounds: { i: 'igh', e: '-' }, spares: 'c', says: 'i-e says "igh" (a split pair)' },
+      push: { tiles: 'p [u] sh', sounds: { u: 'oo-short' }, spares: 'o', says: 'u says "oo", as in book' },
+      day: { tiles: 'd ay', spares: 'i' },
+      cloud: { tiles: 'c l ou d', spares: 'w' },
+      boy: { tiles: 'b oy', spares: 'i' },
+      read: { tiles: 'r ea d', spares: 'b' },
+      play: { tiles: 'p l ay', spares: 'i' },
+      sound: { tiles: 's ou n d', spares: 'w' },
+      joy: { tiles: 'j oy', spares: 'i' },
+      treat: { tiles: 't r ea t', spares: 'i' }
     }
   };
 })();
@@ -3641,10 +3708,17 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
      harder    then from single letters with the tray filled to 10 tiles, three more days;
      secure    right first time in harder letters too. Secure words come back for review, in harder letters.
    Right first time: found and built with no wrong tap, no wrong drop and no hint. A wrong try restarts that step's
-   three days; a word never goes back a step.
-   A round: five different words (or every word in play, if fewer), one or two secure ones for review and the rest
-   not yet secure, as MeeMee Rescue picks its bonds. The words in play are the chosen week's words plus the tricky
-   words of the weeks before it.
+   three days. A word goes back only from secure (answer 12 of the 0.6.0 PRD): two slips in a row (answers not right
+   first time) take it back to harder letters, for three more days right first time; a right answer in between clears
+   the first slip.
+   What's in play: one week (that week's words and the tricky words of the weeks before it), or every week ('all', the
+   Words tab's "Weeks 1–5").
+   A round: five different words (or every word in play, if fewer), one or two secure ones for review and the rest not
+   yet secure.
+     One week: the rest at random, and at least 3 of the 5 from the chosen week's own words while it has that many in
+               play (answer 10).
+     All weeks: the rest from the lowest step first (not yet, sound tiles, letters, harder letters), at random within a
+               step (answer 8).
    Pure functions of the words file and the saved answers, so they are easy to test. */
 (function () {
   'use strict';
@@ -3653,6 +3727,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   S.STEPS = ['notyet', 'tiles', 'letters', 'harder', 'secure'];
   S.NAMES = { notyet: 'Not yet', tiles: 'Sound tiles', letters: 'Letters', harder: 'Harder letters', secure: 'Secure' };
+  S.ALL = 'all';                 // every week in play (saved as the week)
+  S.SILENT = '-';                // a tile that says nothing (the e of a split pair)
+  S.SLIPS = 2;                   // slips in a row that take a secure word back to harder letters
   function rank(step) { return S.STEPS.indexOf(step); }
 
   function day(t) {
@@ -3675,11 +3752,18 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       return m ? { text: m[1], tricky: true } : { text: t, tricky: false };
     });
   };
-  // Every word with its week, whether it is one of that week's tricky words, its tiles, letters and spares.
-  // Problems in the file (a word with no tiles, tiles that don't spell it) are listed, not thrown, so the tests and
-  // the grown-ups area can say what is wrong.
+  // Every word with its week, whether it is one of that week's tricky words, its tiles (each with what it says), letters
+  // and spares. Problems in the file (a word with no tiles, tiles that don't spell it, a tile with no sound) are listed,
+  // not thrown, so the tests and the grown-ups area can say what is wrong.
   S.read = function (data) {
-    const out = { words: {}, order: [], weeks: [], problems: [], harderTray: +data.harderTray || 10, startWeek: +data.startWeek || 1 };
+    const out = { words: {}, order: [], weeks: [], problems: [], harderTray: +data.harderTray || 10, startWeek: +data.startWeek || 1,
+      sounds: {} };
+    const usual = data.sounds && typeof data.sounds === 'object' ? data.sounds : {};
+    const goodId = function (id) { return id === S.SILENT || /^[a-z]+(-[a-z]+)*$/.test(String(id)); };
+    Object.keys(usual).forEach(function (g) {
+      if (goodId(usual[g])) out.sounds[g] = usual[g];
+      else out.problems.push('sounds: ' + g + ' should be a sound id, such as "ai"');
+    });
     (data.weeks || []).forEach(function (wk) {
       const n = +wk.week;
       out.weeks.push({ week: n, tricky: (wk.tricky || []).slice(), other: (wk.other || []).slice() });
@@ -3691,6 +3775,18 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
           const tiles = S.tiles(spec.tiles);
           if (tiles.map(function (t) { return t.text; }).join('') !== w) out.problems.push(w + ': its tiles spell ' + tiles.map(function (t) { return t.text; }).join(''));
           if (!/^[a-z]+$/.test(w)) out.problems.push(w + ': only lower-case letters, please');
+          // what each tile says: the word's own sound for it, or the tile's usual sound
+          const own = spec.sounds && typeof spec.sounds === 'object' ? spec.sounds : {};
+          Object.keys(own).forEach(function (k) {
+            if (!tiles.some(function (t) { return t.text === k; })) out.problems.push(w + ': its sounds name ' + k + ', which isn\'t one of its tiles');
+            else if (!goodId(own[k])) out.problems.push(w + ': the sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+          });
+          tiles.forEach(function (t) {
+            const mine = Object.prototype.hasOwnProperty.call(own, t.text) && goodId(own[t.text]);
+            t.sound = mine ? own[t.text] : (out.sounds[t.text] || null);
+            if (t.tricky && !mine) out.problems.push(w + ': say what its tricky tile ' + t.text + ' says in its sounds');
+            else if (!t.sound) out.problems.push(w + ': no sound for its tile ' + t.text);
+          });
           const letters = [];
           tiles.forEach(function (t) { t.text.split('').forEach(function (ch) { letters.push({ text: ch, tricky: t.tricky }); }); });
           const spares = String(spec.spares || '').trim().split(/\s+/).filter(Boolean);
@@ -3704,32 +3800,67 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (!out.weeks.some(function (wk) { return wk.week === out.startWeek; }) && out.weeks.length) out.startWeek = out.weeks[out.weeks.length - 1].week;
     return out;
   };
+  // A tile's recorded sound: the line id, or null for a tile that says nothing.
+  S.soundLine = function (sound) { return sound && sound !== S.SILENT ? 'words-s-' + sound : null; };
+  // Every sound the words use, as line ids (for the grown-ups' list of sounds waiting for a recording).
+  S.soundLines = function (book) {
+    const out = [];
+    book.order.forEach(function (w) {
+      book.words[w].tiles.forEach(function (t) { const id = S.soundLine(t.sound); if (id && out.indexOf(id) < 0) out.push(id); });
+    });
+    return out;
+  };
+  // The all-weeks choice's name, from the words file: "Weeks 1–5" (an en dash), or null with fewer than two weeks.
+  S.allLabel = function (book) {
+    if (book.weeks.length < 2) return null;
+    return 'Weeks ' + book.weeks[0].week + '–' + book.weeks[book.weeks.length - 1].week;
+  };
 
   // The words in play for a week: that week's words (tricky, then other) and the tricky words of the weeks before it.
+  // For 'all', every word, week by week (each week's tricky words, then its other words).
   S.inPlay = function (book, week) {
     const out = [];
-    book.weeks.forEach(function (wk) {
-      if (wk.week === week) out.push.apply(out, wk.tricky.concat(wk.other));
-    });
-    book.weeks.forEach(function (wk) {
-      if (wk.week < week) out.push.apply(out, wk.tricky);
-    });
+    if (week === S.ALL) {
+      book.weeks.forEach(function (wk) { out.push.apply(out, wk.tricky.concat(wk.other)); });
+    } else {
+      book.weeks.forEach(function (wk) {
+        if (wk.week === week) out.push.apply(out, wk.tricky.concat(wk.other));
+      });
+      book.weeks.forEach(function (wk) {
+        if (wk.week < week) out.push.apply(out, wk.tricky);
+      });
+    }
     return out.filter(function (w) { return book.words[w]; });
+  };
+  // A week's own words (its tricky words and its other words).
+  S.ownWords = function (book, week) {
+    const wk = book.weeks.filter(function (x) { return x.week === week; })[0];
+    return wk ? wk.tricky.concat(wk.other).filter(function (w) { return book.words[w]; }) : [];
   };
 
   // ---------------------------------------------------------------- steps
   S.firstTime = function (a) { return !a.tapped && !a.drops && !a.hint; };
-  // answers: [{ t, w, step, tapped, drops, hint }] -> { word: { step, days: [...], answers: n } }
+  // answers: [{ t, w, step, tapped, drops, hint }] -> { word: { step, days: [...], answers: n, slips: n } }
   S.statuses = function (answers) {
     const by = {};
     (answers || []).filter(function (a) {
       return a && typeof a.t === 'number' && typeof a.w === 'string';
     }).sort(function (x, y) { return x.t - y.t; }).forEach(function (a) {
-      const s = by[a.w] || (by[a.w] = { step: 'tiles', days: [], answers: 0 });
+      const s = by[a.w] || (by[a.w] = { step: 'tiles', days: [], answers: 0, slips: 0 });
       s.answers++;
-      // an answer saved at a later step than the replay has reached (older answers were trimmed): carry on from there
-      if (rank(a.step) > rank(s.step)) { s.step = a.step; s.days = []; }
-      if (s.step === 'secure') return;                      // a word never goes back a step
+      // Each answer was saved at the step its word was on, so the replay follows it where they differ (only when the
+      // oldest answers have been trimmed away, at 3,000):
+      //   saved at a later step than the replay has reached: carry on from there;
+      //   saved at an earlier one: the word went back from secure (two slips, the first one trimmed away), so it is on
+      //   that step again (its days start from this answer).
+      const r = rank(a.step);
+      if (r > rank(s.step) || (r >= rank('tiles') && r < rank(s.step))) { s.step = a.step; s.days = []; s.slips = 0; }
+      if (s.step === 'secure') {
+        // a secure word: two slips in a row take it back to harder letters; a right answer in between clears one
+        if (S.firstTime(a)) s.slips = 0;
+        else if (++s.slips >= S.SLIPS) { s.step = 'harder'; s.days = []; s.slips = 0; }
+        return;
+      }
       if (S.firstTime(a)) { const d = day(a.t); if (s.days.indexOf(d) < 0) s.days.push(d); }
       else s.days = [];
       if (s.days.length >= 3) { s.step = S.STEPS[rank(s.step) + 1]; s.days = []; }
@@ -3741,18 +3872,44 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   S.mode = function (step) { return step === 'letters' ? 'letters' : (step === 'harder' || step === 'secure') ? 'harder' : 'tiles'; };
 
   // ---------------------------------------------------------------- a round
-  // opts: { words: the words in play, answers, size: 5, rand } -> [{ word, step }]
+  // opts: { words: the words in play, answers, size: 5, rand,
+  //         lowest: true with every week in play (the words on the lowest step first),
+  //         own: the chosen week's own words in play (one week in play: at least 3 of them a round) } -> [{ word, step }]
   S.pickRound = function (opts) {
     const rand = opts.rand || Math.random;
     const size = Math.min(opts.size || 5, opts.words.length);
     const map = S.statuses(opts.answers);
-    const secure = shuffle(opts.words.filter(function (w) { return S.step(map, w) === 'secure'; }), rand);
-    const work = shuffle(opts.words.filter(function (w) { return S.step(map, w) !== 'secure'; }), rand);
+    const isSecure = function (w) { return S.step(map, w) === 'secure'; };
+    const secure = shuffle(opts.words.filter(isSecure), rand);
+    let work = shuffle(opts.words.filter(function (w) { return !isSecure(w); }), rand);
+    if (opts.lowest) {                                        // the lowest step first, at random within a step
+      const keyed = work.map(function (w, i) { return { w: w, r: rank(S.step(map, w)), i: i }; });
+      keyed.sort(function (a, b) { return a.r - b.r || a.i - b.i; });
+      work = keyed.map(function (k) { return k.w; });
+    }
     let nSecure = Math.min(rand() < 0.5 ? 1 : 2, secure.length);
     const nWork = Math.min(size - nSecure, work.length);
     nSecure = Math.min(size - nWork, secure.length);         // too few to practise: more secure ones
-    const chosen = shuffle(secure.slice(0, nSecure).concat(work.slice(0, nWork)), rand);
-    return chosen.map(function (w) { const s = S.step(map, w); return { word: w, step: s === 'notyet' ? 'tiles' : s }; });
+    const chosen = secure.slice(0, nSecure).concat(work.slice(0, nWork));
+    if (opts.own && opts.own.length) {
+      // one week in play: at least 3 of the round from the week's own words (all of them, if it has fewer in play).
+      // Bring in its words that need work first, then its secure ones, each in place of another week's word of the
+      // same kind where there is one.
+      const own = opts.own.filter(function (w) { return opts.words.indexOf(w) >= 0; });
+      const mine = function (w) { return own.indexOf(w) >= 0; };
+      const need = Math.min(3, chosen.length, own.length);
+      const out = function (list) { return list.filter(function (w) { return chosen.indexOf(w) < 0; }); };
+      const bring = shuffle(out(own).filter(function (w) { return !isSecure(w); }), rand)
+        .concat(shuffle(out(own).filter(isSecure), rand));
+      while (chosen.filter(mine).length < need && bring.length) {
+        const w = bring.shift();
+        const others = chosen.filter(function (x) { return !mine(x); });
+        const same = others.filter(function (x) { return isSecure(x) === isSecure(w); });
+        const drop = (same.length ? same : others).slice(-1)[0];
+        chosen[chosen.indexOf(drop)] = w;
+      }
+    }
+    return shuffle(chosen, rand).map(function (w) { const s = S.step(map, w); return { word: w, step: s === 'notyet' ? 'tiles' : s }; });
   };
 
   // Find: the word asked for and two others from the words in play, in a random order.
@@ -3763,18 +3920,20 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   };
 
   // Build: the places in the rocket and the tiles in the tray, for a word at a step.
-  //   tiles    one tile per sound ('ay'), no spares;
+  //   tiles    one tile per sound ('ay'), no spares; each says its sound in this word when picked up (sound);
   //   letters  one tile per letter, with the word's spares;
-  //   harder   as letters, then the tray filled up to book.harderTray with letters from the week's other words
+  //   harder   as letters, then the tray filled up to book.harderTray with letters from other words
   //            (fill: the words to take them from, in order of preference), each a letter not already in the tray.
-  // -> { mode, places: [{ text, tricky }], tray: [{ text, tricky, spare }] } (the tray shuffled)
+  // -> { mode, places: [{ text, tricky, sound }], tray: [{ text, tricky, spare, sound }] } (the tray shuffled)
   S.plan = function (book, word, step, fill, rand) {
     rand = rand || Math.random;
     const e = book.words[word];
     const mode = S.mode(step);
-    const places = (mode === 'tiles' ? e.tiles : e.letters).map(function (t) { return { text: t.text, tricky: t.tricky }; });
-    const tray = places.map(function (p) { return { text: p.text, tricky: p.tricky, spare: false }; });
-    if (mode !== 'tiles') e.spares.forEach(function (s) { tray.push({ text: s, tricky: false, spare: true }); });
+    const places = (mode === 'tiles' ? e.tiles : e.letters).map(function (t) {
+      return { text: t.text, tricky: t.tricky, sound: mode === 'tiles' ? t.sound : null };
+    });
+    const tray = places.map(function (p) { return { text: p.text, tricky: p.tricky, spare: false, sound: p.sound }; });
+    if (mode !== 'tiles') e.spares.forEach(function (s) { tray.push({ text: s, tricky: false, spare: true, sound: null }); });
     if (mode === 'harder') {
       const have = {};
       tray.forEach(function (t) { have[t.text] = true; });
@@ -3786,20 +3945,26 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         shuffle(letters, rand).forEach(function (ch) {
           if (tray.length >= book.harderTray || have[ch]) return;
           have[ch] = true;
-          tray.push({ text: ch, tricky: false, spare: true });
+          tray.push({ text: ch, tricky: false, spare: true, sound: null });
         });
       });
     }
     return { mode: mode, places: places, tray: shuffle(tray, rand) };
   };
-  // Where harder letters' extra letters come from, in order: the other words of the week in play, then the other
-  // words in play, then any word in the file (only needed when a week has very few letters).
-  S.fillFrom = function (book, week) {
-    const wk = book.weeks.filter(function (x) { return x.week === week; })[0];
-    return [wk ? wk.tricky.concat(wk.other) : [], S.inPlay(book, week), book.order];
+  // Where harder letters' extra letters come from, in order of preference:
+  //   one week in play   that week's words, then the other words in play, then any word in the file;
+  //   every week (all)   the word's own week's words, then any word in play, then any word in the file (answer 9).
+  // pool: the words in play this round (the recorded ones); without it, every word in play.
+  S.fillFrom = function (book, week, word, pool) {
+    const inPlay = pool || S.inPlay(book, week);
+    if (week === S.ALL) {
+      const e = book.words[word];
+      return [e ? S.ownWords(book, e.week) : [], inPlay, book.order];
+    }
+    return [S.ownWords(book, week), inPlay, book.order];
   };
 
-  // Every question the game can ask for a week: each word in play, to find and to build at each step.
+  // Every question the game can ask for a week (or 'all'): each word in play, to find and to build at each step.
   S.allQuestions = function (book, week) {
     const out = [];
     S.inPlay(book, week).forEach(function (w) {
@@ -3810,12 +3975,208 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   };
 })();
 
-/* MeeMee Rockets: the tricky-words game (the test build).
+/* MeeMee Rockets: the crew's job moments (0.6.0; the design canvas's round 7, board Moments7, as drawn).
+   A cat with a job appears briefly at its own moment, with no words, never over the word being found or built:
+     lookout    as a round starts, peeks up from the bottom right of Find with the telescope (below Scruffles's ship);
+     engineer   on a right tap in Find, pops up under the launch pad below that rocket and taps its clamp with the spanner;
+     navigator  as the star lights after the launch, holds up the star map on the cargo tray and points the way to the next
+                star (the dotted route goes behind the rocket, so it never crosses the word);
+     cook       on the end screen, brings a pan of fish for the MeeMee in the little rockets.
+   A job no cat has has no moment (MW.crew.who). With reduce motion the cats fade in and out instead of moving (the kit's
+   moment styles), and the spanner doesn't swing.
+   Positions are stage px from the board (each of its panels is a 1280 x 800 stage drawn at half size). MeeMee Rescue's
+   moments.js is the example this follows; Rockets has its own, because its screens are its own. */
+(function () {
+  'use strict';
+  const MW = window.MW;
+
+  const L = MW.LAYOUT.wordsMoments = {
+    // a 210-wide cat facing left, its head and the telescope showing above the stage's bottom edge
+    lookout: { x: 1000, y: 640, w: 210, scope: { x: 85, y: 2, size: 143 }, clip: { x: 960, w: 320 } },
+    // under the pad below the tapped rocket (dx from its centre line); the spanner held up to the clamp, turned 40 degrees
+    engineer: { dx: -83, y: 676, w: 160, spanner: { dx: 29, y: 620, size: 84, turn: -40 } },
+    // standing on the cargo tray, the star map held up; the route starts at the top of the map
+    navigator: { x: 600, y: 470, w: 140, map: { x: 650, y: 440, size: 96 }, from: { dx: 50, dy: 12 }, below: 24 },
+    // beside the little rockets, facing them, the pan held out to the last one
+    cook: { x: 880, y: 560, w: 170, pan: { x: 800, y: 630, size: 120 } }
+  };
+  function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
+  function size(svg, s) { svg.setAttribute('width', s); svg.setAttribute('height', s); return svg; }
+  function drop(el, ms) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms); }
+  function layer(parent, before) {
+    const l = MW.make('div', 'mw-layer mw-fill mw-moments');
+    if (before) parent.insertBefore(l, before); else parent.appendChild(l);
+    return l;
+  }
+
+  // opts: { find: Find's screen, findBefore: the layer the lookout and engineer go under (in front of the rockets and
+  //         the pad), build: Build's screen, routeBefore: the rocket's layer (the route goes behind it), buildBefore: the
+  //         layer the navigator goes under (in front of the tray and its tiles), stars: Build's MW.stars,
+  //         end: the end screen, endBefore: what the cook goes under (the Play button) }
+  MW.wordsMoments = function (opts) {
+    const m = {};
+    let timers = [];
+    const findLayer = layer(opts.find, opts.findBefore);
+    const routeLayer = layer(opts.build, opts.routeBefore);
+    const buildLayer = layer(opts.build, opts.buildBefore);
+    const endLayer = layer(opts.end, opts.endBefore);
+    let peek = null;
+
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+    function catFor(job, w) {
+      const who = MW.crew.who(job);
+      if (!who) return null;
+      const c = MW.crew.cat(who, w);
+      c.setJob(job);
+      return c;
+    }
+    // a box w x h at (x, y) whose drawings face the other way (the board's cats facing left)
+    function flipBox(x, y, w, h) {
+      const f = place(MW.make('div', 'words-moment-flip'), x, y);
+      f.style.width = w + 'px'; f.style.height = h + 'px';
+      return f;
+    }
+    function show(el) { void el.getBoundingClientRect(); el.classList.add('is-shown'); }
+    function hide(el, after) { later(function () { el.classList.remove('is-shown'); drop(el, 400); }, after); }
+
+    // ---------------------------------------------------------------- lookout (Find, as a round starts)
+    m.lookoutUp = function () {
+      m.lookoutDown(true);
+      const k = L.lookout, cat = catFor('lookout', k.w);
+      if (!cat) return false;
+      // a box clipped at the stage's bottom edge, the cat rising inside it (a fade with reduce motion)
+      const box = place(MW.make('div', 'mw-moment mw-peek', { 'data-moment': 'lookout' }), k.clip.x, k.y);
+      box.style.width = k.clip.w + 'px'; box.style.height = (MW.stage.H - k.y) + 'px';
+      const inner = MW.make('div', 'mw-peek-inner');
+      const flip = flipBox(k.x - k.clip.x, 0, k.w, cat.h);
+      flip.appendChild(cat);
+      const scope = place(MW.make('div', 'words-moment-held'), k.scope.x, k.scope.y);
+      scope.appendChild(size(MW.art('held-telescope'), k.scope.size));
+      flip.appendChild(scope);
+      inner.appendChild(flip);
+      box.appendChild(inner);
+      findLayer.appendChild(box);
+      peek = box;
+      show(box);
+      MW.log('moment', 'lookout');
+      return true;
+    };
+    m.lookoutShown = function () { return !!peek; };
+    m.lookoutDown = function (now) {
+      if (!peek) return;
+      const b = peek; peek = null;
+      if (now) { drop(b, 0); return; }
+      b.classList.remove('is-shown');
+      drop(b, 600);
+    };
+
+    // ---------------------------------------------------------------- engineer (Find, a right tap)
+    // cx: the tapped rocket's centre line
+    m.engineer = function (cx) {
+      const k = L.engineer, cat = catFor('engineer', k.w);
+      if (!cat) return false;
+      m.lookoutDown();                                        // a quick first answer: the lookout makes way
+      const box = place(MW.make('div', 'mw-moment mw-peek', { 'data-moment': 'engineer' }), cx + k.dx, k.y);
+      box.style.width = k.w + 'px'; box.style.height = (MW.stage.H - k.y) + 'px';
+      const inner = MW.make('div', 'mw-peek-inner');
+      inner.appendChild(cat);
+      box.appendChild(inner);
+      // the spanner: it pops up (the kit's moment style), turned as on the board, and swings from its ring to tap
+      const sp = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'engineer-spanner' }), cx + k.spanner.dx, k.spanner.y);
+      const turn = MW.make('div', 'words-spanner');
+      turn.style.transform = 'rotate(' + k.spanner.turn + 'deg)';
+      const swing = MW.make('div', 'words-spanner-swing');
+      swing.appendChild(size(MW.art('job-engineer'), k.spanner.size));
+      turn.appendChild(swing);
+      sp.appendChild(turn);
+      findLayer.appendChild(box);
+      findLayer.appendChild(sp);
+      show(box);
+      later(function () { show(sp); }, 200);
+      later(function () { swing.classList.add('is-tapping'); }, 450);   // two taps on the clamp
+      hide(box, 2600); hide(sp, 2600);
+      MW.log('moment', 'engineer ' + Math.round(cx));
+      return true;
+    };
+
+    // ---------------------------------------------------------------- navigator (Build, as the star lights)
+    // next: the star to point at, or null after the last word
+    m.navigator = function (next) {
+      const k = L.navigator, cat = catFor('navigator', k.w);
+      if (!cat) return false;
+      const box = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'navigator' }), k.x, k.y);
+      box.style.width = k.w + 'px'; box.style.height = cat.h + 'px';
+      box.appendChild(cat);
+      const mp = place(MW.make('div', 'mw-moment mw-moment-pop words-moment-held', { 'data-moment': 'navigator-map' }), k.map.x, k.map.y);
+      mp.appendChild(size(MW.art('job-navigator'), k.map.size));
+      const star = next !== null && next !== undefined ? opts.stars.el.children[next] : null;
+      if (star) {
+        // a dotted route from the top of the map to just below the star (stage px), behind the rocket
+        const s = MW.stage.scale || 1, box0 = opts.stars.el.getBoundingClientRect(), r = star.getBoundingClientRect();
+        const sx = Math.round(opts.stars.el.offsetLeft + (r.left - box0.left + r.width / 2) / s);
+        const sy = Math.round(opts.stars.el.offsetTop + (r.bottom - box0.top) / s + k.below);
+        const fx = k.map.x + k.from.dx, fy = k.map.y + k.from.dy;
+        const route = MW.make('div', 'mw-layer mw-fill mw-route mw-moment-pop', { 'data-moment': 'navigator-route' });
+        route.innerHTML = '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><path class="s-mint" fill="none" stroke-width="6" '
+          + 'stroke-dasharray="2 14" stroke-linecap="round" d="M' + fx + ' ' + fy + ' Q ' + (fx - 10) + ' ' + Math.round(sy + 0.38 * (fy - sy)) + ' ' + sx + ' ' + sy + '"/></svg>';
+        routeLayer.appendChild(route);
+        later(function () { show(route); }, 250);
+        hide(route, 1900);
+      }
+      buildLayer.appendChild(box);
+      buildLayer.appendChild(mp);
+      show(box);
+      later(function () { show(mp); }, 120);
+      hide(box, 2100); hide(mp, 2100);
+      MW.log('moment', 'navigator ' + (star ? next : 'end'));
+      return true;
+    };
+
+    // ---------------------------------------------------------------- cook (the end screen)
+    m.cook = function () {
+      const k = L.cook, cat = catFor('cook', k.w);
+      if (!cat) return false;
+      const box = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'cook' }), k.x, k.y);
+      box.style.width = k.w + 'px'; box.style.height = cat.h + 'px';
+      const flip = flipBox(0, 0, k.w, cat.h);
+      flip.appendChild(cat);
+      box.appendChild(flip);
+      const pan = place(MW.make('div', 'mw-moment mw-cook-pan', { 'data-moment': 'cook-pan' }), k.pan.x, k.pan.y);
+      pan.appendChild(size(MW.art('job-cook'), k.pan.size));
+      endLayer.appendChild(box);
+      endLayer.appendChild(pan);
+      show(box);
+      later(function () { show(pan); MW.sparkles(endLayer, k.pan.x + k.pan.size / 2, k.pan.y + k.pan.size / 2, 70); }, 250);
+      MW.log('moment', 'cook');
+      return true;
+    };
+
+    // the in-round cats leave when the next word starts
+    m.settle = function () {
+      m.lookoutDown();
+      [findLayer, routeLayer, buildLayer].forEach(function (l) {
+        Array.prototype.forEach.call(l.querySelectorAll('.is-shown'), function (el) { el.classList.remove('is-shown'); drop(el, 400); });
+      });
+    };
+    // leaving, or a new round: everything goes at once
+    m.clear = function () {
+      timers.forEach(clearTimeout); timers = [];
+      peek = null;
+      [findLayer, routeLayer, buildLayer, endLayer].forEach(function (l) { l.innerHTML = ''; });
+    };
+    m.layers = { find: findLayer, route: routeLayer, build: buildLayer, end: endLayer };
+    return m;
+  };
+})();
+
+/* MeeMee Rockets: the tricky-words game.
    A round is five words. Each word is found, then built, and earns a star:
      Find   three rockets on the launch pad, each with a word. "Find the word… one." He taps one.
      Build  the word's rocket lies on its side with empty portholes; its tiles are loose in the tray. "Now build the
-            word… one." He drags the tiles into the portholes, left to right. The last tile launches the rocket.
-   The words, their tiles and spares are in words.js; each word's step and how rounds are chosen in steps.js.
+            word… one." He drags the tiles into the portholes, left to right. In the sound tiles step a tile says its
+            sound as it is picked up. The last tile lights the engines and the launch lights, and the rocket launches.
+   The words, their tiles, sounds and spares are in words.js; each word's step and how rounds are chosen in steps.js;
+   the crew's job moments in moments.js.
    It joins the world with MW.world.game below: the world gives it the start screen, the map, pausing, Home and the
    grown-ups area (its Words tab is at the end of this file). */
 (function () {
@@ -3836,17 +4197,28 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // they fit; two rows of up to five when they don't (harder letters always).
   const TRAY = { x: 110, y: 462, w: 656, h: 290, pad: 28, gap: 20, perRow: 5, one: [150], two: [88, 212] };
   const POD = { find: [965, 337, 270], build: [951, 450, 290] };
+  // The launch lights (LaunchLights card): 22 px lights along the hull's peach-dark stripe and its top edge, 92 apart,
+  // the two rows half a step apart (rocket units, the hull's back top corner at 0, 0), numbered from the back to the nose
+  // and split into three groups in turn. Each is on for a third of a second and off for two thirds; the groups start a
+  // third of a second apart, so they chase from the back to the nose (game.css). Lit and steady with reduce motion.
+  const LAMPS = { step: 92, rows: [[44, 168], [90, 15]], end: 25, groups: 3, stagger: 1000 / 3, art: 23 };
 
   const BOOK = S.read(MW.wordsData || { weeks: [], words: {} });
   const st = { round: [], qi: 0, item: null, prompt: null, praise: [], timers: [], tapped: 0, drops: 0, hinted: false,
     trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null,
-    pool: null, week: null, repeat: null, pauses: 0 };
+    pool: null, week: null, repeat: null, pauses: 0, lamps: [] };
   const G = MW.wordsGame = { st: st, book: BOOK, nextRound: null };
   let findPod, buildPod, endPod, findStars, buildStars, endStars, findFx, buildFx, tileLayer, trayEl, shipLayer, dragger, again, endRockets;
+  let moments = null;
 
   W.game({
     id: ID,
-    build: function () { buildFind(); buildBuild(); buildEnd(); },
+    build: function () {
+      buildFind(); buildBuild(); buildEnd();
+      moments = MW.wordsMoments({ find: MW.$(FIND), findBefore: findFx, build: MW.$(BUILD), routeBefore: shipLayer, buildBefore: buildFx,
+        stars: buildStars, end: MW.$(END), endBefore: again });
+      G.moments = moments;
+    },
     start: function () { startRound(); },
     sections: [{ id: 'words-progress', title: 'Words', render: renderProgress }],
     onPause: function () { st.pauses++; clearTimers(); if (dragger) dragger.cancel(); },
@@ -3854,6 +4226,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       if ((MW.shell.screen === FIND && W.st.phase === 'words-find') || (MW.shell.screen === BUILD && W.st.phase === 'words-build')) {
         findPod.face('thinking'); buildPod.face('thinking');
         W.speak(st.prompt);
+        // the pause cleared the lookout's duck: it ducks as it would have, once the first question has been asked again
+        if (MW.shell.screen === FIND && moments.lookoutShown()) later(W.st.token, 1800, function () { moments.lookoutDown(); });
       }
     },
     onHome: leave
@@ -3863,13 +4237,18 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // Read without creating it (MW.store.peek), so a tablet that has never played keeps nothing for this game.
   function saved() { return MW.store.peek(ID); }
   function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
+  // The week in play: a week's number, or S.ALL for every week (the Words tab's "Weeks 1–5"). A week saved before 0.6.0
+  // (week 5) carries on; one no longer in the words file gives way to the file's start week.
   function week() {
-    const w = +saved().week;
+    const v = saved().week;
+    if (v === S.ALL && S.allLabel(BOOK)) return S.ALL;
+    const w = +v;
     return BOOK.weeks.some(function (x) { return x.week === w; }) ? w : BOOK.startWeek;
   }
-  function recorded(w) { return !!((MW.audio.manifest || {}).voice || {})[line(w)]; }
+  function recorded(w) { return MW.audio.recorded(line(w)); }
   function line(w) { return 'words-w-' + w; }
-  // The words in play: the week's words and earlier weeks' tricky words, once their recordings are on the page.
+  // The words in play: the week's words and earlier weeks' tricky words (or every week's words), once their
+  // recordings are on the page.
   function inPlay() { return S.inPlay(BOOK, week()).filter(recorded); }
   // A round keeps the words and the week it started with: a week picked in the grown-ups area starts with the next round.
   function roundPool() { return st.pool || inPlay(); }
@@ -3922,7 +4301,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     dragger = MW.dragger(s, {
       counters: function () { return st.tiles.filter(function (c) { return !c.placed; }); },
       enabled: function () { return !W.st.paused && W.st.phase === 'words-build' && MW.shell.screen === BUILD; },
-      onPick: function (c) { MW.log('pick', c.text); },
+      onPick: function (c) { MW.log('pick', c.text); sayTile(c); },
       onDrop: onDrop                                           // each tile is picked up in its own box (makeTile)
     });
   }
@@ -3954,7 +4333,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         return { word: w, step: s === 'notyet' ? 'tiles' : s };
       });
     }
-    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND });
+    const wk = week();
+    if (wk === S.ALL) return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, lowest: true });
+    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, own: S.ownWords(BOOK, wk) });
   }
 
   async function startRound() {
@@ -3969,10 +4350,12 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     MW.log('words', 'round ' + JSON.stringify(st.round));
     if (!st.round.length) { MW.log('words', 'no words in play'); W.home(); return; }
     W.st.phase = 'words-starting';
+    moments.clear();
     await fontReady();                                         // measure the words in bold Andika itself, not a stand-in
     if (token !== W.st.token) return;
     setFind(st.round[0]);
     MW.shell.show(FIND);
+    moments.lookoutUp();                                       // the lookout peeks up from the bottom right
     await W.speak([['words-round-ready']]);
     if (!(await W.ok(token))) return;
     askFind();
@@ -4020,7 +4403,10 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   // Ask the round's next word: Find first. (showFind sets the screen up; the tests use it on its own too.)
   async function askFind() {
+    const token = W.st.token;
     showFind(st.round[st.qi]);
+    if (st.qi === 0) later(token, 1800, function () { moments.lookoutDown(); });   // spotted them
+    else moments.settle();
     await W.speak(st.prompt);
   }
   function showFind(item) {
@@ -4073,6 +4459,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     findPod.face('got-it');
     findPod.celebrate();
     MW.sparkles(findFx, r.cx, 420, 175);
+    if (!moments.engineer(r.cx)) moments.lookoutDown();        // the engineer taps the rocket's clamp
     await MW.wait(550);
     if (!(await W.ok(token))) return;
     st.praise = st.praise.length ? st.praise : MW.shuffle(PRAISE);
@@ -4091,7 +4478,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (dragger) dragger.cancel();
     clearTimers();
     st.tiles.forEach(function (c) { c.remove(); });
-    st.tiles = []; st.places = []; st.next = 0; st.plan = null;
+    st.tiles = []; st.places = []; st.next = 0; st.plan = null; st.lamps = [];
     if (st.ship) { st.ship.el.remove(); st.ship = null; }
   }
 
@@ -4119,6 +4506,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     const nose = MW.art('words-ship-nose');
     nose.setAttribute('class', 'words-part'); nose.style.left = (L - NOSE_X) + 'px'; nose.style.top = '0px';
     inner.appendChild(nose);
+    st.lamps = makeLamps(inner, L);
     const slots = [];
     let x = 78;
     widths.forEach(function (w, i) {
@@ -4131,6 +4519,22 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     shipLayer.appendChild(el);
     return { el: el, inner: inner, scale: scale, L: L, slots: slots,
       box: { x: SHIP.x, y: SHIP.y, w: (L + NOSE) * scale, h: H * scale } };
+  }
+  // The launch lights along this rocket's hull (LAMPS): off until the engines light, then the groups chase (game.css).
+  function makeLamps(inner, L) {
+    const pts = [];
+    LAMPS.rows.forEach(function (row) { for (let x = row[0]; x < L - LAMPS.end; x += LAMPS.step) pts.push([x, row[1]]); });
+    pts.sort(function (a, b) { return a[0] - b[0]; });
+    return pts.map(function (p, i) {
+      const lamp = MW.art('words-lamp');
+      const g = i % LAMPS.groups;
+      lamp.setAttribute('class', 'words-part words-lamp');
+      lamp.setAttribute('data-group', g);
+      lamp.style.left = (p[0] - LAMPS.art) + 'px'; lamp.style.top = (p[1] - LAMPS.art) + 'px';
+      lamp.querySelector('.words-lamp-on').style.animationDelay = Math.round(g * LAMPS.stagger) + 'ms';
+      inner.appendChild(lamp);
+      return { x: p[0], y: p[1], group: g, el: lamp };
+    });
   }
   function onShip(x, y) {
     const b = st.ship.box;
@@ -4149,8 +4553,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     tileLayer.appendChild(el);
     // its pick-up box (MW.dragger): 10 px each side, so neighbours' boxes meet halfway across the tray's 20 px gap and a
     // finger anywhere on a long tile picks that tile; 20 px above and below, for a forgiving pick-up
-    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null,
-      grab: { w: w + TRAY.gap, h: D + 40 } };
+    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, sound: t.sound || null, k: k, w: w, x: 0, y: 0, draggable: true,
+      placed: false, home: null, grab: { w: w + TRAY.gap, h: D + 40 } };
     c.moveTo = function (x, y, size, animate) {
       c.x = x; c.y = y;
       el.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
@@ -4188,7 +4592,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   function showBuild(item) {
     st.item = item;
     clearBoard();
-    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek()));
+    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek(), item.word, roundPool()));
     st.places = st.plan.places;
     st.next = 0;
     st.drops = 0;
@@ -4220,6 +4624,18 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     wrongDrop(c);
   }
   function floatHome(c) { c.moveTo(c.home.x, c.home.y, 0, true); }
+
+  // In the sound tiles step only, a tile says its sound as it is picked up, once per pick-up (not again as it snaps in).
+  // A recorded sound stops anything being said; one not recorded yet does nothing and stops nothing; the e of a split
+  // pair says nothing (answers 13, 21 and 22 of the 0.6.0 PRD).
+  function sayTile(c) {
+    if (!st.plan || st.plan.mode !== 'tiles') return;
+    const id = S.soundLine(c.sound);
+    if (!id) { MW.log('words', 'sound ' + c.text + ': none'); return; }
+    if (!MW.audio.recorded(id)) { MW.log('words', 'sound ' + id + ' not recorded yet'); return; }
+    MW.log('words', 'sound ' + id);
+    W.speak([[id]]);
+  }
 
   function wrongDrop(c) {
     st.drops++;
@@ -4279,6 +4695,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (!(await sayThrough([['words-you-built', line(item.word)]], token))) return;
     setStars(buildStars, st.qi + 1);
     MW.audio.sfx('twinkle');
+    moments.navigator(st.qi + 1 < st.round.length ? st.qi + 1 : null);   // the navigator points the way to the next star
     await MW.wait(700);
     if (!(await W.ok(token))) return;
     st.ship.el.classList.add('is-away');                       // off it goes
@@ -4335,6 +4752,10 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (!(await W.ok(token))) return;
     await MW.wait(500);
     if (!(await W.ok(token))) return;
+    if (moments.cook()) {                                      // the cook brings a pan of fish for the MeeMee
+      await MW.wait(1300);
+      if (!(await W.ok(token))) return;
+    }
     again.classList.add('mw-pulse');                           // tap here for another go
     await W.speak([['words-round-another']]);
   }
@@ -4350,6 +4771,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     st.rockets.forEach(function (r) { r.el.classList.remove('is-lit', 'is-hint'); });
     [findPod, buildPod, endPod].forEach(function (p) { if (p) p.lightsOff(); });
     if (again) again.classList.remove('mw-pulse');
+    if (moments) moments.clear();
     st.item = null; st.prompt = null; st.pool = null; st.week = null; st.repeat = null;
   }
 
@@ -4369,21 +4791,33 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     const run = list.every(function (w, i) { return i === 0 || w === list[i - 1] + 1; });
     return 'Weeks ' + (run ? list[0] + ' to ' + list[list.length - 1] : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]);
   }
+  const COUNT = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  function pickWeek(GU, value) {
+    const g = MW.store.game(ID); g.week = value; MW.store.save();
+    MW.log('words', 'week ' + value);
+    GU.show('words-progress');
+  }
   function renderProgress(el) {
     const GU = MW.grownups;
     const map = S.statuses(answers());
     const wk = week();
+    const all = wk === S.ALL;
+    const allLabel = S.allLabel(BOOK);
     GU.h3(el, 'Week in play');
     const r = GU.row(el);
     BOOK.weeks.forEach(function (x) {
-      GU.btn(r, 'Week ' + x.week, function () {
-        const g = MW.store.game(ID); g.week = x.week; MW.store.save();
-        MW.log('words', 'week ' + x.week);
-        GU.show('words-progress');
-      }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+      GU.btn(r, 'Week ' + x.week, function () { pickWeek(GU, x.week); }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
     });
-    const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
-    GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    // after the last week, every week together ("Weeks 1–5", named from the words file)
+    if (allLabel) GU.btn(r, allLabel, function () { pickWeek(GU, S.ALL); }, 'gu-choice words-week words-week-all' + (all ? ' is-on' : ''));
+    if (all) {
+      const n = BOOK.weeks.length;
+      GU.p(el, MW.esc(allLabel) + ' plays every word from all ' + (COUNT[n] || n) + ' weeks, leaning on the ones that need the most work. '
+        + 'A change starts with the next round.', 'gu-note');
+    } else {
+      const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
+      GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    }
 
     const grid = MW.make('div', 'words-grid');
     const row = function (label, words) {
@@ -4393,21 +4827,38 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       words.forEach(function (w) { cells.appendChild(cell(S.step(map, w), w)); });
       grid.appendChild(cells);
     };
-    const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
-    row('Tricky words', now.tricky);
-    row('Week ' + wk + ' words', now.other);
-    row('Earlier weeks', [].concat.apply([], BOOK.weeks.filter(function (x) { return x.week < wk; }).map(function (x) { return x.tricky; })));
-    row('Later weeks', [].concat.apply([], BOOK.weeks.filter(function (x) { return x.week > wk; }).map(function (x) { return x.tricky.concat(x.other); })));
+    const flat = function (weeks, pick) { return [].concat.apply([], weeks.map(pick)); };
+    if (all) {
+      // every week: every tricky word, then every other word
+      row('Tricky words', flat(BOOK.weeks, function (x) { return x.tricky; }));
+      row('Other words', flat(BOOK.weeks, function (x) { return x.other; }));
+    } else {
+      const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
+      row('Tricky words', now.tricky);
+      row('Week ' + wk + ' words', now.other);
+      row('Earlier weeks', flat(BOOK.weeks.filter(function (x) { return x.week < wk; }), function (x) { return x.tricky; }));
+      row('Later weeks', flat(BOOK.weeks.filter(function (x) { return x.week > wk; }), function (x) { return x.tricky.concat(x.other); }));
+    }
     el.appendChild(grid);
     const legend = MW.make('div', 'words-legend');
     S.STEPS.forEach(function (s) { legend.appendChild(cell(s, S.NAMES[s])); });
     el.appendChild(legend);
+    const earlierOther = !all && BOOK.weeks.some(function (x) { return x.week < wk && x.other.length; });
     GU.p(el, 'Each word is built with <b>sound tiles</b> until it is right first time (no wrong tap or drop, no hint) on three different days. '
       + 'Then it moves to <b>letters</b>: one tile per letter, with a spare or two; then to <b>harder letters</b>, with the tray filled to '
       + BOOK.harderTray + ' tiles. Three more days right first time at each step; after harder letters it is <b>secure</b>. '
-      + 'Each round has five words, mostly ones that need work.' + (BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : ''), 'gu-note');
+      + 'A secure word goes back to harder letters after two slips in a row (answers not right first time); a right answer in between clears the first slip. '
+      + (all ? 'Each round has five words: one or two secure ones to review, then the words on the lowest step first. '
+        : 'Each round has five words, at least three of them from the week in play (all of its words, if fewer are recorded): '
+          + 'one or two secure ones to review and the rest needing work. ')
+      + 'When there aren\'t enough words that need work, more secure ones fill the round.'
+      + (!all && BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : '')
+      + (earlierOther && allLabel ? ' Earlier weeks\' other words come up with ' + MW.esc(allLabel) + '.' : ''), 'gu-note');
     const waiting = BOOK.order.filter(function (w) { return !recorded(w); });
     if (waiting.length) GU.p(el, 'Waiting for a recording, so not in play yet: ' + MW.esc(waiting.join(', ')) + '.', 'gu-note');
+    const quiet = S.soundLines(BOOK).filter(function (id) { return !MW.audio.recorded(id); });
+    if (quiet.length) GU.p(el, 'Tile sounds waiting for a recording (those tiles are quiet until then): '
+      + MW.esc(quiet.map(function (id) { return id.slice(8); }).join(', ')) + '.', 'gu-note');
     if (BOOK.problems.length) GU.p(el, 'To fix in the words file (games/words/words.js): ' + MW.esc(BOOK.problems.join('; ')) + '.', 'gu-note');
     const n = answers().length;
     GU.p(el, n ? 'Words built on this tablet: ' + n + '.' : 'No words built on this tablet yet.', 'gu-note');
@@ -4427,7 +4878,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   // ---------------------------------------------------------------- test hooks
   G.start = startRound; G.showFind = showFind; G.showBuild = showBuild; G.setFind = setFind; G.drop = onDrop; G.tapRocket = tapRocket; G.home = W.home; G.makeRound = makeRound;
-  G.inPlay = inPlay; G.week = week; G.answers = answers;
+  G.inPlay = inPlay; G.week = week; G.answers = answers; G.sayTile = sayTile; G.LAMPS = LAMPS;
 })();
 
 </script>

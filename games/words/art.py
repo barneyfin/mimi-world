@@ -7,6 +7,7 @@ raw colour. Parts that only show at certain moments are groups with a class the 
   words-fire   a standing rocket's engines (flame, lit lights, smoke): shown when the right word is tapped
   words-glow   a tile's spark ring: shown on the hint tile
   words-loose / words-set   a tile in the tray (its own frame) / a tile set in a porthole (only its glass shows)
+  words-lamp-off / words-lamp-on   a launch light, off and lit (the lit one blinks while the rocket launches)
 
 The rocket on its side (Build) is made of pieces the game puts together for each word, because its length depends on
 the word: the back (fins, nozzle, flame), the hull (drawn long; the game shows as much of it as the word needs), the
@@ -375,6 +376,25 @@ def tile(k, d=D):
     return svg(w, d, body)
 
 
+# ---------------------------------------------------------------- the launch lights (LaunchLights card)
+
+LAMP_R = 11                 # a 22 px light with a 3 px ink edge
+
+
+def lamp():
+    """One of the small lights along a launching rocket's hull, centred on (0, 0) of a 46 x 46 box: words-lamp-off
+    (peach-shade) under words-lamp-on (spark, with a soft spark glow), which the game's CSS switches on and off."""
+    r = LAMP_R - 1.5
+    off = (f'<circle cx="0" cy="0" r="{r}" fill="@peach-shade" stroke="@ink" stroke-width="3"/>'
+           '<circle cx="-3" cy="-3" r="2" fill="@highlight" opacity="0.5"/>')
+    on = ('<circle cx="0" cy="0" r="23" fill="@spark" opacity="0.2"/>'
+          '<circle cx="0" cy="0" r="17" fill="@spark" opacity="0.45"/>'
+          f'<circle cx="0" cy="0" r="{r}" fill="@spark" stroke="@ink" stroke-width="3"/>'
+          '<circle cx="-3" cy="-3" r="2.2" fill="@highlight" opacity="0.9"/>')
+    return ('<svg width="46" height="46" viewBox="-23 -23 46 46" overflow="visible" aria-hidden="true">'
+            '<g class="words-lamp-off">' + tok(off) + '</g><g class="words-lamp-on">' + tok(on) + '</g></svg>')
+
+
 # ---------------------------------------------------------------- the planet's badge, and the little rockets at the end
 
 def badge_rocket(uid="words-bdg"):
@@ -413,6 +433,7 @@ def templates():
         "words-ship-hull": ship_hull(),
         "words-ship-nose": ship_nose(),
         "words-rocket-mini": mini_rocket(),
+        "words-lamp": lamp(),
     }
     for k in (1, 2, 3, 4):                # letters in one tile: a sound can be written with up to four ("eigh")
         t[f"words-socket-{k}"] = socket(k)

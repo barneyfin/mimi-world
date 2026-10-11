@@ -782,9 +782,9 @@
    "gain_db": -0.9
   },
   "words-s-ee": {
-   "dur": 1.28,
-   "lufs_before": -19.5,
-   "gain_db": -0.5
+   "dur": 0.96,
+   "lufs_before": -19.3,
+   "gain_db": -0.7
   },
   "words-s-igh": {
    "dur": 0.88,

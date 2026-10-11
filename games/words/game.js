@@ -1,9 +1,11 @@
-/* MeeMee Rockets: the tricky-words game (the test build).
+/* MeeMee Rockets: the tricky-words game.
    A round is five words. Each word is found, then built, and earns a star:
      Find   three rockets on the launch pad, each with a word. "Find the word… one." He taps one.
      Build  the word's rocket lies on its side with empty portholes; its tiles are loose in the tray. "Now build the
-            word… one." He drags the tiles into the portholes, left to right. The last tile launches the rocket.
-   The words, their tiles and spares are in words.js; each word's step and how rounds are chosen in steps.js.
+            word… one." He drags the tiles into the portholes, left to right. In the sound tiles step a tile says its
+            sound as it is picked up. The last tile lights the engines and the launch lights, and the rocket launches.
+   The words, their tiles, sounds and spares are in words.js; each word's step and how rounds are chosen in steps.js;
+   the crew's job moments in moments.js.
    It joins the world with MW.world.game below: the world gives it the start screen, the map, pausing, Home and the
    grown-ups area (its Words tab is at the end of this file). */
 (function () {
@@ -24,17 +26,28 @@
   // they fit; two rows of up to five when they don't (harder letters always).
   const TRAY = { x: 110, y: 462, w: 656, h: 290, pad: 28, gap: 20, perRow: 5, one: [150], two: [88, 212] };
   const POD = { find: [965, 337, 270], build: [951, 450, 290] };
+  // The launch lights (LaunchLights card): 22 px lights along the hull's peach-dark stripe and its top edge, 92 apart,
+  // the two rows half a step apart (rocket units, the hull's back top corner at 0, 0), numbered from the back to the nose
+  // and split into three groups in turn. Each is on for a third of a second and off for two thirds; the groups start a
+  // third of a second apart, so they chase from the back to the nose (game.css). Lit and steady with reduce motion.
+  const LAMPS = { step: 92, rows: [[44, 168], [90, 15]], end: 25, groups: 3, stagger: 1000 / 3, art: 23 };
 
   const BOOK = S.read(MW.wordsData || { weeks: [], words: {} });
   const st = { round: [], qi: 0, item: null, prompt: null, praise: [], timers: [], tapped: 0, drops: 0, hinted: false,
     trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null,
-    pool: null, week: null, repeat: null, pauses: 0 };
+    pool: null, week: null, repeat: null, pauses: 0, lamps: [] };
   const G = MW.wordsGame = { st: st, book: BOOK, nextRound: null };
   let findPod, buildPod, endPod, findStars, buildStars, endStars, findFx, buildFx, tileLayer, trayEl, shipLayer, dragger, again, endRockets;
+  let moments = null;
 
   W.game({
     id: ID,
-    build: function () { buildFind(); buildBuild(); buildEnd(); },
+    build: function () {
+      buildFind(); buildBuild(); buildEnd();
+      moments = MW.wordsMoments({ find: MW.$(FIND), findBefore: findFx, build: MW.$(BUILD), routeBefore: shipLayer, buildBefore: buildFx,
+        stars: buildStars, end: MW.$(END), endBefore: again });
+      G.moments = moments;
+    },
     start: function () { startRound(); },
     sections: [{ id: 'words-progress', title: 'Words', render: renderProgress }],
     onPause: function () { st.pauses++; clearTimers(); if (dragger) dragger.cancel(); },
@@ -42,6 +55,8 @@
       if ((MW.shell.screen === FIND && W.st.phase === 'words-find') || (MW.shell.screen === BUILD && W.st.phase === 'words-build')) {
         findPod.face('thinking'); buildPod.face('thinking');
         W.speak(st.prompt);
+        // the pause cleared the lookout's duck: it ducks as it would have, once the first question has been asked again
+        if (MW.shell.screen === FIND && moments.lookoutShown()) later(W.st.token, 1800, function () { moments.lookoutDown(); });
       }
     },
     onHome: leave
@@ -51,13 +66,18 @@
   // Read without creating it (MW.store.peek), so a tablet that has never played keeps nothing for this game.
   function saved() { return MW.store.peek(ID); }
   function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
+  // The week in play: a week's number, or S.ALL for every week (the Words tab's "Weeks 1–5"). A week saved before 0.6.0
+  // (week 5) carries on; one no longer in the words file gives way to the file's start week.
   function week() {
-    const w = +saved().week;
+    const v = saved().week;
+    if (v === S.ALL && S.allLabel(BOOK)) return S.ALL;
+    const w = +v;
     return BOOK.weeks.some(function (x) { return x.week === w; }) ? w : BOOK.startWeek;
   }
-  function recorded(w) { return !!((MW.audio.manifest || {}).voice || {})[line(w)]; }
+  function recorded(w) { return MW.audio.recorded(line(w)); }
   function line(w) { return 'words-w-' + w; }
-  // The words in play: the week's words and earlier weeks' tricky words, once their recordings are on the page.
+  // The words in play: the week's words and earlier weeks' tricky words (or every week's words), once their
+  // recordings are on the page.
   function inPlay() { return S.inPlay(BOOK, week()).filter(recorded); }
   // A round keeps the words and the week it started with: a week picked in the grown-ups area starts with the next round.
   function roundPool() { return st.pool || inPlay(); }
@@ -110,7 +130,7 @@
     dragger = MW.dragger(s, {
       counters: function () { return st.tiles.filter(function (c) { return !c.placed; }); },
       enabled: function () { return !W.st.paused && W.st.phase === 'words-build' && MW.shell.screen === BUILD; },
-      onPick: function (c) { MW.log('pick', c.text); },
+      onPick: function (c) { MW.log('pick', c.text); sayTile(c); },
       onDrop: onDrop                                           // each tile is picked up in its own box (makeTile)
     });
   }
@@ -142,7 +162,9 @@
         return { word: w, step: s === 'notyet' ? 'tiles' : s };
       });
     }
-    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND });
+    const wk = week();
+    if (wk === S.ALL) return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, lowest: true });
+    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, own: S.ownWords(BOOK, wk) });
   }
 
   async function startRound() {
@@ -157,10 +179,12 @@
     MW.log('words', 'round ' + JSON.stringify(st.round));
     if (!st.round.length) { MW.log('words', 'no words in play'); W.home(); return; }
     W.st.phase = 'words-starting';
+    moments.clear();
     await fontReady();                                         // measure the words in bold Andika itself, not a stand-in
     if (token !== W.st.token) return;
     setFind(st.round[0]);
     MW.shell.show(FIND);
+    moments.lookoutUp();                                       // the lookout peeks up from the bottom right
     await W.speak([['words-round-ready']]);
     if (!(await W.ok(token))) return;
     askFind();
@@ -208,7 +232,10 @@
 
   // Ask the round's next word: Find first. (showFind sets the screen up; the tests use it on its own too.)
   async function askFind() {
+    const token = W.st.token;
     showFind(st.round[st.qi]);
+    if (st.qi === 0) later(token, 1800, function () { moments.lookoutDown(); });   // spotted them
+    else moments.settle();
     await W.speak(st.prompt);
   }
   function showFind(item) {
@@ -261,6 +288,7 @@
     findPod.face('got-it');
     findPod.celebrate();
     MW.sparkles(findFx, r.cx, 420, 175);
+    if (!moments.engineer(r.cx)) moments.lookoutDown();        // the engineer taps the rocket's clamp
     await MW.wait(550);
     if (!(await W.ok(token))) return;
     st.praise = st.praise.length ? st.praise : MW.shuffle(PRAISE);
@@ -279,7 +307,7 @@
     if (dragger) dragger.cancel();
     clearTimers();
     st.tiles.forEach(function (c) { c.remove(); });
-    st.tiles = []; st.places = []; st.next = 0; st.plan = null;
+    st.tiles = []; st.places = []; st.next = 0; st.plan = null; st.lamps = [];
     if (st.ship) { st.ship.el.remove(); st.ship = null; }
   }
 
@@ -307,6 +335,7 @@
     const nose = MW.art('words-ship-nose');
     nose.setAttribute('class', 'words-part'); nose.style.left = (L - NOSE_X) + 'px'; nose.style.top = '0px';
     inner.appendChild(nose);
+    st.lamps = makeLamps(inner, L);
     const slots = [];
     let x = 78;
     widths.forEach(function (w, i) {
@@ -319,6 +348,22 @@
     shipLayer.appendChild(el);
     return { el: el, inner: inner, scale: scale, L: L, slots: slots,
       box: { x: SHIP.x, y: SHIP.y, w: (L + NOSE) * scale, h: H * scale } };
+  }
+  // The launch lights along this rocket's hull (LAMPS): off until the engines light, then the groups chase (game.css).
+  function makeLamps(inner, L) {
+    const pts = [];
+    LAMPS.rows.forEach(function (row) { for (let x = row[0]; x < L - LAMPS.end; x += LAMPS.step) pts.push([x, row[1]]); });
+    pts.sort(function (a, b) { return a[0] - b[0]; });
+    return pts.map(function (p, i) {
+      const lamp = MW.art('words-lamp');
+      const g = i % LAMPS.groups;
+      lamp.setAttribute('class', 'words-part words-lamp');
+      lamp.setAttribute('data-group', g);
+      lamp.style.left = (p[0] - LAMPS.art) + 'px'; lamp.style.top = (p[1] - LAMPS.art) + 'px';
+      lamp.querySelector('.words-lamp-on').style.animationDelay = Math.round(g * LAMPS.stagger) + 'ms';
+      inner.appendChild(lamp);
+      return { x: p[0], y: p[1], group: g, el: lamp };
+    });
   }
   function onShip(x, y) {
     const b = st.ship.box;
@@ -337,8 +382,8 @@
     tileLayer.appendChild(el);
     // its pick-up box (MW.dragger): 10 px each side, so neighbours' boxes meet halfway across the tray's 20 px gap and a
     // finger anywhere on a long tile picks that tile; 20 px above and below, for a forgiving pick-up
-    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null,
-      grab: { w: w + TRAY.gap, h: D + 40 } };
+    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, sound: t.sound || null, k: k, w: w, x: 0, y: 0, draggable: true,
+      placed: false, home: null, grab: { w: w + TRAY.gap, h: D + 40 } };
     c.moveTo = function (x, y, size, animate) {
       c.x = x; c.y = y;
       el.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
@@ -376,7 +421,7 @@
   function showBuild(item) {
     st.item = item;
     clearBoard();
-    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek()));
+    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek(), item.word, roundPool()));
     st.places = st.plan.places;
     st.next = 0;
     st.drops = 0;
@@ -408,6 +453,18 @@
     wrongDrop(c);
   }
   function floatHome(c) { c.moveTo(c.home.x, c.home.y, 0, true); }
+
+  // In the sound tiles step only, a tile says its sound as it is picked up, once per pick-up (not again as it snaps in).
+  // A recorded sound stops anything being said; one not recorded yet does nothing and stops nothing; the e of a split
+  // pair says nothing (answers 13, 21 and 22 of the 0.6.0 PRD).
+  function sayTile(c) {
+    if (!st.plan || st.plan.mode !== 'tiles') return;
+    const id = S.soundLine(c.sound);
+    if (!id) { MW.log('words', 'sound ' + c.text + ': none'); return; }
+    if (!MW.audio.recorded(id)) { MW.log('words', 'sound ' + id + ' not recorded yet'); return; }
+    MW.log('words', 'sound ' + id);
+    W.speak([[id]]);
+  }
 
   function wrongDrop(c) {
     st.drops++;
@@ -467,6 +524,7 @@
     if (!(await sayThrough([['words-you-built', line(item.word)]], token))) return;
     setStars(buildStars, st.qi + 1);
     MW.audio.sfx('twinkle');
+    moments.navigator(st.qi + 1 < st.round.length ? st.qi + 1 : null);   // the navigator points the way to the next star
     await MW.wait(700);
     if (!(await W.ok(token))) return;
     st.ship.el.classList.add('is-away');                       // off it goes
@@ -523,6 +581,10 @@
     if (!(await W.ok(token))) return;
     await MW.wait(500);
     if (!(await W.ok(token))) return;
+    if (moments.cook()) {                                      // the cook brings a pan of fish for the MeeMee
+      await MW.wait(1300);
+      if (!(await W.ok(token))) return;
+    }
     again.classList.add('mw-pulse');                           // tap here for another go
     await W.speak([['words-round-another']]);
   }
@@ -538,6 +600,7 @@
     st.rockets.forEach(function (r) { r.el.classList.remove('is-lit', 'is-hint'); });
     [findPod, buildPod, endPod].forEach(function (p) { if (p) p.lightsOff(); });
     if (again) again.classList.remove('mw-pulse');
+    if (moments) moments.clear();
     st.item = null; st.prompt = null; st.pool = null; st.week = null; st.repeat = null;
   }
 
@@ -557,21 +620,33 @@
     const run = list.every(function (w, i) { return i === 0 || w === list[i - 1] + 1; });
     return 'Weeks ' + (run ? list[0] + ' to ' + list[list.length - 1] : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]);
   }
+  const COUNT = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  function pickWeek(GU, value) {
+    const g = MW.store.game(ID); g.week = value; MW.store.save();
+    MW.log('words', 'week ' + value);
+    GU.show('words-progress');
+  }
   function renderProgress(el) {
     const GU = MW.grownups;
     const map = S.statuses(answers());
     const wk = week();
+    const all = wk === S.ALL;
+    const allLabel = S.allLabel(BOOK);
     GU.h3(el, 'Week in play');
     const r = GU.row(el);
     BOOK.weeks.forEach(function (x) {
-      GU.btn(r, 'Week ' + x.week, function () {
-        const g = MW.store.game(ID); g.week = x.week; MW.store.save();
-        MW.log('words', 'week ' + x.week);
-        GU.show('words-progress');
-      }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+      GU.btn(r, 'Week ' + x.week, function () { pickWeek(GU, x.week); }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
     });
-    const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
-    GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    // after the last week, every week together ("Weeks 1–5", named from the words file)
+    if (allLabel) GU.btn(r, allLabel, function () { pickWeek(GU, S.ALL); }, 'gu-choice words-week words-week-all' + (all ? ' is-on' : ''));
+    if (all) {
+      const n = BOOK.weeks.length;
+      GU.p(el, MW.esc(allLabel) + ' plays every word from all ' + (COUNT[n] || n) + ' weeks, leaning on the ones that need the most work. '
+        + 'A change starts with the next round.', 'gu-note');
+    } else {
+      const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
+      GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    }
 
     const grid = MW.make('div', 'words-grid');
     const row = function (label, words) {
@@ -581,21 +656,38 @@
       words.forEach(function (w) { cells.appendChild(cell(S.step(map, w), w)); });
       grid.appendChild(cells);
     };
-    const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
-    row('Tricky words', now.tricky);
-    row('Week ' + wk + ' words', now.other);
-    row('Earlier weeks', [].concat.apply([], BOOK.weeks.filter(function (x) { return x.week < wk; }).map(function (x) { return x.tricky; })));
-    row('Later weeks', [].concat.apply([], BOOK.weeks.filter(function (x) { return x.week > wk; }).map(function (x) { return x.tricky.concat(x.other); })));
+    const flat = function (weeks, pick) { return [].concat.apply([], weeks.map(pick)); };
+    if (all) {
+      // every week: every tricky word, then every other word
+      row('Tricky words', flat(BOOK.weeks, function (x) { return x.tricky; }));
+      row('Other words', flat(BOOK.weeks, function (x) { return x.other; }));
+    } else {
+      const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
+      row('Tricky words', now.tricky);
+      row('Week ' + wk + ' words', now.other);
+      row('Earlier weeks', flat(BOOK.weeks.filter(function (x) { return x.week < wk; }), function (x) { return x.tricky; }));
+      row('Later weeks', flat(BOOK.weeks.filter(function (x) { return x.week > wk; }), function (x) { return x.tricky.concat(x.other); }));
+    }
     el.appendChild(grid);
     const legend = MW.make('div', 'words-legend');
     S.STEPS.forEach(function (s) { legend.appendChild(cell(s, S.NAMES[s])); });
     el.appendChild(legend);
+    const earlierOther = !all && BOOK.weeks.some(function (x) { return x.week < wk && x.other.length; });
     GU.p(el, 'Each word is built with <b>sound tiles</b> until it is right first time (no wrong tap or drop, no hint) on three different days. '
       + 'Then it moves to <b>letters</b>: one tile per letter, with a spare or two; then to <b>harder letters</b>, with the tray filled to '
       + BOOK.harderTray + ' tiles. Three more days right first time at each step; after harder letters it is <b>secure</b>. '
-      + 'Each round has five words, mostly ones that need work.' + (BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : ''), 'gu-note');
+      + 'A secure word goes back to harder letters after two slips in a row (answers not right first time); a right answer in between clears the first slip. '
+      + (all ? 'Each round has five words: one or two secure ones to review, then the words on the lowest step first. '
+        : 'Each round has five words, at least three of them from the week in play (all of its words, if fewer are recorded): '
+          + 'one or two secure ones to review and the rest needing work. ')
+      + 'When there aren\'t enough words that need work, more secure ones fill the round.'
+      + (!all && BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : '')
+      + (earlierOther && allLabel ? ' Earlier weeks\' other words come up with ' + MW.esc(allLabel) + '.' : ''), 'gu-note');
     const waiting = BOOK.order.filter(function (w) { return !recorded(w); });
     if (waiting.length) GU.p(el, 'Waiting for a recording, so not in play yet: ' + MW.esc(waiting.join(', ')) + '.', 'gu-note');
+    const quiet = S.soundLines(BOOK).filter(function (id) { return !MW.audio.recorded(id); });
+    if (quiet.length) GU.p(el, 'Tile sounds waiting for a recording (those tiles are quiet until then): '
+      + MW.esc(quiet.map(function (id) { return id.slice(8); }).join(', ')) + '.', 'gu-note');
     if (BOOK.problems.length) GU.p(el, 'To fix in the words file (games/words/words.js): ' + MW.esc(BOOK.problems.join('; ')) + '.', 'gu-note');
     const n = answers().length;
     GU.p(el, n ? 'Words built on this tablet: ' + n + '.' : 'No words built on this tablet yet.', 'gu-note');
@@ -615,5 +707,5 @@
 
   // ---------------------------------------------------------------- test hooks
   G.start = startRound; G.showFind = showFind; G.showBuild = showBuild; G.setFind = setFind; G.drop = onDrop; G.tapRocket = tapRocket; G.home = W.home; G.makeRound = makeRound;
-  G.inPlay = inPlay; G.week = week; G.answers = answers;
+  G.inPlay = inPlay; G.week = week; G.answers = answers; G.sayTile = sayTile; G.LAMPS = LAMPS;
 })();
