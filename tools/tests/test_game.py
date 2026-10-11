@@ -1259,8 +1259,12 @@ async def test_words_round(p, name, vw, vh, dpr):
     print(f"\n== MeeMee Rockets: a round ({name}, {vw}x{vh}) ==")
     browser, ctx, page, t, problems, requests = await open_tablet(p, name, vw, vh, dpr, mode=None)
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    n_voice = await page.evaluate("Object.keys(MW.audio.manifest.voice).filter(k => k.startsWith('words-')).length")
-    check(f"{name}: every MeeMee Rockets line is on the page (42 recorded, none pending)", n_voice == 42, str(n_voice))
+    on_page = set(await page.evaluate("Object.keys(MW.audio.manifest.voice).filter(k => k.startsWith('words-'))"))
+    w_lines = json.loads((ROOT / "games" / "words" / "lines.json").read_text(encoding="utf-8"))["lines"]
+    recorded = {l["id"] for l in w_lines if not l.get("pending")}
+    pending = {l["id"] for l in w_lines if l.get("pending")}
+    check(f"{name}: every recorded MeeMee Rockets line is on the page, and no pending one ({len(recorded)} recorded, {len(pending)} pending)",
+          on_page == recorded, f"missing {sorted(recorded - on_page)[:5]}, extra {sorted(on_page - recorded)[:5]}")
     s = await w_open(t, page, W_ROUND)
     said = await t.said()
     check(f"{name}: the indigo planet says 'MeeMee Rockets!' and opens Find", s["screen"] == "screen-words-find" and "words-name" in said, json.dumps(s))

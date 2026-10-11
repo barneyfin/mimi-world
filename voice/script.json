@@ -386,8 +386,7 @@
       "game": "MeeMee Rescue",
       "group": "Numbers mode",
       "words": "Find the number.",
-      "how": "Friendly and clear, like showing someone a new game. Said after the question on the first two questions of a numbers-mode round.",
-      "pending": true
+      "how": "Friendly and clear, like showing someone a new game. Said after the question on the first two questions of a numbers-mode round."
     },
     {
       "id": "words-name",
@@ -688,592 +687,518 @@
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "feel",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-food",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "food",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-sort",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "sort",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-down",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "down",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-right",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "right",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-hard",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "hard",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-took",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "took",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-hear",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "hear",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-misses",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "misses",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-chain",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "chain",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-queen",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "queen",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-chair",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "chair",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-year",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "year",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-cobweb",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "cobweb",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-goats",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "goats",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-farmyard",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "farmyard",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-green",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "green",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-brown",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "brown",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-train",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "train",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-thinks",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "thinks",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-drum",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "drum",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-splat",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "splat",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-paint",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "paint",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-frog",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "frog",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-day",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "day",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-cloud",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "cloud",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-boy",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "boy",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-read",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "read",
-      "how": "Say it as \"reed\" (the ea sound of week 4). Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Say it as \"reed\" (the ea sound of week 4). Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-play",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "play",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-sound",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "sound",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-joy",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "joy",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-w-treat",
       "game": "MeeMee Rockets",
       "group": "Other words, weeks 1 to 4",
       "words": "treat",
-      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
-      "pending": true
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
       "id": "words-s-a",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "a",
-      "how": "A pure sound, clear and short. Used by: a.",
-      "pending": true
+      "how": "A pure sound, clear and short. Used by: a."
     },
     {
       "id": "words-s-b",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "b",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: b.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: b."
     },
     {
       "id": "words-s-d",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "d",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: d.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: d."
     },
     {
       "id": "words-s-e",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "e",
-      "how": "A pure sound, clear and short. Used by: e, ai (said).",
-      "pending": true
+      "how": "A pure sound, clear and short. Used by: e, ai (said)."
     },
     {
       "id": "words-s-f",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "f",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: f.",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: f."
     },
     {
       "id": "words-s-g",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "g",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: g.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: g."
     },
     {
       "id": "words-s-h",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "h",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: h.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: h."
     },
     {
       "id": "words-s-i",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "i",
-      "how": "A pure sound, clear and short. Used by: i.",
-      "pending": true
+      "how": "A pure sound, clear and short. Used by: i."
     },
     {
       "id": "words-s-j",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "j",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: j.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: j."
     },
     {
       "id": "words-s-k",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "k (for c and k)",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: c, k.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: c, k."
     },
     {
       "id": "words-s-l",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "l",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: l, ll.",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: l, ll."
     },
     {
       "id": "words-s-m",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "m",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: m.",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: m."
     },
     {
       "id": "words-s-n",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "n",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: n, ne (one).",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: n, ne (one)."
     },
     {
       "id": "words-s-o",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "o",
-      "how": "A pure sound, clear and short. Used by: o, a (what).",
-      "pending": true
+      "how": "A pure sound, clear and short. Used by: o, a (what)."
     },
     {
       "id": "words-s-p",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "p",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: p.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: p."
     },
     {
       "id": "words-s-r",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "r",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: r.",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: r."
     },
     {
       "id": "words-s-s",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "s",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: s, ss.",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: s, ss."
     },
     {
       "id": "words-s-t",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "t",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: t.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: t."
     },
     {
       "id": "words-s-u",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "u",
-      "how": "A pure sound, clear and short. Used by: u, o (love), o (some).",
-      "pending": true
+      "how": "A pure sound, clear and short. Used by: u, o (love), o (some)."
     },
     {
       "id": "words-s-v",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "v",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: f (of), ve (love).",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: f (of), ve (love)."
     },
     {
       "id": "words-s-w",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "w",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: w, wh (what).",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: w, wh (what)."
     },
     {
       "id": "words-s-y",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "y, as in yes",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: y.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: y."
     },
     {
       "id": "words-s-ai",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ai, as in rain",
-      "how": "A pure sound, clear and a little longer. Used by: ai, ay, ey (they).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ai, ay, ey (they)."
     },
     {
       "id": "words-s-air",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "air, as in chair",
-      "how": "A pure sound, clear and a little longer. Used by: air.",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: air."
     },
     {
       "id": "words-s-ar",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ar, as in hard",
-      "how": "A pure sound, clear and a little longer. Used by: ar.",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ar."
     },
     {
       "id": "words-s-ch",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ch",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: ch.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: ch."
     },
     {
       "id": "words-s-ear",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ear, as in hear",
-      "how": "A pure sound, clear and a little longer. Used by: ear, ere (here).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ear, ere (here)."
     },
     {
       "id": "words-s-ee",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ee, as in feel",
-      "how": "A pure sound, clear and a little longer. Used by: ea, ee, e (me), e (she).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ea, ee, e (me), e (she)."
     },
     {
       "id": "words-s-igh",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "igh, as in right",
-      "how": "A pure sound, clear and a little longer. Used by: igh, y (my), i (like).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: igh, y (my), i (like)."
     },
     {
       "id": "words-s-oa",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oa, as in goat",
-      "how": "A pure sound, clear and a little longer. Used by: oa, o (go).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: oa, o (go)."
     },
     {
       "id": "words-s-oo-long",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oo, as in food",
-      "how": "A pure sound, clear and a little longer. Used by: oo, o (into), ou (you).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: oo, o (into), ou (you)."
     },
     {
       "id": "words-s-oo-short",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oo, as in took",
-      "how": "A pure sound, clear and short. Used by: u (push), oo (took).",
-      "pending": true
+      "how": "A pure sound, clear and short. Used by: u (push), oo (took)."
     },
     {
       "id": "words-s-or",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "or, as in sort",
-      "how": "A pure sound, clear and a little longer. Used by: or, a (all).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: or, a (all)."
     },
     {
       "id": "words-s-ow",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ow, as in down",
-      "how": "A pure sound, clear and a little longer. Used by: ow, ou (and ou in out).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ow, ou (and ou in out)."
     },
     {
       "id": "words-s-oy",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oy, as in boy",
-      "how": "A pure sound, clear and a little longer. Used by: oy.",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: oy."
     },
     {
       "id": "words-s-qu",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "kw (qu)",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: qu.",
-      "pending": true
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: qu."
     },
     {
       "id": "words-s-sh",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "sh",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: sh, s (sure).",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: sh, s (sure)."
     },
     {
       "id": "words-s-th",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "th, as in thinks",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th.",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th."
     },
     {
       "id": "words-s-th-voiced",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "th, as in they",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th (they).",
-      "pending": true
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th (they)."
     },
     {
       "id": "words-s-ur",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ur, as in turn",
-      "how": "A pure sound, clear and a little longer. Used by: ere (were).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ere (were)."
     },
     {
       "id": "words-s-ure",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ure, as in sure",
-      "how": "A pure sound, clear and a little longer. Used by: ure (sure).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: ure (sure)."
     },
     {
       "id": "words-s-wu",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "w-u, as at the start of one",
-      "how": "A pure sound, clear and a little longer. Used by: o (one).",
-      "pending": true
+      "how": "A pure sound, clear and a little longer. Used by: o (one)."
     }
   ]
 }
