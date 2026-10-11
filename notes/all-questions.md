@@ -1,8 +1,9 @@
 # Every question MeeMee Rescue can ask
 
 Made by tools/tests/test_game.py from the game's own list (MW.bonds.allQuestions); don't edit it by hand.
-Zero bonds (marked *) come up only once the other bonds of that number are secure, and only when the answer
-is checked by tapping Scruffles.
+Zero bonds (marked *) come up only once the other bonds of that number are secure. With MeeMee to count they
+come up only when the answer is checked by tapping Scruffles; in numbers mode, whichever check is set (the
+answer is the 0 tile, or the other number). Numbers mode asks the same questions with the same words.
 
 | Whole | Number sentence | Answer | What Scruffles says |
 |---|---|---|---|

@@ -2,7 +2,7 @@
 
 Maths and phonics games for a five-year-old, set in space with the family's three cats: Scruffles (the hero), Moggles and Snuffles. The MeeMee are the lost kittens they rescue.
 
-- **MeeMee Rescue**: number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. On the crew screen the player gives Moggles and Snuffles their jobs (lookout, engineer, navigator, cook), and each job has a moment in a round. Grown-ups see which bonds are secure.
+- **MeeMee Rescue**: number bonds to 10 on the part–whole diagram. Play opens the MeeMee World map; the MeeMee Rescue planet starts a round of five questions chosen from the bonds that need work. The player answers by dragging MeeMee into the empty circle to count, or, in numbers mode (a grown-up's choice in Settings), by dragging a number tile from 0 to 10. On the crew screen the player gives Moggles and Snuffles their jobs (lookout, engineer, navigator, cook), and each job has a moment in a round. Grown-ups see which bonds are secure, for each way of answering.
 - **MeeMee Rockets** (test build): the class's tricky words, starting with week 5. The indigo planet starts a round of five words: find each word among three rockets on the launch pad, then build it by dragging its tiles into the rocket's portholes (sound tiles, then single letters, then harder letters). Grown-ups pick the week in play and see each word's step.
 
 Live at https://barneyfin.github.io/mimi-world/ (the recording page is at /mimi-world/record/).

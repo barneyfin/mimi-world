@@ -1,6 +1,6 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
-game) and the kit (0.6.0: the title banners, the store, stars, pick-up boxes, numbers mode's pieces), on Fire and Doogee
-screen sizes.
+game), the kit (0.6.0: the title banners, the store, stars, pick-up boxes, numbers mode's pieces) and MeeMee Rescue's
+numbers mode (0.6.0), on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -383,6 +383,7 @@ async def test_tap_mode(p):
     check("tap: four MeeMee and a tap on Scruffles completes it", s["phase"] == "celebrate", json.dumps(s))
     rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
     check("tap: saved with 3 wrong checks and the hint", rec["tries"] == 3 and rec["hint"] is True, json.dumps(rec))
+    check("tap: saved as answered with MeeMee to count (0.6.0: every answer is saved with its mode)", rec.get("mode") == "counting", json.dumps(rec))
     s = await t.wait_phase(["asking", "open"], 15)
     p2 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
     check("tap: question 2 ends with the line too", s["qi"] == 1 and "tap-scruffles" in p2, p2)
@@ -765,8 +766,9 @@ async def test_bonds(p):
     check("bonds: every question a round picks is on the list", all((q["whole"], q["left"], q["missing"]) in keys for q in qs + tap))
     lines = ["# Every question MeeMee Rescue can ask", "",
              "Made by tools/tests/test_game.py from the game's own list (MW.bonds.allQuestions); don't edit it by hand.",
-             "Zero bonds (marked *) come up only once the other bonds of that number are secure, and only when the answer",
-             "is checked by tapping Scruffles.", "",
+             "Zero bonds (marked *) come up only once the other bonds of that number are secure. With MeeMee to count they",
+             "come up only when the answer is checked by tapping Scruffles; in numbers mode, whichever check is set (the",
+             "answer is the 0 tile, or the other number). Numbers mode asks the same questions with the same words.", "",
              "| Whole | Number sentence | Answer | What Scruffles says |", "|---|---|---|---|"]
     for q in allq:
         w, a, b, m = q["whole"], q["left"], q["right"], q["missing"]
@@ -2430,6 +2432,834 @@ async def test_kit_pieces(p, name, vw, vh, dpr):
     await browser.close()
 
 
+# ---------------------------------------------------------------- 0.6.0: MeeMee Rescue's numbers mode
+POD = (1030, 300)                     # Scruffles: tapped to check
+
+
+def tile_xy(n):
+    """The middle of number tile n in its place on the track (x 128 + 94 n, tops at 686, 84 across)."""
+    return (128 + 94 * n + 42, 686 + 42)
+
+
+async def n_state(page):
+    return await page.evaluate("""(() => { const R = MW.rescue, s = R.st, d = R.diagram(), tr = R.track();
+        return { phase: s.phase, qi: s.qi, target: s.target, answer: s.answer, placed: s.placed ? s.placed.n : null,
+                 tries: s.tries, misses: s.misses, hinted: s.hinted, mode: R.mode(), screen: MW.shell.screen,
+                 carried: ['whole', 'left', 'right'].map(k => d.carried(k)), away: tr.away(),
+                 out: tr.tiles.filter(t => t.out()).map(t => t.n), fixed: s.fixed.length,
+                 ghosts: document.querySelectorAll('#screen-game .mw-ghost').length,
+                 lit: document.querySelectorAll('#screen-game .mw-ghost.is-lit').length,
+                 face: document.querySelector('#screen-game .mw-pod').dataset.face,
+                 ready: document.querySelector('#screen-game .mw-pod').classList.contains('is-ready') }; })()""")
+
+
+async def n_look(page):
+    """What the game screen shows: visible pills, any '?', the asteroid, the track, MeeMee counters."""
+    return await page.evaluate("""(() => { const g = document.getElementById('screen-game');
+        const shown = e => !!e && getComputedStyle(e).display !== 'none' && !e.closest('.mw-off');
+        const tray = Array.from(g.children).find(e => e.style.left === '745px' && e.style.top === '515px');
+        const tr = MW.rescue.track();
+        return { pills: Array.from(g.querySelectorAll('.mw-pill')).filter(shown).length,
+                 q: Array.from(g.querySelectorAll('.numeral-whole, .numeral-part')).filter(e => shown(e) && e.textContent === '?').length,
+                 tray: shown(tray), track: shown(tr.el), tiles: tr.tiles.map(t => t.el.textContent),
+                 counters: g.querySelectorAll('.mw-counters .mw-mimi').length,
+                 look: MW.rescue.diagram().look() }; })()""")
+
+
+async def n_wait(t, pred_js, timeout=10):
+    for _ in range(int(timeout / 0.1)):
+        if await t.page.evaluate(pred_js):
+            return True
+        await asyncio.sleep(0.1)
+    return False
+
+
+async def n_quiet(t, timeout=15):
+    """Until nothing is being said."""
+    for _ in range(int(timeout / 0.1)):
+        if not await t.page.evaluate("MW.audio.speaking()"):
+            return True
+        await asyncio.sleep(0.1)
+    return False
+
+
+async def n_hold(t, sx0, sy0, sx1, sy1, touch_id=40, steps=8):
+    """A finger down at one point, moved to another, still held."""
+    x0, y0 = await t.screen(sx0, sy0)
+    x1, y1 = await t.screen(sx1, sy1)
+    await touch(t, "touchStart", [(touch_id, (x0, y0))])
+    for k in range(1, steps + 1):
+        await touch(t, "touchMove", [(touch_id, (x0 + (x1 - x0) * k / steps, y0 + (y1 - y0) * k / steps))])
+        await asyncio.sleep(0.02)
+    await asyncio.sleep(0.15)
+
+
+async def n_check(t):
+    """Tap Scruffles, then a moment."""
+    await t.tap(*POD)
+    await asyncio.sleep(0.5)
+
+
+async def test_numbers_round(p, name, vw, vh, dpr):
+    """A whole numbers-mode round with tap Scruffles (the usual check), played by touch, with the boards' screenshots."""
+    print(f"\n== numbers mode: a round with tap Scruffles ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"numbers-{name}", vw, vh, dpr, mode="tap")
+    await page.evaluate("MW.store.setting('answerMode', 'numbers'); MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.start_round()
+    await t.wait_phase(["open"], 20)
+    st = await n_state(page)
+    look = await n_look(page)
+    check(f"numbers ({name}): a numbered MeeMee in each given circle (7 in the whole, 3 in a part); the missing part waits empty and dashed",
+          st["carried"] == [7, 3, None] and st["mode"] == "numbers"
+          and await page.evaluate("MW.rescue.diagram().circles.right.classList.contains('is-waiting')"), json.dumps(st))
+    check(f"numbers ({name}): no pills, no '?', no asteroid and no MeeMee to drag; the number track holds 0 to 10",
+          look["pills"] == 0 and look["q"] == 0 and not look["tray"] and look["track"] and look["counters"] == 0
+          and look["tiles"] == [str(i) for i in range(11)] and look["look"] == "numbers", json.dumps(look))
+    said = await t.said()
+    check(f"numbers ({name}): question 1 as in counting mode, then 'Find the number.', then 'Tap Scruffles when you're ready.'",
+          "q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more rescue-find-number tap-scruffles" in said, str(said[-2:]))
+    # the ask (Numbers8Ask): a tile on its way to the circle
+    await n_hold(t, *tile_xy(4), 652, 632)
+    ring = await page.evaluate("getComputedStyle(document.querySelectorAll('#screen-game .mw-track-place')[4]).display")
+    check(f"numbers ({name}): a tile picked up leaves a dashed ring in its place", ring == "block", ring)
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-1-ask.png"))
+    hx, hy = await t.screen(*tile_xy(4))
+    await touch(t, "touchMove", [(40, (hx, hy))])
+    await asyncio.sleep(0.05)
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.4)
+    st = await n_state(page)
+    check(f"numbers ({name}): ... and put back in its place it's simply back (not a try)", st["out"] == [] and st["tries"] == 0 and st["misses"] == 0, json.dumps(st))
+
+    # tapping Scruffles with no tile in the circle asks the question again and isn't a try
+    await n_quiet(t)
+    n0 = len(await t.said())
+    await n_check(t)
+    said = await t.said()
+    st = await n_state(page)
+    check(f"numbers ({name}): Scruffles tapped with no tile in the circle asks the question again (not a try)",
+          said[n0:][:1] == ["q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more rescue-find-number tap-scruffles"] and st["tries"] == 0,
+          json.dumps([said[n0:], st["tries"]]))
+    # a tile dropped in the circle stays there; a second one sends the first back
+    await t.drag(*tile_xy(2), 560, 480)
+    st = await n_state(page)
+    check(f"numbers ({name}): tile 2 dropped in the waiting circle stays there, its place ringed, the ship's lights glow (tap mode)",
+          st["placed"] == 2 and st["out"] == [2] and st["ready"] and st["phase"] == "open", json.dumps(st))
+    await asyncio.sleep(0.3)
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-2-dropped.png"))
+    await t.drag(*tile_xy(5), 600, 520)
+    st = await n_state(page)
+    check(f"numbers ({name}): a second tile (5) in the circle sends the first (2) back to the track", st["placed"] == 5 and st["out"] == [5], json.dumps(st))
+    # a wrong number: try-again face, "Let's try again.", and the tile floats back
+    await n_check(t)
+    st = await n_state(page)
+    check(f"numbers ({name}): a wrong number (5 for 4): 'Let's try again.', the try-again face, and the tile floats back",
+          (await t.said())[-1:] == ["again-try-again"] and st["face"] == "try-again" and st["placed"] is None and st["out"] == []
+          and st["tries"] == 1 and not st["hinted"] and not st["ready"], json.dumps(st))
+    # with tap Scruffles a tile dropped away from the circle isn't a try
+    await asyncio.sleep(1.2)
+    n0 = len(await t.said())
+    await t.drag(*tile_xy(8), 900, 330)
+    await asyncio.sleep(0.4)
+    st = await n_state(page)
+    check(f"numbers ({name}): a tile dropped anywhere else floats back to its place, and with tap Scruffles isn't a try",
+          st["out"] == [] and st["misses"] == 0 and st["tries"] == 1 and (await t.said())[n0:] == [], json.dumps(st))
+    # the second wrong number brings the hint: the given part as MeeMee, the whole keeps its number, ghosts count on
+    await t.drag(*tile_xy(6), 550, 470)
+    await n_check(t)
+    st = await n_state(page)
+    said = await t.said()
+    check(f"numbers ({name}): the second wrong number brings the counting-on hint ('Let's count on from three. Four, five, six, seven.')",
+          "q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7" in said and st["hinted"] and st["tries"] == 2, str(said[-2:]))
+    check(f"numbers ({name}): ... the given part comes back as 3 MeeMee, the whole keeps its numbered MeeMee, 4 ghosts wait",
+          st["carried"] == [7, None, None] and st["fixed"] == 3 and st["ghosts"] == 4, json.dumps(st))
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    st = await n_state(page)
+    check(f"numbers ({name}): ... the ghosts light as they're counted, and stay (with the MeeMee) until the question is answered",
+          st["lit"] == 4 and st["fixed"] == 3 and st["hinted"], json.dumps(st))
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-3-hint-part.png"))
+    # right: a MeeMee pops up to carry the number; the track slides away; the number sentence
+    await t.drag(*tile_xy(4), 545, 465)
+    await n_check(t)
+    st = await n_state(page)
+    rail = await stage_box(page, "MW.rescue.track().el.querySelector('svg')")
+    right = await page.evaluate("""[MW.rescue.diagram().circles.right.classList.contains('is-success'),
+        Array.from(document.querySelectorAll('#screen-game .mw-numbered')).some(e => e.classList.contains('is-popping') && e.textContent === '4'),
+        document.querySelector('#screen-game .mw-pod').classList.contains('is-celebrating')]""")
+    check(f"numbers ({name}): tile 4 and a tap: a numbered MeeMee pops up carrying 4, the success ring, the got-it face and the ship's lights",
+          st["phase"] == "celebrate" and st["carried"] == [7, 3, 4] and right == [True, True, True] and st["face"] == "got-it", json.dumps([st, right]))
+    check(f"numbers ({name}): ... the track slides down out of sight, every tile back in it", st["away"] and st["out"] == [] and rail[1] >= 800, json.dumps([st["away"], rail]))
+    check(f"numbers ({name}): ... the hint's MeeMee fly up to the ship and the part carries its number again", st["carried"][1] == 3
+          and await page.evaluate("document.querySelectorAll('#screen-game .mw-counters .mw-mimi.is-rescued').length") == 3)
+    await n_wait(t, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-3 and num-mid-4 make num-end-7')", 10)
+    await asyncio.sleep(0.4)
+    eq = await page.inner_text("#screen-game .mw-equation")
+    check(f"numbers ({name}): the number sentence shows and is said: 3 + 4 = 7", eq.replace("\n", " ").split() == ["3", "+", "4", "=", "7"], eq)
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-5-right.png"))
+    rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
+    check(f"numbers ({name}): saved with its mode: numbers, 2 wrong numbers, the hint, tap Scruffles",
+          rec.get("mode") == "numbers" and rec["tries"] == 2 and rec["hint"] is True and rec["check"] == "tap" and rec["misses"] == 0, json.dumps(rec))
+
+    # Q2: a missing whole: numbered MeeMee in both parts, the whole waiting; two wrong numbers, then count with me
+    s = await t.wait_phase(["open"], 20)
+    st = await n_state(page)
+    rail = await stage_box(page, "MW.rescue.track().el.querySelector('svg')")
+    said = await t.said()
+    check(f"numbers ({name}): the track comes back for the next question", not st["away"] and abs(rail[1] - 674) < 0.6, json.dumps(rail))
+    check(f"numbers ({name}): question 2 (missing whole): numbered MeeMee in both parts, the whole waits; asked as in counting mode, then the two lines",
+          st["carried"] == [None, 2, 3] and st["target"] == "whole"
+          and "q-weve-got num-mid-2 and num-end-3 q-how-many-altogether rescue-find-number tap-scruffles" in said, json.dumps([st, said[-1:]]))
+    await t.drag(*tile_xy(4), 380, 205)
+    await n_check(t)
+    await asyncio.sleep(1.2)
+    await t.drag(*tile_xy(6), 400, 220)
+    await n_check(t)
+    st = await n_state(page)
+    check(f"numbers ({name}): two wrong numbers for a missing whole bring 'Count them with me.': both parts as MeeMee, 5 ghosts in the whole",
+          any(x.startswith("again-count-with-me") for x in await t.said()) and st["carried"] == [None, None, None] and st["fixed"] == 5 and st["ghosts"] == 5,
+          json.dumps(st))
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-4-hint-whole.png"))
+    await t.drag(*tile_xy(5), 380, 205)
+    await n_check(t)
+    st = await n_state(page)
+    check(f"numbers ({name}): tile 5 completes 2 + 3 = ?", st["phase"] == "celebrate" and st["carried"] == [5, 2, 3], json.dumps(st))
+
+    # Q3: from the third question neither line is said; right first time
+    s = await t.wait_phase(["open"], 20)
+    p3 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check(f"numbers ({name}): from question 3, no 'Find the number.' and no tap line", s["qi"] == 2 and "rescue-find-number" not in p3 and "tap-scruffles" not in p3, p3)
+    await t.drag(*tile_xy(1), 210, 470)
+    await n_check(t)
+    st = await n_state(page)
+    rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
+    check(f"numbers ({name}): ? + 5 = 6 answered with tile 1, right first time", st["phase"] == "celebrate" and rec["tries"] == 0 and not rec["hint"] and rec["mode"] == "numbers", json.dumps(rec))
+    s = await t.wait_phase(["open"], 20)
+    await t.drag(*tile_xy(5), 550, 470)
+    await n_check(t)
+    s = await t.wait_phase(["open"], 20)
+    await t.drag(*tile_xy(4), 380, 205)
+    await n_check(t)
+    await t.wait_phase(["done"], 20)
+    await asyncio.sleep(1)
+    s = await t.state()
+    modes = await page.evaluate("MW.store.get('answers').map(a => a.mode)")
+    check(f"numbers ({name}): the round ends on the celebration screen with five answers saved as numbers", s["screen"] == "screen-end" and modes == ["numbers"] * 5, json.dumps([s, modes]))
+
+    # the grown-ups tabs (Grownups8Settings, Grownups8Progress)
+    await n_quiet(t)
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('settings')")
+    await asyncio.sleep(0.4)
+    settings = await page.evaluate("""(() => { const b = document.querySelector('.gu-body');
+        return { h3: Array.from(b.querySelectorAll('.gu-h3')).map(h => h.textContent),
+                 ways: Array.from(b.querySelectorAll('[data-way]')).map(x => [x.textContent, x.classList.contains('is-on')]) }; })()""")
+    check(f"numbers ({name}): Settings: 'How your child answers' above 'Answer check', 'MeeMee to count' or 'Numbers' (on)",
+          settings["h3"] == ["How your child answers", "Answer check"] and settings["ways"] == [["MeeMee to count", False], ["Numbers", True]], json.dumps(settings))
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-6-settings.png"))
+    await page.evaluate("MW.grownups.show('progress')")
+    await asyncio.sleep(0.4)
+    prog = await page.evaluate("""(() => { const b = document.querySelector('.gu-body');
+        return { h3: b.querySelector('.gu-h3').textContent, ways: Array.from(b.querySelectorAll('[data-way]')).map(x => [x.textContent, x.classList.contains('is-on')]),
+                 lead: b.querySelector('.gu-lead').textContent }; })()""")
+    check(f"numbers ({name}): Progress: 'Showing progress for' with the switch on Numbers, and the numbers-mode summary",
+          prog["h3"] == "Showing progress for" and prog["ways"] == [["MeeMee to count", False], ["Numbers", True]]
+          and prog["lead"] == "Secure: 0 of 34 bonds. Practising: 5. Questions answered this way on this tablet: 5.", json.dumps(prog))
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-7-progress.png"))
+    rows = await page.evaluate("Array.from(document.querySelectorAll('.gu-body .gu-table tr')).slice(1).map(tr => tr.children[2].textContent)")
+    check(f"numbers ({name}): Progress's recent answers are this way's (five, the first with 2 wrong numbers and the hint)",
+          len(rows) == 5 and rows[-1] == "2 wrong numbers, with the hint (tap Scruffles)", json.dumps(rows))
+    await page.evaluate("(() => { const b = document.querySelector('.gu-body'); b.scrollTop = b.scrollHeight; })()")
+    await asyncio.sleep(0.3)
+    await page.screenshot(path=str(SHOTS / f"{name}-numbers-8-recent.png"))
+    await page.evaluate("MW.grownups.close()")
+    check(f"numbers ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_numbers_auto(p):
+    """Numbers mode with 'as soon as it's right': checked as a tile lands; a tile dropped away is a try. The lookout's place."""
+    print("\n== numbers mode: as soon as it's right ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "numbers-auto", 1280, 800, 1, mode="auto")
+    await page.evaluate("MW.store.setting('answerMode', 'numbers'); MW.crew.save({moggles: 'lookout', snuffles: 'engineer'}); MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await t.tap(*RESCUE)
+    await t.wait_screen("screen-game", 6)
+    await asyncio.sleep(1.2)
+    shown = await page.evaluate("!!document.querySelector('#screen-game [data-moment=lookout].is-shown')")
+    lb = await stage_box(page, "document.querySelector('#screen-game [data-moment=lookout]')")    # the window it peeks through
+    order = await page.evaluate("""(() => { const lay = document.querySelector('[data-moment=lookout]').closest('.mw-moments'), tr = MW.rescue.track().el;
+        return !!(lay.compareDocumentPosition(tr) & Node.DOCUMENT_POSITION_FOLLOWING); })()""")
+    check("numbers: the lookout peeks up from behind the right-hand end of the number track (its rail ends at 1166, top 674), below the ship (answer 24)",
+          shown and order and lb[0] > 880 and lb[0] + lb[2] <= 1166 and lb[1] >= 500 and 674 < lb[1] + lb[3] <= 700, json.dumps([lb, order]))
+    check("numbers: ... and keeps clear of the diagram", lb and not any(overlaps_circle(lb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]), str(lb))
+    await page.screenshot(path=str(SHOTS / "numbers-lookout.png"))
+    await t.wait_phase(["open"], 20)
+    said = await t.said()
+    check("numbers: with 'as soon as it's right' the first question ends with 'Find the number.' (no tap line)",
+          said[-1:] == ["q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more rescue-find-number"], str(said[-1:]))
+    n0 = len(said)
+    await n_check(t)
+    check("numbers: tapping Scruffles asks the question again", (await t.said())[n0:][:1] == said[-1:] and (await n_state(page))["tries"] == 0)
+    await n_quiet(t)
+    await t.drag(*tile_xy(2), 550, 470)
+    await asyncio.sleep(0.3)
+    st = await n_state(page)
+    check("numbers: a wrong tile is checked as it lands: 'Let's try again.' and it floats back",
+          (await t.said())[-1:] == ["again-try-again"] and st["tries"] == 1 and st["placed"] is None and st["out"] == [] and st["phase"] == "open", json.dumps(st))
+    await asyncio.sleep(1.2)
+    await t.drag(*tile_xy(9), 760, 300)
+    await asyncio.sleep(0.4)
+    st = await n_state(page)
+    check("numbers: a tile dropped away from the circle floats back and counts as a try (a miss)", st["misses"] == 1 and st["out"] == []
+          and (await t.said())[-1:] == ["again-try-again"], json.dumps(st))
+    await asyncio.sleep(1.2)
+    await t.drag(*tile_xy(9), *tile_xy(9))                  # picked up and put down in its place: nothing
+    await t.drag(*tile_xy(6), 520, 450)
+    await asyncio.sleep(0.4)
+    st = await n_state(page)
+    check("numbers: the second wrong number brings the hint", st["hinted"] and st["tries"] == 2 and st["misses"] == 1, json.dumps(st))
+    await t.drag(*tile_xy(4), 560, 480)
+    st = await n_state(page)
+    check("numbers: the right tile completes it as it lands (no tap)", st["phase"] == "celebrate" and st["carried"][2] == 4, json.dumps(st))
+    rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
+    check("numbers: saved with its mode and the check", rec["mode"] == "numbers" and rec["check"] == "auto" and rec["tries"] == 2 and rec["misses"] == 1 and rec["hint"], json.dumps(rec))
+    # Q2: two misses bring the count-with-me hint; then the right tile
+    await t.wait_phase(["open"], 20)
+    said = await t.said()
+    check("numbers: question 2 ends with 'Find the number.' too", said[-1:] == ["q-weve-got num-mid-2 and num-end-3 q-how-many-altogether rescue-find-number"], str(said[-1:]))
+    await t.drag(*tile_xy(3), 660, 120)
+    await asyncio.sleep(1.2)
+    await t.drag(*tile_xy(3), 210, 470)                     # onto a given part: a miss
+    await asyncio.sleep(0.5)
+    st = await n_state(page)
+    check("numbers: two tiles dropped away bring 'Count them with me.'", st["hinted"] and st["misses"] == 2
+          and any(x.startswith("again-count-with-me") for x in await t.said()), json.dumps(st))
+    await t.drag(*tile_xy(5), 380, 205)
+    st = await n_state(page)
+    check("numbers: tile 5 in the whole completes 2 + 3 = ?", st["phase"] == "celebrate" and st["carried"] == [5, 2, 3], json.dumps(st))
+    await t.wait_phase(["open"], 20)
+    p3 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check("numbers: from question 3, no 'Find the number.'", "rescue-find-number" not in p3, p3)
+    await t.tap(*HOME)
+    check("numbers: Home goes back to the map", await t.wait_screen("screen-map", 5))
+    check("numbers (auto): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_numbers_bonds(p):
+    """Every bond, zero bonds included, as a numbers question; zero bonds and progress kept apart by mode."""
+    print("\n== numbers mode: every bond, and progress by mode ==")
+    browser = await p.chromium.launch()
+    ctx, page, problems = await seeded(browser, [], check_mode="auto")
+    qs = await page.evaluate("MW.bonds.allQuestions([2,3,4,5,6,7,8,9,10], true)")
+    out = await page.evaluate("""(qs) => { MW.store.setting('answerMode', 'numbers'); const R = MW.rescue, out = [];
+        qs.forEach(q => { R.ask(q); const d = R.diagram(), tr = R.track(), s = R.st, c = MW.LAYOUT[q.missing];
+          const ans = q.missing === 'whole' ? q.whole : q[q.missing], wrong = (ans + 1) % 11;
+          const o = { q: q, ans: ans, mode: R.mode(), shown: ['whole', 'left', 'right'].map(k => d.carried(k)),
+                      waiting: d.circles[q.missing].classList.contains('is-waiting'), prompt: s.prompt };
+          R.drop(tr.tile(wrong), c.x + 30, c.y - 20, false);
+          o.wrong = [s.phase, s.tries, s.placed ? s.placed.n : null, tr.tile(wrong).out()];
+          R.drop(tr.tile(ans), c.x - 40, c.y + 30, false);
+          const rec = MW.store.get('answers').slice(-1)[0];
+          o.right = [s.phase, d.carried(q.missing), d.circles[q.missing].classList.contains('is-success'), tr.away()];
+          o.rec = [rec.mode, rec.whole, rec.left, rec.right, rec.missing, rec.tries];
+          out.push(o); });
+        MW.world.home(); return out; }""", qs)
+    bad = []
+    for o in out:
+        q, ans = o["q"], o["ans"]
+        want_shown = [None if k == q["missing"] else q[k] for k in ("whole", "left", "right")]
+        if q["missing"] == "whole":
+            want_prompt = [["q-weve-got", f"num-mid-{q['left']}", "and", f"num-end-{q['right']}"], ["q-how-many-altogether"]]
+        else:
+            given = q["right" if q["missing"] == "left" else "left"]
+            want_prompt = [["q-lets-make", f"num-end-{q['whole']}"], ["q-weve-got", f"num-end-{given}"], ["q-how-many-more"]]
+        ok = (o["mode"] == "numbers" and o["shown"] == want_shown and o["waiting"] and o["prompt"] == want_prompt
+              and o["wrong"] == ["open", 1, None, False] and o["right"] == ["celebrate", ans, True, True]
+              and o["rec"] == ["numbers", q["whole"], q["left"], q["right"], q["missing"], 1])
+        if not ok:
+            bad.append(o)
+    zeros = [o for o in out if 0 in (o["q"]["left"], o["q"]["right"])]
+    check("numbers: every bond as a numbers question (189, zero bonds included): the numbered MeeMee, the same words, a wrong tile refused, the right tile completes it",
+          len(out) == 189 and not bad, json.dumps(bad[:2]))
+    check("numbers: a zero bond's answer is what the question asks for: 0, or the other number",
+          len(zeros) == 54 and {o["ans"] for o in zeros if o["q"]["missing"] != "whole" and o["q"][o["q"]["missing"]] == 0} == {0}
+          and all(o["ans"] > 0 for o in zeros if o["q"]["missing"] == "whole"), str(len(zeros)))
+    await ctx.close()
+
+    # zero bonds in numbers mode, whichever check, once that number's other bonds are secure in numbers mode
+    rounds = """() => { const out = {}; [['numbers', 'auto'], ['numbers', 'tap'], ['counting', 'auto'], ['counting', 'tap']].forEach(mc => {
+        MW.store.setting('answerMode', mc[0]); MW.store.setting('check', mc[1]); MW.rescue.st.mode = null; MW.rescue.st.check = null;
+        const z = new Set(); for (let i = 0; i < 300; i++) MW.rescue.makeRound().forEach(q => { if (q.left === 0 || q.right === 0) z.add(q.whole); });
+        out[mc.join('-')] = Array.from(z).sort((a, b) => a - b); }); return out; }"""
+    num_secure = [dict(a, mode="numbers") for a in secure_answers([(5, 1), (5, 2), (3, 1)])]
+    ctx, page, problems2 = await seeded(browser, num_secure)
+    got = await page.evaluate(rounds)
+    check("numbers: zero bonds come up in numbers mode whichever check is set, once that number's other bonds are secure in numbers mode",
+          got == {"numbers-auto": [3, 5], "numbers-tap": [3, 5], "counting-auto": [], "counting-tap": []}, json.dumps(got))
+    await ctx.close()
+    old_secure = secure_answers([(5, 1), (5, 2), (3, 1)])               # saved before 0.6.0: no mode, so counting mode's
+    ctx, page, problems3 = await seeded(browser, old_secure)
+    got = await page.evaluate(rounds)
+    check("numbers: answers with no mode (saved before 0.6.0) count as counting mode's: they open zero bonds there, not in numbers mode",
+          got == {"numbers-auto": [], "numbers-tap": [], "counting-auto": [], "counting-tap": [3, 5]}, json.dumps(got))
+    # a numbers-mode round picks from numbers-mode progress
+    secure = await page.evaluate("""() => { MW.store.setting('answerMode', 'numbers'); MW.rescue.st.mode = null; const out = new Set();
+        for (let i = 0; i < 200; i++) MW.rescue.makeRound().forEach(q => out.add(q.status)); return Array.from(out).sort(); }""")
+    check("numbers: a numbers-mode round picks from numbers-mode progress (nothing secure there yet)", secure == ["notyet"], json.dumps(secure))
+    await ctx.close()
+    check("numbers (bonds): no console errors", not (problems or problems2 or problems3), "; ".join((problems + problems2 + problems3)[:3]))
+    await browser.close()
+
+
+async def test_numbers_grownups(p):
+    """Settings' 'How your child answers' (a change starts with the next round), and the Progress tab's switch."""
+    print("\n== numbers mode: the grown-ups area ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "numbers-gu", 1046, 653, 1.22, mode="auto")
+    old = secure_answers([(7, 3)]) + [ans(T0 + 5 * DAY, 5, 1, first=False)]              # counting mode's (no mode: before 0.6.0)
+    new = [dict(a, mode="numbers") for a in secure_answers([(2, 1)])] + [dict(ans(T0 + 6 * DAY, 9, 4), mode="numbers")]
+    push = "(a) => { const s = MW.store.get('answers'); a.forEach(x => s.push(x)); MW.store.save(); }"
+    await page.evaluate(push, old)
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('progress')")
+    await asyncio.sleep(0.4)
+    grid = """(() => { const b = document.querySelector('.gu-body'), g = {};
+        b.querySelectorAll('.gu-grid .mw-cell').forEach(c => { g[c.textContent.trim()] = c.className.split(' ').find(x => x.startsWith('is-')); });
+        return { ways: Array.from(b.querySelectorAll('[data-way]')).map(x => [x.textContent, x.classList.contains('is-on')]),
+                 lead: b.querySelector('.gu-lead').textContent, g: [g['3 + 4'], g['1 + 4'], g['1 + 1'], g['4 + 5']],
+                 order: Array.from(b.children).map(e => e.className.split(' ')[0]).slice(0, 5),
+                 table: !!b.querySelector('.gu-table'),
+                 recent: Array.from(b.querySelectorAll('.gu-table tr')).slice(1).map(tr => [tr.children[1].textContent.split('   (')[0], tr.children[2].textContent]) }; })()"""
+    a = await page.evaluate(grid)
+    check("numbers: the Progress tab opens on the way set in Settings (MeeMee to count): its own secure and practising, and its recent answers",
+          a["ways"] == [["MeeMee to count", True], ["Numbers", False]] and a["g"] == ["is-secure", "is-practising", "is-notyet", "is-notyet"]
+          and a["lead"].startswith("Secure: 1 of 34 bonds. Practising: 1. Questions answered this way on this tablet: 4.")
+          and sorted(r[0] for r in a["recent"]) == ["1 + ? = 5", "3 + ? = 7", "3 + ? = 7", "3 + ? = 7"], json.dumps(a))
+    check("numbers: ... the switch sits above the grid (heading, switch, note, summary, grid)", a["order"] == ["gu-h3", "gu-row", "gu-p", "gu-p", "gu-grid"], json.dumps(a["order"]))
+    await page.click(".gu-body [data-way=numbers]")
+    await asyncio.sleep(0.3)
+    b = await page.evaluate(grid)
+    check("numbers: the switch on 'Numbers' with no numbers answers yet: 'No questions answered this way', and no table of the other way's answers",
+          b["ways"] == [["MeeMee to count", False], ["Numbers", True]] and b["lead"] == "No questions answered this way on this tablet yet."
+          and not b["table"] and b["g"] == ["is-notyet"] * 4, json.dumps(b))
+    await page.evaluate(push, new)
+    await page.evaluate("MW.grownups.show('progress')")       # the switch stays on Numbers
+    await asyncio.sleep(0.3)
+    b = await page.evaluate(grid)
+    check("numbers: the switch on 'Numbers' shows numbers mode's grid: 1 + 1 secure, 4 + 5 practising, 3 + 4 not yet",
+          b["ways"] == [["MeeMee to count", False], ["Numbers", True]] and b["g"] == ["is-notyet", "is-notyet", "is-secure", "is-practising"]
+          and b["lead"].startswith("Secure: 1 of 34 bonds. Practising: 1. Questions answered this way on this tablet: 4."), json.dumps(b))
+    check("numbers: ... and only the answers given with numbers in the recent answers",
+          sorted(r[0] for r in b["recent"]) == ["1 + ? = 2", "1 + ? = 2", "1 + ? = 2", "4 + ? = 9"] and all(r[1] == "First time (tap Scruffles)" for r in b["recent"]),
+          json.dumps(b["recent"]))
+    await page.screenshot(path=str(SHOTS / "numbers-gu-progress-switch.png"))
+    await page.click(".gu-body [data-way=counting]")
+    await asyncio.sleep(0.3)
+    a = await page.evaluate(grid)
+    check("numbers: back on 'MeeMee to count': counting's grid and only counting's recent answers", a["g"] == ["is-secure", "is-practising", "is-notyet", "is-notyet"]
+          and sorted(r[0] for r in a["recent"]) == ["1 + ? = 5", "3 + ? = 7", "3 + ? = 7", "3 + ? = 7"], json.dumps(a))
+    await page.evaluate("MW.grownups.close()")
+
+    # a change of mode starts with the next round
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.start_round()
+    await t.wait_phase(["open"], 20)
+    look = await n_look(page)
+    check("numbers: a counting round looks as before (pills, the asteroid, no track)", look["look"] == "counting" and look["pills"] == 2 and look["tray"]
+          and not look["track"] and look["counters"] == 13, json.dumps(look))
+    await t.tap(46, 754, 3.3)                                # the grown-ups lock
+    await page.evaluate("MW.grownups.show('settings')")
+    await asyncio.sleep(0.3)
+    await page.click(".gu-body [data-way=numbers]")
+    await asyncio.sleep(0.2)
+    on = await page.evaluate("[MW.store.setting('answerMode'), Array.from(document.querySelectorAll('.gu-body [data-way]')).map(x => x.classList.contains('is-on'))]")
+    check("numbers: 'Numbers' in Settings is saved with Rescue's settings", on == ["numbers", [False, True]], json.dumps(on))
+    await page.click(".gu-close")
+    await asyncio.sleep(0.6)
+    look = await n_look(page)
+    check("numbers: ... but this round carries on counting", look["look"] == "counting" and look["tray"] and not look["track"]
+          and await page.evaluate("MW.rescue.mode()") == "counting", json.dumps(look))
+    await t.fill(4, "right")
+    s = await t.wait_phase(["celebrate"], 3)
+    rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
+    check("numbers: ... and its answers are saved as counting", s["phase"] == "celebrate" and rec["mode"] == "counting", json.dumps(rec))
+    await t.wait_phase(["open"], 20)
+    look = await n_look(page)
+    check("numbers: ... to the end of the round (question 2 still counting)", look["look"] == "counting" and look["tray"], json.dumps(look))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.wait_phase(["open"], 20)
+    look = await n_look(page)
+    st = await n_state(page)
+    check("numbers: the next round is in numbers mode", look["look"] == "numbers" and not look["tray"] and look["track"] and st["carried"] == [7, 3, None], json.dumps([look, st]))
+    # and back to counting: exactly as before
+    await page.evaluate("MW.store.setting('answerMode', 'counting')")
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.wait_phase(["open"], 20)
+    look = await n_look(page)
+    vis = await page.evaluate("Array.from(document.querySelectorAll('#screen-game .mw-numbered')).filter(e => getComputedStyle(e).display !== 'none').length")
+    check("numbers: switched back, the counting look returns (pills, asteroid, no numbered MeeMee, no track)",
+          look["look"] == "counting" and look["pills"] == 2 and look["tray"] and not look["track"] and vis == 0, json.dumps([look, vis]))
+    check("numbers (grown-ups): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_numbers_pause(p):
+    """Home and pausing mid-drag; a hint cut short; a zero bond; reduce motion."""
+    print("\n== numbers mode: pausing, Home, zero bonds ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "numbers-pause", 1046, 653, 1.22, mode="tap")
+    zround = [{"whole": 5, "left": 5, "right": 0, "missing": "right"},
+              {"whole": 6, "left": 0, "right": 6, "missing": "whole"},
+              {"whole": 4, "left": 1, "right": 3, "missing": "left"},
+              {"whole": 3, "left": 3, "right": 0, "missing": "right"},
+              {"whole": 2, "left": 1, "right": 1, "missing": "right"}]
+    await page.evaluate("MW.store.setting('answerMode', 'numbers'); MW.rescue.nextRound = %s" % json.dumps(zround))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.start_round()
+    await t.wait_phase(["open"], 20)
+    await n_quiet(t)
+    # a placed tile picked up again, then the screen goes off: it goes back into the circle
+    await t.drag(*tile_xy(3), 550, 470)
+    await n_hold(t, 550, 470, 800, 300, touch_id=41)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.5)
+    held = await page.evaluate("[MW.rescue.st.paused, MW.rescue.track().tile(3).x, MW.rescue.track().tile(3).y, MW.rescue.st.placed && MW.rescue.st.placed.n]")
+    n0 = len(await t.said())
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.6)
+    said = await t.said()
+    check("numbers: the screen going off mid-drag puts the tile back where it was (in the circle)", held == [True, 550, 470, 3], json.dumps(held))
+    check("numbers: coming back asks the question again", said[n0:][:1] == ["q-lets-make num-end-5 q-weve-got num-end-5 q-how-many-more rescue-find-number tap-scruffles"], str(said[n0:]))
+    # a tile from the track held as the screen goes off: back to its place
+    await n_quiet(t)
+    await n_hold(t, *tile_xy(7), 700, 300, touch_id=42)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.4)
+    st = await n_state(page)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.5)
+    check("numbers: a tile held from the track as the screen goes off goes back to its place (not a try)", st["out"] == [3] and st["tries"] == 0 and st["misses"] == 0, json.dumps(st))
+    # a zero bond: 5 + ? = 5 is answered with the 0 tile
+    await n_quiet(t)
+    await t.drag(*tile_xy(0), 550, 470)
+    st = await n_state(page)
+    check("numbers: the 0 tile replaces the 3", st["placed"] == 0 and st["out"] == [0], json.dumps(st))
+    await n_check(t)
+    st = await n_state(page)
+    check("numbers: 5 + ? = 5 answered with the 0 tile and a tap", st["phase"] == "celebrate" and st["carried"] == [5, 5, 0], json.dumps(st))
+    await n_wait(t, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-5 and num-mid-0 make num-end-5')", 10)
+    eq = await page.inner_text("#screen-game .mw-equation")
+    check("numbers: ... the number sentence 5 + 0 = 5", eq.replace("\n", " ").split() == ["5", "+", "0", "=", "5"], eq)
+    # 0 + 6 = ?: the answer is 6
+    await t.wait_phase(["open"], 20)
+    st = await n_state(page)
+    check("numbers: 0 + 6 = ?: a numbered MeeMee carrying 0, one carrying 6, the whole waits", st["carried"] == [None, 0, 6], json.dumps(st))
+    # two wrong numbers, then Hear-again cuts the hint short: it is taken away (back to numbered MeeMee) and comes back next time
+    await n_quiet(t)
+    await t.drag(*tile_xy(5), 380, 205); await n_check(t); await asyncio.sleep(1.2)
+    await t.drag(*tile_xy(7), 380, 205); await n_check(t)
+    st = await n_state(page)
+    check("numbers: two wrong numbers for 0 + 6 bring 'Count them with me.' (6 MeeMee, 6 ghosts)", st["hinted"] and st["fixed"] == 6 and st["ghosts"] == 6 and st["carried"] == [None, None, None], json.dumps(st))
+    await asyncio.sleep(0.6)
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.5)
+    st = await n_state(page)
+    check("numbers: Hear-again during the hint takes it away: the numbered MeeMee come back", not st["hinted"] and st["fixed"] == 0 and st["ghosts"] == 0 and st["carried"] == [None, 0, 6], json.dumps(st))
+    await n_quiet(t)
+    await t.drag(*tile_xy(4), 380, 205); await n_check(t)
+    st = await n_state(page)
+    check("numbers: the next wrong number gives the hint again", st["hinted"] and st["fixed"] == 6, json.dumps(st))
+    await t.drag(*tile_xy(6), 380, 205); await n_check(t)
+    st = await n_state(page)
+    check("numbers: 0 + 6 = ? answered with 6", st["phase"] == "celebrate" and st["carried"] == [6, 0, 6], json.dumps(st))
+    await t.wait_phase(["open"], 20)
+    await t.drag(*tile_xy(1), 210, 470); await n_check(t)    # ? + 3 = 4
+    check("numbers: ? + 3 = 4 answered with tile 1", (await n_state(page))["phase"] == "celebrate")
+    s4 = await t.wait_phase(["open"], 20)
+    p4 = await page.evaluate("JSON.stringify(MW.rescue.st.prompt)")
+    check("numbers: with tap Scruffles a zero answer later in the round still ends with 'Tap Scruffles when you're ready.' (as Settings says; no 'Find the number.')",
+          s4["qi"] == 3 and p4 == json.dumps([["q-lets-make", "num-end-3"], ["q-weve-got", "num-end-3"], ["q-how-many-more"], ["tap-scruffles"]]).replace(" ", ""), p4)
+    # Home mid-drag: nothing is said after, every tile is back in its place
+    await n_hold(t, *tile_xy(2), 600, 500, touch_id=43)
+    await page.evaluate("MW.rescue.home()")
+    n0 = len(await t.said())
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.6)
+    st = await n_state(page)
+    check("numbers: Home while a tile is held: nothing is said, the map shows, the tiles are all back", len(await t.said()) == n0 and st["screen"] == "screen-map"
+          and st["out"] == [] and st["placed"] is None, json.dumps(st))
+    check("numbers (pausing): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_numbers_motion(p):
+    """Reduce motion in numbers mode: tiles jump rather than glide, the numbered MeeMee fades in, the track fades away."""
+    print("\n== numbers mode: reduce motion ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, reduced_motion="reduce")
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(ORIGIN + "/")
+    await page.wait_for_load_state("load")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)   # all loaded before closing
+    got = await page.evaluate("""(() => { MW.store.setting('answerMode', 'numbers'); MW.store.setting('check', 'auto'); MW.store.setting('checkPicked', true);
+        const R = MW.rescue; R.ask({ whole: 7, left: 3, right: 4, missing: 'right' }); const tr = R.track(), c = MW.LAYOUT.right;
+        R.drop(tr.tile(2), c.x, c.y, false);
+        const wrong = [tr.tile(2).el.classList.contains('is-moving'), tr.tile(2).out()];
+        R.drop(tr.tile(4), c.x, c.y, false);
+        const pop = Array.from(document.querySelectorAll('#screen-game .mw-numbered.is-popping')).map(e => getComputedStyle(e).animationName);
+        const t = getComputedStyle(tr.el);
+        return { wrong: wrong, pop: pop, away: tr.away(), transform: t.transform, transition: t.transitionProperty }; })()""")
+    await asyncio.sleep(0.5)
+    op = await page.evaluate("getComputedStyle(MW.rescue.track().el).opacity")
+    check("numbers (reduce motion): a wrong tile goes straight back (no glide)", got["wrong"] == [False, False], json.dumps(got))
+    check("numbers (reduce motion): the numbered MeeMee fades in rather than popping up", got["pop"] == ["mw-arrive"], json.dumps(got))
+    check("numbers (reduce motion): the track fades away rather than sliding", got["away"] and got["transform"] == "none" and op == "0", json.dumps([got, op]))
+    await page.evaluate("MW.world.home()")
+    peek = await page.evaluate("""(() => { const d = document.createElement('div'); d.className = 'mw-peek rescue-peek-flip'; d.innerHTML = '<div class="mw-peek-inner"></div>';
+        document.body.appendChild(d); const c = getComputedStyle(d.firstChild), out = [c.transform, c.scale, c.transitionProperty]; d.remove(); return out; })()""")
+    check("numbers (reduce motion): the mirrored lookout fades in rather than rising, and stays mirrored", peek == ["none", "-1 1", "opacity"], json.dumps(peek))
+    check("numbers (reduce motion): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def n_says_after(t, n0):
+    return (await t.said())[n0:]
+
+
+async def test_numbers_taps(p):
+    """Taps on Scruffles while he talks after a check (numbers mode, and counting mode as before), 'Find the number.'
+    not recorded, and Home or the grown-ups area mid-celebration and mid-hint, in numbers mode."""
+    print("\n== numbers mode: taps while Scruffles talks; Home and pauses mid-celebration and mid-hint ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "numbers-taps", 1280, 800, 1, mode="tap")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    # "Find the number." not recorded yet (pending): it is left out, and the question and the tap line are still said
+    await page.evaluate("delete MW.audio.manifest.voice['rescue-find-number']; MW.store.setting('answerMode', 'numbers'); MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.start_round()
+    await t.wait_phase(["open"], 20)
+    said = await t.said()
+    fails = await page.evaluate("MW.events.filter(e => e.type === 'audio-fail').map(e => e.detail)")
+    check("numbers: with 'Find the number.' not recorded, the question and the tap line are still said",
+          said[-1:] == ["q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more tap-scruffles"] and not fails, json.dumps([said[-2:], fails]))
+    await n_quiet(t)
+
+    # a double tap: the first checks a wrong number, the second (no tile now) waits for "Let's try again."
+    await t.drag(*tile_xy(5), 550, 470)
+    n0 = len(await t.said())
+    await w_double_tap(t, *POD)
+    await asyncio.sleep(0.3)
+    talking = await page.evaluate("MW.audio.speaking()")
+    await n_quiet(t)
+    st = await n_state(page)
+    check("numbers: a double tap on Scruffles (a wrong number, then no tile): 'Let's try again.' plays to the end, the question isn't asked again, one try",
+          talking and await n_says_after(t, n0) == ["again-try-again"] and st["tries"] == 1 and not st["hinted"], json.dumps([await n_says_after(t, n0), st]))
+    # once he's quiet, a tap with no tile asks the question again (not a try)
+    n0 = len(await t.said())
+    await n_check(t)
+    check("numbers: once he's quiet, a tap with no tile asks the question again", (await n_says_after(t, n0))[:1] == said[-1:]
+          and (await n_state(page))["tries"] == 1, json.dumps(await n_says_after(t, n0)))
+    await n_quiet(t)
+    # the second wrong number brings the hint; a double tap and a single tap during it leave it in place
+    await t.drag(*tile_xy(6), 550, 470)
+    n0 = len(await t.said())
+    await w_double_tap(t, *POD)
+    await asyncio.sleep(0.6)
+    await t.tap(*POD)
+    await asyncio.sleep(0.4)
+    mid = await n_state(page)
+    await n_quiet(t)
+    st = await n_state(page)
+    says = await n_says_after(t, n0)
+    check("numbers: a double tap that brings the hint, then another tap during it: the hint plays to the end and stays",
+          says == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"] and mid["hinted"] and st["hinted"] and st["fixed"] == 3
+          and st["ghosts"] == 4 and st["lit"] == 4 and st["carried"] == [7, None, None] and st["tries"] == 2, json.dumps([says, st]))
+    # right, then Home in the middle of the celebration: nothing more is said, the map shows, the next round is as new
+    await t.drag(*tile_xy(4), 550, 470)
+    await n_check(t)
+    check("numbers: tile 4 completes it", (await n_state(page))["phase"] == "celebrate")
+    await t.tap(*HOME)
+    n0 = len(await t.said())
+    await asyncio.sleep(3)
+    st = await n_state(page)
+    check("numbers: Home mid-celebration: back on the map, nothing more said (no number sentence), the tiles all back",
+          st["screen"] == "screen-map" and await n_says_after(t, n0) == [] and st["out"] == [] and st["placed"] is None, json.dumps([await n_says_after(t, n0), st]))
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.wait_phase(["open"], 20)
+    st = await n_state(page)
+    check("numbers: ... and the next round starts as new, the track back", st["qi"] == 0 and st["carried"] == [7, 3, None] and not st["away"] and st["tries"] == 0, json.dumps(st))
+    await n_quiet(t)
+    # a single impatient tap during "Let's try again."
+    await t.drag(*tile_xy(2), 550, 470)
+    await n_check(t)
+    n0 = len(await t.said())
+    await asyncio.sleep(0.2)
+    await t.tap(*POD)
+    await n_quiet(t)
+    st = await n_state(page)
+    check("numbers: a single tap during 'Let's try again.' does nothing (the line isn't cut off, the question isn't asked again)",
+          await n_says_after(t, n0) == [] and st["tries"] == 1, json.dumps([await n_says_after(t, n0), st]))
+    # the grown-ups area opened mid-hint: the hint is taken away (as in counting mode) and comes back in full next time
+    await t.drag(*tile_xy(6), 550, 470)
+    await n_check(t)
+    await asyncio.sleep(0.6)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")
+    await asyncio.sleep(0.6)
+    st = await n_state(page)
+    check("numbers: the grown-ups area opened mid-hint: the hint stops and is taken away (numbered MeeMee back)", not st["hinted"] and st["fixed"] == 0
+          and st["ghosts"] == 0 and st["carried"] == [7, 3, None] and not await page.evaluate("MW.audio.speaking()"), json.dumps(st))
+    n0 = len(await t.said())
+    await page.click(".gu-close")
+    await asyncio.sleep(0.6)
+    check("numbers: ... closed, the question is asked again", (await n_says_after(t, n0))[:1] == ["q-lets-make num-end-7 q-weve-got num-end-3 q-how-many-more tap-scruffles"],
+          json.dumps(await n_says_after(t, n0)))
+    await n_quiet(t)
+    await t.drag(*tile_xy(7), 550, 470)
+    await n_check(t)
+    st = await n_state(page)
+    check("numbers: ... and the next wrong number gives the hint again", st["hinted"] and st["fixed"] == 3, json.dumps(st))
+    await n_quiet(t)
+    # the grown-ups area opened mid-celebration: everything waits, then carries on
+    await t.drag(*tile_xy(4), 550, 470)
+    await n_check(t)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")
+    n0 = len(await t.said())
+    await asyncio.sleep(2.5)
+    st = await n_state(page)
+    check("numbers: the grown-ups area opened mid-celebration: nothing is said while it's open, the answer stays",
+          st["phase"] == "celebrate" and st["carried"] == [7, 3, 4] and await n_says_after(t, n0) == [], json.dumps([await n_says_after(t, n0), st]))
+    await page.click(".gu-close")
+    ok = await n_wait(t, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-3 and num-mid-4 make num-end-7')", 10)
+    s = await t.wait_phase(["open"], 20)
+    st = await n_state(page)
+    check("numbers: ... closed, the celebration carries on (the number sentence), then question 2 with the track back",
+          ok and s["qi"] == 1 and st["carried"] == [None, 2, 3] and not st["away"], json.dumps(st))
+
+    # counting mode, as before: a tap during the hint leaves it in place
+    await page.evaluate("MW.store.setting('answerMode', 'counting')")
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.wait_phase(["open"], 20)
+    await n_quiet(t)
+    await t.fill(2, "right")
+    n0 = len(await t.said())
+    await w_double_tap(t, *POD)                              # two wrong checks (too few): the second brings the hint
+    await asyncio.sleep(0.6)
+    await w_double_tap(t, *POD)                              # and more taps during the hint
+    await asyncio.sleep(0.4)
+    await t.tap(*POD)
+    await n_quiet(t)
+    says = await n_says_after(t, n0)
+    st = await t.state()
+    hint = await page.evaluate("[MW.rescue.st.hinted, document.querySelectorAll('#screen-game .mw-ghost').length, document.querySelectorAll('#screen-game .mw-ghost.is-lit').length]")
+    check("counting: a double tap with too few is two wrong checks (the hint), and taps during the hint leave it in place, as before",
+          says[-1:] == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"] and len(says) <= 2 and hint == [True, 2, 2]
+          and st["placed"] == 2 and await page.evaluate("MW.rescue.st.tries") >= 2, json.dumps([says, hint, st]))
+    check("numbers (taps): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+LOOKOUT_LOOK = """(() => { const b = document.querySelector('#screen-game [data-moment=lookout].is-shown'); if (!b) return null;
+    const i = b.querySelector('.mw-peek-inner'), mid = e => { const r = e.getBoundingClientRect(); return (r.left + r.right) / 2; };
+    return { scale: getComputedStyle(i).scale, flip: b.classList.contains('rescue-peek-flip'),
+             scopeLeft: mid(i.querySelector('.mw-held-scope')) < mid(i.firstElementChild),
+             window: [b.offsetLeft, b.offsetTop, b.offsetWidth, b.offsetHeight] }; })()"""
+
+
+async def test_numbers_decided(p, name, vw, vh, dpr):
+    """Barney's two decisions (11 October): no hint for a zero answer in numbers mode, and the lookout mirrored in numbers
+    mode (looking towards the diagram)."""
+    print(f"\n== numbers mode: no hint for a zero answer; the lookout mirrored ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"numbers-decided-{name}", vw, vh, dpr, mode="tap")
+    zround = [{"whole": 5, "left": 5, "right": 0, "missing": "right"},
+              {"whole": 6, "left": 0, "right": 6, "missing": "whole"},
+              {"whole": 4, "left": 1, "right": 3, "missing": "left"},
+              {"whole": 3, "left": 3, "right": 0, "missing": "right"},
+              {"whole": 2, "left": 1, "right": 1, "missing": "right"}]
+    await page.evaluate("MW.store.setting('answerMode', 'numbers'); MW.crew.save({moggles: 'lookout', snuffles: null}); MW.rescue.nextRound = %s" % json.dumps(zround))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await t.tap(*RESCUE)
+    await t.wait_screen("screen-game", 6)
+    await asyncio.sleep(1.2)
+    look = await page.evaluate(LOOKOUT_LOOK)
+    check(f"numbers ({name}): the lookout is mirrored in numbers mode, its telescope towards the diagram, in the same window (906, 519, 250 x 175)",
+          look is not None and look["scale"] == "-1 1" and look["flip"] and look["scopeLeft"] and look["window"] == [906, 519, 250, 175], json.dumps(look))
+    await page.screenshot(path=str(SHOTS / f"{name}-lookout-numbers.png"))
+
+    # 5 + ? = 5: two and three wrong numbers, and never the hint
+    await t.wait_phase(["open"], 20)
+    await n_quiet(t)
+    n0 = len(await t.said())
+    sts = []
+    for tile in (3, 2, 4):
+        await t.drag(*tile_xy(tile), 550, 470)
+        await n_check(t)
+        await n_quiet(t)
+        sts.append(await n_state(page))
+    says = (await t.said())[n0:]
+    two, three = sts[1], sts[2]
+    check(f"numbers ({name}): 5 + ? = 5, two wrong numbers: 'Let's try again.' each time, the tile back, and no hint (no MeeMee or ghosts, no counting on)",
+          two["tries"] == 2 and not two["hinted"] and two["fixed"] == 0 and two["ghosts"] == 0 and two["carried"] == [5, 5, None] and two["out"] == []
+          and says[:2] == ["again-try-again", "again-try-again"], json.dumps([says, two]))
+    check(f"numbers ({name}): ... and a third: the same, still no hint", three["tries"] == 3 and not three["hinted"] and three["fixed"] == 0 and three["ghosts"] == 0
+          and three["carried"] == [5, 5, None] and says == ["again-try-again"] * 3 and not any("count" in x for x in says), json.dumps([says, three]))
+    await t.drag(*tile_xy(0), 550, 470)
+    await n_check(t)
+    st = await n_state(page)
+    rec = await page.evaluate("MW.store.get('answers').slice(-1)[0]")
+    check(f"numbers ({name}): ... then the 0 tile completes it (saved with 3 wrong numbers and no hint)", st["phase"] == "celebrate" and rec["tries"] == 3 and rec["hint"] is False, json.dumps(rec))
+    # 0 + 6 = ?: a non-zero answer still gets the hint on the second wrong number
+    await t.wait_phase(["open"], 20)
+    await n_quiet(t)
+    await t.drag(*tile_xy(5), 380, 205)
+    await n_check(t)
+    await n_quiet(t)
+    await t.drag(*tile_xy(7), 380, 205)
+    await n_check(t)
+    st = await n_state(page)
+    check(f"numbers ({name}): 0 + 6 = ? (answer 6): the second wrong number still brings the hint", st["hinted"] and st["tries"] == 2 and st["fixed"] == 6
+          and any(x.startswith("again-count-with-me") for x in await t.said()), json.dumps(st))
+    # with 'as soon as it's right', tiles dropped away from a zero answer's circle don't bring the hint either
+    got = await page.evaluate("""(() => { MW.store.setting('check', 'auto'); const R = MW.rescue; R.ask({ whole: 5, left: 5, right: 0, missing: 'right' });
+        const tr = R.track(); R.drop(tr.tile(7), 900, 330, false); R.drop(tr.tile(8), 900, 330, false); R.drop(tr.tile(2), 550, 470, false);
+        const s = R.st; return [s.misses, s.tries, s.hinted, s.fixed.length, document.querySelectorAll('#screen-game .mw-ghost').length]; })()""")
+    check(f"numbers ({name}): with 'as soon as it's right', two misses and a wrong number on a zero answer: no hint", got == [2, 1, False, 0, 0], json.dumps(got))
+    await page.evaluate("MW.store.setting('check', 'tap')")
+
+    # counting mode: the lookout as before, not mirrored, looking left from behind the asteroid
+    await page.evaluate("MW.store.setting('answerMode', 'counting')")
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await t.wait_screen("screen-game", 6)
+    await asyncio.sleep(1.2)
+    look = await page.evaluate(LOOKOUT_LOOK)
+    check(f"counting ({name}): the lookout isn't mirrored, as before (telescope to the right, over the asteroid)",
+          look is not None and look["scale"] == "none" and not look["flip"] and not look["scopeLeft"] and look["window"] == [690, 390, 250, 175], json.dumps(look))
+    await page.screenshot(path=str(SHOTS / f"{name}-lookout-counting.png"))
+    check(f"numbers ({name}, decided): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -2463,6 +3293,16 @@ async def main():
         await test_banner_unrecorded(p)
         await test_kit_pieces(p, "fire", 1046, 653, 1.22)
         await test_kit_pieces(p, "doogee", 1280, 800, 2)
+        await test_numbers_round(p, "fire", 1046, 653, 1.22)
+        await test_numbers_round(p, "doogee", 1280, 800, 2)
+        await test_numbers_auto(p)
+        await test_numbers_bonds(p)
+        await test_numbers_grownups(p)
+        await test_numbers_pause(p)
+        await test_numbers_motion(p)
+        await test_numbers_taps(p)
+        await test_numbers_decided(p, "fire", 1046, 653, 1.22)
+        await test_numbers_decided(p, "doogee", 1280, 800, 2)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)} of {len(RESULTS)} checks passed")

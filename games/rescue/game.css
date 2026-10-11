@@ -1,0 +1,7 @@
+/* MeeMee Rescue's own styles (colour tokens only).
+   Numbers mode's lookout (moments.js) peeks up from behind the right-hand end of the number track. It is mirrored so its
+   telescope points left, towards the part-whole diagram, as it does at the MeeMee from behind the asteroid in counting
+   mode. The window it peeks through keeps its place; the cat and its telescope are mirrored about the window's middle
+   (the window is 250 wide), so both stay inside it. The scale property leaves the kit's rise (or, with reduce motion,
+   its fade) on transform untouched. */
+.rescue-peek-flip .mw-peek-inner { width: 250px; scale: -1 1; transform-origin: 125px 50%; }

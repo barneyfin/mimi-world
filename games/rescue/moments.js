@@ -1,6 +1,8 @@
 /* MeeMee Rescue: the crew's job moments (phase 4, 0.4.1; the design canvas's round 4, Moments4).
    A cat with a job appears briefly at its own moment, with no words, never over the diagram or the tray:
-     lookout    as a round starts, peeks over the asteroid with the telescope and spots the MeeMee;
+     lookout    as a round starts, peeks over the asteroid with the telescope and spots the MeeMee (in numbers mode,
+                where there is no asteroid, it peeks up from behind the right-hand end of the number track, below the
+                ship, answer 24 of the 0.6.0 PRD, mirrored so it looks towards the diagram);
      engineer   on a right answer, gives the ship a tap with the spanner while the lights flash;
      navigator  as a star turns peach, holds up the star map and points to the next one;
      cook       on the end screen, brings fish for the rescued MeeMee.
@@ -11,6 +13,9 @@
 
   const L = MW.LAYOUT.moments = {
     lookout: { x: 690, y: 390, w: 220, show: 175, box: 250, scope: { x: 89, y: 2, size: 150 } },   // behind the asteroid
+    // numbers mode: behind the number track's right-hand end (its rail runs to x 1166, its top at 674), below the ship,
+    // mirrored (flip) so it looks left, towards the diagram, as it does from the asteroid (game.css: rescue-peek-flip)
+    lookoutTrack: { x: 906, y: 519, w: 220, show: 175, box: 250, scope: { x: 89, y: 2, size: 150 }, flip: true },
     engineer: { x: 700, y: 318, w: 140, spanner: { x: 100, y: 84, size: 88 } },                     // by the ship's left fin
     navigator: { x: 686, y: 124, w: 120, map: { x: 64, y: 50, size: 80 } },                         // under the stars
     cook: { size: 104, moggles: { x: 254, y: 494, flip: true }, snuffles: { x: 770, y: 494, flip: false } }   // end screen
@@ -19,7 +24,8 @@
   function size(svg, s) { svg.setAttribute('width', s); svg.setAttribute('height', s); return svg; }
   function drop(el, ms) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms); }
 
-  // opts: { game: the game screen, tray: the asteroid's element, over: the layer the moments go under,
+  // opts: { game: the game screen, tray: the asteroid's element, over: the layer the moments go under (the number track
+  //         comes after it, so the lookout is behind the track as well as the asteroid),
   //         stars: MW.stars on the game screen, end: the end screen, endCats: { moggles: box, snuffles: box } }
   MW.moments = function (opts) {
     const m = {};
@@ -44,12 +50,14 @@
     function hide(el, after) { later(function () { el.classList.remove('is-shown'); drop(el, 400); }, after); }
 
     // ---------------------------------------------------------------- lookout
-    m.lookoutUp = function () {
+    // at: 'track' in numbers mode (behind the number track), otherwise behind the asteroid
+    m.lookoutUp = function (at) {
       m.lookoutDown(true);
-      const k = L.lookout, cat = catFor('lookout', k.w);
+      const k = at === 'track' ? L.lookoutTrack : L.lookout, cat = catFor('lookout', k.w);
       if (!cat) return false;
       const box = place(MW.make('div', 'mw-moment mw-peek', { 'data-moment': 'lookout' }), k.x, k.y);
       box.style.width = k.box + 'px'; box.style.height = k.show + 'px';
+      if (k.flip) box.classList.add('rescue-peek-flip');
       const inner = MW.make('div', 'mw-peek-inner');
       inner.appendChild(cat);
       const scope = place(size(MW.art('held-telescope'), k.scope.size), k.scope.x, k.scope.y);
@@ -59,7 +67,7 @@
       low.appendChild(box);
       peek = box;
       show(box);
-      MW.log('moment', 'lookout');
+      MW.log('moment', at === 'track' ? 'lookout track' : 'lookout');
       return true;
     };
     m.lookoutDown = function (now) {

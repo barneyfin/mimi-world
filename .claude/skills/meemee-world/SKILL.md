@@ -11,7 +11,7 @@ Read `MEEMEE.md` (in the folder root) first: it holds the rules every game follo
 - [reference.md](reference.md): how a game joins the world, the kit's functions, the voice lines, the build and the tests.
 - [design.md](design.md): the look and the words: colours, layout, characters, motion, what Scruffles says and how.
 
-For a finished example, read `games/rescue/` (MeeMee Rescue: number bonds on the part–whole diagram; `rescue.js` shows a full round, hints, celebrations and a grown-ups tab). Start a new game from `games/_template/`, which is small and shows every part a game needs. Learn from their structure; do not copy MeeMee Rescue's play, lines or art into another game.
+For a finished example, read `games/rescue/` (MeeMee Rescue: number bonds on the part–whole diagram; `rescue.js` shows a full round, hints, celebrations, grown-ups tabs, and a second way of answering, numbers mode, chosen in Settings, with its own progress). Start a new game from `games/_template/`, which is small and shows every part a game needs. Learn from their structure; do not copy MeeMee Rescue's play, lines or art into another game.
 
 ## Folder
 

@@ -8,8 +8,12 @@
      not yet     never asked.
    A round of five: 1 or 2 bonds he is secure on, the rest he is practising or hasn't met. If there aren't enough of
    one kind, the other fills in. At most two bonds come from one whole, and the same whole isn't asked twice in a row,
-   while there are enough wholes in play. A whole's zero bond (5 and 0) joins once its other bonds are secure, and only when
-   the answer is checked by tapping Scruffles (an empty circle is the answer to "how many more?").
+   while there are enough wholes in play. A whole's zero bond (5 and 0) joins once its other bonds are secure. With MeeMee
+   to count it comes only when the answer is checked by tapping Scruffles (an empty circle is the answer to "how many
+   more?"); in numbers mode it comes whichever check is set, because there is a 0 tile (decided 10 October 2026).
+   Each way of answering keeps its own progress (decided 10 October 2026): every answer is saved with its mode
+   ('counting' or 'numbers'); an answer saved before numbers mode has none and counts as counting. The game passes
+   pickRound and statuses one mode's answers (ofMode).
    Pure functions of the saved answers, so they are easy to test. */
 (function () {
   'use strict';
@@ -41,6 +45,10 @@
   const B = MW.bonds = {};
 
   B.key = function (w, a, b) { return w + ':' + Math.min(a, b); };
+  // Which way an answer was given: 'numbers', or 'counting' (also for answers saved before 0.6.0, which have no mode).
+  B.modeOf = function (ans) { return ans && ans.mode === 'numbers' ? 'numbers' : 'counting'; };
+  // One way's answers: each way has its own secure, practising and not yet.
+  B.ofMode = function (answers, mode) { return (answers || []).filter(function (a) { return B.modeOf(a) === mode; }); };
   B.firstTime = function (ans) { return !ans.tries && !ans.hint; };
 
   // Every bond of a whole, smaller part first: 7 -> [0,7] [1,6] [2,5] [3,4]
@@ -84,7 +92,7 @@
     return out;
   };
 
-  // opts: { wholes: [2..10], answers: [...], size: 5, zero: true in tap-Scruffles mode, rand: Math.random }
+  // opts: { wholes: [2..10], answers: one mode's [...], size: 5, zero: true in numbers mode or with tap Scruffles, rand: Math.random }
   // -> [{ whole, left, right, missing: 'whole' | 'left' | 'right', status }]
   B.pickRound = function (opts) {
     const rand = opts.rand || Math.random;

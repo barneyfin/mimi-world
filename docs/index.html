@@ -502,6 +502,14 @@ button { font-family: var(--font-andika); }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
 
+/* MeeMee Rescue's own styles (colour tokens only).
+   Numbers mode's lookout (moments.js) peeks up from behind the right-hand end of the number track. It is mirrored so its
+   telescope points left, towards the part-whole diagram, as it does at the MeeMee from behind the asteroid in counting
+   mode. The window it peeks through keeps its place; the cat and its telescope are mirrored about the window's middle
+   (the window is 250 wide), so both stay inside it. The scale property leaves the kit's rise (or, with reduce motion,
+   its fade) on transform untouched. */
+.rescue-peek-flip .mw-peek-inner { width: 250px; scale: -1 1; transform-origin: 125px 50%; }
+
 /* MeeMee Rockets' own styles. Colours only through tokens: var(--token), or the f-/s-/bg-/c- classes. */
 
 /* ---------------------------------------------------------------- Find: the rockets on the launch pad */
@@ -650,7 +658,7 @@ button { font-family: var(--font-andika); }
 <template id="art-words-tile-4"><svg width="247.5" height="104" viewBox="0 0 247.5 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="s-spark" x="-12" y="-12" width="271.5" height="128" rx="64" fill="none" stroke-width="12"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="243.5" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="233.5" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="238" cy="69.6" r="2.2"/><circle class="f-ink" cx="213.1" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="213.1" cy="9.5" r="2.2"/><circle class="f-ink" cx="238" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="226.7" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H216.3" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="244.5" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H216.3" stroke-width="5" stroke-linecap="round"/></g></svg></template>
 <script>
 window.MW = { VERSION: '0.6.0' };
-window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"rescue-find-number":{"dur":1.75},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74},"words-w-feel":{"dur":1.1},"words-w-food":{"dur":1.13},"words-w-sort":{"dur":1.21},"words-w-down":{"dur":0.94},"words-w-right":{"dur":1.09},"words-w-hard":{"dur":0.93},"words-w-took":{"dur":0.76},"words-w-hear":{"dur":0.72},"words-w-misses":{"dur":1.2},"words-w-chain":{"dur":0.95},"words-w-queen":{"dur":1.0},"words-w-chair":{"dur":0.9},"words-w-year":{"dur":1.03},"words-w-cobweb":{"dur":1.24},"words-w-goats":{"dur":0.84},"words-w-farmyard":{"dur":1.37},"words-w-green":{"dur":0.96},"words-w-brown":{"dur":0.97},"words-w-train":{"dur":0.94},"words-w-thinks":{"dur":1.01},"words-w-drum":{"dur":0.83},"words-w-splat":{"dur":1.13},"words-w-paint":{"dur":0.78},"words-w-frog":{"dur":0.72},"words-w-day":{"dur":0.72},"words-w-cloud":{"dur":1.32},"words-w-boy":{"dur":0.77},"words-w-read":{"dur":1.13},"words-w-play":{"dur":0.8},"words-w-sound":{"dur":1.2},"words-w-joy":{"dur":0.98},"words-w-treat":{"dur":0.8},"words-s-a":{"dur":0.48},"words-s-b":{"dur":0.36},"words-s-d":{"dur":0.38},"words-s-e":{"dur":0.36},"words-s-f":{"dur":0.72},"words-s-g":{"dur":0.39},"words-s-h":{"dur":0.34},"words-s-i":{"dur":0.39},"words-s-j":{"dur":0.46},"words-s-k":{"dur":0.42},"words-s-l":{"dur":0.68},"words-s-m":{"dur":0.71},"words-s-n":{"dur":0.78},"words-s-o":{"dur":0.43},"words-s-p":{"dur":0.39},"words-s-r":{"dur":0.72},"words-s-s":{"dur":0.7},"words-s-t":{"dur":0.35},"words-s-u":{"dur":0.33},"words-s-v":{"dur":0.9},"words-s-w":{"dur":0.34},"words-s-y":{"dur":0.4},"words-s-ai":{"dur":0.8},"words-s-air":{"dur":0.85},"words-s-ar":{"dur":0.91},"words-s-ch":{"dur":0.42},"words-s-ear":{"dur":0.63},"words-s-ee":{"dur":0.71},"words-s-igh":{"dur":0.88},"words-s-oa":{"dur":0.26},"words-s-oo-long":{"dur":0.77},"words-s-oo-short":{"dur":0.35},"words-s-or":{"dur":0.64},"words-s-ow":{"dur":0.82},"words-s-oy":{"dur":0.57},"words-s-qu":{"dur":0.38},"words-s-sh":{"dur":0.56},"words-s-th":{"dur":0.64},"words-s-th-voiced":{"dur":0.87},"words-s-ur":{"dur":0.74},"words-s-ure":{"dur":0.67},"words-s-wu":{"dur":0.57}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
+window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"rescue-find-number":{"dur":1.75},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74},"words-w-feel":{"dur":1.1},"words-w-food":{"dur":1.13},"words-w-sort":{"dur":1.21},"words-w-down":{"dur":0.94},"words-w-right":{"dur":1.09},"words-w-hard":{"dur":0.93},"words-w-took":{"dur":0.76},"words-w-hear":{"dur":0.72},"words-w-misses":{"dur":1.2},"words-w-chain":{"dur":0.95},"words-w-queen":{"dur":1.0},"words-w-chair":{"dur":0.9},"words-w-year":{"dur":1.03},"words-w-cobweb":{"dur":1.24},"words-w-goats":{"dur":0.84},"words-w-farmyard":{"dur":1.37},"words-w-green":{"dur":0.96},"words-w-brown":{"dur":0.97},"words-w-train":{"dur":0.94},"words-w-thinks":{"dur":1.01},"words-w-drum":{"dur":0.83},"words-w-splat":{"dur":1.13},"words-w-paint":{"dur":0.78},"words-w-frog":{"dur":0.72},"words-w-day":{"dur":0.72},"words-w-cloud":{"dur":1.32},"words-w-boy":{"dur":0.77},"words-w-read":{"dur":1.13},"words-w-play":{"dur":0.8},"words-w-sound":{"dur":1.2},"words-w-joy":{"dur":0.98},"words-w-treat":{"dur":0.8},"words-s-a":{"dur":0.48},"words-s-b":{"dur":0.36},"words-s-d":{"dur":0.38},"words-s-e":{"dur":0.36},"words-s-f":{"dur":0.72},"words-s-g":{"dur":0.39},"words-s-h":{"dur":0.34},"words-s-i":{"dur":0.39},"words-s-j":{"dur":0.46},"words-s-k":{"dur":0.42},"words-s-l":{"dur":0.68},"words-s-m":{"dur":0.71},"words-s-n":{"dur":0.78},"words-s-o":{"dur":0.43},"words-s-p":{"dur":0.39},"words-s-r":{"dur":0.72},"words-s-s":{"dur":0.7},"words-s-t":{"dur":0.35},"words-s-u":{"dur":0.33},"words-s-v":{"dur":0.9},"words-s-w":{"dur":0.34},"words-s-y":{"dur":0.4},"words-s-ai":{"dur":0.8},"words-s-air":{"dur":0.85},"words-s-ar":{"dur":0.91},"words-s-ch":{"dur":0.42},"words-s-ear":{"dur":0.63},"words-s-ee":{"dur":1.28},"words-s-igh":{"dur":0.88},"words-s-oa":{"dur":0.83},"words-s-oo-long":{"dur":0.77},"words-s-oo-short":{"dur":0.35},"words-s-or":{"dur":0.64},"words-s-ow":{"dur":0.82},"words-s-oy":{"dur":0.57},"words-s-qu":{"dur":0.38},"words-s-sh":{"dur":0.56},"words-s-th":{"dur":0.64},"words-s-th-voiced":{"dur":0.87},"words-s-ur":{"dur":0.74},"words-s-ure":{"dur":0.67},"words-s-wu":{"dur":0.49}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
 window.MW_GAMES = [{"id":"rescue","name":"MeeMee Rescue","planet":0,"badge":"mimi","say":"map-mimi-rescue"},{"id":"words","name":"MeeMee Rockets","planet":1,"badge":"words-badge","say":"words-name"}];
 window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"rescue-find-number","group":"Numbers mode","words":"Find the number."},{"id":"words-name","group":"Map","words":"MeeMee Rockets!"},{"id":"words-round-ready","group":"Rounds","words":"Ready to launch some rockets?"},{"id":"words-round-done","group":"Rounds","words":"You launched all the rockets!"},{"id":"words-round-another","group":"Rounds","words":"Another go?"},{"id":"words-find","group":"Find","words":"Find the word…"},{"id":"words-that-word","group":"Find","words":"That word is…"},{"id":"words-found-it","group":"Praise","words":"You found it!"},{"id":"words-super-reading","group":"Praise","words":"Super reading!"},{"id":"words-well-done","group":"Praise","words":"Well done!"},{"id":"words-build","group":"Build","words":"Now build the word…"},{"id":"words-you-built","group":"Build","words":"You built the word…"},{"id":"words-tricky-bit","group":"Build","words":"That's the tricky bit."},{"id":"words-try-again","group":"Trying again","words":"Let's try again."},{"id":"words-look-together","group":"Trying again","words":"Let's look together."},{"id":"words-w-all","group":"Week 5 words","words":"all"},{"id":"words-w-of","group":"Week 5 words","words":"of"},{"id":"words-w-one","group":"Week 5 words","words":"one"},{"id":"words-w-here","group":"Week 5 words","words":"here"},{"id":"words-w-magnet","group":"Week 5 words","words":"magnet"},{"id":"words-w-cartoon","group":"Week 5 words","words":"cartoon"},{"id":"words-w-rabbit","group":"Week 5 words","words":"rabbit"},{"id":"words-w-spray","group":"Week 5 words","words":"spray"},{"id":"words-w-popcorn","group":"Week 5 words","words":"popcorn"},{"id":"words-w-proud","group":"Week 5 words","words":"proud"},{"id":"words-w-toy","group":"Week 5 words","words":"toy"},{"id":"words-w-say","group":"Week 5 words","words":"say"},{"id":"words-w-go","group":"Tricky words, weeks 1 to 4","words":"go"},{"id":"words-w-my","group":"Tricky words, weeks 1 to 4","words":"my"},{"id":"words-w-into","group":"Tricky words, weeks 1 to 4","words":"into"},{"id":"words-w-out","group":"Tricky words, weeks 1 to 4","words":"out"},{"id":"words-w-what","group":"Tricky words, weeks 1 to 4","words":"what"},{"id":"words-w-she","group":"Tricky words, weeks 1 to 4","words":"she"},{"id":"words-w-me","group":"Tricky words, weeks 1 to 4","words":"me"},{"id":"words-w-love","group":"Tricky words, weeks 1 to 4","words":"love"},{"id":"words-w-they","group":"Tricky words, weeks 1 to 4","words":"they"},{"id":"words-w-some","group":"Tricky words, weeks 1 to 4","words":"some"},{"id":"words-w-were","group":"Tricky words, weeks 1 to 4","words":"were"},{"id":"words-w-sure","group":"Tricky words, weeks 1 to 4","words":"sure"},{"id":"words-w-said","group":"Tricky words, weeks 1 to 4","words":"said"},{"id":"words-w-you","group":"Tricky words, weeks 1 to 4","words":"you"},{"id":"words-w-like","group":"Tricky words, weeks 1 to 4","words":"like"},{"id":"words-w-push","group":"Tricky words, weeks 1 to 4","words":"push"},{"id":"words-w-feel","group":"Other words, weeks 1 to 4","words":"feel"},{"id":"words-w-food","group":"Other words, weeks 1 to 4","words":"food"},{"id":"words-w-sort","group":"Other words, weeks 1 to 4","words":"sort"},{"id":"words-w-down","group":"Other words, weeks 1 to 4","words":"down"},{"id":"words-w-right","group":"Other words, weeks 1 to 4","words":"right"},{"id":"words-w-hard","group":"Other words, weeks 1 to 4","words":"hard"},{"id":"words-w-took","group":"Other words, weeks 1 to 4","words":"took"},{"id":"words-w-hear","group":"Other words, weeks 1 to 4","words":"hear"},{"id":"words-w-misses","group":"Other words, weeks 1 to 4","words":"misses"},{"id":"words-w-chain","group":"Other words, weeks 1 to 4","words":"chain"},{"id":"words-w-queen","group":"Other words, weeks 1 to 4","words":"queen"},{"id":"words-w-chair","group":"Other words, weeks 1 to 4","words":"chair"},{"id":"words-w-year","group":"Other words, weeks 1 to 4","words":"year"},{"id":"words-w-cobweb","group":"Other words, weeks 1 to 4","words":"cobweb"},{"id":"words-w-goats","group":"Other words, weeks 1 to 4","words":"goats"},{"id":"words-w-farmyard","group":"Other words, weeks 1 to 4","words":"farmyard"},{"id":"words-w-green","group":"Other words, weeks 1 to 4","words":"green"},{"id":"words-w-brown","group":"Other words, weeks 1 to 4","words":"brown"},{"id":"words-w-train","group":"Other words, weeks 1 to 4","words":"train"},{"id":"words-w-thinks","group":"Other words, weeks 1 to 4","words":"thinks"},{"id":"words-w-drum","group":"Other words, weeks 1 to 4","words":"drum"},{"id":"words-w-splat","group":"Other words, weeks 1 to 4","words":"splat"},{"id":"words-w-paint","group":"Other words, weeks 1 to 4","words":"paint"},{"id":"words-w-frog","group":"Other words, weeks 1 to 4","words":"frog"},{"id":"words-w-day","group":"Other words, weeks 1 to 4","words":"day"},{"id":"words-w-cloud","group":"Other words, weeks 1 to 4","words":"cloud"},{"id":"words-w-boy","group":"Other words, weeks 1 to 4","words":"boy"},{"id":"words-w-read","group":"Other words, weeks 1 to 4","words":"read"},{"id":"words-w-play","group":"Other words, weeks 1 to 4","words":"play"},{"id":"words-w-sound","group":"Other words, weeks 1 to 4","words":"sound"},{"id":"words-w-joy","group":"Other words, weeks 1 to 4","words":"joy"},{"id":"words-w-treat","group":"Other words, weeks 1 to 4","words":"treat"},{"id":"words-s-a","group":"Tile sounds","words":"a"},{"id":"words-s-b","group":"Tile sounds","words":"b"},{"id":"words-s-d","group":"Tile sounds","words":"d"},{"id":"words-s-e","group":"Tile sounds","words":"e"},{"id":"words-s-f","group":"Tile sounds","words":"f"},{"id":"words-s-g","group":"Tile sounds","words":"g"},{"id":"words-s-h","group":"Tile sounds","words":"h"},{"id":"words-s-i","group":"Tile sounds","words":"i"},{"id":"words-s-j","group":"Tile sounds","words":"j"},{"id":"words-s-k","group":"Tile sounds","words":"k (for c and k)"},{"id":"words-s-l","group":"Tile sounds","words":"l"},{"id":"words-s-m","group":"Tile sounds","words":"m"},{"id":"words-s-n","group":"Tile sounds","words":"n"},{"id":"words-s-o","group":"Tile sounds","words":"o"},{"id":"words-s-p","group":"Tile sounds","words":"p"},{"id":"words-s-r","group":"Tile sounds","words":"r"},{"id":"words-s-s","group":"Tile sounds","words":"s"},{"id":"words-s-t","group":"Tile sounds","words":"t"},{"id":"words-s-u","group":"Tile sounds","words":"u"},{"id":"words-s-v","group":"Tile sounds","words":"v"},{"id":"words-s-w","group":"Tile sounds","words":"w"},{"id":"words-s-y","group":"Tile sounds","words":"y, as in yes"},{"id":"words-s-ai","group":"Tile sounds","words":"ai, as in rain"},{"id":"words-s-air","group":"Tile sounds","words":"air, as in chair"},{"id":"words-s-ar","group":"Tile sounds","words":"ar, as in hard"},{"id":"words-s-ch","group":"Tile sounds","words":"ch"},{"id":"words-s-ear","group":"Tile sounds","words":"ear, as in hear"},{"id":"words-s-ee","group":"Tile sounds","words":"ee, as in feel"},{"id":"words-s-igh","group":"Tile sounds","words":"igh, as in right"},{"id":"words-s-oa","group":"Tile sounds","words":"oa, as in goat"},{"id":"words-s-oo-long","group":"Tile sounds","words":"oo, as in food"},{"id":"words-s-oo-short","group":"Tile sounds","words":"oo, as in took"},{"id":"words-s-or","group":"Tile sounds","words":"or, as in sort"},{"id":"words-s-ow","group":"Tile sounds","words":"ow, as in down"},{"id":"words-s-oy","group":"Tile sounds","words":"oy, as in boy"},{"id":"words-s-qu","group":"Tile sounds","words":"kw (qu)"},{"id":"words-s-sh","group":"Tile sounds","words":"sh"},{"id":"words-s-th","group":"Tile sounds","words":"th, as in thinks"},{"id":"words-s-th-voiced","group":"Tile sounds","words":"th, as in they"},{"id":"words-s-ur","group":"Tile sounds","words":"ur, as in turn"},{"id":"words-s-ure","group":"Tile sounds","words":"ure, as in sure"},{"id":"words-s-wu","group":"Tile sounds","words":"w-u, as at the start of one"}];
 </script>
@@ -2547,8 +2555,12 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
      not yet     never asked.
    A round of five: 1 or 2 bonds he is secure on, the rest he is practising or hasn't met. If there aren't enough of
    one kind, the other fills in. At most two bonds come from one whole, and the same whole isn't asked twice in a row,
-   while there are enough wholes in play. A whole's zero bond (5 and 0) joins once its other bonds are secure, and only when
-   the answer is checked by tapping Scruffles (an empty circle is the answer to "how many more?").
+   while there are enough wholes in play. A whole's zero bond (5 and 0) joins once its other bonds are secure. With MeeMee
+   to count it comes only when the answer is checked by tapping Scruffles (an empty circle is the answer to "how many
+   more?"); in numbers mode it comes whichever check is set, because there is a 0 tile (decided 10 October 2026).
+   Each way of answering keeps its own progress (decided 10 October 2026): every answer is saved with its mode
+   ('counting' or 'numbers'); an answer saved before numbers mode has none and counts as counting. The game passes
+   pickRound and statuses one mode's answers (ofMode).
    Pure functions of the saved answers, so they are easy to test. */
 (function () {
   'use strict';
@@ -2580,6 +2592,10 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   const B = MW.bonds = {};
 
   B.key = function (w, a, b) { return w + ':' + Math.min(a, b); };
+  // Which way an answer was given: 'numbers', or 'counting' (also for answers saved before 0.6.0, which have no mode).
+  B.modeOf = function (ans) { return ans && ans.mode === 'numbers' ? 'numbers' : 'counting'; };
+  // One way's answers: each way has its own secure, practising and not yet.
+  B.ofMode = function (answers, mode) { return (answers || []).filter(function (a) { return B.modeOf(a) === mode; }); };
   B.firstTime = function (ans) { return !ans.tries && !ans.hint; };
 
   // Every bond of a whole, smaller part first: 7 -> [0,7] [1,6] [2,5] [3,4]
@@ -2623,7 +2639,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     return out;
   };
 
-  // opts: { wholes: [2..10], answers: [...], size: 5, zero: true in tap-Scruffles mode, rand: Math.random }
+  // opts: { wholes: [2..10], answers: one mode's [...], size: 5, zero: true in numbers mode or with tap Scruffles, rand: Math.random }
   // -> [{ whole, left, right, missing: 'whole' | 'left' | 'right', status }]
   B.pickRound = function (opts) {
     const rand = opts.rand || Math.random;
@@ -2674,7 +2690,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
 /* MeeMee Rescue: the crew's job moments (phase 4, 0.4.1; the design canvas's round 4, Moments4).
    A cat with a job appears briefly at its own moment, with no words, never over the diagram or the tray:
-     lookout    as a round starts, peeks over the asteroid with the telescope and spots the MeeMee;
+     lookout    as a round starts, peeks over the asteroid with the telescope and spots the MeeMee (in numbers mode,
+                where there is no asteroid, it peeks up from behind the right-hand end of the number track, below the
+                ship, answer 24 of the 0.6.0 PRD, mirrored so it looks towards the diagram);
      engineer   on a right answer, gives the ship a tap with the spanner while the lights flash;
      navigator  as a star turns peach, holds up the star map and points to the next one;
      cook       on the end screen, brings fish for the rescued MeeMee.
@@ -2685,6 +2703,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   const L = MW.LAYOUT.moments = {
     lookout: { x: 690, y: 390, w: 220, show: 175, box: 250, scope: { x: 89, y: 2, size: 150 } },   // behind the asteroid
+    // numbers mode: behind the number track's right-hand end (its rail runs to x 1166, its top at 674), below the ship,
+    // mirrored (flip) so it looks left, towards the diagram, as it does from the asteroid (game.css: rescue-peek-flip)
+    lookoutTrack: { x: 906, y: 519, w: 220, show: 175, box: 250, scope: { x: 89, y: 2, size: 150 }, flip: true },
     engineer: { x: 700, y: 318, w: 140, spanner: { x: 100, y: 84, size: 88 } },                     // by the ship's left fin
     navigator: { x: 686, y: 124, w: 120, map: { x: 64, y: 50, size: 80 } },                         // under the stars
     cook: { size: 104, moggles: { x: 254, y: 494, flip: true }, snuffles: { x: 770, y: 494, flip: false } }   // end screen
@@ -2693,7 +2714,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   function size(svg, s) { svg.setAttribute('width', s); svg.setAttribute('height', s); return svg; }
   function drop(el, ms) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms); }
 
-  // opts: { game: the game screen, tray: the asteroid's element, over: the layer the moments go under,
+  // opts: { game: the game screen, tray: the asteroid's element, over: the layer the moments go under (the number track
+  //         comes after it, so the lookout is behind the track as well as the asteroid),
   //         stars: MW.stars on the game screen, end: the end screen, endCats: { moggles: box, snuffles: box } }
   MW.moments = function (opts) {
     const m = {};
@@ -2718,12 +2740,14 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     function hide(el, after) { later(function () { el.classList.remove('is-shown'); drop(el, 400); }, after); }
 
     // ---------------------------------------------------------------- lookout
-    m.lookoutUp = function () {
+    // at: 'track' in numbers mode (behind the number track), otherwise behind the asteroid
+    m.lookoutUp = function (at) {
       m.lookoutDown(true);
-      const k = L.lookout, cat = catFor('lookout', k.w);
+      const k = at === 'track' ? L.lookoutTrack : L.lookout, cat = catFor('lookout', k.w);
       if (!cat) return false;
       const box = place(MW.make('div', 'mw-moment mw-peek', { 'data-moment': 'lookout' }), k.x, k.y);
       box.style.width = k.box + 'px'; box.style.height = k.show + 'px';
+      if (k.flip) box.classList.add('rescue-peek-flip');
       const inner = MW.make('div', 'mw-peek-inner');
       inner.appendChild(cat);
       const scope = place(size(MW.art('held-telescope'), k.scope.size), k.scope.x, k.scope.y);
@@ -2733,7 +2757,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       low.appendChild(box);
       peek = box;
       show(box);
-      MW.log('moment', 'lookout');
+      MW.log('moment', at === 'track' ? 'lookout track' : 'lookout');
       return true;
     };
     m.lookoutDown = function (now) {
@@ -2829,6 +2853,10 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
    Its planet starts a round of five part–whole questions in Barney's voice, chosen from the bonds that need work
    (bonds.js). The player drags MeeMee from the asteroid into the waiting circle. Each crew job has its moment in a
    round (moments.js). Grown-ups see the progress grid.
+   Numbers mode (0.6.0; NumbersMode card, round 8's Numbers8 boards), which a grown-up turns on in Settings ("How your
+   child answers"): each given circle holds a MeeMee carrying its number, and the player drags a number tile (0 to 10)
+   from the number track along the bottom into the waiting circle. Two wrong tries bring the MeeMee back to count on (never for a zero answer).
+   Each way keeps its own progress: every answer is saved with its mode.
    Older than the rules for new games, so some names don't have the game's prefix: its screens are screen-game and
    screen-end, its voice lines have no "rescue-" in front, and its saved answers and settings sit at the top level. */
 (function () {
@@ -2839,16 +2867,23 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   const N = function (n) { return 'num-mid-' + n; };
   const E = function (n) { return 'num-end-' + n; };
   const OTHER = { left: 'right', right: 'left' };
+  const FIND = 'rescue-find-number';                         // "Find the number." (numbers mode)
+  // the two ways of answering, as the grown-ups area names them (Settings and the Progress tab's switch)
+  const WAYS = [['counting', 'MeeMee to count'], ['numbers', 'Numbers']];
 
   const W = MW.world;
   const st = { hintTimers: [], round: null, qi: 0, q: null, target: null, answer: 0,
-    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], check: null };
+    counters: [], fixed: [], tries: 0, misses: 0, hinted: false, ghosts: null, prompt: null, praise: [], check: null,
+    mode: null, placed: null,                                // numbers mode: the way of answering, and the tile in the circle
+    talking: false };                                        // Scruffles is saying something after a check (afterCheck)
   // the token, the phase and pausing belong to the world (one of each for the page); st reads and writes them there
   ['token', 'phase', 'paused'].forEach(function (k) {
     Object.defineProperty(st, k, { enumerable: true, get: function () { return W.st[k]; }, set: function (v) { W.st[k] = v; } });
   });
   const R = MW.rescue = { st: st, nextRound: null };
-  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, tray, moments;
+  let diagram, stars, equation, pod, endPod, layer, ghostLayer, fxLayer, endStars, endMimi, dragger, tray, track, moments;
+  let view = null;                                           // the Progress tab's switch: which way's progress it shows
+  let talk = 0;                                              // counts what's said after a check (afterCheck)
   const endCats = {};
   const speak = W.speak, ok = W.ok;
 
@@ -2881,13 +2916,17 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     stars = MW.stars(s, MW.LAYOUT.stars.x, MW.LAYOUT.stars.y);
     ghostLayer = MW.make('div', 'mw-layer mw-fill'); s.appendChild(ghostLayer);
     layer = MW.make('div', 'mw-layer mw-fill mw-counters'); s.appendChild(layer);
+    // numbers mode's number track (the kit's): above the counters, so a tile dropped in a circle shows over it and over
+    // the hint's MeeMee, and in front of the lookout. Hidden in counting mode, as the asteroid is in numbers mode.
+    track = MW.numberTrack(s);
+    track.el.classList.add('mw-off');
     fxLayer = MW.make('div', 'mw-layer mw-fill mw-fx'); s.appendChild(fxLayer);
     MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
     dragger = MW.dragger(s, {
-      counters: function () { return st.counters; },
+      counters: function () { return numbers() ? track.tiles : st.counters; },
       enabled: function () { return !st.paused && (st.phase === 'asking' || st.phase === 'open'); },
-      onPick: function (c) { MW.log('pick', c.where); },
-      onDrop: onDrop
+      onPick: function (c) { MW.log('pick', c.where || 'tile ' + c.n); },
+      onDrop: drop
     });
   }
 
@@ -2913,21 +2952,27 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (R.nextRound) { const r = R.nextRound; R.nextRound = null; return r.map(function (q) { return Object.assign({}, q); }); }
     let wholes = (MW.store.setting('wholes') || []).filter(function (w) { return w >= 2 && w <= 10; });
     if (!wholes.length) wholes = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-    // zero bonds are answered with an empty circle, so they come up only when the answer is checked by tapping Scruffles
-    return MW.bonds.pickRound({ wholes: wholes, answers: MW.store.get('answers') || [], size: ROUND, zero: check() === 'tap' });
+    // With MeeMee to count, zero bonds are answered with an empty circle, so they come up only when the answer is checked
+    // by tapping Scruffles; in numbers mode there is a 0 tile, so they come up whichever check is set. Each way of
+    // answering has its own progress, so a round picks from its own way's answers.
+    const m = mode();
+    return MW.bonds.pickRound({ wholes: wholes, answers: MW.bonds.ofMode(MW.store.get('answers') || [], m), size: ROUND,
+      zero: m === 'numbers' || check() === 'tap' });
   }
 
   async function startRound() {
     const token = ++st.token;
     st.check = savedCheck();
+    st.mode = savedMode();
     st.round = makeRound();
     st.qi = 0;
     clearBoard(true);
+    showMode();
     moments.clear();
     MW.shell.show('screen-game');
     stars.set(0);
     st.phase = 'starting';
-    moments.lookoutUp();                                     // the lookout peeks over the asteroid
+    moments.lookoutUp(numbers() ? 'track' : null);           // the lookout peeks over the asteroid (or the number track)
     MW.log('round', JSON.stringify(st.round));
     await speak([['round-ready']]);
     if (!(await ok(token))) return;
@@ -2938,7 +2983,18 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (st.ghosts) { st.ghosts.clear(); st.ghosts = null; }
     st.counters.concat(st.fixed).forEach(function (c) { c.remove(); });
     st.counters = []; st.fixed = [];
+    st.placed = null;
+    talk++; st.talking = false;                              // a new question (or leaving): nothing said after a check is going on
+    track.reset();                                           // every number tile back in its place
     if (all) { equation.hide(); }
+  }
+  // The round's way of answering on the screen: the diagram's look, and the asteroid or the number track.
+  function showMode() {
+    const n = numbers();
+    diagram.look(n ? 'numbers' : 'counting');
+    tray.el.classList.toggle('mw-off', n);
+    track.el.classList.toggle('mw-off', !n);
+    if (n && track.away()) track.show();
   }
 
   async function nextQuestion(token) {
@@ -2953,24 +3009,33 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     if (st.qi === 0) setTimeout(function () { if (token === st.token) moments.lookoutDown(); }, 1800);   // spotted them
     else moments.settle();
     stars.set(st.qi);
-    // the MeeMee already rescued: the given part(s), in their counting pattern
-    ['left', 'right'].forEach(function (k) {
-      if (k === q.missing) return;
-      diagram.slots(k, q[k]).forEach(function (p) {
-        st.fixed.push(MW.counter(layer, { fixed: true, x: p.x, y: p.y, size: p.size }));
+    if (numbers()) {
+      // numbers mode: the given circles hold numbered MeeMee (diagram.set did that), and the track is back for this question
+      if (track.away()) track.show();
+    } else {
+      // the MeeMee already rescued: the given part(s), in their counting pattern
+      ['left', 'right'].forEach(function (k) {
+        if (k === q.missing) return;
+        diagram.slots(k, q[k]).forEach(function (p) {
+          st.fixed.push(MW.counter(layer, { fixed: true, x: p.x, y: p.y, size: p.size }));
+        });
       });
-    });
-    // ten MeeMee waiting on the asteroid: more than any answer needs
-    MW.LAYOUT.traySlots.forEach(function (p, i) {
-      const c = MW.counter(layer, { x: p.x, y: p.y });
-      c.home = p; c.where = 'tray'; c.slot = i;
-      c.el.classList.add('is-arriving');
-      c.el.addEventListener('animationend', function () { c.el.classList.remove('is-arriving'); }, { once: true });
-      st.counters.push(c);
-    });
+      // ten MeeMee waiting on the asteroid: more than any answer needs
+      MW.LAYOUT.traySlots.forEach(function (p, i) {
+        const c = MW.counter(layer, { x: p.x, y: p.y });
+        c.home = p; c.where = 'tray'; c.slot = i;
+        c.el.classList.add('is-arriving');
+        c.el.addEventListener('animationend', function () { c.el.classList.remove('is-arriving'); }, { once: true });
+        st.counters.push(c);
+      });
+    }
     st.prompt = promptFor(q);
-    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready.", and so does any
-    // question whose answer is zero (the answer is an empty circle and a tap on Scruffles)
+    // numbers mode: the first two questions of a round say "Find the number." after the question. Left out until it is
+    // recorded, so a missing recording never silences the question.
+    if (numbers() && st.qi < 2 && MW.audio.recorded(FIND)) st.prompt = st.prompt.concat([[FIND]]);
+    // tap mode: the first two questions of a round end with "Tap Scruffles when you're ready.", and so does any question
+    // whose answer is zero (with MeeMee to count the answer is an empty circle and a tap on Scruffles; in numbers mode
+    // the check works the same way, as Settings says)
     if (check() === 'tap' && (st.qi < 2 || st.answer === 0)) st.prompt = st.prompt.concat([['tap-scruffles']]);
     st.phase = 'asking';
     MW.log('question', JSON.stringify(q));
@@ -2999,6 +3064,16 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // a change in Settings starts with the next round.
   function savedCheck() { return MW.store.setting('check') === 'tap' ? 'tap' : 'auto'; }
   function check() { return st.check || savedCheck(); }
+  // How the player answers: 'counting' (MeeMee to count, the usual way) or 'numbers' (a number tile). Like the check, a
+  // round keeps the way it started with; a change in Settings starts with the next round.
+  function savedMode() { return MW.store.setting('answerMode') === 'numbers' ? 'numbers' : 'counting'; }
+  function mode() { return st.mode || savedMode(); }
+  function numbers() { return mode() === 'numbers'; }
+
+  // A drop from the dragger: a number tile (numbers mode) or a MeeMee.
+  function drop(c, x, y, cancelled) {
+    if (track.tiles.indexOf(c) >= 0) onTileDrop(c, x, y, cancelled); else onDrop(c, x, y, cancelled);
+  }
 
   function onDrop(c, x, y, cancelled) {
     if (st.counters.indexOf(c) < 0) return;                 // left over from a question that has ended
@@ -3035,39 +3110,108 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     c.moveTo(c.home.x, c.home.y, 80, true);
   }
 
+  // Numbers mode: a number tile dropped. Anywhere inside the waiting circle's rim puts it there (one tile at a time: a
+  // second one sends the first back); anywhere else, it floats back to its place on the track.
+  function onTileDrop(t, x, y, cancelled) {
+    const was = t === st.placed;
+    // Not answering now (paused, celebrating, or a touch taken away by the tablet): just put it back.
+    if (cancelled || st.paused || !numbers() || !(st.phase === 'open' || st.phase === 'asking')) {
+      if (was) placeTile(t); else t.goHome(true);
+      return;
+    }
+    if (diagram.hit(x, y) === st.target) {
+      if (was) { placeTile(t); return; }                     // moved about inside the circle: back to its middle
+      if (st.placed) st.placed.goHome(true);                 // the circle holds one tile: the first goes back
+      st.placed = t;
+      placeTile(t);
+      MW.audio.sfx('pop');
+      pod.face('thinking');
+      MW.log('drop', 'tile ' + t.n);
+      pod.ready(check() === 'tap');                          // tap mode: the lights glow while there's a tile to check
+      if (check() === 'auto') checkTile();
+      return;
+    }
+    t.goHome(true);
+    if (was) { st.placed = null; pod.ready(false); MW.audio.sfx('whoosh'); MW.log('drop', 'out'); return; }   // taken back out
+    if (Math.hypot(x - t.home.x, y - t.home.y) <= 70) return;  // a nudge on the track isn't a try
+    MW.audio.sfx('whoosh');
+    MW.log('drop', 'miss');
+    if (check() === 'auto') wrongTry('miss');               // as a far-off MeeMee: a try only when checked as it lands
+  }
+  function placeTile(t) { const c = MW.LAYOUT[st.target]; t.moveTo(c.x, c.y, 0, true); }
+  // Numbers mode: the tile in the circle is checked (as it lands, or when Scruffles is tapped).
+  function checkTile() {
+    const t = st.placed;
+    MW.log('check', 'tile ' + t.n + ' for ' + st.answer);
+    if (t.n === st.answer) { success(); return; }
+    st.placed = null;                                        // a wrong number floats back to the track
+    t.goHome(true);
+    pod.ready(false);
+    MW.audio.sfx('whoosh');
+    wrongTry('number');
+  }
+
   // Tapping Scruffles: checks the answer in "tap" mode; otherwise asks the question again.
   function onPodTap() {
     if (st.paused || !(st.phase === 'open' || st.phase === 'asking')) return;
     if (dragger && dragger.dragging()) return;              // one hand holding a MeeMee, the other tapping
     if (check() !== 'tap') { hearAgain(); return; }
+    if (numbers()) {
+      if (!st.placed) {
+        // nothing to check: the question again, not a try, but only once Scruffles is quiet. While he's saying "Let's try
+        // again." or giving the hint (or asking), a tap (a double tap's second, an impatient one) does nothing.
+        if (st.talking || MW.audio.speaking()) { MW.log('check', 'no tile, waiting'); return; }
+        MW.log('check', 'no tile');
+        hearAgain();
+        return;
+      }
+      checkTile();
+      return;
+    }
     const n = inTarget().length;
     MW.log('check', n + ' of ' + st.answer);
     if (n === st.answer) { success(); return; }
     wrongTry(n > st.answer ? 'too-many' : 'too-few');
   }
 
-  // A wrong try: a wrong check (tap mode) or a MeeMee dropped away from the waiting circle (a miss).
-  // No red, no buzzer: Scruffles's try-again face, a calm line, and the hint after the second one.
+  // A wrong try: a wrong check (tap mode), a wrong number (numbers mode) or a MeeMee or tile dropped away from the waiting
+  // circle (a miss, when the answer is checked as it lands).
+  // No red, no buzzer: Scruffles's try-again face, a calm line, and the hint after the second one (not for a zero answer
+  // in numbers mode).
+  // What Scruffles says after a check (the try-again line, the hint): st.talking is true from the moment it's asked for
+  // until it ends or is cut short, so a tap on him meanwhile can wait for it (numbers mode, no tile in the circle).
+  function afterCheck(saying) {
+    const n = ++talk;
+    st.talking = true;
+    saying.then(function () { if (n === talk) st.talking = false; });
+    return saying;
+  }
   function wrongTry(kind) {
     if (kind === 'miss') st.misses++; else st.tries++;
     const count = kind === 'miss' ? st.misses : st.tries;
     pod.face('try-again');
     const token = st.token, qi = st.qi;
     setTimeout(function () { if (token === st.token && qi === st.qi && st.phase !== 'celebrate') pod.face('thinking'); }, 1600);
-    if (kind === 'too-many') { speak([['too-many']]); return; }
-    if (count >= 2 && !st.hinted) { hint(); return; }
-    if (count >= 2) return;
-    speak([[kind === 'miss' ? 'again-try-again' : 'again-look-again']]);
+    if (kind === 'too-many') { afterCheck(speak([['too-many']])); return; }
+    // Numbers mode, an answer of zero (5 + ? = 5): never the hint, however many tries; each gets "Let's try again." (decided
+    // by Barney, 11 October 2026: counting on by nothing shows nothing). Counting mode is as before.
+    const hints = !(numbers() && st.answer === 0);
+    if (hints && count >= 2 && !st.hinted) { hint(); return; }
+    if (hints && count >= 2) return;
+    afterCheck(speak([[kind === 'miss' || kind === 'number' ? 'again-try-again' : 'again-look-again']]));
   }
 
   // ---------------------------------------------------------------- the hint: count on together
+  // Numbers mode (Numbers8Hint): the given part (both parts, for a missing whole) comes back as MeeMee in its counting
+  // pattern and the whole keeps its numbered MeeMee; the waiting circle counts on with ghosts, with the same lines. The
+  // player still drags the number. The MeeMee and ghosts stay until the question is answered.
   async function hint() {
-    const q = st.q, token = st.token, qi = st.qi;
+    const q = st.q, token = st.token, qi = st.qi, nums = numbers();
     st.hinted = true;
     MW.log('hint', q.missing);
     diagram.hinting(st.target, true);
-    tidy(true);
-    const placed = inTarget().length;
+    if (nums) bringBack(q); else tidy(true);
+    const placed = nums ? 0 : inTarget().length;
     const slots = diagram.slots(st.target, Math.max(st.answer, placed));
     if (st.ghosts) st.ghosts.clear();
     st.ghosts = MW.ghosts(ghostLayer, slots.slice(placed, st.answer));
@@ -3090,13 +3234,13 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         lines.push([given + i === q.whole ? E(given + i) : N(given + i)]);
         actions.push((function (j) {
           return function () {
-            const inside = inTarget();
+            const inside = nums ? [] : inTarget();
             if (j < inside.length) hop(inside[j]); else if (st.ghosts) st.ghosts.light(j - placed);
           };
         })(i - 1));
       }
     }
-    const heard = await speak(lines, {
+    const heard = await afterCheck(speak(lines, {
       onStart: function (timeline) {
         // one entry per clip; the first line may have two clips
         let k = 0;
@@ -3106,15 +3250,34 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
           if (actions[si]) st.hintTimers.push(setTimeout(function () { if (token === st.token && qi === st.qi) actions[si](); }, at * 1000));
         });
       }
-    });
+    }));
     // Cut short (Hear-again, a pause): take the hint away so the next wrong try gives it again in full.
     if (!heard && token === st.token && qi === st.qi && st.phase !== 'celebrate') {
       clearHint();
       st.hinted = false;
       if (st.ghosts) { st.ghosts.clear(); st.ghosts = null; }
       diagram.hinting(st.target, false);
-      tidy(true);
+      if (nums) takeBack(q); else tidy(true);
     }
+  }
+  // Numbers mode's hint: the given part(s) as MeeMee in their counting pattern, in place of their numbered MeeMee ...
+  function bringBack(q) {
+    ['left', 'right'].forEach(function (k) {
+      if (k === q.missing) return;
+      diagram.carry(k, null);
+      diagram.slots(k, q[k]).forEach(function (p) {
+        const c = MW.counter(layer, { fixed: true, x: p.x, y: p.y, size: p.size });
+        c.el.classList.add('is-arriving');                   // they fade in (the arrival holds them visible: let it go)
+        c.el.addEventListener('animationend', function () { c.el.classList.remove('is-arriving'); }, { once: true });
+        st.fixed.push(c);
+      });
+    });
+  }
+  // ... and back to their numbered MeeMee (a hint cut short, so the next wrong try gives it again in full).
+  function takeBack(q) {
+    st.fixed.forEach(function (c) { c.remove(); });
+    st.fixed = [];
+    ['left', 'right'].forEach(function (k) { if (k !== q.missing) diagram.carry(k, q[k]); });
   }
   function clearHint() {
     st.hintTimers.forEach(clearTimeout);
@@ -3133,8 +3296,21 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     clearHint();
     moments.lookoutDown();                                   // a quick first answer: the lookout makes way for the engineer
     MW.store.recordAnswer({ t: Date.now(), whole: q.whole, left: q.left, right: q.right, missing: q.missing,
-      tries: st.tries, misses: st.misses, hint: st.hinted, check: check() });
+      tries: st.tries, misses: st.misses, hint: st.hinted, check: check(), mode: mode() });
     if (st.ghosts) { st.ghosts.clear(); st.ghosts = null; }
+    if (numbers()) {
+      // Numbers8Right: a MeeMee pops up to carry the number (diagram.success, below) in place of the tile, which goes
+      // back as the track slides down out of sight
+      st.placed = null;
+      track.hide();
+      // the hint's MeeMee have done their job: they fly up to the ship, and the given parts carry their numbers again
+      st.fixed.forEach(function (m) {
+        m.el.classList.remove('is-arriving');
+        m.el.classList.add('is-rescued');
+        if (!MW.reduceMotion) m.moveTo(1030 + (Math.random() * 60 - 30), 300, 30, true);   // reduce motion: just fade
+      });
+      if (st.fixed.length) ['left', 'right'].forEach(function (k) { if (k !== q.missing) diagram.carry(k, q[k]); });
+    }
     diagram.success(st.target, st.answer);
     const c = MW.LAYOUT[st.target];
     MW.sparkles(fxLayer, c.x, c.y, c.r + 34);
@@ -3156,8 +3332,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     moments.navigator(st.qi + 1 < ROUND ? st.qi + 1 : null); // the navigator points to the next star
     await MW.wait(800);
     if (!(await ok(token))) return;
-    // the rescued MeeMee fly up into the pod
-    inTarget().concat(st.fixed).forEach(function (m) {
+    // the rescued MeeMee fly up into the pod (numbers mode: the hint's went as the answer came)
+    if (!numbers()) inTarget().concat(st.fixed).forEach(function (m) {
       m.el.classList.add('is-rescued');
       if (!MW.reduceMotion) m.moveTo(1030 + (Math.random() * 60 - 30), 300, 30, true);   // reduce motion: just fade
     });
@@ -3205,7 +3381,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   function leave() {
     clearHint();
     if (dragger) dragger.cancel();
-    st.check = null;
+    st.check = null; st.mode = null;
     pod.lightsOff(); endPod.lightsOff();
     clearBoard(true);
     if (moments) moments.clear();
@@ -3232,7 +3408,18 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       id: 'progress', title: 'Progress',
       render: function (el) {
         const G = MW.grownups;
-        const answers = MW.store.get('answers') || [];
+        // which way's progress shows (Grownups8Progress): each way of answering keeps its own
+        const shown = view || savedMode();
+        G.h3(el, 'Showing progress for');
+        const r0 = G.row(el);
+        WAYS.forEach(function (m) {
+          const b = G.btn(r0, m[1], function () { view = m[0]; MW.grownups.show('progress'); }, 'gu-choice');
+          b.classList.toggle('is-on', m[0] === shown);
+          b.setAttribute('data-way', m[0]);
+        });
+        G.p(el, 'Each way keeps its own progress: a bond secure with MeeMee to count starts again with numbers.');
+        const all = MW.store.get('answers') || [];
+        const answers = MW.bonds.ofMode(all, shown);
         const map = MW.bonds.statuses(answers);
         let nSecure = 0, nPractising = 0, total = 0;
         // the progress grid (the design system's BondGrid): every bond of 2 to 10, smaller part first
@@ -3249,8 +3436,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
           grid.appendChild(row);
         }
         G.p(el, answers.length
-          ? 'Secure: ' + nSecure + ' of ' + total + ' bonds. Practising: ' + nPractising + '. Questions answered on this tablet: ' + answers.length + '.'
-          : 'No questions answered on this tablet yet.', 'gu-lead');
+          ? 'Secure: ' + nSecure + ' of ' + total + ' bonds. Practising: ' + nPractising + '. Questions answered this way on this tablet: ' + answers.length + '.'
+          : 'No questions answered this way on this tablet yet.', 'gu-lead');
         el.appendChild(grid);
         const legend = MW.make('div', 'gu-legend');
         legend.appendChild(cell('secure', 'Secure'));
@@ -3258,7 +3445,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         legend.appendChild(cell('notyet', 'Not yet'));
         el.appendChild(legend);
         G.p(el, '<b>Secure</b> means right first time (no wrong check and no hint) on three different days. A wrong answer moves a bond back to practising, and its three days start again. Each round has 1 or 2 secure bonds and 3 or 4 that need work.', 'gu-note');
-        G.p(el, '<b>Zero bonds</b> (such as 0 + 7) join the rounds once the other bonds of that number are secure. They come up only when your child taps Scruffles to check (Settings), because the answer is an empty circle.', 'gu-note');
+        G.p(el, '<b>Zero bonds</b> (such as 0 + 7) join the rounds once the other bonds of that number are secure. With MeeMee to count they come up only when your child taps Scruffles to check (Settings), because the answer is an empty circle. With numbers they come up whichever check is set, because there is a 0 tile.', 'gu-note');
 
         G.h3(el, 'Wholes in play');
         const r2 = G.row(el);
@@ -3279,13 +3466,15 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         paintW();
         G.p(el, 'Questions use only the wholes switched on. Changes start with the next round.', 'gu-note');
 
+        // the answers given the way that's showing, like the grid and the summary
         if (answers.length) {
           G.h3(el, 'Recent answers');
           const rows = answers.slice(-25).reverse().map(function (a) {
             const d = new Date(a.t);
             const when = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            const parts = [];
-            if (a.tries) parts.push(a.tries + (a.tries === 1 ? ' wrong check' : ' wrong checks'));
+            const parts = [], nums = MW.bonds.modeOf(a) === 'numbers';
+            const wrong = nums ? ' wrong number' : ' wrong check';
+            if (a.tries) parts.push(a.tries + wrong + (a.tries === 1 ? '' : 's'));
             if (a.misses) parts.push(a.misses + (a.misses === 1 ? ' missed drop' : ' missed drops'));
             if (a.hint) parts.push('with the hint');
             const how = (parts.length ? parts.join(', ') : 'First time') + (a.check === 'tap' ? ' (tap Scruffles)' : '');
@@ -3316,6 +3505,20 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       id: 'settings', title: 'Settings',
       render: function (el) {
         const G = MW.grownups;
+        // how the child answers (Grownups8Settings): MeeMee to count, or numbers
+        G.h3(el, 'How your child answers');
+        const r0 = G.row(el);
+        const paintWay = function () {
+          Array.prototype.forEach.call(r0.children, function (b, i) { b.classList.toggle('is-on', WAYS[i][0] === savedMode()); });
+        };
+        WAYS.forEach(function (m) {
+          const b = G.btn(r0, m[1], function () { MW.store.setting('answerMode', m[0]); view = null; paintWay(); MW.log('setting', 'answer ' + m[0]); }, 'gu-choice');
+          b.setAttribute('data-way', m[0]);
+        });
+        paintWay();
+        G.p(el, '<b>MeeMee to count</b> (the usual way): your child drags MeeMee into the empty circle, counting as they go.');
+        G.p(el, '<b>Numbers:</b> each circle shows a MeeMee holding its number, and your child drags a number tile (0 to 10) into the empty circle. Two wrong tries bring the MeeMee back, so they can count them (not when the answer is zero). Each way keeps its own progress (Progress tab).');
+
         G.h3(el, 'Answer check');
         const r1 = G.row(el);
         const modes = [['tap', 'When your child taps Scruffles'], ['auto', 'As soon as the count is right']];
@@ -3329,13 +3532,34 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         G.p(el, '<b>When your child taps Scruffles</b> (the usual way): they put in as many MeeMee as they think, then tap Scruffles to check. The first two questions of each round end with "Tap Scruffles when you\'re ready." (so does any question whose answer is zero), and the ship\'s lights glow once there is a MeeMee in the circle. Too many gets "That\'s too many. Take one back."; two wrong checks bring the counting-on hint.', 'gu-note');
         G.p(el, '<b>As soon as the count is right:</b> the question completes when the waiting circle holds the right number of MeeMee. No deciding when to stop, so it is easier but teaches less.', 'gu-note');
 
-        G.p(el, 'A change starts with the next round. Zero bonds come up only in the first way. Which numbers are in play is on the Progress tab.', 'gu-note');
+        G.p(el, 'A change starts with the next round. With numbers, the answer check works the same way, and zero bonds come up either way. Which numbers are in play is on the Progress tab.', 'gu-note');
       }
     };
   }
 
   // ---------------------------------------------------------------- test hooks
-  R.drop = onDrop; R.podTap = onPodTap; R.start = startRound; R.home = W.home; R.map = W.home; R.makeRound = makeRound;
+  R.drop = drop; R.podTap = onPodTap; R.start = startRound; R.home = W.home; R.map = W.home; R.makeRound = makeRound;
+  R.track = function () { return track; }; R.diagram = function () { return diagram; }; R.mode = mode;
+  // Ask one question straight away, as a round of its own in the way set in Settings, with nothing said (the tests use
+  // it to put every bond on the screen in numbers mode without playing whole rounds).
+  R.ask = function (q) {
+    const token = ++st.token;
+    clearHint();
+    if (dragger) dragger.cancel();
+    st.check = savedCheck(); st.mode = savedMode();
+    st.round = [Object.assign({}, q)]; st.qi = 0;
+    clearBoard(true);
+    showMode();
+    MW.shell.show('screen-game');
+    st.q = st.round[0]; st.target = q.missing; st.answer = q.missing === 'whole' ? q.whole : q[q.missing];
+    st.tries = 0; st.misses = 0; st.hinted = false;
+    diagram.set(st.q);
+    pod.face('thinking'); pod.lightsOff();
+    if (track.away()) track.show();
+    st.prompt = promptFor(st.q);
+    st.phase = 'open';
+    return token;
+  };
   R.crew = function () { return W.crewScreen; };
 })();
 
