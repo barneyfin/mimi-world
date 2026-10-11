@@ -211,6 +211,8 @@
 .numeral-whole{font-family:var(--font-andika);font-size:140px;line-height:1;font-weight:700}
 .equation{font-family:var(--font-andika);font-size:64px;line-height:1;font-weight:700}
 .numeral-part{font-family:var(--font-andika);font-size:52px;line-height:1;font-weight:700}
+.banner{font-family:var(--font-andika);font-size:84px;line-height:1;font-weight:700}
+.numeral-sign{font-family:var(--font-andika);font-size:84px;line-height:1;font-weight:700}
 .title{font-family:var(--font-andika);font-size:30px;line-height:36px;font-weight:700}
 .button-label{font-family:var(--font-andika);font-size:22px;line-height:26px;font-weight:700}
 .body{font-family:var(--font-andika);font-size:19px;line-height:27px;font-weight:400}
@@ -270,7 +272,7 @@ button { font-family: var(--font-andika); }
 .mw-chip { box-sizing: border-box; min-width: 48px; height: 48px; border-radius: var(--radius-round); display: inline-flex;
   align-items: center; justify-content: center; border: 3px solid var(--mint); color: var(--moon); background: transparent; }
 .mw-chip.is-on { background: var(--mint); color: var(--numeral); }
-.mw-caption { color: var(--text-2); }
+.mw-off { display: none !important; }
 
 /* ---------------------------------------------------------------- the diagram in play */
 .mw-circle, .mw-pill { transition: box-shadow 450ms cubic-bezier(.2,.8,.2,1), background-color 260ms; }
@@ -294,6 +296,28 @@ button { font-family: var(--font-andika); }
 @keyframes mw-arrive { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mw-hop { 0% { translate: 0 0; } 40% { translate: 0 -18px; } 100% { translate: 0 0; } }
 .mw-start-mimi { display: flex; gap: 16px; line-height: 0; }
+
+/* numbers mode (0.6.0, NumbersMode): a numbered MeeMee in a circle; it pops up to carry a right answer */
+.mw-numbered { width: 140px; height: 209px; transform-origin: 70px 102.5px; line-height: 0; pointer-events: none; }
+.mw-numbered > svg { position: absolute; left: 0; top: 0; }
+.mw-numbered-sign { position: absolute; left: 0; top: 102.4px; width: 140px; height: 100px; box-sizing: border-box; padding: 4.5px 4.5px 10.5px;
+  display: flex; align-items: center; justify-content: center; color: var(--numeral); white-space: nowrap; }
+.mw-numbered.is-popping { animation: mw-carry 260ms cubic-bezier(.2,.8,.2,1) both; }   /* the snap: 260 ms, ease-out */
+@keyframes mw-carry { from { opacity: 0; translate: 0 40px; scale: 0.6; } to { opacity: 1; translate: 0 0; scale: 1; } }
+/* the number track along the bottom: its rail, a dashed ring where a tile is out, and the tiles (84, in a 120 box) */
+.mw-track { transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out; }
+.mw-track.is-away { transform: translateY(140px); }
+.mw-track-place { position: absolute; box-sizing: border-box; width: 72px; height: 72px; border-radius: var(--radius-round);
+  border: 4px dashed var(--text-3); display: none; }
+.mw-track-place.is-out { display: block; }
+.mw-number-tile { position: absolute; left: 0; top: 0; width: 84px; height: 84px; margin: -42px 0 0 -42px; pointer-events: none; will-change: transform; }
+.mw-number-tile.is-moving { transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-number-tile.is-lifted { z-index: 5; }
+.mw-number-tile-body { position: relative; width: 100%; height: 100%; transition: transform 120ms ease-out; }
+.mw-number-tile-body svg { position: absolute; left: -3px; top: -3px; }
+.mw-number-tile-n { position: absolute; inset: 0; box-sizing: border-box; padding: 6px 6px 10px; display: flex; align-items: center;
+  justify-content: center; color: var(--numeral); white-space: nowrap; }
+.mw-number-tile.is-lifted .mw-number-tile-body { transform: scale(1.1) rotate(-5deg); filter: drop-shadow(var(--lift)); }
 
 /* hint ghosts: where the missing MeeMee would sit */
 .mw-ghost { position: absolute; box-sizing: border-box; border-radius: var(--radius-round);
@@ -429,6 +453,22 @@ button { font-family: var(--font-andika); }
 .mw-cook-pan.is-flipped svg { transform: scaleX(-1); }
 .mw-cook-pan.is-shown { scale: 1; }
 
+/* ---------------------------------------------------------------- title banners (0.6.0, TitleBanner)
+   The set's or a game's name on a moon plaque, while it is spoken. Above the screens and below the grown-ups lock:
+   taps under it do nothing, and the lock still opens the grown-ups area. */
+.mw-banner { position: absolute; inset: 0; z-index: 40; display: none; }
+.mw-banner.is-up { display: block; }
+.mw-banner-card { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; transform-origin: 640px 380px;
+  opacity: 0; transform: scale(0.88); transition: opacity 260ms ease-out, transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-banner.is-in .mw-banner-card { opacity: 1; transform: none; }
+.mw-banner.is-going .mw-banner-card { opacity: 0; transform: none; }
+.mw-banner-row { position: absolute; left: 0; top: 292px; width: 1280px; display: flex; justify-content: center; }
+.mw-banner-plaque { display: inline-flex; align-items: center; gap: 22px; padding: 22px 40px 22px 30px; box-sizing: border-box;
+  border-radius: 48px; background: var(--moon); border: 8px solid var(--mint); box-shadow: 0 0 0 4px var(--ink), 0 12px 0 4px var(--ink); }
+.mw-banner-art { line-height: 0; }
+.mw-banner-name { color: var(--numeral); padding-bottom: 8px; white-space: nowrap; }
+.mw-banner-spark { position: absolute; width: 28px; height: 28px; line-height: 0; }
+
 /* ---------------------------------------------------------------- turn me sideways */
 .mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
   align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
@@ -454,6 +494,11 @@ button { font-family: var(--font-andika); }
   .mw-spanner.is-tapping { animation: none; }
   .mw-cook-pan { scale: 1; opacity: 0; transition: opacity 300ms ease-out; }
   .mw-cook-pan.is-shown { opacity: 1; }
+  .mw-banner-card, .mw-banner.is-in .mw-banner-card, .mw-banner.is-going .mw-banner-card { transform: none; transition: opacity 260ms ease-out; }
+  .mw-numbered.is-popping { animation: mw-arrive 300ms ease-out both; }
+  .mw-track { transition: opacity 260ms ease-out; }
+  .mw-track.is-away { transform: none; opacity: 0; }
+  .mw-number-tile.is-moving, .mw-number-tile-body { transition: none; }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -569,6 +614,9 @@ button { font-family: var(--font-andika); }
 <template id="art-map"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="10" cy="298.4" r="0.7" opacity="0.6"/><circle class="f-moon" cx="59.7" cy="792.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="786.9" cy="32.8" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1213.1" cy="296.3" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1182.6" cy="363.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="243" cy="35.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1234.4" cy="710.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="161.3" cy="381.3" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1176.6" cy="705.4" r="0.9" opacity="0.5"/><circle class="f-moon" cx="495.2" cy="789.9" r="0.7" opacity="0.4"/><circle class="f-moon" cx="916.5" cy="788.3" r="0.9" opacity="0.5"/><circle class="f-moon" cx="795.5" cy="148.4" r="0.9" opacity="0.7"/><circle class="f-moon" cx="394.8" cy="87.4" r="1.1" opacity="0.6"/><circle class="f-galaxy-mint" cx="863" cy="714.2" r="2.2" opacity="0.95"/><circle class="f-moon" cx="24.1" cy="279.1" r="1" opacity="0.7"/><circle class="f-moon" cx="946.1" cy="51.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="50.1" cy="201.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="191.3" cy="125.1" r="1.4" opacity="0.9"/><circle class="f-galaxy-mint" cx="1161.7" cy="383.5" r="2.2" opacity="0.95"/><circle class="f-moon" cx="1123.7" cy="479.9" r="1" opacity="0.6"/><circle class="f-galaxy" cx="19" cy="546" r="1.8" opacity="0.95"/><circle class="f-moon" cx="1217.8" cy="337.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1035.8" cy="115.1" r="0.9" opacity="0.4"/><circle class="f-moon" cx="97.2" cy="99.8" r="0.9" opacity="0.7"/><circle class="f-moon" cx="793.7" cy="149.1" r="1.5" opacity="0.9"/><circle class="f-galaxy-mint" cx="951.4" cy="50.7" r="1.9" opacity="0.95"/><circle class="f-moon" cx="86.5" cy="608" r="1.1" opacity="0.4"/><circle class="f-moon" cx="59.1" cy="312.4" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1208.3" cy="83.7" r="1.7" opacity="0.9"/><circle class="f-moon" cx="937.4" cy="768.1" r="1" opacity="0.5"/><circle class="f-moon" cx="716.9" cy="56.2" r="2" opacity="0.9"/><circle class="f-moon" cx="1265.4" cy="90.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="793.9" cy="21.6" r="1.7" opacity="0.9"/><circle class="f-moon" cx="67.9" cy="347.9" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1227.2" cy="73.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="1135.1" cy="620.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="317" cy="728.3" r="1" opacity="0.6"/><circle class="f-moon" cx="1228" cy="785.5" r="0.9" opacity="0.5"/><circle class="f-moon" cx="502.1" cy="120.6" r="0.7" opacity="0.5"/><circle class="f-moon" cx="1202.4" cy="591" r="0.8" opacity="0.7"/><circle class="f-moon" cx="1212.2" cy="259.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="486.6" cy="747.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="361.8" cy="143.4" r="0.8" opacity="0.4"/><circle class="f-moon" cx="1224.3" cy="33.1" r="2" opacity="0.9"/><circle class="f-moon" cx="899.4" cy="21" r="0.7" opacity="0.6"/><circle class="f-moon" cx="15.6" cy="435" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1140.2" cy="297.6" r="1.1" opacity="0.6"/><circle class="f-moon" cx="677.3" cy="44.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="1075.6" cy="735" r="1.4" opacity="0.9"/><circle class="f-moon" cx="744.1" cy="69.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="81.6" cy="648.4" r="1.8" opacity="0.9"/><circle class="f-moon" cx="96" cy="59.3" r="1" opacity="0.4"/><circle class="f-moon" cx="348.2" cy="52.3" r="0.9" opacity="0.6"/><circle class="f-moon" cx="834.2" cy="130.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="105.3" cy="657.9" r="0.7" opacity="0.5"/><circle class="f-moon" cx="632.2" cy="133.7" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1155.3" cy="541.4" r="1.1" opacity="0.7"/><circle class="f-galaxy-mint" cx="682.2" cy="721.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="471.3" cy="725.6" r="0.8" opacity="0.4"/><circle class="f-moon" cx="237.2" cy="773.9" r="0.9" opacity="0.4"/><circle class="f-moon" cx="1217" cy="723.2" r="1" opacity="0.5"/><circle class="f-galaxy-peach" cx="732.4" cy="789.4" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1254.1" cy="589.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1263" cy="239.3" r="1" opacity="0.6"/><circle class="f-moon" cx="57.4" cy="682.7" r="1.1" opacity="0.5"/><circle class="f-moon" cx="207" cy="118.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="40.3" cy="728.1" r="0.9" opacity="0.5"/><circle class="f-moon" cx="917.2" cy="61.7" r="0.8" opacity="0.6"/><circle class="f-moon" cx="164.4" cy="710.8" r="0.9" opacity="0.6"/><circle class="f-galaxy" cx="170.7" cy="598.3" r="2.1" opacity="0.95"/><circle class="f-moon" cx="251" cy="117.1" r="1" opacity="0.5"/><circle class="f-moon" cx="162.3" cy="699.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="1226.1" cy="300.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="31.2" cy="512.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="745.3" cy="74.4" r="0.8" opacity="0.6"/><circle class="f-moon" cx="279.1" cy="43.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="147.7" cy="427.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="689.1" cy="73" r="1" opacity="0.4"/><circle class="f-moon" cx="847.3" cy="13.1" r="0.9" opacity="0.7"/><circle class="f-moon" cx="49.5" cy="398.8" r="1.9" opacity="0.9"/><circle class="f-galaxy" cx="741" cy="149.5" r="2.1" opacity="0.95"/><circle class="f-moon" cx="1168" cy="236.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1046.5" cy="114.7" r="1.6" opacity="0.9"/><circle class="f-moon" cx="864.7" cy="720.4" r="1.1" opacity="0.6"/><circle class="f-galaxy" cx="656.1" cy="89.8" r="2" opacity="0.95"/><circle class="f-moon" cx="1164.1" cy="341.3" r="0.7" opacity="0.4"/><circle class="f-moon" cx="1079" cy="120.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="862.9" cy="765.9" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1269.9" cy="264.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="1111.9" cy="710.1" r="2" opacity="0.9"/><circle class="f-moon" cx="657.6" cy="769.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="170.2" cy="310.4" r="0.7" opacity="0.4"/><circle class="f-moon" cx="67.5" cy="507.7" r="1" opacity="0.5"/><circle class="f-moon" cx="929.8" cy="97.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1247.9" cy="208.6" r="1.6" opacity="0.9"/><circle class="f-galaxy-mint" cx="177.3" cy="277.9" r="1.7" opacity="0.95"/><circle class="f-moon" cx="210.2" cy="78.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="1233.9" cy="40.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="645.9" cy="39.2" r="0.9" opacity="0.6"/><circle class="f-moon" cx="300" cy="107" r="1.1" opacity="0.6"/><circle class="f-moon" cx="257.8" cy="143" r="1.6" opacity="0.9"/><circle class="f-moon" cx="381.8" cy="737.1" r="0.8" opacity="0.4"/><circle class="f-moon" cx="246.1" cy="759.4" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1189.8" cy="150.5" r="1.7" opacity="0.9"/><circle class="f-moon" cx="69.6" cy="306" r="1.2" opacity="0.5"/><circle class="f-moon" cx="1152.9" cy="741.1" r="1.9" opacity="0.9"/><circle class="f-moon" cx="787.5" cy="13" r="2" opacity="0.9"/><circle class="f-moon" cx="8.4" cy="705.5" r="2" opacity="0.9"/><circle class="f-moon" cx="1222.5" cy="76.9" r="1.2" opacity="0.7"/><circle class="f-moon" cx="816.7" cy="772.1" r="1.2" opacity="0.4"/><g transform="translate(1130 90) rotate(20) scale(0.8)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="1.4" r="1.1" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="4.2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="15.8" cy="6.3" r="1.2" opacity="0.6"/><circle class="f-moon" cx="9.6" cy="8.5" r="1" opacity="0.9"/><circle class="f-moon" cx="5.8" cy="12" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-5" cy="13.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="12.6" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.2" cy="12.1" r="1.2" opacity="0.5"/><circle class="f-moon" cx="-35.8" cy="11.5" r="1.2" opacity="0.6"/><circle class="f-moon" cx="-13.2" cy="-2" r="1.5" opacity="0.9"/><circle class="f-moon" cx="-15.9" cy="-4.5" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-16.1" cy="-7.2" r="1.5" opacity="0.5"/><circle class="f-moon" cx="-12.7" cy="-9" r="1" opacity="0.7"/><circle class="f-moon" cx="-4.6" cy="-11.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="3.9" cy="-13.5" r="1.3" opacity="0.6"/><circle class="f-moon" cx="14.2" cy="-12.9" r="1.1" opacity="0.8"/><circle class="f-moon" cx="27.9" cy="-13.5" r="0.8" opacity="0.6"/><circle class="f-moon" cx="38.6" cy="-10.5" r="1" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(140 120) rotate(-24) scale(0.62)"><ellipse class="f-peach" rx="58" ry="20" opacity="0.13"/><ellipse class="f-peach" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-peach" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-peach" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-peach" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-peach" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="16" cy="2.8" r="1.2" opacity="0.6"/><circle class="f-moon" cx="13.9" cy="4.7" r="1.2" opacity="0.8"/><circle class="f-moon" cx="14.2" cy="7.4" r="1" opacity="0.9"/><circle class="f-moon" cx="11.8" cy="9.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="3.3" cy="11.5" r="1.4" opacity="0.6"/><circle class="f-moon" cx="-3.1" cy="13.2" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-16.4" cy="14" r="1.4" opacity="0.7"/><circle class="f-moon" cx="-27.9" cy="12.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-35.8" cy="10.9" r="1" opacity="0.8"/><circle class="f-moon" cx="-15.4" cy="-1.3" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-15.3" cy="-4" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="-7.1" r="1.3" opacity="0.6"/><circle class="f-moon" cx="-10.6" cy="-10.1" r="1.5" opacity="0.7"/><circle class="f-moon" cx="-6" cy="-11.1" r="1" opacity="0.6"/><circle class="f-moon" cx="4.2" cy="-13.6" r="1" opacity="0.9"/><circle class="f-moon" cx="15.6" cy="-14.4" r="1.4" opacity="0.5"/><circle class="f-moon" cx="25.6" cy="-11.9" r="1.3" opacity="0.6"/><circle class="f-moon" cx="37.1" cy="-11" r="0.9" opacity="0.9"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(150 700) rotate(-30) scale(0.7)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.7" cy="1.9" r="0.9" opacity="0.9"/><circle class="f-moon" cx="13.9" cy="4.4" r="1.5" opacity="0.5"/><circle class="f-moon" cx="14.9" cy="7.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="11.7" cy="9.2" r="1.4" opacity="0.6"/><circle class="f-moon" cx="3.4" cy="10.6" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-3.9" cy="13.4" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.4" cy="13" r="1.3" opacity="0.8"/><circle class="f-moon" cx="-26.6" cy="11.9" r="1" opacity="0.6"/><circle class="f-moon" cx="-38.5" cy="11.4" r="1" opacity="0.9"/><circle class="f-moon" cx="-13.3" cy="-3.1" r="1.1" opacity="0.7"/><circle class="f-moon" cx="-17.8" cy="-4.5" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-14.3" cy="-7.6" r="1.3" opacity="0.9"/><circle class="f-moon" cx="-12.1" cy="-10.3" r="0.9" opacity="0.7"/><circle class="f-moon" cx="-6.4" cy="-12.2" r="1.2" opacity="0.9"/><circle class="f-moon" cx="4" cy="-13.1" r="1.3" opacity="0.5"/><circle class="f-moon" cx="15.1" cy="-14" r="1.3" opacity="0.9"/><circle class="f-moon" cx="24.5" cy="-12.6" r="1.3" opacity="0.6"/><circle class="f-moon" cx="36.6" cy="-9.8" r="1.6" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(860 90) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><g transform="translate(470 700) scale(0.7)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(1230 420) scale(0.7)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><path class="f-spark" transform="translate(70 330) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="s-night-button" cx="640" cy="430" rx="200" ry="80" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="330" ry="135" fill="none" stroke-width="3" stroke-dasharray="6 10"/><ellipse class="s-night-button" cx="640" cy="430" rx="600" ry="250" fill="none" stroke-width="3" stroke-dasharray="6 10"/><circle class="f-planet-indigo-light" cx="1117" cy="434" r="3"/><circle class="f-asteroid" cx="1102" cy="450" r="5"/><circle class="f-planet-indigo-light" cx="1091" cy="479" r="7"/><circle class="f-asteroid" cx="1086" cy="494" r="4"/><circle class="f-planet-indigo-light" cx="1051" cy="522" r="6"/><circle class="f-asteroid" cx="1022" cy="535" r="3"/><circle class="f-planet-indigo-light" cx="999" cy="560" r="5"/><circle class="f-asteroid" cx="947" cy="569" r="7"/><circle class="f-planet-indigo-light" cx="902" cy="590" r="4"/><circle class="f-asteroid" cx="865" cy="595" r="6"/><circle class="f-planet-indigo-light" cx="802" cy="612" r="3"/><circle class="f-asteroid" cx="747" cy="611" r="5"/><circle class="f-planet-indigo-light" cx="704" cy="623" r="7"/><circle class="f-asteroid" cx="635" cy="617" r="4"/><circle class="f-planet-indigo-light" cx="578" cy="623" r="6"/><circle class="f-asteroid" cx="535" cy="611" r="3"/><circle class="f-planet-indigo-light" cx="468" cy="612" r="5"/><circle class="f-asteroid" cx="248" cy="319" r="5"/><circle class="f-planet-indigo-light" cx="283" cy="308" r="7"/><circle class="f-asteroid" cx="335" cy="285" r="4"/><circle class="f-planet-indigo-light" cx="368" cy="278" r="6"/><circle class="f-asteroid" cx="417" cy="259" r="3"/><circle class="f-planet-indigo-light" cx="480" cy="256" r="5"/><circle class="f-asteroid" cx="523" cy="243" r="7"/><circle class="f-planet-indigo-light" cx="578" cy="245" r="4"/><circle class="f-asteroid" cx="647" cy="237" r="6"/><circle class="f-planet-indigo-light" cx="692" cy="245" r="3"/><circle class="f-asteroid" cx="747" cy="243" r="5"/><circle class="f-planet-indigo-light" cx="814" cy="256" r="7"/><circle class="f-asteroid" cx="853" cy="259" r="4"/><circle class="f-planet-indigo-light" cx="902" cy="278" r="6"/><circle class="f-asteroid" cx="959" cy="285" r="3"/><circle class="f-planet-indigo-light" cx="987" cy="308" r="5"/><circle class="f-asteroid" cx="1022" cy="319" r="7"/><circle class="f-planet-indigo-light" cx="1063" cy="346" r="4"/><circle class="f-asteroid" cx="1074" cy="360" r="6"/><circle class="f-planet-indigo-light" cx="1091" cy="389" r="3"/><circle class="f-asteroid" cx="1114" cy="404" r="5"/><circle class="f-peach" cx="640" cy="430" r="112" opacity="0.10"/><circle class="f-peach" cx="640" cy="430" r="86" opacity="0.16"/><clipPath id="map-sun"><circle cx="640" cy="430" r="64"/></clipPath><g clip-path="url(#map-sun)"><g transform="rotate(-45 640 430)"><rect class="f-planet-peach-6" x="576" y="366" width="128" height="128"/><rect class="f-planet-peach-dark" x="576" y="366" width="128" height="110.1"/><rect class="f-planet-peach-4" x="576" y="366" width="128" height="92.2"/><rect class="f-planet-peach" x="576" y="366" width="128" height="70.4"/><rect class="f-planet-peach-2" x="576" y="366" width="128" height="46.1"/><rect class="f-planet-peach-light" x="576" y="366" width="128" height="23"/></g></g><circle class="s-planet-peach-light" cx="640" cy="430" r="66.5" fill="none" stroke-width="3" opacity="0.28"/><circle class="s-mint" cx="330" cy="300" r="78" fill="none" stroke-width="10" opacity="0.3"/><g transform="rotate(-14 330 300)"><path class="s-mint-deep" d="M228.5 300 A101.5 22 0 0 1 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-deeper" d="M242.7 300 A87.3 19 0 0 1 417.3 300" fill="none" stroke-width="2.9" stroke-linecap="round"/></g><clipPath id="map-rescue"><circle cx="330" cy="300" r="58"/></clipPath><g clip-path="url(#map-rescue)"><g transform="rotate(-45 330 300)"><rect class="f-planet-mint-dark" x="272" y="242" width="116" height="116"/><rect class="f-planet-mint-4" x="272" y="242" width="116" height="83.5"/><rect class="f-planet-mint" x="272" y="242" width="116" height="63.8"/><rect class="f-planet-mint-2" x="272" y="242" width="116" height="41.8"/><rect class="f-planet-mint-light" x="272" y="242" width="116" height="20.9"/></g><ellipse class="f-shadow" cx="347.4" cy="320.3" rx="7" ry="5.4" opacity="0.16"/><ellipse class="f-highlight" cx="346.1" cy="319" rx="5" ry="3.5" opacity="0.07"/><ellipse class="f-shadow" cx="309.7" cy="305.8" rx="4.6" ry="3.6" opacity="0.16"/><ellipse class="f-highlight" cx="308.9" cy="305" rx="3.3" ry="2.3" opacity="0.07"/></g><circle class="s-planet-mint-light" cx="330" cy="300" r="60.5" fill="none" stroke-width="3" opacity="0.28"/><g clip-path="url(#map-rescue)"><g transform="rotate(-14 330 300)"><path class="s-shadow" d="M233.6 302.9 A96.4 19.8 0 0 0 426.4 302.9" fill="none" stroke-width="7" opacity="0.18"/></g></g><g transform="rotate(-14 330 300)"><path class="s-mint" d="M228.5 300 A101.5 22 0 0 0 431.5 300" fill="none" stroke-width="9.3" stroke-linecap="round"/><path class="s-mint-light" d="M220.4 300 A109.6 23.8 0 0 0 439.6 300" fill="none" stroke-width="3.5" stroke-linecap="round"/><path class="s-mint-deep" d="M242.7 300 A87.3 19 0 0 0 417.3 300" fill="none" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/></g><clipPath id="map-moon"><circle cx="232" cy="232" r="14"/></clipPath><g clip-path="url(#map-moon)"><g transform="rotate(-45 232 232)"><rect class="f-planet-peach-4" x="218" y="218" width="28" height="28"/><rect class="f-planet-peach" x="218" y="218" width="28" height="15.4"/><rect class="f-planet-peach-2" x="218" y="218" width="28" height="10.1"/><rect class="f-planet-peach-light" x="218" y="218" width="28" height="5"/></g></g><circle class="s-mint" cx="1010" cy="560" r="66" fill="none" stroke-width="10" opacity="0.3"/><clipPath id="map-p1"><circle cx="1010" cy="560" r="46"/></clipPath><g clip-path="url(#map-p1)"><g transform="rotate(-45 1010 560)"><rect class="f-planet-indigo-6" x="964" y="514" width="92" height="92"/><rect class="f-planet-indigo-dark" x="964" y="514" width="92" height="79.1"/><rect class="f-planet-indigo-4" x="964" y="514" width="92" height="66.2"/><rect class="f-planet-indigo" x="964" y="514" width="92" height="50.6"/><rect class="f-planet-indigo-2" x="964" y="514" width="92" height="33.1"/><rect class="f-planet-indigo-light" x="964" y="514" width="92" height="16.6"/></g><ellipse class="f-shadow" cx="1019.2" cy="546.2" rx="6.4" ry="5" opacity="0.16"/><ellipse class="f-highlight" cx="1018" cy="545" rx="4.6" ry="3.2" opacity="0.07"/></g><circle class="s-planet-indigo-light" cx="1010" cy="560" r="48.5" fill="none" stroke-width="3" opacity="0.28"/><g opacity="0.45"><clipPath id="map-l0"><circle cx="1150" cy="250" r="30"/></clipPath><g clip-path="url(#map-l0)"><g transform="rotate(-45 1150 250)"><rect class="f-planet-peach-dark" x="1120" y="220" width="60" height="60"/><rect class="f-planet-peach-4" x="1120" y="220" width="60" height="43.2"/><rect class="f-planet-peach" x="1120" y="220" width="60" height="33"/><rect class="f-planet-peach-2" x="1120" y="220" width="60" height="21.6"/><rect class="f-planet-peach-light" x="1120" y="220" width="60" height="10.8"/></g></g><circle class="s-planet-peach-light" cx="1150" cy="250" r="32.5" fill="none" stroke-width="3" opacity="0.28"/></g><ellipse class="f-mint" cx="250" cy="598" rx="210" ry="26" opacity="0.12"/><ellipse class="s-mint" cx="250" cy="598" rx="210" ry="26" fill="none" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round" opacity="0.7"/></svg></template>
 <template id="art-crew"><svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true"><rect class="f-night" width="1280" height="800"/><path class="f-night-raised" d="M800 -40 C 950 -70, 1190 -30, 1310 50 L 1310 400 C 1190 350, 1030 320, 925 236 C 838 168, 752 -16, 800 -40 Z"/><path class="f-nebula" d="M870 -30 C 990 -50, 1180 -10, 1300 70 L 1300 300 C 1200 270, 1080 240, 1000 180 C 930 128, 840 -10, 870 -30 Z" opacity="0.8"/><path class="f-mimi" d="M960 -20 C 1060 -30, 1200 10, 1300 80 L 1300 210 C 1220 190, 1130 160, 1070 120 C 1010 80, 930 -10, 960 -20 Z" opacity="0.10"/><path class="f-mint" d="M1040 20 C 1110 10, 1220 50, 1300 110 L 1300 170 C 1240 160, 1170 130, 1120 100 C 1080 76, 1020 30, 1040 20 Z" opacity="0.07"/><path class="f-night-raised" d="M-40 520 C 60 480, 200 500, 300 560 C 380 610, 360 700, 260 760 C 160 820, -20 840, -60 800 Z" opacity="0.9"/><path class="f-mimi" d="M-30 560 C 50 530, 160 545, 240 590 C 300 625, 290 690, 210 735 C 130 780, -10 790, -40 760 Z" opacity="0.07"/><circle class="f-moon" cx="1042" cy="224.5" r="1.9" opacity="0.9"/><circle class="f-moon" cx="1158.4" cy="153" r="1.8" opacity="0.9"/><circle class="f-galaxy-peach" cx="675.8" cy="356.9" r="1.6" opacity="0.95"/><circle class="f-moon" cx="1039.7" cy="227" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1102.3" cy="257.6" r="2" opacity="0.9"/><circle class="f-moon" cx="1262" cy="58.2" r="1" opacity="0.6"/><circle class="f-moon" cx="709.8" cy="312.6" r="1.9" opacity="0.9"/><circle class="f-moon" cx="86.3" cy="79.5" r="1.4" opacity="0.9"/><circle class="f-moon" cx="622.4" cy="13.6" r="1.1" opacity="0.5"/><circle class="f-galaxy-peach" cx="852.5" cy="198.1" r="1.9" opacity="0.95"/><circle class="f-moon" cx="896.3" cy="134.6" r="1" opacity="0.4"/><circle class="f-moon" cx="931" cy="370.6" r="1" opacity="0.4"/><circle class="f-moon" cx="418" cy="89.2" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1060.1" cy="348" r="2" opacity="0.9"/><circle class="f-moon" cx="749.9" cy="409" r="1.8" opacity="0.9"/><circle class="f-moon" cx="920.5" cy="185.6" r="0.8" opacity="0.6"/><circle class="f-moon" cx="1268.4" cy="541.7" r="1.2" opacity="0.5"/><circle class="f-moon" cx="181.1" cy="37.3" r="1.1" opacity="0.6"/><circle class="f-moon" cx="295.1" cy="94.8" r="1.1" opacity="0.6"/><circle class="f-moon" cx="26.8" cy="11.1" r="1.8" opacity="0.9"/><circle class="f-moon" cx="420.4" cy="107" r="0.9" opacity="0.5"/><circle class="f-moon" cx="110" cy="166" r="0.8" opacity="0.5"/><circle class="f-moon" cx="696.8" cy="368.6" r="1.5" opacity="0.9"/><circle class="f-moon" cx="35.7" cy="68" r="0.9" opacity="0.4"/><circle class="f-moon" cx="16.9" cy="359.8" r="0.8" opacity="0.6"/><circle class="f-moon" cx="290.6" cy="39.3" r="1.2" opacity="0.5"/><circle class="f-moon" cx="58.5" cy="193.2" r="1.7" opacity="0.9"/><circle class="f-moon" cx="1007" cy="310.1" r="1.4" opacity="0.9"/><circle class="f-moon" cx="796.6" cy="154.6" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1036.3" cy="229.8" r="1.9" opacity="0.9"/><circle class="f-moon" cx="800.9" cy="190.9" r="2" opacity="0.9"/><circle class="f-moon" cx="1021.9" cy="355.8" r="0.7" opacity="0.6"/><circle class="f-moon" cx="206.7" cy="178.1" r="0.8" opacity="0.5"/><circle class="f-moon" cx="128.9" cy="112.7" r="1.2" opacity="0.7"/><circle class="f-moon" cx="631.9" cy="405.2" r="1" opacity="0.5"/><circle class="f-galaxy" cx="365" cy="367.1" r="1.9" opacity="0.95"/><circle class="f-moon" cx="23.8" cy="139.2" r="1.2" opacity="0.4"/><circle class="f-moon" cx="398.8" cy="245.6" r="1.6" opacity="0.9"/><circle class="f-moon" cx="325.5" cy="348.1" r="0.9" opacity="0.6"/><circle class="f-moon" cx="256.2" cy="346" r="1.1" opacity="0.6"/><circle class="f-moon" cx="1048.6" cy="212.8" r="1.1" opacity="0.4"/><circle class="f-moon" cx="1083.3" cy="232.8" r="1.7" opacity="0.9"/><circle class="f-moon" cx="412.2" cy="91.2" r="1.8" opacity="0.9"/><circle class="f-galaxy-peach" cx="1022.2" cy="282.5" r="1.6" opacity="0.95"/><circle class="f-galaxy" cx="856.2" cy="210.3" r="1.8" opacity="0.95"/><circle class="f-moon" cx="497.5" cy="120.3" r="1.1" opacity="0.5"/><circle class="f-moon" cx="1023" cy="282.6" r="1.6" opacity="0.9"/><circle class="f-moon" cx="851.2" cy="6.9" r="1.2" opacity="0.5"/><circle class="f-moon" cx="238.1" cy="124.2" r="0.8" opacity="0.4"/><circle class="f-moon" cx="757.3" cy="344.6" r="1.8" opacity="0.9"/><circle class="f-moon" cx="223.8" cy="222.9" r="1.9" opacity="0.9"/><circle class="f-moon" cx="148.2" cy="60" r="0.8" opacity="0.4"/><circle class="f-moon" cx="163.4" cy="377" r="0.7" opacity="0.6"/><circle class="f-moon" cx="712.3" cy="345.8" r="1" opacity="0.4"/><circle class="f-moon" cx="246.8" cy="124" r="1.1" opacity="0.7"/><circle class="f-moon" cx="828" cy="122" r="0.8" opacity="0.5"/><circle class="f-moon" cx="1237.3" cy="110.8" r="0.8" opacity="0.5"/><circle class="f-moon" cx="434.4" cy="405" r="1.1" opacity="0.4"/><circle class="f-moon" cx="142.8" cy="99.2" r="0.8" opacity="0.5"/><circle class="f-moon" cx="485.8" cy="277.3" r="1" opacity="0.5"/><circle class="f-moon" cx="396.7" cy="210.3" r="1.9" opacity="0.9"/><circle class="f-moon" cx="726.5" cy="343.9" r="1.7" opacity="0.9"/><circle class="f-galaxy-peach" cx="896.3" cy="161.2" r="2.1" opacity="0.95"/><circle class="f-moon" cx="437.4" cy="303.8" r="1.5" opacity="0.9"/><circle class="f-moon" cx="396.5" cy="298.3" r="0.8" opacity="0.6"/><circle class="f-moon" cx="398.6" cy="51.1" r="2" opacity="0.9"/><circle class="f-moon" cx="111.5" cy="179.9" r="1" opacity="0.5"/><circle class="f-moon" cx="1133.2" cy="10.9" r="0.9" opacity="0.7"/><circle class="f-moon" cx="93.5" cy="168.3" r="1.7" opacity="0.9"/><circle class="f-moon" cx="28.6" cy="389.3" r="1.8" opacity="0.9"/><g transform="translate(200 140) rotate(-20) scale(0.7)"><ellipse class="f-mimi" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mimi" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="14.1" cy="1.5" r="1.3" opacity="0.5"/><circle class="f-moon" cx="16.1" cy="4.1" r="0.8" opacity="0.7"/><circle class="f-moon" cx="12.9" cy="6.7" r="0.9" opacity="0.5"/><circle class="f-moon" cx="10.6" cy="9.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="5" cy="12.3" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-2.4" cy="12" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-16.2" cy="12.6" r="1" opacity="0.9"/><circle class="f-moon" cx="-27.5" cy="12.9" r="1.3" opacity="0.7"/><circle class="f-moon" cx="-37.4" cy="9.9" r="0.8" opacity="0.6"/><circle class="f-moon" cx="-14.1" cy="-2.3" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-16.1" cy="-4.8" r="1.4" opacity="0.8"/><circle class="f-moon" cx="-15.8" cy="-6.7" r="1.2" opacity="0.9"/><circle class="f-moon" cx="-10" cy="-9.7" r="1.6" opacity="0.6"/><circle class="f-moon" cx="-4.8" cy="-10.9" r="0.9" opacity="0.7"/><circle class="f-moon" cx="2.4" cy="-12.5" r="1.4" opacity="0.8"/><circle class="f-moon" cx="16.3" cy="-13.7" r="1.4" opacity="0.8"/><circle class="f-moon" cx="26.6" cy="-12.8" r="1.5" opacity="0.9"/><circle class="f-moon" cx="37.5" cy="-10.4" r="0.8" opacity="0.8"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(980 300) rotate(18) scale(0.55)"><ellipse class="f-mint" rx="58" ry="20" opacity="0.13"/><ellipse class="f-mint" rx="44" ry="15" opacity="0.18"/><ellipse class="f-galaxy-mint" rx="30" ry="10" opacity="0.32"/><path class="s-galaxy-mint" d="M0 0 C 16 -12, 38 -11, 50 3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M0 0 C -16 12, -38 11, -50 -3" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.45"/><path class="s-galaxy-mint" d="M4 -2 C 22 -16, 46 -10, 56 8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><path class="s-galaxy-mint" d="M-4 2 C -22 16, -46 10, -56 -8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/><circle class="f-moon" cx="13.7" cy="3.1" r="0.9" opacity="0.8"/><circle class="f-moon" cx="14.3" cy="3.9" r="1.6" opacity="0.6"/><circle class="f-moon" cx="15.3" cy="6.7" r="1.2" opacity="0.7"/><circle class="f-moon" cx="9.7" cy="9.9" r="0.9" opacity="0.6"/><circle class="f-moon" cx="2.6" cy="10.9" r="1.1" opacity="0.9"/><circle class="f-moon" cx="-4.8" cy="12.1" r="1" opacity="0.9"/><circle class="f-moon" cx="-16.6" cy="13.6" r="1.1" opacity="0.8"/><circle class="f-moon" cx="-26.9" cy="13.1" r="1.2" opacity="0.8"/><circle class="f-moon" cx="-36" cy="10.9" r="0.9" opacity="0.5"/><circle class="f-moon" cx="-13" cy="-2.2" r="1" opacity="0.9"/><circle class="f-moon" cx="-15.6" cy="-3.9" r="1.5" opacity="0.6"/><circle class="f-moon" cx="-15.3" cy="-6.1" r="0.9" opacity="0.8"/><circle class="f-moon" cx="-12.5" cy="-8.9" r="1.4" opacity="0.9"/><circle class="f-moon" cx="-3.1" cy="-11.4" r="1" opacity="0.6"/><circle class="f-moon" cx="4.4" cy="-12.8" r="0.9" opacity="0.9"/><circle class="f-moon" cx="14.8" cy="-13" r="1" opacity="0.6"/><circle class="f-moon" cx="24.3" cy="-13" r="1" opacity="0.7"/><circle class="f-moon" cx="37.1" cy="-10.1" r="1.5" opacity="0.6"/><ellipse class="f-moon" rx="14" ry="5.5" opacity="0.85"/><ellipse class="f-highlight" rx="6" ry="2.6" opacity="0.9"/></g><g transform="translate(380 240) scale(0.8)" opacity="0.9"><path class="f-moon" d="M0 -16 L1 -1 L16 0 L1 1 L0 16 L-1 1 L-16 0 L-1 -1 Z" opacity="0.55"/><path class="f-spark" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z"/><circle class="f-highlight" r="2"/></g><path class="f-spark" transform="translate(860 110) scale(0.6)" d="M0 -12 Q 2 -2 12 0 Q 2 2 0 12 Q -2 2 -12 0 Q -2 -2 0 -12 Z"/><ellipse class="f-night-raised" cx="300" cy="372" rx="200" ry="22"/><ellipse class="s-night-button" cx="300" cy="372" rx="200" ry="22" fill="none" stroke-width="3"/><ellipse class="s-mint" cx="220" cy="368" rx="64" ry="11" fill="none" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.7"/><ellipse class="s-mint" cx="380" cy="368" rx="64" ry="11" fill="none" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.7"/></svg></template>
 <template id="art-held-telescope"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g></svg></template>
+<template id="art-numbered-mimi"><svg width="140" height="209" viewBox="0 0 140 209" overflow="visible" aria-hidden="true"><svg x="6" y="0" width="128" height="128" viewBox="0 0 80 80" overflow="visible"><path class="f-mimi s-mimi-outline" d="M14 32 L12 6 L33 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi s-mimi-outline" d="M66 32 L68 6 L47 21 Z" stroke-width="4" stroke-linejoin="round"/><path class="f-mimi-muzzle" d="M17 25 L16 13 L27 21 Z"/><path class="f-mimi-muzzle" d="M63 25 L64 13 L53 21 Z"/><path class="f-mimi s-mimi-outline" d="M9 45 C 9 28, 23 17, 40 17 C 57 17, 71 28, 71 45 C 73 47, 72 51, 70 52 C 67 64, 55 73, 40 73 C 25 73, 13 64, 10 52 C 8 51, 7 47, 9 45 Z" stroke-width="4" stroke-linejoin="round"/><path class="s-mimi-shade" d="M26 24 C 31 21, 36 21, 40 23 C 44 21, 49 21, 54 24" fill="none" stroke-width="2.4" stroke-linecap="round"/><path class="f-mimi-shade" d="M15 56 C 22 66, 32 70, 40 70 C 48 70, 58 66, 65 56 C 58 62, 50 64, 40 64 C 30 64, 22 62, 15 56 Z" opacity="0.7"/><ellipse class="f-mimi-muzzle" cx="40" cy="55" rx="14" ry="10"/><circle class="f-mimi-eye" cx="29" cy="41" r="5.4"/><circle class="f-mimi-eye" cx="51" cy="41" r="5.4"/><circle class="f-highlight" cx="27.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="49.4" cy="39.2" r="1.9"/><circle class="f-highlight" cx="30.6" cy="43" r="0.9"/><circle class="f-highlight" cx="52.6" cy="43" r="0.9"/><path class="f-mimi-nose" d="M37 51 L43 51 L40 54.5 Z"/><path class="s-mimi-outline" d="M36.5 58 C 38 59.6, 40 59.6, 40 57 C 40 59.6, 42 59.6, 43.5 58" fill="none" stroke-width="1.6" stroke-linecap="round"/><path class="s-mimi-outline" d="M28 55 L18 53 M28 58 L19 60 M52 55 L62 53 M52 58 L61 60" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/></svg><rect class="f-peach-dark" x="0" y="108.4" width="140" height="100" rx="22"/><rect class="f-peach s-ink" x="2.25" y="104.7" width="135.5" height="95.5" rx="19.75" stroke-width="4.5"/><ellipse class="f-mimi s-mimi-outline" cx="28" cy="106.4" rx="15" ry="10" stroke-width="3.5"/><path class="s-mimi-outline" d="M23 100.4 V106.4 M28 99.4 V106.4 M33 100.4 V106.4" stroke-width="2" stroke-linecap="round"/><ellipse class="f-mimi s-mimi-outline" cx="112" cy="106.4" rx="15" ry="10" stroke-width="3.5"/><path class="s-mimi-outline" d="M107 100.4 V106.4 M112 99.4 V106.4 M117 100.4 V106.4" stroke-width="2" stroke-linecap="round"/></svg></template>
+<template id="art-number-tile"><svg width="90" height="96" viewBox="-45 -45 90 96" overflow="visible" aria-hidden="true"><circle class="f-ink" cx="0" cy="6" r="45"/><circle class="f-moon s-ink" cx="0" cy="0" r="43.5" stroke-width="3"/><circle class="s-mint" cx="0" cy="0" r="39" fill="none" stroke-width="6"/></svg></template>
+<template id="art-number-track"><svg width="1052" height="108" viewBox="0 0 1052 108" aria-hidden="true"><clipPath id="track-in"><path d="M54 4.5 H998 A49.5 49.5 0 0 1 998 103.5 H54 A49.5 49.5 0 0 1 54 4.5 Z"/></clipPath><path class="f-asteroid" d="M54 4.5 H998 A49.5 49.5 0 0 1 998 103.5 H54 A49.5 49.5 0 0 1 54 4.5 Z"/><g clip-path="url(#track-in)"><path class="f-asteroid-crater" d="M54 4.5 H998 A49.5 49.5 0 0 1 998 103.5 H54 A49.5 49.5 0 0 1 54 4.5 Z M54 -5.5 H998 A49.5 49.5 0 0 1 998 93.5 H54 A49.5 49.5 0 0 1 54 -5.5 Z" fill-rule="evenodd"/><path class="f-asteroid-light" d="M54 4.5 H998 A49.5 49.5 0 0 1 998 103.5 H54 A49.5 49.5 0 0 1 54 4.5 Z M54 12.5 H998 A49.5 49.5 0 0 1 998 111.5 H54 A49.5 49.5 0 0 1 54 12.5 Z" fill-rule="evenodd"/></g><rect class="s-ink" x="2.25" y="2.25" width="1047.5" height="103.5" rx="51.75" fill="none" stroke-width="4.5"/></svg></template>
 <template id="art-job-lookout"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><path class="s-ink" d="M34 66 L22 90 M38 66 L40 92 M42 64 L58 88" stroke-width="4" stroke-linecap="round"/><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g><circle class="f-ink" cx="40" cy="64" r="4.5"/></svg></template>
 <template id="art-badge-lookout"><svg width="56" height="56" viewBox="-8 -8 116 116" aria-hidden="true"><circle class="f-moon s-mint" cx="50" cy="50" r="54" stroke-width="7"/><circle class="s-ink" cx="50" cy="50" r="58" fill="none" stroke-width="2.5"/><g transform="translate(9 9) scale(0.82)"><path class="s-ink" d="M34 66 L22 90 M38 66 L40 92 M42 64 L58 88" stroke-width="4" stroke-linecap="round"/><g transform="rotate(-32 50 52)"><rect class="f-peach-dark s-ink" x="14" y="44" width="22" height="16" rx="4" stroke-width="3.5"/><rect class="f-mint-dark s-ink" x="34" y="41" width="30" height="22" rx="4" stroke-width="3.5"/><rect class="f-mint s-ink" x="62" y="37" width="26" height="30" rx="5" stroke-width="3.5"/><rect class="f-peach" x="44" y="41" width="6" height="22"/><rect class="s-ink" x="44" y="41" width="6" height="22" fill="none" stroke-width="2"/><ellipse class="f-glass s-ink" cx="88" cy="52" rx="5" ry="15" stroke-width="3.5"/><path class="s-mint-light" d="M66 42 h16" stroke-width="3" stroke-linecap="round"/></g><circle class="f-ink" cx="40" cy="64" r="4.5"/></g></svg></template>
 <template id="art-job-engineer"><svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-45 50 50)"><path class="f-steel s-ink" d="M44 34 L56 34 L56 76 L44 76 Z" stroke-width="3.5" stroke-linejoin="round"/><path class="f-steel s-ink" d="M43 9 L43 25 L57 25 L57 9 A20 20 0 1 1 43 9 Z" stroke-width="3.5" stroke-linejoin="round"/><circle class="f-steel s-ink" cx="50" cy="84" r="10" stroke-width="3.5"/><circle class="f-steel-dark s-ink" cx="50" cy="84" r="4" stroke-width="2"/><path class="s-cat-white" d="M50 40 L50 70" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/></g></svg></template>
@@ -601,7 +649,7 @@ button { font-family: var(--font-andika); }
 <template id="art-words-socket-4"><svg width="263.5" height="120" viewBox="0 0 263.5 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="263.5" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="253.5" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="255.3" cy="81.4" r="2"/><circle class="f-ink" cx="225" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="225" cy="8.3" r="2"/><circle class="f-ink" cx="255.3" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="247.5" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="231.5" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
 <template id="art-words-tile-4"><svg width="247.5" height="104" viewBox="0 0 247.5 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="s-spark" x="-12" y="-12" width="271.5" height="128" rx="64" fill="none" stroke-width="12"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="243.5" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="233.5" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="238" cy="69.6" r="2.2"/><circle class="f-ink" cx="213.1" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="213.1" cy="9.5" r="2.2"/><circle class="f-ink" cx="238" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="226.7" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H216.3" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="244.5" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H216.3" stroke-width="5" stroke-linecap="round"/></g></svg></template>
 <script>
-window.MW = { VERSION: '0.5.0' };
+window.MW = { VERSION: '0.6.0' };
 window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
 window.MW_GAMES = [{"id":"rescue","name":"MeeMee Rescue","planet":0,"badge":"mimi","say":"map-mimi-rescue"},{"id":"words","name":"MeeMee Rockets","planet":1,"badge":"words-badge","say":"words-name"}];
 window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"words-name","group":"Map","words":"MeeMee Rockets!"},{"id":"words-round-ready","group":"Rounds","words":"Ready to launch some rockets?"},{"id":"words-round-done","group":"Rounds","words":"You launched all the rockets!"},{"id":"words-round-another","group":"Rounds","words":"Another go?"},{"id":"words-find","group":"Find","words":"Find the word…"},{"id":"words-that-word","group":"Find","words":"That word is…"},{"id":"words-found-it","group":"Praise","words":"You found it!"},{"id":"words-super-reading","group":"Praise","words":"Super reading!"},{"id":"words-well-done","group":"Praise","words":"Well done!"},{"id":"words-build","group":"Build","words":"Now build the word…"},{"id":"words-you-built","group":"Build","words":"You built the word…"},{"id":"words-tricky-bit","group":"Build","words":"That's the tricky bit."},{"id":"words-try-again","group":"Trying again","words":"Let's try again."},{"id":"words-look-together","group":"Trying again","words":"Let's look together."},{"id":"words-w-all","group":"Week 5 words","words":"all"},{"id":"words-w-of","group":"Week 5 words","words":"of"},{"id":"words-w-one","group":"Week 5 words","words":"one"},{"id":"words-w-here","group":"Week 5 words","words":"here"},{"id":"words-w-magnet","group":"Week 5 words","words":"magnet"},{"id":"words-w-cartoon","group":"Week 5 words","words":"cartoon"},{"id":"words-w-rabbit","group":"Week 5 words","words":"rabbit"},{"id":"words-w-spray","group":"Week 5 words","words":"spray"},{"id":"words-w-popcorn","group":"Week 5 words","words":"popcorn"},{"id":"words-w-proud","group":"Week 5 words","words":"proud"},{"id":"words-w-toy","group":"Week 5 words","words":"toy"},{"id":"words-w-say","group":"Week 5 words","words":"say"},{"id":"words-w-go","group":"Tricky words, weeks 1 to 4","words":"go"},{"id":"words-w-my","group":"Tricky words, weeks 1 to 4","words":"my"},{"id":"words-w-into","group":"Tricky words, weeks 1 to 4","words":"into"},{"id":"words-w-out","group":"Tricky words, weeks 1 to 4","words":"out"},{"id":"words-w-what","group":"Tricky words, weeks 1 to 4","words":"what"},{"id":"words-w-she","group":"Tricky words, weeks 1 to 4","words":"she"},{"id":"words-w-me","group":"Tricky words, weeks 1 to 4","words":"me"},{"id":"words-w-love","group":"Tricky words, weeks 1 to 4","words":"love"},{"id":"words-w-they","group":"Tricky words, weeks 1 to 4","words":"they"},{"id":"words-w-some","group":"Tricky words, weeks 1 to 4","words":"some"},{"id":"words-w-were","group":"Tricky words, weeks 1 to 4","words":"were"},{"id":"words-w-sure","group":"Tricky words, weeks 1 to 4","words":"sure"},{"id":"words-w-said","group":"Tricky words, weeks 1 to 4","words":"said"},{"id":"words-w-you","group":"Tricky words, weeks 1 to 4","words":"you"},{"id":"words-w-like","group":"Tricky words, weeks 1 to 4","words":"like"},{"id":"words-w-push","group":"Tricky words, weeks 1 to 4","words":"push"}];
@@ -672,10 +720,17 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     },
     setMusic: function (on) { load().music = !!on; save(); },
     // A game's own saved data: an object it can change freely, then MW.store.save() to keep the change.
+    // It creates the game's entry the first time (kept on the next save), so use it only to change things.
     game: function (id) {
       const g = load().games;
       if (!g[id] || typeof g[id] !== 'object' || Array.isArray(g[id])) g[id] = {};
       return g[id];
+    },
+    // Reading only: the game's saved data, or an empty object if it has saved nothing. It never creates anything, so a
+    // tablet that has never played a game keeps nothing for it. Don't change what it returns: use game(id) for that.
+    peek: function (id) {
+      const g = load().games[id];
+      return g && typeof g === 'object' && !Array.isArray(g) ? g : {};
     },
     // Forget a game's saved data (for its own "clear this tablet's progress" button).
     clearGame: function (id) { delete load().games[id]; save(); },
@@ -734,6 +789,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     el.addEventListener('click', function (e) { if (e.detail === 0 && !el.disabled) fn(e); });
   };
   // A copy of a drawing. Its ids (clip paths) get a number of their own, so the same drawing can be on the page twice.
+  // To draw it at another size, set its width and height; to show more or less of it (a hull as long as a word),
+  // set its viewBox too (the skill's reference.md, Drawings).
   let artCopies = 0;
   MW.art = function (name) {
     const t = document.getElementById('art-' + name);
@@ -851,6 +908,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       decoded: Object.keys(buffers).length, total: total, failed: failed.slice() };
   };
   A.has = function (key) { return !!buffers[key]; };
+  // Is this line recorded (on the page)? A line still waiting for its recording (pending) isn't, and say() skips it.
+  A.recorded = function (id) { return !!(manifest.voice || {})[id]; };
 
   // ---------------------------------------------------------------- the first tap
   A.unlock = function () {
@@ -1045,7 +1104,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
 /* MeeMee World kit: counters and dragging.
    A counter (a MeeMee) is drawn at 80 stage px inside an invisible 120 px grab circle.
-   One finger drags at a time; where grab circles overlap, the counter nearest the finger is picked up. */
+   A thing that isn't round (a long tile) carries its own pick-up box instead: grab = { w, h }, centred on it.
+   One finger drags at a time; where pick-up areas overlap, the thing whose centre is nearest the finger is picked up. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -1099,16 +1159,21 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // ---------------------------------------------------------------- dragging
   // MW.dragger(stageEl, { counters: () => [...], onPick(c), onDrop(c, x, y), grab: radius in stage px (default 60) })
   // Anything with x, y (its centre), draggable, el, lift(on) and moveTo(x, y, size, animate) can be dragged.
+  // Each thing is picked up within its own box if it has one (c.grab = { w, h }, in stage px, centred on x, y), or
+  // else within the dragger's grab radius. Where they overlap, the thing whose centre is nearest the finger wins.
+  const draggers = [];
   MW.dragger = function (surface, opts) {
     let drag = null;
     const stats = MW.dragStats = MW.dragStats || { last: null };
 
     function nearest(p) {
-      let best = null, bestD = opts.grab || GRAB_R;
+      const r = opts.grab || GRAB_R;
+      let best = null, bestD = Infinity;
       opts.counters().forEach(function (c) {
         if (!c.draggable) return;
-        const d = Math.hypot(c.x - p.x, c.y - p.y);
-        if (d <= bestD) { best = c; bestD = d; }
+        const dx = Math.abs(c.x - p.x), dy = Math.abs(c.y - p.y), d = Math.hypot(dx, dy);
+        const inside = c.grab ? dx <= c.grab.w / 2 && dy <= c.grab.h / 2 : d <= r;
+        if (inside && d <= bestD) { best = c; bestD = d; }
       });
       return best;
     }
@@ -1167,13 +1232,22 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       stats.last = { fps: Math.round(1000 / (sum / frames.length)), worst: Math.round(worst), slow: slow, n: frames.length };
     }
 
-    return { dragging: function () { return !!drag; }, cancel: function () { if (drag) end(null, true); } };
+    const api = { dragging: function () { return !!drag; }, cancel: function () { if (drag) end(null, true); },
+      holding: function () { return drag ? drag.c : null; } };
+    draggers.push(api);
+    return api;
+  };
+  // Let go of any of these things that a finger is holding, in whichever dragger holds it: its onDrop gets cancelled
+  // (as when the tablet takes the touch away), so it goes back. MW.numberTrack's hide() uses it for its tiles.
+  MW.dragger.release = function (things) {
+    draggers.forEach(function (d) { const c = d.holding(); if (c && things.indexOf(c) >= 0) d.cancel(); });
   };
 })();
 
 /* MeeMee World kit: the pieces of a game screen.
-   The part–whole diagram, the asteroid tray, Scruffles's pod, progress stars, the equation, sparkles and hint ghosts.
-   Positions follow the design system's GameScreen (1280x800 stage). */
+   The part–whole diagram (counting look, and the numbers look of MeeMee Rescue's numbers mode), the asteroid tray, the
+   number track, Scruffles's pod, progress stars, the equation, sparkles and hint ghosts.
+   Positions follow the design system's GameScreen and NumbersMode (1280x800 stage). */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -1187,8 +1261,12 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     tray: { x: 745, y: 515 },
     traySlots: [],
     equation: { x: 180, y: 700, w: 400, h: 80 },
-    stars: { x: 517, y: 34 },
-    dropSlack: 22             // a drop this far outside a circle's rim still counts as inside
+    stars: { x: 517, y: 34, cx: 640 },     // x: the left edge of five stars; cx: the middle, for MW.stars(…, { centre: true })
+    dropSlack: 22,            // a drop this far outside a circle's rim still counts as inside
+    // numbers mode (0.6.0): the numbered MeeMee in a circle (the whole's drawn at 0.86), and the number track along the
+    // bottom: tiles 0 to 10, 84 across, 94 apart from x 128, their tops at 686, each picked up in a 120 box
+    numbered: { whole: 0.86, part: 1 },
+    track: { x: 128, top: 686, step: 94, tile: 84, grab: 120, rail: { x: 114, y: 674 }, away: 140 }
   };
   for (let row = 0; row < 2; row++) for (let i = 0; i < 5; i++) L.traySlots.push({ x: L.tray.x + 82 + i * 94, y: L.tray.y + (row ? 180 : 85) });
 
@@ -1225,6 +1303,41 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     });
     d.circles = circles; d.pills = pills;
 
+    // The look: 'counting' (the usual: numbers in the whole circle and the pills, "?" where the answer goes) or
+    // 'numbers' (MeeMee Rescue's numbers mode, NumbersMode card): no pills and no "?"; each given circle holds a
+    // numbered MeeMee carrying its number, and the waiting circle is empty until a number tile is dropped in it.
+    let look = 'counting';
+    const carriers = {};
+    let last = pills.right;                                   // the numbered MeeMee go just above the diagram's circles
+    function carrier(k) {
+      if (!carriers[k]) {
+        const c = L[k];
+        const m = carriers[k] = MW.numberedMimi(k === 'whole' ? L.numbered.whole : L.numbered.part);
+        m.place(c.x, c.y);
+        parent.insertBefore(m.el, last.nextSibling);
+        last = m.el;
+      }
+      return carriers[k];
+    }
+    d.look = function (name) {
+      if (name === undefined) return look;
+      look = name === 'numbers' ? 'numbers' : 'counting';
+      const off = look === 'numbers';
+      pills.left.classList.toggle('mw-off', off); pills.right.classList.toggle('mw-off', off);
+      nums.whole.classList.toggle('mw-off', off);
+      if (!off) Object.keys(carriers).forEach(function (k) { carriers[k].hide(); });
+      return look;
+    };
+    // A numbered MeeMee carrying n in circle k ('whole', 'left' or 'right'); n null takes it away (numbers look only).
+    // pop: it pops up into the circle, as when a right answer is carried (a fade with reduce motion).
+    d.carry = function (k, n, pop) {
+      if (look !== 'numbers') return;
+      if (n === null || n === undefined) { if (carriers[k]) carriers[k].hide(); return; }
+      carrier(k).show(n, pop);
+    };
+    // What circle k's numbered MeeMee is carrying, or null (for checks).
+    d.carried = function (k) { return carriers[k] ? carriers[k].shown() : null; };
+
     // q = { whole, left, right, missing: 'left' | 'right' | 'whole' }
     d.set = function (q) {
       ['whole', 'left', 'right'].forEach(function (k) {
@@ -1236,6 +1349,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         nums[k].textContent = waiting ? '?' : String(q[k]);
         nums[k].style.visibility = '';
         circles[k].setAttribute('aria-label', k === 'whole' ? 'The whole' : 'A part');
+        if (look === 'numbers') d.carry(k, waiting ? null : q[k]);
       });
     };
     // The live count in the waiting circle: its pill shows the number of MeeMee in it ("?" when empty).
@@ -1243,12 +1357,15 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       if (k === 'whole') nums.whole.style.visibility = (n > 0 || circles.whole.classList.contains('is-hinting')) ? 'hidden' : '';
       else nums[k].textContent = n > 0 ? String(n) : '?';
     };
+    // The circle is answered: the success ring, and its number shows (in the numbers look, a numbered MeeMee pops up
+    // to carry it).
     d.success = function (k, value) {
       circles[k].classList.remove('is-waiting', 'is-hinting');
       circles[k].classList.add('is-success');
       nums[k].textContent = String(value);
       nums[k].style.visibility = '';
       if (pills[k]) { pills[k].classList.remove('is-waiting'); pills[k].classList.add('is-success'); }
+      if (look === 'numbers') d.carry(k, value, true);
     };
     d.hinting = function (k, on) {
       circles[k].classList.toggle('is-hinting', !!on);
@@ -1275,6 +1392,104 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     parent.appendChild(el);
     return { el: el, slots: L.traySlots };
   };
+
+  // ---------------------------------------------------------------- a numbered MeeMee (numbers mode)
+  // A MeeMee holding up a peach sign with a number on it (the "numbered-mimi" drawing, 140 x 209, and the number in
+  // numeral-sign). k scales it: 1 in a part circle, 0.86 in the whole. MW.diagram's numbers look makes these itself.
+  MW.numberedMimi = function (k) {
+    k = k || 1;
+    const el = MW.make('div', 'mw-numbered mw-abs mw-off', { role: 'img' });
+    el.style.transform = 'scale(' + k + ')';
+    el.appendChild(MW.art('numbered-mimi'));
+    const sign = MW.make('span', 'mw-numbered-sign numeral-sign');
+    el.appendChild(sign);
+    let shown = null;
+    return {
+      el: el, k: k,
+      // centre it on (cx, cy): the middle of a circle
+      place: function (cx, cy) { abs(el, cx - 70, cy - 102.5); },
+      show: function (n, pop) {
+        shown = n;
+        sign.textContent = String(n);
+        el.setAttribute('aria-label', 'A MeeMee carrying ' + n);
+        el.classList.remove('mw-off', 'is-popping');
+        if (pop) { void el.offsetWidth; el.classList.add('is-popping'); }
+      },
+      hide: function () { shown = null; el.classList.add('mw-off'); el.classList.remove('is-popping'); },
+      shown: function () { return shown; }
+    };
+  };
+
+  // ---------------------------------------------------------------- the number track (numbers mode)
+  // Tiles 0 to 10 in order along the bottom on an asteroid rail (NumbersMode card). Each tile is a draggable thing for
+  // MW.dragger: x, y (its middle), draggable, el, lift(on), moveTo(x, y, size, animate), with a 120 pick-up box.
+  // While a tile is away from its place, the place shows a dashed ring. The game says what a drop does: put the tile
+  // in a circle (tile.moveTo(x, y, 0, true)) or send it back (tile.goHome(true)).
+  // hide() lets go of a tile a finger is holding (its dragger's onDrop gets cancelled), sends any tile that is out back
+  // to its place at once, then slides the track down out of sight (260 ms; a fade with reduce motion); show() brings
+  // it back. While it is away its tiles can't be picked up.
+  MW.numberTrack = function (parent) {
+    const T = L.track;
+    const el = MW.make('div', 'mw-track mw-layer mw-fill');
+    const rail = abs(MW.art('number-track'), T.rail.x, T.rail.y);
+    rail.classList.add('mw-abs');
+    el.appendChild(rail);
+    const tiles = [];
+    for (let n = 0; n <= 10; n++) {
+      const x = T.x + n * T.step;
+      const place = abs(MW.make('div', 'mw-track-place'), x + 6, T.top + 6);
+      el.appendChild(place);
+      tiles.push(numberTile(el, n, { x: x + T.tile / 2, y: T.top + T.tile / 2 }, place));
+    }
+    parent.appendChild(el);
+    let away = false;
+    const track = {
+      el: el, tiles: tiles,
+      tile: function (n) { return tiles[n]; },
+      away: function () { return away; },
+      // every tile back in its place at once
+      reset: function () { tiles.forEach(function (t) { t.lift(false); t.goHome(false); }); },
+      hide: function () {
+        MW.dragger.release(tiles);                            // a tile held as the track goes: let go of it first
+        track.reset();
+        away = true;
+        tiles.forEach(function (t) { t.draggable = false; });
+        void el.offsetWidth;                                  // slide from where it is now, even if it has only just been drawn
+        el.classList.add('is-away');
+        MW.log('track', 'away');
+      },
+      show: function () {
+        away = false;
+        tiles.forEach(function (t) { t.draggable = true; });
+        void el.offsetWidth;
+        el.classList.remove('is-away');
+        MW.log('track', 'back');
+      }
+    };
+    return track;
+  };
+  // One number tile: the "number-tile" drawing with its number in numeral-part, 84 across, in a 120 pick-up box.
+  function numberTile(layer, n, home, place) {
+    const el = MW.make('div', 'mw-number-tile', { role: 'img', 'aria-label': String(n) });
+    const body = MW.make('div', 'mw-number-tile-body');
+    body.appendChild(MW.art('number-tile'));
+    body.appendChild(MW.make('span', 'mw-number-tile-n numeral-part', null, String(n)));
+    el.appendChild(body);
+    layer.appendChild(el);
+    const t = { el: el, n: n, home: home, x: home.x, y: home.y, size: L.track.tile, draggable: true,
+      grab: { w: L.track.grab, h: L.track.grab } };
+    t.moveTo = function (x, y, size, animate) {
+      t.x = x; t.y = y;
+      el.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
+      el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+      place.classList.toggle('is-out', Math.abs(x - home.x) > 0.5 || Math.abs(y - home.y) > 0.5);
+    };
+    t.lift = function (on) { t.lifted = !!on; el.classList.toggle('is-lifted', !!on); };
+    t.goHome = function (animate) { t.moveTo(home.x, home.y, 0, animate); };
+    t.out = function () { return place.classList.contains('is-out'); };
+    t.moveTo(home.x, home.y, 0, false);
+    return t;
+  }
 
   // ---------------------------------------------------------------- Scruffles in the pod
   MW.pod = function (parent, x, y, w) {
@@ -1310,7 +1525,11 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   };
 
   // ---------------------------------------------------------------- progress stars
-  MW.stars = function (parent, x, y, size) {
+  // MW.stars(parent, x, y, size): x is the row's left edge. MW.stars(parent, cx, y, size, { centre: true }): the row is
+  // centred on cx, however many stars set(done, total) shows (MW.LAYOUT.stars.cx is the usual middle, 640). Either
+  // way the row's left edge is set in px, so its offsetLeft and its place on screen agree.
+  MW.stars = function (parent, x, y, size, opts) {
+    const centre = !!(opts && opts.centre);
     const el = abs(MW.make('div', 'mw-stars', { role: 'img' }), x, y);
     parent.appendChild(el);
     const STAR = '24,5 29.3,17.7 43,18.8 32.6,27.8 35.8,41.2 24,34 12.2,41.2 15.4,27.8 5,18.8 18.7,17.7';
@@ -1329,9 +1548,17 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         }
         el.innerHTML = html;
         el.setAttribute('aria-label', 'Question ' + Math.min(done + 1, total) + ' of ' + total);
+        if (centre) el.style.left = (x - (total * size + (total - 1) * starGap()) / 2) + 'px';
       }
     };
   };
+
+  // the gap between stars: the space-s token (14 px), read from the page's tokens
+  let gapPx = null;
+  function starGap() {
+    if (gapPx === null) gapPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-s')) || 14;
+    return gapPx;
+  }
 
   // ---------------------------------------------------------------- the equation
   MW.equation = function (parent) {
@@ -2018,10 +2245,11 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   }
 })();
 
-/* MeeMee World kit: the world shell (phase 5).
+/* MeeMee World kit: the world shell (phase 5; title banners from 0.6.0).
    What every game shares, so a game is only its own play:
      the start screen (Play: sound and full screen start on that first tap), the home map with a planet for each game,
-     the crew screen, pausing (grown-ups area open, tablet upright, screen off), the grown-ups area, and updates.
+     the title banners (the set's name as the map first opens, a game's as its planet is tapped), the crew screen,
+     pausing (grown-ups area open, tablet upright, screen off), the grown-ups area, and updates.
    One page holds every game (decided 10 October). A game joins by calling MW.world.game({...}) when its script loads;
    its folder's game.json (read by the build, here as MW_GAMES) says its name, planet, badge and spoken name.
    The meemee-world skill (.claude/skills/meemee-world/reference.md) documents all of this. */
@@ -2077,12 +2305,98 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     return MW.audio.say(lines, opts);
   };
 
+  // ---------------------------------------------------------------- title banners (TitleBanner)
+  // The set's or a game's name on a plaque, the only words the player sees apart from numerals and the letters being
+  // practised, and always spoken with it (MEEMEE.md): so a banner shows only when its line is recorded (a line still
+  // pending gives no banner, and the game starts straight away). It stays for its line and at least about 2 seconds, then goes by
+  // itself; taps under it do nothing (the grown-ups lock still works). It fades and grows in over 260 ms and fades out
+  // over 260 ms (a fade only, with reduce motion). Pausing or going Home takes it away at once.
+  const BANNER = W.BANNER = { min: 2000, fade: 260, top: 292,
+    sparks: [[300, -12, 1.4], [985, 168, 1.1], [1000, -22, 0.8]],     // x, y below the plaque's top, size (round 8 boards)
+    art: { mimi: 104 }, gameArt: 112, worldArt: 96 };                // a kit drawing, a game's own badge, the MeeMee at each end
+  let banner = null, bannerRun = null;
+  function buildBanner(stageEl) {
+    const el = MW.make('div', 'mw-banner', { id: 'banner' });
+    const card = MW.make('div', 'mw-banner-card');
+    const row = MW.make('div', 'mw-banner-row');
+    const plaque = MW.make('div', 'mw-banner-plaque', { role: 'img' });
+    row.appendChild(plaque);
+    card.appendChild(row);
+    BANNER.sparks.forEach(function (s) {
+      const sp = MW.make('div', 'mw-banner-spark mw-abs');
+      sp.style.left = (s[0] - 14 * s[2]) + 'px'; sp.style.top = (BANNER.top + s[1] - 14 * s[2]) + 'px';
+      sp.style.transform = 'scale(' + s[2] + ')';
+      const a = MW.art('spark'); a.setAttribute('width', 28); a.setAttribute('height', 28);
+      sp.appendChild(a);
+      card.appendChild(sp);
+    });
+    el.appendChild(card);
+    // taps under it do nothing (it is above every screen, below the grown-ups lock)
+    ['pointerdown', 'pointerup', 'click'].forEach(function (type) { el.addEventListener(type, function (e) { e.stopPropagation(); e.preventDefault(); }); });
+    stageEl.appendChild(el);
+    function art(name, size) {
+      const a = MW.art(name); a.setAttribute('width', size); a.setAttribute('height', size);
+      const box = MW.make('div', 'mw-banner-art', { 'data-art': name }); box.appendChild(a);
+      return box;
+    }
+    let timer = 0;
+    return {
+      el: el,
+      // info: { name, left: drawing, right: drawing or null, size: drawn size }
+      show: function (info) {
+        clearTimeout(timer);
+        plaque.innerHTML = '';
+        plaque.setAttribute('aria-label', info.name);
+        plaque.appendChild(art(info.left, info.size));
+        plaque.appendChild(MW.make('span', 'mw-banner-name banner', null, MW.esc(info.name)));
+        if (info.right) plaque.appendChild(art(info.right, info.size));
+        el.classList.remove('is-in', 'is-going');
+        el.classList.add('is-up');
+        void el.offsetWidth;                                  // start the fade from the beginning
+        el.classList.add('is-in');
+      },
+      hide: function () {
+        if (!el.classList.contains('is-up') || el.classList.contains('is-going')) return;
+        el.classList.add('is-going');
+        el.classList.remove('is-in');
+        clearTimeout(timer);
+        timer = setTimeout(function () { el.classList.remove('is-up', 'is-going'); }, BANNER.fade);
+      },
+      up: function () { return el.classList.contains('is-up'); }
+    };
+  }
+  // Show a banner while its line is said. Resolves true once the banner has gone by itself, or false straight away if
+  // a pause or Home took it away first.
+  async function titleBanner(info, lines) {
+    if (bannerRun) bannerRun.cancelled = true;
+    const run = bannerRun = { cancelled: false };
+    const shownAt = performance.now();
+    banner.show(info);
+    MW.log('banner', 'up ' + info.name);
+    await MW.audio.say(lines);                                // a pause hushes it; a line not recorded yet says nothing
+    while (!run.cancelled && performance.now() - shownAt < BANNER.min) await MW.wait(40);
+    if (run.cancelled) return false;
+    banner.hide();
+    MW.log('banner', 'going ' + info.name);
+    await MW.wait(BANNER.fade);
+    if (run.cancelled) return false;
+    bannerRun = null;
+    MW.log('banner', 'gone ' + info.name);
+    return true;
+  }
+  function cancelBanner() {
+    if (bannerRun) { bannerRun.cancelled = true; bannerRun = null; MW.log('banner', 'cancelled'); }
+    if (banner) banner.hide();
+  }
+  W.banner = { up: function () { return !!banner && banner.up(); }, cancel: cancelBanner };
+
   // ---------------------------------------------------------------- pausing
   // Reasons: the grown-ups area is open, the tablet is upright, or the page is hidden (screen off, another app).
   // The world carries on only when none is left; then each game picks up where it was (usually: ask again).
   W.pause = function (why) {
     st.pauses[why] = true;
     st.paused = true;
+    cancelBanner();                                           // a banner goes; opening a planet stops on the map
     MW.audio.hush();
     if (W.crewScreen) W.crewScreen.dragger.cancel();        // a cat held when the screen goes off goes back to its place
     each(function (g) { if (g.onPause) g.onPause(why); });
@@ -2100,29 +2414,45 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   function openGrownups() { W.pause('grown-ups'); MW.grownups.openPanel(); }
 
   // ---------------------------------------------------------------- home: the map
-  // "Welcome to MeeMee World!" the first time in a visit. Every game is told (onHome) so it can tidy up.
+  // The first time in a visit (after Play): MeeMee World's banner, with "Welcome to MeeMee World!". Every game is told
+  // (onHome) so it can tidy up.
   W.home = function () {
     st.token++;
+    cancelBanner();
     MW.audio.hush();                                          // nothing from the last screen carries on over the map
     if (W.crewScreen) W.crewScreen.dragger.cancel();
     each(function (g) { if (g.onHome) g.onHome(); });
     st.phase = 'map';                                         // after the games have tidied up, whatever they did
     W.map.setCrew(MW.crew.jobs());
     MW.shell.show('screen-map');
-    if (!st.welcomed) { st.welcomed = true; W.speak([['map-welcome']]); }
+    if (!st.welcomed) { st.welcomed = true; welcome(); return; }
     if (!MW.crew.ready()) W.map.callCrew();                  // no jobs yet: the cats hop, to say "tap us"
   };
+  // MeeMee World's banner: the planets and the crew wait until it has gone (or a pause took it away).
+  async function welcome() {
+    const token = st.token;
+    if (!MW.audio.recorded('map-welcome')) { if (!MW.crew.ready()) W.map.callCrew(); return; }   // no line, no banner
+    st.phase = 'welcome';
+    await titleBanner({ name: 'MeeMee World', left: 'mimi', right: 'mimi', size: BANNER.worldArt }, [['map-welcome']]);
+    if (token !== st.token || st.phase !== 'welcome') return;
+    st.phase = 'map';
+    if (!MW.crew.ready()) W.map.callCrew();
+  }
 
-  // A game's planet: say its name ("MeeMee Rescue!"), then start it.
+  // A game's planet: its banner while its name is said ("MeeMee Rescue!"), then, once the banner has gone, the game.
+  // The name and badge come from its game.json; a kit drawing as the badge (the MeeMee) is drawn at its design-system
+  // size, a game's own badge (drawn in a 100 x 100 box) at 112.
   async function open(g) {
     if (st.phase !== 'map' || st.paused) return;
     st.phase = 'opening';
     const token = ++st.token;
     W.map.bounce(g.planet);
     MW.log('map', g.id);
-    await W.speak([[g.say]]);
-    if (token !== st.token) return;
-    if (st.paused) { st.phase = 'map'; return; }             // the grown-ups area opened (or the screen went off) meanwhile
+    if (MW.audio.recorded(g.say)) {                          // a name not recorded yet: no banner, the game starts at once
+      const gone = await titleBanner({ name: g.name, left: g.badge, size: BANNER.art[g.badge] || BANNER.gameArt }, [[g.say]]);
+      if (token !== st.token) return;
+      if (!gone || st.paused) { st.phase = 'map'; return; }   // a pause took the banner away: stay on the map
+    } else MW.log('banner', 'none for ' + g.name + ' (' + g.say + ' not recorded yet)');
     try { g.start(); } catch (e) {
       MW.log('game-error', g.id + ': ' + e); console.error('MeeMee World: ' + g.id + ':', e);
       W.home();
@@ -2144,9 +2474,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   }
 
   // ---------------------------------------------------------------- the start screen
+  // Nothing to read: MeeMee World's name is shown (and said) by its banner after Play (decided 10 October 2026).
   function buildStart() {
     const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee World'));
     const p = MW.pod(s, 240, 150, 420);
     p.el.disabled = true; p.el.tabIndex = -1;
     const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
@@ -2181,6 +2511,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     });
     each(function (g) { g.build(); });
     MW.shell.gate(stageEl, openGrownups);
+    banner = buildBanner(stageEl);
     MW.grownups.init(stageEl, {
       title: 'Grown-ups',
       sections: [].concat.apply([], W.games.map(function (g) { return g.sections || []; })),
@@ -3305,8 +3636,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   });
 
   // ---------------------------------------------------------------- saved data (this game's own, on the tablet)
-  // Read without creating it, so a tablet that has never played keeps nothing for this game.
-  function saved() { const g = MW.store.get('games') || {}; return g[ID] || {}; }
+  // Read without creating it (MW.store.peek), so a tablet that has never played keeps nothing for this game.
+  function saved() { return MW.store.peek(ID); }
   function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
   function week() {
     const w = +saved().week;
@@ -3345,7 +3676,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     });
     findPod = MW.pod(s, POD.find[0], POD.find[1], POD.find[2]);
     MW.onTap(findPod.el, hearAgain);
-    findStars = MW.stars(s, 517, 34);
+    findStars = MW.stars(s, MW.LAYOUT.stars.cx, MW.LAYOUT.stars.y, null, { centre: true });   // centred, however many words
     findFx = MW.make('div', 'mw-layer mw-fill'); s.appendChild(findFx);
     MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
   }
@@ -3360,7 +3691,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     shipLayer = MW.make('div', 'mw-layer mw-fill'); s.appendChild(shipLayer);
     buildPod = MW.pod(s, POD.build[0], POD.build[1], POD.build[2]);
     MW.onTap(buildPod.el, function () { if (!(dragger && dragger.dragging())) hearAgain(); });
-    buildStars = MW.stars(s, 517, 34);
+    buildStars = MW.stars(s, MW.LAYOUT.stars.cx, MW.LAYOUT.stars.y, null, { centre: true });
     tileLayer = MW.make('div', 'mw-layer mw-fill words-tiles'); s.appendChild(tileLayer);
     buildFx = MW.make('div', 'mw-layer mw-fill'); s.appendChild(buildFx);
     MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
@@ -3368,14 +3699,13 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       counters: function () { return st.tiles.filter(function (c) { return !c.placed; }); },
       enabled: function () { return !W.st.paused && W.st.phase === 'words-build' && MW.shell.screen === BUILD; },
       onPick: function (c) { MW.log('pick', c.text); },
-      onDrop: onDrop,
-      grab: 100                                                // ovals are up to 200 px wide
+      onDrop: onDrop                                           // each tile is picked up in its own box (makeTile)
     });
   }
 
   function buildEnd() {
     const s = W.screen(END, 'All the rockets launched');
-    endStars = MW.stars(s, 450, 40, 60);
+    endStars = MW.stars(s, 640, 40, 60, { centre: true });
     endPod = MW.pod(s, 380, 120, 400); endPod.face('got-it'); endPod.el.disabled = true; endPod.el.tabIndex = -1;
     endRockets = MW.make('div', 'mw-abs words-end-rockets', { style: 'left:300px;top:590px' });
     s.appendChild(endRockets);
@@ -3387,11 +3717,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     MW.shell.buttons(s, ['home', 'music'], { home: W.home });
   }
 
-  function setStars(stars, done) {
-    const n = st.round.length || ROUND;
-    stars.set(done, n);
-    stars.el.style.left = Math.round(640 - (38 * n + 14 * (n - 1)) / 2) + 'px';   // centred, however many words
-  }
+  function setStars(stars, done) { stars.set(done, st.round.length || ROUND); }
 
   // ---------------------------------------------------------------- a round
   function makeRound() {
@@ -3597,7 +3923,10 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     body.appendChild(MW.make('span', 'words-tile-text', null, MW.esc(t.text)));
     el.appendChild(body);
     tileLayer.appendChild(el);
-    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null };
+    // its pick-up box (MW.dragger): 10 px each side, so neighbours' boxes meet halfway across the tray's 20 px gap and a
+    // finger anywhere on a long tile picks that tile; 20 px above and below, for a forgiving pick-up
+    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null,
+      grab: { w: w + TRAY.gap, h: D + 40 } };
     c.moveTo = function (x, y, size, animate) {
       c.x = x; c.y = y;
       el.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
@@ -3765,7 +4094,6 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     MW.shell.show(END);
     const n = st.round.length;
     endStars.set(n, n);
-    endStars.el.style.left = Math.round(640 - (60 * n + 14 * (n - 1)) / 2) + 'px';
     endRockets.innerHTML = '';
     for (let i = 0; i < n; i++) {
       const r = MW.make('div', 'words-end-rocket');

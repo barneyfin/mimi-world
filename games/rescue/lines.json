@@ -258,6 +258,13 @@
       "group": "Map",
       "words": "MeeMee Rescue!",
       "how": "Announcing the game's name."
+    },
+    {
+      "id": "rescue-find-number",
+      "group": "Numbers mode",
+      "words": "Find the number.",
+      "how": "Friendly and clear, like showing someone a new game. Said after the question on the first two questions of a numbers-mode round.",
+      "pending": true
     }
   ]
 }

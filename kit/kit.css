@@ -53,7 +53,7 @@ button { font-family: var(--font-andika); }
 .mw-chip { box-sizing: border-box; min-width: 48px; height: 48px; border-radius: var(--radius-round); display: inline-flex;
   align-items: center; justify-content: center; border: 3px solid var(--mint); color: var(--moon); background: transparent; }
 .mw-chip.is-on { background: var(--mint); color: var(--numeral); }
-.mw-caption { color: var(--text-2); }
+.mw-off { display: none !important; }
 
 /* ---------------------------------------------------------------- the diagram in play */
 .mw-circle, .mw-pill { transition: box-shadow 450ms cubic-bezier(.2,.8,.2,1), background-color 260ms; }
@@ -77,6 +77,28 @@ button { font-family: var(--font-andika); }
 @keyframes mw-arrive { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mw-hop { 0% { translate: 0 0; } 40% { translate: 0 -18px; } 100% { translate: 0 0; } }
 .mw-start-mimi { display: flex; gap: 16px; line-height: 0; }
+
+/* numbers mode (0.6.0, NumbersMode): a numbered MeeMee in a circle; it pops up to carry a right answer */
+.mw-numbered { width: 140px; height: 209px; transform-origin: 70px 102.5px; line-height: 0; pointer-events: none; }
+.mw-numbered > svg { position: absolute; left: 0; top: 0; }
+.mw-numbered-sign { position: absolute; left: 0; top: 102.4px; width: 140px; height: 100px; box-sizing: border-box; padding: 4.5px 4.5px 10.5px;
+  display: flex; align-items: center; justify-content: center; color: var(--numeral); white-space: nowrap; }
+.mw-numbered.is-popping { animation: mw-carry 260ms cubic-bezier(.2,.8,.2,1) both; }   /* the snap: 260 ms, ease-out */
+@keyframes mw-carry { from { opacity: 0; translate: 0 40px; scale: 0.6; } to { opacity: 1; translate: 0 0; scale: 1; } }
+/* the number track along the bottom: its rail, a dashed ring where a tile is out, and the tiles (84, in a 120 box) */
+.mw-track { transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out; }
+.mw-track.is-away { transform: translateY(140px); }
+.mw-track-place { position: absolute; box-sizing: border-box; width: 72px; height: 72px; border-radius: var(--radius-round);
+  border: 4px dashed var(--text-3); display: none; }
+.mw-track-place.is-out { display: block; }
+.mw-number-tile { position: absolute; left: 0; top: 0; width: 84px; height: 84px; margin: -42px 0 0 -42px; pointer-events: none; will-change: transform; }
+.mw-number-tile.is-moving { transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-number-tile.is-lifted { z-index: 5; }
+.mw-number-tile-body { position: relative; width: 100%; height: 100%; transition: transform 120ms ease-out; }
+.mw-number-tile-body svg { position: absolute; left: -3px; top: -3px; }
+.mw-number-tile-n { position: absolute; inset: 0; box-sizing: border-box; padding: 6px 6px 10px; display: flex; align-items: center;
+  justify-content: center; color: var(--numeral); white-space: nowrap; }
+.mw-number-tile.is-lifted .mw-number-tile-body { transform: scale(1.1) rotate(-5deg); filter: drop-shadow(var(--lift)); }
 
 /* hint ghosts: where the missing MeeMee would sit */
 .mw-ghost { position: absolute; box-sizing: border-box; border-radius: var(--radius-round);
@@ -212,6 +234,22 @@ button { font-family: var(--font-andika); }
 .mw-cook-pan.is-flipped svg { transform: scaleX(-1); }
 .mw-cook-pan.is-shown { scale: 1; }
 
+/* ---------------------------------------------------------------- title banners (0.6.0, TitleBanner)
+   The set's or a game's name on a moon plaque, while it is spoken. Above the screens and below the grown-ups lock:
+   taps under it do nothing, and the lock still opens the grown-ups area. */
+.mw-banner { position: absolute; inset: 0; z-index: 40; display: none; }
+.mw-banner.is-up { display: block; }
+.mw-banner-card { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; transform-origin: 640px 380px;
+  opacity: 0; transform: scale(0.88); transition: opacity 260ms ease-out, transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-banner.is-in .mw-banner-card { opacity: 1; transform: none; }
+.mw-banner.is-going .mw-banner-card { opacity: 0; transform: none; }
+.mw-banner-row { position: absolute; left: 0; top: 292px; width: 1280px; display: flex; justify-content: center; }
+.mw-banner-plaque { display: inline-flex; align-items: center; gap: 22px; padding: 22px 40px 22px 30px; box-sizing: border-box;
+  border-radius: 48px; background: var(--moon); border: 8px solid var(--mint); box-shadow: 0 0 0 4px var(--ink), 0 12px 0 4px var(--ink); }
+.mw-banner-art { line-height: 0; }
+.mw-banner-name { color: var(--numeral); padding-bottom: 8px; white-space: nowrap; }
+.mw-banner-spark { position: absolute; width: 28px; height: 28px; line-height: 0; }
+
 /* ---------------------------------------------------------------- turn me sideways */
 .mw-sideways { position: fixed; inset: 0; display: none; z-index: 200; background: var(--night); color: var(--moon);
   align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-size: 22px; }
@@ -237,5 +275,10 @@ button { font-family: var(--font-andika); }
   .mw-spanner.is-tapping { animation: none; }
   .mw-cook-pan { scale: 1; opacity: 0; transition: opacity 300ms ease-out; }
   .mw-cook-pan.is-shown { opacity: 1; }
+  .mw-banner-card, .mw-banner.is-in .mw-banner-card, .mw-banner.is-going .mw-banner-card { transform: none; transition: opacity 260ms ease-out; }
+  .mw-numbered.is-popping { animation: mw-arrive 300ms ease-out both; }
+  .mw-track { transition: opacity 260ms ease-out; }
+  .mw-track.is-away { transform: none; opacity: 0; }
+  .mw-number-tile.is-moving, .mw-number-tile-body { transition: none; }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }

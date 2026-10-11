@@ -1,6 +1,7 @@
 /* MeeMee World kit: counters and dragging.
    A counter (a MeeMee) is drawn at 80 stage px inside an invisible 120 px grab circle.
-   One finger drags at a time; where grab circles overlap, the counter nearest the finger is picked up. */
+   A thing that isn't round (a long tile) carries its own pick-up box instead: grab = { w, h }, centred on it.
+   One finger drags at a time; where pick-up areas overlap, the thing whose centre is nearest the finger is picked up. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -54,16 +55,21 @@
   // ---------------------------------------------------------------- dragging
   // MW.dragger(stageEl, { counters: () => [...], onPick(c), onDrop(c, x, y), grab: radius in stage px (default 60) })
   // Anything with x, y (its centre), draggable, el, lift(on) and moveTo(x, y, size, animate) can be dragged.
+  // Each thing is picked up within its own box if it has one (c.grab = { w, h }, in stage px, centred on x, y), or
+  // else within the dragger's grab radius. Where they overlap, the thing whose centre is nearest the finger wins.
+  const draggers = [];
   MW.dragger = function (surface, opts) {
     let drag = null;
     const stats = MW.dragStats = MW.dragStats || { last: null };
 
     function nearest(p) {
-      let best = null, bestD = opts.grab || GRAB_R;
+      const r = opts.grab || GRAB_R;
+      let best = null, bestD = Infinity;
       opts.counters().forEach(function (c) {
         if (!c.draggable) return;
-        const d = Math.hypot(c.x - p.x, c.y - p.y);
-        if (d <= bestD) { best = c; bestD = d; }
+        const dx = Math.abs(c.x - p.x), dy = Math.abs(c.y - p.y), d = Math.hypot(dx, dy);
+        const inside = c.grab ? dx <= c.grab.w / 2 && dy <= c.grab.h / 2 : d <= r;
+        if (inside && d <= bestD) { best = c; bestD = d; }
       });
       return best;
     }
@@ -122,6 +128,14 @@
       stats.last = { fps: Math.round(1000 / (sum / frames.length)), worst: Math.round(worst), slow: slow, n: frames.length };
     }
 
-    return { dragging: function () { return !!drag; }, cancel: function () { if (drag) end(null, true); } };
+    const api = { dragging: function () { return !!drag; }, cancel: function () { if (drag) end(null, true); },
+      holding: function () { return drag ? drag.c : null; } };
+    draggers.push(api);
+    return api;
+  };
+  // Let go of any of these things that a finger is holding, in whichever dragger holds it: its onDrop gets cancelled
+  // (as when the tablet takes the touch away), so it goes back. MW.numberTrack's hide() uses it for its tiles.
+  MW.dragger.release = function (things) {
+    draggers.forEach(function (d) { const c = d.holding(); if (c && things.indexOf(c) >= 0) d.cancel(); });
   };
 })();

@@ -24,15 +24,15 @@ Use token names only (as classes `f-<token>` fill, `s-<token>` stroke, `bg-<toke
 
 Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l* and *1* clearly different. Bold for anything the child sees.
 
-- For the child: `numeral-whole` (140 px), `equation` (64 px), `numeral-part` (52 px). A phonics game sets its letters and words in Andika at a similar size, in `numeral` on `moon`. Andika stays for letters too (decided 10 October 2026); check its letter shapes against the child's reading book when the game is played (MEEMEE.md, Rules).
-- The kit's title banners are the only other words the child sees: the set's or a game's name, for about 2 seconds while it is spoken, in Andika bold (84 px) in `numeral` on a `moon` plaque with a `mint` rim and an `ink` edge (design system, TitleBanner). The kit shows them; a game doesn't.
+- For the child: `numeral-whole` (140 px), `equation` (64 px), `numeral-part` (52 px, also on a number tile), `numeral-sign` (84 px, on a numbered MeeMee's sign). A phonics game sets its letters and words in Andika at a similar size, in `numeral` on `moon`. Andika stays for letters too (decided 10 October 2026); check its letter shapes against the child's reading book when the game is played (MEEMEE.md, Rules).
+- The kit's title banners are the only other words the child sees: the set's or a game's name, for about 2 seconds while it is spoken, in `banner` (Andika bold, 84 px) in `numeral` on a `moon` plaque with an 8 px `mint` rim, a 4 px `ink` edge and a solid `ink` shadow, centred with its top at 292, the game's badge at its left (design system, TitleBanner). The kit shows them from each `game.json`; a game doesn't. Draw a game's badge in a 100 × 100 box, filling it as the template's star does: the banner shows it at 112 px.
 - For grown-ups: `title` (30), `button-label` (22), `body` (19), `label` (17).
 
 ## Size and layout
 
 - Every screen is drawn on a 1280 × 800 stage and scaled to fit the tablet (0.82 on the Fire, 1.0 on the Doogee). Lay things out in stage pixels; never reflow.
 - On the Fire, 80 stage px is about 11 mm. Anything tapped is at least `button-nav` (84 px); anything dragged is drawn at about `mimi-size` (80) inside a `mimi-grab` (120) area. Nothing tapped sits closer than `space-m` (24) to the edge.
-- Fixed places on every game screen (the kit puts them there): Home top-left (24, 20); Music top-right (1172, 26, or 1052 when Hear-again is there); Hear-again (1160, 20); progress stars top-centre (517, 34); the grown-ups lock bottom-left (24, 732). Keep these corners clear.
+- Fixed places on every game screen (the kit puts them there): Home top-left (24, 20); Music top-right (1172, 26, or 1052 when Hear-again is there); Hear-again (1160, 20); progress stars top-centre (five from 517, 34: centred on 640 for any other number, `MW.stars(…, { centre: true })`); the grown-ups lock bottom-left (24, 732). Keep these corners clear.
 - The child's hand comes from the right, so put what they drag from on the right and the thing being worked on (the maths, the word) on the left, where a hand won't cover it. Scruffles's ship usually sits top-right (`MW.LAYOUT.pod`: 830, 70, 400 wide).
 
 ## Characters and drawings
@@ -40,6 +40,7 @@ Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l*
 - **Scruffles** (grey and white) is the hero of every game and flies the rescue ship (`MW.pod`): three faces (thinking, got it, try again) and lights that flash on a right answer. Keep the grey cap, the white stripe widening into the muzzle, the amber-green eyes and the fluffy white chest.
 - **Moggles** (all black, peach scarf) and **Snuffles** (black and white, black patch on one front leg, mint collar) are the crew, with jobs the child gives them (`MW.crew`). A game may give them a short wordless moment.
 - **The MeeMee** are identical lilac kittens (`mimi` drawing), the counters. One MeeMee, two MeeMee.
+- **MeeMee Rescue's numbers mode** (NumbersMode card; kit drawings): a numbered MeeMee (`numbered-mimi`: a MeeMee 128 across holding up a `peach` sign 140 × 100 with its number in `numeral-sign`; 0.86 of that in the whole circle); number tiles (`number-tile`: a `moon` disc 84 across, `mint` rim, `ink` edge and shadow, the number in `numeral-part`); and the number track (`number-track`: an `asteroid` rail along the bottom holding tiles 0 to 10, 94 apart from x 128, tops at 686, clear of the grown-ups lock). A tile out of the track leaves a dashed `text-3` ring.
 - **Drawing style:** soft flat shapes with a 4–6 px outline in `ink`, no gradients, and a little detail inside the outline (fur lines, a ring and two glints in each eye, one darker step of shading). Detail stays inside the silhouette; silhouettes stay simple. Planets are three to six hard bands lit from the top left, with craters, no outline.
 - **In code:** draw with the helpers in `design/gen_art.py` (`mimi`, `cat`, `scruffles_pod`, `planet`, `star`, `spark`, `icon`, `job_picture`) and `tok()` for your own shapes (reference.md, Drawings).
 - Never a helmet, hood, cloak or armour, and nothing that looks like a character from a film, show or app.
@@ -50,7 +51,8 @@ Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l*
 - A dragged thing grows to 1.12 and lifts on a soft shadow; one finger drags at a time.
 - Success: the ring (450 ms), sparkles (`MW.sparkles`: grow in 300 ms, gone by 1.2 s), Scruffles's got-it face, the ship's lights (about 4 s), a chime.
 - A hop (`mw-hop`, 420 ms) is the one way something bounces for attention.
-- Nothing bigger than a character flashes more than 3 times a second; anything repeating takes at least a second per cycle; the whole screen never flashes.
+- A title banner fades and grows in over 260 ms, stays for its line and at least 2 seconds, and fades out over 260 ms. The number track slides down out of sight and back over 260 ms. A dragged number tile grows to 1.1 and tilts 5 degrees; a numbered MeeMee pops up to carry a right answer (260 ms, the snap's timing). With reduce motion each is a fade. A title banner shows only when its line is recorded: never a silent banner.
+- Nothing bigger than a character flashes more than 3 times a second; small lights may flash up to 3 times a second, and anything else repeating takes at least a second per cycle; the whole screen never flashes.
 - Reduce motion (`MW.reduceMotion` and the CSS media query): movement becomes a fade or an instant change; flashing lights stay steadily lit.
 
 ## Words: what Scruffles says

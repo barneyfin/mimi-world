@@ -1,7 +1,8 @@
-/* MeeMee World kit: the world shell (phase 5).
+/* MeeMee World kit: the world shell (phase 5; title banners from 0.6.0).
    What every game shares, so a game is only its own play:
      the start screen (Play: sound and full screen start on that first tap), the home map with a planet for each game,
-     the crew screen, pausing (grown-ups area open, tablet upright, screen off), the grown-ups area, and updates.
+     the title banners (the set's name as the map first opens, a game's as its planet is tapped), the crew screen,
+     pausing (grown-ups area open, tablet upright, screen off), the grown-ups area, and updates.
    One page holds every game (decided 10 October). A game joins by calling MW.world.game({...}) when its script loads;
    its folder's game.json (read by the build, here as MW_GAMES) says its name, planet, badge and spoken name.
    The meemee-world skill (.claude/skills/meemee-world/reference.md) documents all of this. */
@@ -57,12 +58,98 @@
     return MW.audio.say(lines, opts);
   };
 
+  // ---------------------------------------------------------------- title banners (TitleBanner)
+  // The set's or a game's name on a plaque, the only words the player sees apart from numerals and the letters being
+  // practised, and always spoken with it (MEEMEE.md): so a banner shows only when its line is recorded (a line still
+  // pending gives no banner, and the game starts straight away). It stays for its line and at least about 2 seconds, then goes by
+  // itself; taps under it do nothing (the grown-ups lock still works). It fades and grows in over 260 ms and fades out
+  // over 260 ms (a fade only, with reduce motion). Pausing or going Home takes it away at once.
+  const BANNER = W.BANNER = { min: 2000, fade: 260, top: 292,
+    sparks: [[300, -12, 1.4], [985, 168, 1.1], [1000, -22, 0.8]],     // x, y below the plaque's top, size (round 8 boards)
+    art: { mimi: 104 }, gameArt: 112, worldArt: 96 };                // a kit drawing, a game's own badge, the MeeMee at each end
+  let banner = null, bannerRun = null;
+  function buildBanner(stageEl) {
+    const el = MW.make('div', 'mw-banner', { id: 'banner' });
+    const card = MW.make('div', 'mw-banner-card');
+    const row = MW.make('div', 'mw-banner-row');
+    const plaque = MW.make('div', 'mw-banner-plaque', { role: 'img' });
+    row.appendChild(plaque);
+    card.appendChild(row);
+    BANNER.sparks.forEach(function (s) {
+      const sp = MW.make('div', 'mw-banner-spark mw-abs');
+      sp.style.left = (s[0] - 14 * s[2]) + 'px'; sp.style.top = (BANNER.top + s[1] - 14 * s[2]) + 'px';
+      sp.style.transform = 'scale(' + s[2] + ')';
+      const a = MW.art('spark'); a.setAttribute('width', 28); a.setAttribute('height', 28);
+      sp.appendChild(a);
+      card.appendChild(sp);
+    });
+    el.appendChild(card);
+    // taps under it do nothing (it is above every screen, below the grown-ups lock)
+    ['pointerdown', 'pointerup', 'click'].forEach(function (type) { el.addEventListener(type, function (e) { e.stopPropagation(); e.preventDefault(); }); });
+    stageEl.appendChild(el);
+    function art(name, size) {
+      const a = MW.art(name); a.setAttribute('width', size); a.setAttribute('height', size);
+      const box = MW.make('div', 'mw-banner-art', { 'data-art': name }); box.appendChild(a);
+      return box;
+    }
+    let timer = 0;
+    return {
+      el: el,
+      // info: { name, left: drawing, right: drawing or null, size: drawn size }
+      show: function (info) {
+        clearTimeout(timer);
+        plaque.innerHTML = '';
+        plaque.setAttribute('aria-label', info.name);
+        plaque.appendChild(art(info.left, info.size));
+        plaque.appendChild(MW.make('span', 'mw-banner-name banner', null, MW.esc(info.name)));
+        if (info.right) plaque.appendChild(art(info.right, info.size));
+        el.classList.remove('is-in', 'is-going');
+        el.classList.add('is-up');
+        void el.offsetWidth;                                  // start the fade from the beginning
+        el.classList.add('is-in');
+      },
+      hide: function () {
+        if (!el.classList.contains('is-up') || el.classList.contains('is-going')) return;
+        el.classList.add('is-going');
+        el.classList.remove('is-in');
+        clearTimeout(timer);
+        timer = setTimeout(function () { el.classList.remove('is-up', 'is-going'); }, BANNER.fade);
+      },
+      up: function () { return el.classList.contains('is-up'); }
+    };
+  }
+  // Show a banner while its line is said. Resolves true once the banner has gone by itself, or false straight away if
+  // a pause or Home took it away first.
+  async function titleBanner(info, lines) {
+    if (bannerRun) bannerRun.cancelled = true;
+    const run = bannerRun = { cancelled: false };
+    const shownAt = performance.now();
+    banner.show(info);
+    MW.log('banner', 'up ' + info.name);
+    await MW.audio.say(lines);                                // a pause hushes it; a line not recorded yet says nothing
+    while (!run.cancelled && performance.now() - shownAt < BANNER.min) await MW.wait(40);
+    if (run.cancelled) return false;
+    banner.hide();
+    MW.log('banner', 'going ' + info.name);
+    await MW.wait(BANNER.fade);
+    if (run.cancelled) return false;
+    bannerRun = null;
+    MW.log('banner', 'gone ' + info.name);
+    return true;
+  }
+  function cancelBanner() {
+    if (bannerRun) { bannerRun.cancelled = true; bannerRun = null; MW.log('banner', 'cancelled'); }
+    if (banner) banner.hide();
+  }
+  W.banner = { up: function () { return !!banner && banner.up(); }, cancel: cancelBanner };
+
   // ---------------------------------------------------------------- pausing
   // Reasons: the grown-ups area is open, the tablet is upright, or the page is hidden (screen off, another app).
   // The world carries on only when none is left; then each game picks up where it was (usually: ask again).
   W.pause = function (why) {
     st.pauses[why] = true;
     st.paused = true;
+    cancelBanner();                                           // a banner goes; opening a planet stops on the map
     MW.audio.hush();
     if (W.crewScreen) W.crewScreen.dragger.cancel();        // a cat held when the screen goes off goes back to its place
     each(function (g) { if (g.onPause) g.onPause(why); });
@@ -80,29 +167,45 @@
   function openGrownups() { W.pause('grown-ups'); MW.grownups.openPanel(); }
 
   // ---------------------------------------------------------------- home: the map
-  // "Welcome to MeeMee World!" the first time in a visit. Every game is told (onHome) so it can tidy up.
+  // The first time in a visit (after Play): MeeMee World's banner, with "Welcome to MeeMee World!". Every game is told
+  // (onHome) so it can tidy up.
   W.home = function () {
     st.token++;
+    cancelBanner();
     MW.audio.hush();                                          // nothing from the last screen carries on over the map
     if (W.crewScreen) W.crewScreen.dragger.cancel();
     each(function (g) { if (g.onHome) g.onHome(); });
     st.phase = 'map';                                         // after the games have tidied up, whatever they did
     W.map.setCrew(MW.crew.jobs());
     MW.shell.show('screen-map');
-    if (!st.welcomed) { st.welcomed = true; W.speak([['map-welcome']]); }
+    if (!st.welcomed) { st.welcomed = true; welcome(); return; }
     if (!MW.crew.ready()) W.map.callCrew();                  // no jobs yet: the cats hop, to say "tap us"
   };
+  // MeeMee World's banner: the planets and the crew wait until it has gone (or a pause took it away).
+  async function welcome() {
+    const token = st.token;
+    if (!MW.audio.recorded('map-welcome')) { if (!MW.crew.ready()) W.map.callCrew(); return; }   // no line, no banner
+    st.phase = 'welcome';
+    await titleBanner({ name: 'MeeMee World', left: 'mimi', right: 'mimi', size: BANNER.worldArt }, [['map-welcome']]);
+    if (token !== st.token || st.phase !== 'welcome') return;
+    st.phase = 'map';
+    if (!MW.crew.ready()) W.map.callCrew();
+  }
 
-  // A game's planet: say its name ("MeeMee Rescue!"), then start it.
+  // A game's planet: its banner while its name is said ("MeeMee Rescue!"), then, once the banner has gone, the game.
+  // The name and badge come from its game.json; a kit drawing as the badge (the MeeMee) is drawn at its design-system
+  // size, a game's own badge (drawn in a 100 x 100 box) at 112.
   async function open(g) {
     if (st.phase !== 'map' || st.paused) return;
     st.phase = 'opening';
     const token = ++st.token;
     W.map.bounce(g.planet);
     MW.log('map', g.id);
-    await W.speak([[g.say]]);
-    if (token !== st.token) return;
-    if (st.paused) { st.phase = 'map'; return; }             // the grown-ups area opened (or the screen went off) meanwhile
+    if (MW.audio.recorded(g.say)) {                          // a name not recorded yet: no banner, the game starts at once
+      const gone = await titleBanner({ name: g.name, left: g.badge, size: BANNER.art[g.badge] || BANNER.gameArt }, [[g.say]]);
+      if (token !== st.token) return;
+      if (!gone || st.paused) { st.phase = 'map'; return; }   // a pause took the banner away: stay on the map
+    } else MW.log('banner', 'none for ' + g.name + ' (' + g.say + ' not recorded yet)');
     try { g.start(); } catch (e) {
       MW.log('game-error', g.id + ': ' + e); console.error('MeeMee World: ' + g.id + ':', e);
       W.home();
@@ -124,9 +227,9 @@
   }
 
   // ---------------------------------------------------------------- the start screen
+  // Nothing to read: MeeMee World's name is shown (and said) by its banner after Play (decided 10 October 2026).
   function buildStart() {
     const s = MW.$('screen-start');
-    s.appendChild(MW.make('div', 'mw-abs label mw-caption', { style: 'left:40px;top:34px' }, 'MeeMee World'));
     const p = MW.pod(s, 240, 150, 420);
     p.el.disabled = true; p.el.tabIndex = -1;
     const play = MW.make('button', 'mw-btn mw-btn--play mw-abs mw-pulse', { type: 'button', 'aria-label': 'Play', id: 'play', style: 'left:820px;top:300px' });
@@ -161,6 +264,7 @@
     });
     each(function (g) { g.build(); });
     MW.shell.gate(stageEl, openGrownups);
+    banner = buildBanner(stageEl);
     MW.grownups.init(stageEl, {
       title: 'Grown-ups',
       sections: [].concat.apply([], W.games.map(function (g) { return g.sections || []; })),

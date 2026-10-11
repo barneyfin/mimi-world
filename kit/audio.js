@@ -73,6 +73,8 @@
       decoded: Object.keys(buffers).length, total: total, failed: failed.slice() };
   };
   A.has = function (key) { return !!buffers[key]; };
+  // Is this line recorded (on the page)? A line still waiting for its recording (pending) isn't, and say() skips it.
+  A.recorded = function (id) { return !!(manifest.voice || {})[id]; };
 
   // ---------------------------------------------------------------- the first tap
   A.unlock = function () {

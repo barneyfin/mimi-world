@@ -4,8 +4,8 @@ Each function returns an SVG string. Colours are classes (f-*, s-*) bound to tok
 design system share one palette."""
 import math
 
-from gen_art import (ICONS, JOBS, cross_star, galaxy, held_telescope, icon, job_badge, job_picture, mimi, moggles, nebula, planet,
-                     scruffles_pod, sky_art, snuffles, spark, starfield, tok, tray)
+from gen_art import (ICONS, JOBS, cross_star, galaxy, held_telescope, icon, job_badge, job_picture, mimi, moggles, nebula, number_tile,
+                     number_track, numbered_mimi, planet, scruffles_pod, sky_art, snuffles, spark, starfield, tok, tray)
 
 
 def sky(uid="sky"):
@@ -120,6 +120,10 @@ def art_dict(taken=(0,), extra=None):
         "map": map_art(taken=taken),
         "crew": crew_art(),
         "held-telescope": held_telescope(100),
+        # MeeMee Rescue's numbers mode (0.6.0): the kit's diagram and number track use these (kit/scene.js)
+        "numbered-mimi": numbered_mimi(),
+        "number-tile": number_tile(),
+        "number-track": number_track(),
     }
     for job in JOBS:
         art["job-" + job] = job_picture(job, 100)

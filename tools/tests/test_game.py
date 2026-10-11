@@ -1,5 +1,6 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
-game) and the kit, on Fire and Doogee screen sizes.
+game) and the kit (0.6.0: the title banners, the store, stars, pick-up boxes, numbers mode's pieces), on Fire and Doogee
+screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -109,6 +110,16 @@ class Tablet:
     async def wait_screen(self, screen, timeout=10):
         for _ in range(int(timeout / 0.1)):
             if await self.page.evaluate("MW.shell.screen") == screen:
+                if screen == "screen-map":                   # 0.6.0: a planet can be tapped once the title banner has gone
+                    return await self.wait_banner(timeout)
+                return True
+            await asyncio.sleep(0.1)
+        return False
+
+    async def wait_banner(self, timeout=10):
+        """Until no title banner is showing (MeeMee World's after Play, or a game's after its planet is tapped)."""
+        for _ in range(int(timeout / 0.1)):
+            if not await self.page.evaluate("MW.world.banner.up() || MW.world.st.phase === 'welcome'"):
                 return True
             await asyncio.sleep(0.1)
         return False
@@ -565,8 +576,8 @@ async def test_map(p):
     print("\n== the home map ==")
     browser, ctx, page, t, problems, _ = await open_tablet(p, "map", 1280, 800, 1, mode="tap")
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    caption = await page.inner_text("#screen-start .mw-caption")
-    check("map: the start screen says MeeMee World", caption == "MeeMee World", caption)
+    start = await page.evaluate("[document.getElementById('screen-start').innerText.trim(), document.querySelectorAll('#screen-start .mw-caption').length]")
+    check("map: the start screen has nothing to read (no 'MeeMee World' caption: its banner names it after Play)", start == ["", 0], str(start))
     await t.tap(*PLAY)
     await t.wait_screen("screen-map")
     nav = await page.evaluate("[document.querySelectorAll('#screen-map [aria-label=Home]').length, document.querySelectorAll('#screen-map .mw-music').length]")
@@ -1111,9 +1122,11 @@ async def test_template(p):
     await page.screenshot(path=str(SHOTS / "template-1-map.png"))
     pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % free[0])
     await t.tap(pl["x"], pl["y"])
-    ok = await t.wait_screen("screen-starter-play")
+    ok = await t.wait_screen("screen-starter-play", 2)
     said = await t.said()
-    check("template: tapping its planet says its name and opens its screen", ok and "starter-name" in said, str(said[-3:]))
+    check("template: tapping its planet opens its screen (its name isn't recorded yet, so no banner: straight away)",
+          ok and await page.evaluate("[MW.audio.recorded('starter-name'), MW.events.some(e => e.type === 'banner' && e.detail === 'up Starter game')]") == [False, False],
+          str(said[-3:]))
     await asyncio.sleep(0.3)
     await page.screenshot(path=str(SHOTS / "template-2-screen.png"))
     for _ in range(3):
@@ -2000,6 +2013,419 @@ async def test_words_motion(p):
     await browser.close()
 
 
+# ---------------------------------------------------------------- 0.6.0: the kit (title banners, the five test-build gaps, numbers mode's pieces)
+HOME_BTN = (66, 62)
+BANNER_INFO = """(() => { const b = document.getElementById('banner'), p = b.querySelector('.mw-banner-plaque'), n = p.querySelector('.mw-banner-name');
+    return { up: MW.world.banner.up(), name: n ? n.textContent : null, art: Array.from(p.querySelectorAll('[data-art]')).map(e => e.dataset.art),
+             phase: MW.world.st.phase, screen: MW.shell.screen }; })()"""
+
+
+async def banner_times(page, name):
+    """When a banner went up, started to go and had gone (MW.events ms), the line said with it and how long that is."""
+    return await page.evaluate("""(n => { const ev = MW.events, at = (type, d) => { const e = ev.filter(e => e.type === type && e.detail === d).slice(-1)[0]; return e ? e.t : null; };
+        return { up: at('banner', 'up ' + n), going: at('banner', 'going ' + n), gone: at('banner', 'gone ' + n) }; })(%s)""" % json.dumps(name))
+
+
+async def said_at(page, line):
+    return await page.evaluate("(l => { const e = MW.events.filter(e => e.type === 'say' && e.detail === l).slice(-1)[0]; return e ? [e.t, MW.audio.lengthOf([[l]])] : null; })(%s)" % json.dumps(line))
+
+
+async def wait_gone(page, name, timeout=10):
+    for _ in range(int(timeout / 0.1)):
+        times = await banner_times(page, name)
+        if times["gone"] is not None:
+            return times
+        await asyncio.sleep(0.1)
+    return await banner_times(page, name)
+
+
+async def screen_after(page, screen, t0):
+    """The first time (MW.events ms) that a screen was shown at or after t0."""
+    return await page.evaluate("(a => { const e = MW.events.find(e => e.type === 'screen' && e.detail === a[0] && e.t >= a[1]); return e ? e.t : null; })(%s)"
+                               % json.dumps([screen, t0]))
+
+
+async def test_banners(p, name, vw, vh, dpr):
+    """MeeMee World's banner after Play, each game's banner as its planet is tapped, taps under them, and pausing."""
+    print(f"\n== title banners ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"banner-{name}", vw, vh, dpr, mode="tap")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    start = await page.evaluate("[document.getElementById('screen-start').innerText.trim(), MW.world.banner.up()]")
+    check(f"banner ({name}): the start screen has nothing to read, and no banner (sound can't start before Play)", start == ["", False], str(start))
+    await page.screenshot(path=str(SHOTS / f"banner-{name}-0-start.png"))
+
+    # MeeMee World's banner: once a visit, after Play, while "Welcome to MeeMee World!" plays
+    await t.tap(*PLAY)
+    await asyncio.sleep(0.3)
+    info = await page.evaluate(BANNER_INFO)
+    check(f"banner ({name}): after Play the map opens with MeeMee World's banner, a MeeMee at each end",
+          info == {"up": True, "name": "MeeMee World", "art": ["mimi", "mimi"], "phase": "welcome", "screen": "screen-map"}, json.dumps(info))
+    check(f"banner ({name}): ... while 'Welcome to MeeMee World!' plays", "map-welcome" in await t.said())
+    lock = await page.evaluate("(() => { const s = MW.stage.scale; const e = document.elementFromPoint(MW.stage.offX + 46 * s, MW.stage.offY + 754 * s); return !!(e && e.closest('.mw-gate')); })()")
+    check(f"banner ({name}): the grown-ups lock stays above the banner", lock)
+    await asyncio.sleep(0.25)
+    await page.screenshot(path=str(SHOTS / f"banner-{name}-1-world.png"))
+    n_map = await page.evaluate("MW.events.filter(e => e.type === 'map').length")
+    await t.tap(*RESCUE)
+    await t.tap(*CREW_BTN)
+    await t.tap(1172 + 42, 26 + 42)                          # Music
+    after = await page.evaluate("[MW.events.filter(e => e.type === 'map').length, MW.world.st.phase, MW.shell.screen, MW.audio.music.isOn()]")
+    check(f"banner ({name}): taps under it do nothing (a planet, the crew, Music)", after == [n_map, "welcome", "screen-map", True], str(after))
+    times = await wait_gone(page, "MeeMee World")
+    said = await said_at(page, "map-welcome")
+    shown = (times["going"] or 0) - (times["up"] or 0)
+    check(f"banner ({name}): it stays at least 2 seconds and for all of its line, then goes by itself",
+          times["gone"] is not None and shown >= 1990 and said and times["going"] >= said[0] + said[1] * 1000 - 60, json.dumps([times, said]))
+    await asyncio.sleep(0.1)
+    check(f"banner ({name}): ... and then the map is ready", await page.evaluate("[MW.world.st.phase, MW.world.banner.up()]") == ["map", False])
+
+    # MeeMee Rescue's banner: its name and badge from game.json, while its name is said; the game starts once it has gone
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    await asyncio.sleep(0.3)
+    info = await page.evaluate(BANNER_INFO)
+    check(f"banner ({name}): tapping MeeMee Rescue's planet shows its banner: its name and its badge (the MeeMee)",
+          info == {"up": True, "name": "MeeMee Rescue", "art": ["mimi"], "phase": "opening", "screen": "screen-map"}, json.dumps(info))
+    await asyncio.sleep(0.25)
+    await page.screenshot(path=str(SHOTS / f"banner-{name}-2-rescue.png"))
+    pl = await page.evaluate(WORDS_PLANET)
+    n_map = await page.evaluate("MW.events.filter(e => e.type === 'map').length")
+    await t.tap(*RESCUE)
+    await t.tap(pl["x"], pl["y"])
+    await t.tap(*CREW_BTN)
+    await t.tap(1172 + 42, 26 + 42)                          # Music
+    after = await page.evaluate("[MW.events.filter(e => e.type === 'map').length, MW.world.st.phase, MW.shell.screen, MW.events.filter(e => e.type === 'round').length, MW.audio.music.isOn()]")
+    check(f"banner ({name}): taps under a game's banner do nothing (its planet again, the other planet, the crew, Music)", after == [n_map, "opening", "screen-map", 0, True], str(after))
+    s = await t.wait_phase(["asking", "open"])
+    times = await banner_times(page, "MeeMee Rescue")
+    said = await said_at(page, "map-mimi-rescue")
+    started = await screen_after(page, "screen-game", times["up"] or 0)
+    shown = (times["going"] or 0) - (times["up"] or 0)
+    check(f"banner ({name}): MeeMee Rescue's banner stays at least 2 seconds, for all of 'MeeMee Rescue!'",
+          shown >= 1990 and said and said[0] >= times["up"] - 5 and times["going"] >= said[0] + said[1] * 1000 - 60, json.dumps([times, said]))
+    check(f"banner ({name}): ... and the round starts only once it has gone", s["screen"] == "screen-game" and started is not None and times["gone"] is not None
+          and started >= times["gone"], json.dumps([times, started]))
+
+    # Home: MeeMee World's banner doesn't show again this visit
+    await t.tap(*HOME_BTN)
+    await asyncio.sleep(0.6)
+    ups = await page.evaluate("MW.events.filter(e => e.type === 'banner' && e.detail === 'up MeeMee World').length")
+    check(f"banner ({name}): Home goes back to the map with no banner (MeeMee World's is once a visit)",
+          ups == 1 and await page.evaluate("[MW.shell.screen, MW.world.st.phase, MW.world.banner.up()]") == ["screen-map", "map", False], str(ups))
+
+    # MeeMee Rockets' banner
+    await page.evaluate("MW.wordsGame.nextRound = %s" % json.dumps([{"word": "one", "step": "tiles"}]))
+    await t.tap(pl["x"], pl["y"])
+    await asyncio.sleep(0.3)
+    info = await page.evaluate(BANNER_INFO)
+    check(f"banner ({name}): tapping MeeMee Rockets' planet shows its banner: its name and its badge (the rocket)",
+          info == {"up": True, "name": "MeeMee Rockets", "art": ["words-badge"], "phase": "opening", "screen": "screen-map"}, json.dumps(info))
+    await asyncio.sleep(0.25)
+    await page.screenshot(path=str(SHOTS / f"banner-{name}-3-rockets.png"))
+    s = await w_wait(page, ["words-find"])
+    times = await banner_times(page, "MeeMee Rockets")
+    said = await said_at(page, "words-name")
+    started = await screen_after(page, "screen-words-find", times["up"] or 0)
+    check(f"banner ({name}): MeeMee Rockets' banner stays at least 2 seconds, for all of 'MeeMee Rockets!', then the game starts",
+          (times["going"] or 0) - (times["up"] or 0) >= 1990 and said and times["going"] >= said[0] + said[1] * 1000 - 60
+          and started is not None and started >= times["gone"], json.dumps([times, said, started]))
+    await t.tap(*HOME_BTN)
+    await asyncio.sleep(0.6)
+
+    # a pause mid-banner: the banner goes and the player is back on the map (the screen going off, then the grown-ups area)
+    hide = "Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))"
+    show = "Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))"
+    rounds = await page.evaluate("MW.events.filter(e => e.type === 'round').length")
+    await t.tap(*RESCUE)
+    await asyncio.sleep(0.5)
+    await page.evaluate(hide)
+    await asyncio.sleep(0.5)
+    mid = await page.evaluate("[MW.world.banner.up(), MW.world.st.phase, MW.shell.screen]")
+    await page.evaluate(show)
+    await asyncio.sleep(2.5)
+    end = await page.evaluate("[MW.world.banner.up(), MW.world.st.phase, MW.shell.screen, MW.events.filter(e => e.type === 'round').length]")
+    check(f"banner ({name}): the screen going off mid-banner: the banner goes, back on the map, no round behind it",
+          mid == [False, "map", "screen-map"] and end == [False, "map", "screen-map", rounds], json.dumps([mid, end]))
+    await t.tap(*RESCUE)
+    await asyncio.sleep(0.5)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")   # what holding the lock does
+    await asyncio.sleep(0.5)
+    mid = await page.evaluate("[MW.world.banner.up(), MW.world.st.phase, MW.grownups.open]")
+    await page.evaluate("MW.grownups.close()")
+    await asyncio.sleep(2.5)
+    end = await page.evaluate("[MW.world.banner.up(), MW.world.st.phase, MW.shell.screen, MW.events.filter(e => e.type === 'round').length]")
+    check(f"banner ({name}): the grown-ups area opened mid-banner: the banner goes; closing it leaves the player on the map",
+          mid == [False, "map", True] and end == [False, "map", "screen-map", rounds], json.dumps([mid, end]))
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    s = await t.wait_phase(["asking", "open"])
+    check(f"banner ({name}): and the planet works again after it", s["screen"] == "screen-game", json.dumps(s))
+    check(f"banner ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_banner_motion(p):
+    """The banner fades and grows in; with reduce motion it only fades. The number track slides away; with reduce motion it fades.
+    What moves is read from the transitions the browser runs (property and length), so a busy machine can't fool the check."""
+    print("\n== title banners and the number track: motion ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    runs = "(e => e.getAnimations().map(a => [a.transitionProperty, a.effect.getTiming().duration]).sort())"
+    for reduce in (False, True):
+        label = "reduce motion" if reduce else "motion"
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, reduced_motion="reduce" if reduce else "no-preference")
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        style = "(() => { const c = getComputedStyle(document.querySelector('.mw-banner-card')); return [c.transform, +c.opacity]; })()"
+        card = "document.querySelector('.mw-banner-card')"
+        first = await page.evaluate(f"(() => {{ MW.world.home(); return [{style}, {runs}({card})]; }})()")
+        await asyncio.sleep(0.45)
+        shown = await page.evaluate(style)
+        if reduce:
+            check(f"banner ({label}): it fades in (260 ms) without moving or growing", first == [["none", 0], [["opacity", 260]]] and shown == ["none", 1], json.dumps([first, shown]))
+        else:
+            k = float(first[0][0].split("(")[1].split(",")[0]) if first[0][0].startswith("matrix(") else None
+            check(f"banner ({label}): it fades and grows in (260 ms)", k is not None and k < 0.95 and first[0][1] < 0.05
+                  and first[1] == [["opacity", 260], ["transform", 260]] and shown == ["none", 1], json.dumps([first, shown]))
+        going = await page.evaluate(f"(() => {{ MW.world.banner.cancel(); return [{style}, {runs}({card})]; }})()")
+        await asyncio.sleep(0.45)
+        gone = await page.evaluate("[MW.world.banner.up(), getComputedStyle(document.getElementById('banner')).display]")
+        check(f"banner ({label}): it fades out (260 ms) without moving, then it has gone", going[0][0] == "none" and going[1] == [["opacity", 260]]
+              and gone == [False, "none"], json.dumps([going, gone]))
+        # the number track: slides down out of sight (a fade with reduce motion), and back
+        await page.evaluate("""(() => { const s = MW.make('section', 'mw-screen', {id: 'screen-kittest'}); MW.$('stage').appendChild(s);
+            window.__tr = MW.numberTrack(s); MW.shell.show('screen-kittest'); })()""")
+        track = "(() => { const e = window.__tr.el, r = e.querySelector('svg').getBoundingClientRect(); return [getComputedStyle(e).transform, +getComputedStyle(e).opacity, Math.round((r.top - MW.stage.offY) / MW.stage.scale)]; })()"
+        moving = await page.evaluate(f"(() => {{ window.__tr.hide(); return {runs}(window.__tr.el); }})()")
+        await asyncio.sleep(0.45)
+        away = await page.evaluate(track)
+        returning = await page.evaluate(f"(() => {{ window.__tr.show(); return {runs}(window.__tr.el); }})()")
+        await asyncio.sleep(0.45)
+        back = await page.evaluate(track)
+        if reduce:
+            check(f"track ({label}): it fades away (260 ms) without moving, and back", moving == [["opacity", 260]] and returning == [["opacity", 260]]
+                  and away == ["none", 0, 674] and back == ["none", 1, 674], json.dumps([moving, away, returning, back]))
+        else:
+            check(f"track ({label}): it slides down out of sight (260 ms), and back", moving == [["transform", 260]] and returning == [["transform", 260]]
+                  and away[1] == 1 and away[2] >= 800 and back == ["none", 1, 674], json.dumps([moving, away, returning, back]))
+        check(f"banner and track ({label}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
+async def test_banner_unrecorded(p):
+    """A banner is always spoken with its name: while a name line isn't recorded, no banner, and the game starts at once."""
+    print("\n== title banners: a line not recorded yet ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "banner-unrecorded", 1280, 800, 1, mode="tap")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rec = await page.evaluate("[MW.audio.recorded('map-welcome'), MW.audio.recorded('map-mimi-rescue'), MW.audio.recorded('words-name'), MW.audio.recorded('no-such-line')]")
+    check("banner (unrecorded): MW.audio.recorded says which lines are on the page", rec == [True, True, True, False], str(rec))
+    await page.evaluate("delete MW.audio.manifest.voice['map-welcome']; delete MW.audio.manifest.voice['map-mimi-rescue']; MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*PLAY)
+    await asyncio.sleep(0.3)
+    got = await page.evaluate("[MW.shell.screen, MW.world.st.phase, MW.world.banner.up(), MW.events.filter(e => e.type === 'banner' && e.detail.startsWith('up')).length]")
+    check("banner (unrecorded): with 'Welcome to MeeMee World!' not recorded, the map opens with no banner", got == ["screen-map", "map", False, 0], str(got))
+    t0 = await page.evaluate("performance.now()")
+    await t.tap(*RESCUE)
+    s = await t.wait_phase(["starting", "asking", "open"], 3)
+    started = await screen_after(page, "screen-game", t0)
+    got = await page.evaluate("[MW.world.banner.up(), MW.events.filter(e => e.type === 'banner').map(e => e.detail)]")
+    check("banner (unrecorded): with 'MeeMee Rescue!' not recorded, no banner: the round starts straight away",
+          s["screen"] == "screen-game" and started is not None and started - t0 < 600 and got[0] is False and got[1] == ["none for MeeMee Rescue (map-mimi-rescue not recorded yet)"],
+          json.dumps([s, started and started - t0, got]))
+    check("banner (unrecorded): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+KIT_SCREEN = """(() => { let s = document.getElementById('screen-kittest');
+    if (!s) { s = MW.make('section', 'mw-screen', {id: 'screen-kittest'}); MW.$('stage').appendChild(s); }
+    MW.shell.show('screen-kittest'); return true; })()"""
+
+
+async def stage_box(page, js):
+    """The stage box [x, y, w, h] of the element js finds."""
+    return await page.evaluate("(() => { const e = %s; const r = e.getBoundingClientRect(), s = MW.stage.scale;"
+                               " return [(r.left - MW.stage.offX) / s, (r.top - MW.stage.offY) / s, r.width / s, r.height / s]; })()" % js)
+
+
+async def last_pick(page):
+    return await page.evaluate("(() => { const e = MW.events.filter(e => e.type === 'pick').slice(-1)[0]; return e ? String(e.detail) : null; })()")
+
+
+async def press(t, sx, sy):
+    """A finger down and up again on one spot (picks up whatever is there, and lets it go)."""
+    x, y = await t.screen(sx, sy)
+    await touch(t, "touchStart", [(50, (x, y))])
+    await asyncio.sleep(0.05)
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.35)
+
+
+async def test_kit_pieces(p, name, vw, vh, dpr):
+    """The five gaps from the Rockets test build, and numbers mode's pieces (for MeeMee Rescue's numbers mode)."""
+    print(f"\n== the kit's new pieces ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"kit-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+
+    # reading a game's saved data creates nothing
+    fresh = await page.evaluate("""(() => { const g = MW.wordsGame; g.answers(); g.week(); g.inPlay(); g.makeRound();
+        MW.grownups.openPanel(); MW.grownups.show('words-progress'); MW.grownups.close();
+        return [JSON.stringify(MW.store.peek('words')), Object.keys(MW.store.get('games')), (localStorage.getItem('mimi-world') || '').indexOf('"words"') < 0]; })()""")
+    check(f"kit ({name}): MW.store.peek reads a game's saved data without creating it (MeeMee Rockets reads this way)", fresh == ["{}", [], True], str(fresh))
+    made = await page.evaluate("""(() => { const g = MW.store.game('words'); g.week = 3; MW.store.save();
+        return [MW.store.peek('words').week, MW.wordsGame.week(), Object.keys(MW.store.get('games'))]; })()""")
+    check(f"kit ({name}): MW.store.game creates it (to change it); peek then reads what was saved", made == [3, 3, ["words"]], str(made))
+    await page.evaluate("MW.store.clearGame('words')")
+
+    # stars centred on a point for any total; a call placed by its left edge is as before
+    await page.evaluate(KIT_SCREEN)
+    rows = await page.evaluate("""(() => { const s = document.getElementById('screen-kittest'), out = [];
+        const c = MW.stars(s, MW.LAYOUT.stars.cx, 34, null, { centre: true }), big = MW.stars(s, 640, 140, 60, { centre: true }), old = MW.stars(s, 517, 240);
+        [3, 5, 7].forEach(n => { c.set(1, n); big.set(n, n); old.set(0, 5);
+          const box = e => { const r = e.getBoundingClientRect(), k = MW.stage.scale; return [(r.left - MW.stage.offX) / k, r.width / k, e.children.length, e.offsetLeft]; };
+          out.push([n, box(c.el), box(big.el), box(old.el)]); });
+        [c, big, old].forEach(x => x.el.remove()); return out; })()""")
+    ok = all(abs(a[0] + a[1] / 2 - 640) < 0.6 and abs(b[0] + b[1] / 2 - 640) < 0.6 and a[2] == n == b[2] and abs(o[0] - 517) < 0.6 for n, a, b, o in rows)
+    check(f"kit ({name}): stars centre on a point for 3, 5 and 7 (38 and 60 px); a row placed by its left edge stays at 517", ok, json.dumps(rows))
+    check(f"kit ({name}): ... and each row's offsetLeft is where it is drawn (what the navigator moment reads)",
+          all(abs(x[0] - x[3]) < 0.6 for _, a, b, o in rows for x in (a, b, o)), json.dumps([[r[0], r[1][3], r[2][3]] for r in rows]))
+    await page.evaluate("MW.wordsGame.nextRound = %s; MW.wordsGame.start()" % json.dumps([{"word": w, "step": "tiles"} for w in ("one", "of", "all")]))
+    await w_wait(page, ["words-find"], 10)
+    box = await stage_box(page, "document.querySelector('#screen-words-find .mw-stars')")
+    n = await page.evaluate("[document.querySelectorAll('#screen-words-find .mw-stars svg').length, document.querySelector('#screen-words-find .mw-stars').offsetLeft]")
+    check(f"kit ({name}): MeeMee Rockets' stars use the kit's centring (a round of 3: three stars, centred)", n[0] == 3 and abs(box[0] + box[2] / 2 - 640) < 0.6
+          and abs(n[1] - box[0]) < 0.6, json.dumps([n, box]))
+
+    # long tiles: picked up from either end, never the neighbour ('here' in sound tiles: h, then the long ere)
+    await page.evaluate("MW.wordsGame.showBuild({ word: 'here', step: 'tiles' })")
+    await asyncio.sleep(0.3)
+    tiles = await page.evaluate("MW.wordsGame.st.tiles.map(c => ({ text: c.text, x: c.x, y: c.y, w: c.w, grab: c.grab }))")
+    h = [c for c in tiles if c["text"] == "h"][0]
+    ere = [c for c in tiles if c["text"] == "ere"][0]
+    got = []
+    for label, x in (("left end", ere["x"] - ere["w"] / 2 + 6), ("right end", ere["x"] + ere["w"] / 2 - 6), ("middle", ere["x"])):
+        await press(t, x, ere["y"])
+        got.append([label, await last_pick(page)])
+    await press(t, h["x"] + h["w"] / 2 - 6, h["y"])
+    got.append(["h's right end", await last_pick(page)])
+    nearer_h = abs((ere["x"] - ere["w"] / 2 + 6) - h["x"]) < abs((ere["x"] - ere["w"] / 2 + 6) - ere["x"])
+    check(f"kit ({name}): a long tile ('ere', {ere['w']:.0f} px) is picked up from either end, never its neighbour 'h'",
+          [g[1] for g in got] == ["ere", "ere", "ere", "h"] and ere["grab"]["w"] > ere["w"], json.dumps(got) + (" (its left end is nearer h's middle: one radius for all picked h)" if nearer_h else ""))
+    st = await w_state(page)
+    check(f"kit ({name}): ... and picking a tile up and letting it go where it was isn't a try", st["drops"] == 0 and st["next"] == 0, json.dumps(st))
+    await page.evaluate("MW.world.home(); MW.world.banner.cancel()")
+
+    # numbers mode's diagram: no pills, no "?", a numbered MeeMee in each given circle (the whole's at 0.86)
+    await page.evaluate(KIT_SCREEN)
+    await page.evaluate("""(() => { const s = document.getElementById('screen-kittest');
+        const d = window.__d = MW.diagram(s); d.look('numbers'); d.set({ whole: 7, left: 3, right: 4, missing: 'right' });
+        MW.pod(s, MW.LAYOUT.pod.x, MW.LAYOUT.pod.y, MW.LAYOUT.pod.w); MW.stars(s, 517, 34).set(0);
+        const tr = window.__tr = MW.numberTrack(s);
+        const lay = MW.make('div', 'mw-layer mw-fill'); s.appendChild(lay);
+        window.__drag = MW.dragger(s, { counters: () => tr.tiles, onPick: c => MW.log('pick', c.n),
+          onDrop: (c, x, y, cancelled) => { if (!cancelled && d.hit(x, y) === 'right') c.moveTo(MW.LAYOUT.right.x, MW.LAYOUT.right.y, 0, true); else c.goHome(true); } }); })()""")
+    await asyncio.sleep(0.3)
+    look = await page.evaluate("""(() => { const s = document.getElementById('screen-kittest'), d = window.__d;
+        const vis = e => !!(e.offsetWidth || e.offsetHeight) && getComputedStyle(e).visibility !== 'hidden';
+        const carriers = Array.from(s.querySelectorAll('.mw-numbered')).filter(vis);
+        return { pills: Array.from(s.querySelectorAll('.mw-pill')).filter(vis).length, q: s.innerText.indexOf('?') >= 0,
+                 carried: ['whole', 'left', 'right'].map(k => d.carried(k)), waiting: d.circles.right.classList.contains('is-waiting'),
+                 scales: carriers.map(e => e.style.transform), signs: carriers.map(e => e.textContent) }; })()""")
+    check(f"kit ({name}): the numbers look: no pills and no '?'", look["pills"] == 0 and not look["q"], json.dumps(look))
+    check(f"kit ({name}): ... the whole and the given part each hold a numbered MeeMee (7 at 0.86, 3), the missing part waits empty",
+          look["carried"] == [7, 3, None] and look["waiting"] and sorted(look["scales"]) == ["scale(0.86)", "scale(1)"] and sorted(look["signs"]) == ["3", "7"], json.dumps(look))
+    wb = await stage_box(page, "document.querySelectorAll('#screen-kittest .mw-numbered-sign')[0]")
+    check(f"kit ({name}): the whole's sign sits in the whole circle", 380 - 115 < wb[0] and wb[0] + wb[2] < 380 + 115 and 205 - 115 < wb[1] < wb[1] + wb[3] < 205 + 115, json.dumps(wb))
+
+    # the number track: 11 tiles, 0 to 10 in order, 84 across in 120 boxes, clear of the grown-ups lock
+    tr = await page.evaluate("window.__tr.tiles.map(c => ({ n: c.n, x: c.x, y: c.y, grab: c.grab, text: c.el.textContent }))")
+    boxes = [await stage_box(page, f"window.__tr.tiles[{i}].el.querySelector('.mw-number-tile-body')") for i in range(11)]
+    rail = await stage_box(page, "window.__tr.el.querySelector('svg')")
+    check(f"kit ({name}): the track has 11 tiles, 0 to 10 in order (x 128 + 94 n, tops at 686)",
+          [c["text"] for c in tr] == [str(i) for i in range(11)] and all(abs(b[0] - (128 + 94 * i)) < 0.6 and abs(b[1] - 686) < 0.6 for i, b in enumerate(boxes)), json.dumps(boxes[:3]))
+    check(f"kit ({name}): each tile is drawn 84 across with a 120 pick-up box", all(abs(b[2] - 84) < 0.6 and abs(b[3] - 84) < 0.6 for b in boxes)
+          and all(c["grab"] == {"w": 120, "h": 120} for c in tr), json.dumps([boxes[0], tr[0]["grab"]]))
+    lock = [24, 732, 44, 44]
+    clear = rail[0] > lock[0] + lock[2] and all(c["x"] - 60 > lock[0] + lock[2] for c in tr) and all(b[1] + b[3] <= 800 - 24 for b in boxes)
+    check(f"kit ({name}): the track is clear of the grown-ups lock (and its tiles 24 px from the edge)", clear, json.dumps([rail, lock]))
+    await page.screenshot(path=str(SHOTS / f"kit-{name}-numbers-ask.png"))
+
+    # dragging tiles: into the waiting circle, or back to the track; the tile's place shows a dashed ring while it's out
+    four = tr[4]
+    await t.drag(four["x"], four["y"], 560, 480)
+    at = await page.evaluate("[window.__tr.tile(4).x, window.__tr.tile(4).y, window.__tr.tile(4).out(), window.__tr.tiles.filter(c => c.out()).length]")
+    ring = await page.evaluate("getComputedStyle(document.querySelectorAll('#screen-kittest .mw-track-place')[4]).display")
+    check(f"kit ({name}): a tile dragged into the waiting circle stays there, and its place shows a dashed ring", at == [550, 470, True, 1] and ring == "block", json.dumps([at, ring]))
+    await asyncio.sleep(0.3)
+    await page.screenshot(path=str(SHOTS / f"kit-{name}-numbers-dropped.png"))
+    seven = tr[7]
+    await t.drag(seven["x"], seven["y"], 900, 330)
+    await asyncio.sleep(0.3)
+    back = await page.evaluate("[window.__tr.tile(7).x, window.__tr.tile(7).y, window.__tr.tile(7).out()]")
+    check(f"kit ({name}): a tile dropped anywhere else goes back to its place", back == [seven["x"], seven["y"], False], json.dumps(back))
+    got = []
+    for i, dx in ((5, -38), (5, 38), (6, -38), (0, -38), (10, 38)):
+        await press(t, tr[i]["x"] + dx, tr[i]["y"] + 36)
+        got.append([i, await last_pick(page)])
+    check(f"kit ({name}): a tile is picked up anywhere on it, never its neighbour", all(str(i) == g for i, g in got), json.dumps(got))
+
+    # the track goes while a finger holds a tile: the tile is let go and goes home with the rest
+    six = tr[6]
+    x0, y0 = await t.screen(six["x"], six["y"])
+    x1, y1 = await t.screen(600, 520)
+    await touch(t, "touchStart", [(60, (x0, y0))])
+    for k in range(1, 7):
+        await touch(t, "touchMove", [(60, (x0 + (x1 - x0) * k / 6, y0 + (y1 - y0) * k / 6))])
+        await asyncio.sleep(0.03)
+    held = await page.evaluate("[window.__drag.dragging(), window.__tr.tile(6).out()]")
+    await page.evaluate("window.__tr.hide()")
+    let_go = await page.evaluate("[window.__drag.dragging(), window.__tr.tile(6).x, window.__tr.tile(6).y, window.__tr.tile(6).lifted, window.__tr.tile(6).out(), window.__tr.away()]")
+    n_pick = await page.evaluate("MW.events.filter(e => e.type === 'pick').length")
+    for k in range(1, 4):                                    # the finger carries on moving, then lifts
+        await touch(t, "touchMove", [(60, (x1 + k * 20, y1))])
+        await asyncio.sleep(0.03)
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.4)
+    after = await page.evaluate("[window.__tr.tile(6).x, window.__tr.tile(6).y, window.__tr.tile(6).out(), MW.events.filter(e => e.type === 'pick').length]")
+    check(f"kit ({name}): hiding the track while a tile is held lets go of it: it goes home with the rest, and the finger moving on does nothing",
+          held == [True, True] and let_go == [False, six["x"], six["y"], False, False, True] and after == [six["x"], six["y"], False, n_pick],
+          json.dumps([held, let_go, after]))
+    await page.evaluate("window.__tr.show()")
+    await asyncio.sleep(0.4)
+
+    # a right answer: a numbered MeeMee pops up to carry the number, and the track slides away and back
+    await page.evaluate("window.__d.success('right', 4); window.__tr.hide()")
+    await asyncio.sleep(0.5)
+    right = await page.evaluate("""[window.__d.carried('right'), window.__d.circles.right.classList.contains('is-success'),
+        Array.from(document.querySelectorAll('#screen-kittest .mw-numbered')).some(e => e.classList.contains('is-popping')),
+        window.__tr.tile(4).out(), window.__tr.away()]""")
+    rail = await stage_box(page, "window.__tr.el.querySelector('svg')")
+    check(f"kit ({name}): success in the numbers look: a numbered MeeMee pops up carrying 4; the track slides out of sight, tile 4 back in it",
+          right == [4, True, True, False, True] and rail[1] >= 800, json.dumps([right, rail]))
+    await page.screenshot(path=str(SHOTS / f"kit-{name}-numbers-right.png"))
+    n_pick = await page.evaluate("MW.events.filter(e => e.type === 'pick').length")
+    await press(t, tr[3]["x"], tr[3]["y"])
+    check(f"kit ({name}): while the track is away its tiles can't be picked up", await page.evaluate("MW.events.filter(e => e.type === 'pick').length") == n_pick)
+    await page.evaluate("window.__tr.show(); window.__d.set({ whole: 5, left: 2, right: 3, missing: 'whole' })")
+    await asyncio.sleep(0.4)
+    whole = await page.evaluate("[['whole', 'left', 'right'].map(k => window.__d.carried(k)), window.__d.circles.whole.classList.contains('is-waiting'), window.__tr.away()]")
+    rail = await stage_box(page, "window.__tr.el.querySelector('svg')")
+    check(f"kit ({name}): a missing whole: numbered MeeMee in both parts, the whole waits; the track is back", whole == [[None, 2, 3], True, False] and abs(rail[1] - 674) < 0.6,
+          json.dumps([whole, rail]))
+    await page.screenshot(path=str(SHOTS / f"kit-{name}-numbers-whole.png"))
+    # and the counting look is as before: the pills and "?", no numbered MeeMee
+    back = await page.evaluate("""(() => { const d = window.__d, s = document.getElementById('screen-kittest'); d.look('counting'); d.set({ whole: 7, left: 3, right: 4, missing: 'right' });
+        const vis = e => !!(e.offsetWidth || e.offsetHeight);
+        return [Array.from(s.querySelectorAll('.mw-pill')).filter(vis).map(e => e.textContent), s.querySelector('.numeral-whole').textContent,
+                Array.from(s.querySelectorAll('.mw-numbered')).filter(vis).length]; })()""")
+    check(f"kit ({name}): the counting look is unchanged: pills 3 and ?, 7 in the whole, no numbered MeeMee", back == [["3", "?"], "7", 0], json.dumps(back))
+    check(f"kit ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -2027,6 +2453,12 @@ async def main():
         await test_words_first_find(p)
         await test_words_fixes(p)
         await test_words_motion(p)
+        await test_banners(p, "fire", 1046, 653, 1.22)
+        await test_banners(p, "doogee", 1280, 800, 2)
+        await test_banner_motion(p)
+        await test_banner_unrecorded(p)
+        await test_kit_pieces(p, "fire", 1046, 653, 1.22)
+        await test_kit_pieces(p, "doogee", 1280, 800, 2)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)} of {len(RESULTS)} checks passed")

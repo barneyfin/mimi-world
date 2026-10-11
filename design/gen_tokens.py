@@ -147,6 +147,10 @@ TYPE_STYLES = {
          "usage": "The number sentence shown after a correct answer: numbers in moon on night, + and = in peach."},
         {"name": "numeral-part", "fontSize": "52px", "lineHeight": 1, "fontWeight": 700, "sample": "4",
          "usage": "The numeral in a number pill under each part."},
+        {"name": "banner", "fontSize": "84px", "lineHeight": 1, "fontWeight": 700, "sample": "MeeMee Rescue",
+         "usage": "The set's or a game's name on a title banner, in numeral on moon; shown only while the name is spoken."},
+        {"name": "numeral-sign", "fontSize": "84px", "lineHeight": 1, "fontWeight": 700, "sample": "7",
+         "usage": "The number on a numbered MeeMee's sign in MeeMee Rescue's numbers mode, in numeral on peach."},
     ],
     "For grown-ups": [
         {"name": "title", "fontSize": "30px", "lineHeight": "36px", "fontWeight": 700, "sample": "MeeMee Rescue progress",

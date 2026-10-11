@@ -5,7 +5,7 @@ description: Make, change or fix a MeeMee World game (the tablet maths and phoni
 
 # MeeMee World
 
-Every game in this folder is built on the MeeMee World kit (`kit/`). The kit already provides everything games share: the start screen (sound and full screen start on the first tap), the home map where each game is a planet, the crew screen, pausing (grown-ups area open, tablet upright, screen off), the grown-ups area and its lock, the voice and music players, dragging, Scruffles's ship, progress stars, sparkles, the offline copy and updates. A game supplies only its own play, its own lines and its own drawings. Never rebuild what the kit does.
+Every game in this folder is built on the MeeMee World kit (`kit/`). The kit already provides everything games share: the start screen (sound and full screen start on the first tap), the home map where each game is a planet, the title banners (MeeMee World's name after Play, each game's name and badge as its planet is tapped, taken from its `game.json`), the crew screen, pausing (grown-ups area open, tablet upright, screen off), the grown-ups area and its lock, the voice and music players, dragging, Scruffles's ship, progress stars, sparkles, saving, the offline copy and updates. A game supplies only its own play, its own lines and its own drawings. Never rebuild what the kit does.
 
 Read `MEEMEE.md` (in the folder root) first: it holds the rules every game follows. Then, before writing any code, read both files beside this one:
 - [reference.md](reference.md): how a game joins the world, the kit's functions, the voice lines, the build and the tests.
@@ -39,6 +39,15 @@ Mimi World/                (the folder keeps the old spelling; the set is spelt 
 7. **Test.** Add checks for the game's main path to `tools/tests/test_game.py` (reference.md, Tests). Build and run both suites (below).
 8. **Check** everything on the checklist, then tell Barney (below).
 
+Leave the version alone: the page's version (`VERSION` in `tools/build.py`) is Barney's, set for each release. A new game, or a change to one, doesn't change it.
+
+## Reading the mock-up boards
+
+A game's look comes from its mock-up round on the design canvas, given to you as boards (pictures, often with their HTML) and the design system's cards.
+- **Boards drawn as HTML on the 1280 × 800 stage** (a `.dc.html` whose new parts are absolutely placed elements): their HTML gives every position and size in stage px (`left`, `top`, `width`, `height`; or the script that drew them). Take the numbers from there, not from the picture.
+- **Screenshot boards** (a picture of the real page with the change painted in) give no positions: keep the existing layout, and take any new positions from the design system's card for the piece. Don't measure the picture.
+- If a position you need is in neither, ask Barney rather than guess.
+
 ## Changing an existing game
 
 Read the game's folder first, change only what was asked, rebuild and run the test suites. If a line's words change, keep its id and tell Barney to record it again (the old recording plays until he does); a new line is pending. Never edit `docs/` files.
@@ -59,16 +68,17 @@ python tools/tests/test_build.py            # the build's own checks
 
 ## Rules that are not optional
 
-- **Nothing to read, everything spoken.** No words on a game screen except numerals and the letters or words being practised. The one exception is the kit's title banner, which shows the set's or a game's name while it is spoken (MEEMEE.md); a game never adds words of its own. Every instruction is a line in `lines.json`, in Barney's voice; Hear-again repeats the current one.
+- **Nothing to read, everything spoken.** No words on a game screen except numerals and the letters or words being practised. The one exception is the kit's title banner, which shows the set's or a game's name while it is spoken (MEEMEE.md); the kit shows it from `game.json`, and a game never adds words of its own. Every instruction is a line in `lines.json`, in Barney's voice; Hear-again repeats the current one.
 - **No timers, lives, scores or losing.** A wrong answer gets a calm line; the second gets a hint. No red, no buzzer, no sad faces.
 - **Join the world; don't rebuild it.** A game never makes its own start screen, map, Home behaviour, pause handling or grown-ups lock. Home is `MW.world.home`; pausing comes to the game through `onPause` and `onResume`.
 - **Respect the world's token.** Anything that waits (speech, a timer, a celebration) checks the token it started with (`MW.world.ok(token)`), so nothing happens after the player has left.
 - **Colour tokens only.** In JS, CSS and drawings: token classes (`f-mint`, `s-ink`), `var(--token)`, or `@token` in `art.py`. Never a hex value, `rgb()` or a colour name. The build stops on raw colours.
 - **Sound only through the kit.** `MW.world.speak` / `MW.audio.say` for lines, `MW.audio.sfx` for effects. Never `AudioContext`, `<audio>` or speech synthesis. The build stops on them.
 - **Big, forgiving targets.** Anything tapped or dragged is at least 84 stage px (120 px grab area for things that are dragged), at least 24 px from the edge, and away from the grown-ups lock (bottom left).
-- **Safe motion.** Nothing bigger than a character flashes more than 3 times a second; nothing repeats faster than once a second; the whole screen never flashes. With reduce motion, movement becomes a fade or an instant change.
+- **Safe motion.** Nothing bigger than a character flashes more than 3 times a second; small lights may flash up to 3 times a second, and anything else that repeats takes at least a second; the whole screen never flashes. With reduce motion, movement becomes a fade or an instant change.
 - **Names.** Invented names and art; no character from films, shows or apps; no helmet, hood, cloak or armour on anyone. Never the child's name, anywhere in the folder.
 - **Don't change `kit/` or `design/`** to make one game work. If the kit lacks something, finish the game without it and tell Barney what the kit should gain.
+- **Read saved data without creating it.** `MW.store.peek(id)` reads; `MW.store.game(id)` is only for changing it (it creates the game's entry).
 
 ## Checklist before saying a game is done
 

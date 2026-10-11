@@ -252,6 +252,524 @@
       "group": "Tricky words, weeks 1 to 4",
       "words": "push",
       "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… push.\")."
+    },
+    {
+      "id": "words-w-feel",
+      "group": "Other words, weeks 1 to 4",
+      "words": "feel",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-food",
+      "group": "Other words, weeks 1 to 4",
+      "words": "food",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-sort",
+      "group": "Other words, weeks 1 to 4",
+      "words": "sort",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-down",
+      "group": "Other words, weeks 1 to 4",
+      "words": "down",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-right",
+      "group": "Other words, weeks 1 to 4",
+      "words": "right",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-hard",
+      "group": "Other words, weeks 1 to 4",
+      "words": "hard",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-took",
+      "group": "Other words, weeks 1 to 4",
+      "words": "took",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-hear",
+      "group": "Other words, weeks 1 to 4",
+      "words": "hear",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-misses",
+      "group": "Other words, weeks 1 to 4",
+      "words": "misses",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-chain",
+      "group": "Other words, weeks 1 to 4",
+      "words": "chain",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-queen",
+      "group": "Other words, weeks 1 to 4",
+      "words": "queen",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-chair",
+      "group": "Other words, weeks 1 to 4",
+      "words": "chair",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-year",
+      "group": "Other words, weeks 1 to 4",
+      "words": "year",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-cobweb",
+      "group": "Other words, weeks 1 to 4",
+      "words": "cobweb",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-goats",
+      "group": "Other words, weeks 1 to 4",
+      "words": "goats",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-farmyard",
+      "group": "Other words, weeks 1 to 4",
+      "words": "farmyard",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-green",
+      "group": "Other words, weeks 1 to 4",
+      "words": "green",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-brown",
+      "group": "Other words, weeks 1 to 4",
+      "words": "brown",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-train",
+      "group": "Other words, weeks 1 to 4",
+      "words": "train",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-thinks",
+      "group": "Other words, weeks 1 to 4",
+      "words": "thinks",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-drum",
+      "group": "Other words, weeks 1 to 4",
+      "words": "drum",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-splat",
+      "group": "Other words, weeks 1 to 4",
+      "words": "splat",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-paint",
+      "group": "Other words, weeks 1 to 4",
+      "words": "paint",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-frog",
+      "group": "Other words, weeks 1 to 4",
+      "words": "frog",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-day",
+      "group": "Other words, weeks 1 to 4",
+      "words": "day",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-cloud",
+      "group": "Other words, weeks 1 to 4",
+      "words": "cloud",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-boy",
+      "group": "Other words, weeks 1 to 4",
+      "words": "boy",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-read",
+      "group": "Other words, weeks 1 to 4",
+      "words": "read",
+      "how": "Say it as \"reed\" (the ea sound of week 4). Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-play",
+      "group": "Other words, weeks 1 to 4",
+      "words": "play",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-sound",
+      "group": "Other words, weeks 1 to 4",
+      "words": "sound",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-joy",
+      "group": "Other words, weeks 1 to 4",
+      "words": "joy",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-treat",
+      "group": "Other words, weeks 1 to 4",
+      "words": "treat",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\").",
+      "pending": true
+    },
+    {
+      "id": "words-s-a",
+      "group": "Tile sounds",
+      "words": "a",
+      "how": "A pure sound, clear and short. Used by: a.",
+      "pending": true
+    },
+    {
+      "id": "words-s-b",
+      "group": "Tile sounds",
+      "words": "b",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: b.",
+      "pending": true
+    },
+    {
+      "id": "words-s-d",
+      "group": "Tile sounds",
+      "words": "d",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: d.",
+      "pending": true
+    },
+    {
+      "id": "words-s-e",
+      "group": "Tile sounds",
+      "words": "e",
+      "how": "A pure sound, clear and short. Used by: e, ai (said).",
+      "pending": true
+    },
+    {
+      "id": "words-s-f",
+      "group": "Tile sounds",
+      "words": "f",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: f.",
+      "pending": true
+    },
+    {
+      "id": "words-s-g",
+      "group": "Tile sounds",
+      "words": "g",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: g.",
+      "pending": true
+    },
+    {
+      "id": "words-s-h",
+      "group": "Tile sounds",
+      "words": "h",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: h.",
+      "pending": true
+    },
+    {
+      "id": "words-s-i",
+      "group": "Tile sounds",
+      "words": "i",
+      "how": "A pure sound, clear and short. Used by: i.",
+      "pending": true
+    },
+    {
+      "id": "words-s-j",
+      "group": "Tile sounds",
+      "words": "j",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: j.",
+      "pending": true
+    },
+    {
+      "id": "words-s-k",
+      "group": "Tile sounds",
+      "words": "k (for c and k)",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: c, k.",
+      "pending": true
+    },
+    {
+      "id": "words-s-l",
+      "group": "Tile sounds",
+      "words": "l",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: l, ll.",
+      "pending": true
+    },
+    {
+      "id": "words-s-m",
+      "group": "Tile sounds",
+      "words": "m",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: m.",
+      "pending": true
+    },
+    {
+      "id": "words-s-n",
+      "group": "Tile sounds",
+      "words": "n",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: n, ne (one).",
+      "pending": true
+    },
+    {
+      "id": "words-s-o",
+      "group": "Tile sounds",
+      "words": "o",
+      "how": "A pure sound, clear and short. Used by: o, a (what).",
+      "pending": true
+    },
+    {
+      "id": "words-s-p",
+      "group": "Tile sounds",
+      "words": "p",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: p.",
+      "pending": true
+    },
+    {
+      "id": "words-s-r",
+      "group": "Tile sounds",
+      "words": "r",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: r.",
+      "pending": true
+    },
+    {
+      "id": "words-s-s",
+      "group": "Tile sounds",
+      "words": "s",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: s, ss.",
+      "pending": true
+    },
+    {
+      "id": "words-s-t",
+      "group": "Tile sounds",
+      "words": "t",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: t.",
+      "pending": true
+    },
+    {
+      "id": "words-s-u",
+      "group": "Tile sounds",
+      "words": "u",
+      "how": "A pure sound, clear and short. Used by: u, o (love), o (some).",
+      "pending": true
+    },
+    {
+      "id": "words-s-v",
+      "group": "Tile sounds",
+      "words": "v",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: f (of), ve (love).",
+      "pending": true
+    },
+    {
+      "id": "words-s-w",
+      "group": "Tile sounds",
+      "words": "w",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: w, wh (what).",
+      "pending": true
+    },
+    {
+      "id": "words-s-y",
+      "group": "Tile sounds",
+      "words": "y, as in yes",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: y.",
+      "pending": true
+    },
+    {
+      "id": "words-s-ai",
+      "group": "Tile sounds",
+      "words": "ai, as in rain",
+      "how": "A pure sound, clear and a little longer. Used by: ai, ay, ey (they).",
+      "pending": true
+    },
+    {
+      "id": "words-s-air",
+      "group": "Tile sounds",
+      "words": "air, as in chair",
+      "how": "A pure sound, clear and a little longer. Used by: air.",
+      "pending": true
+    },
+    {
+      "id": "words-s-ar",
+      "group": "Tile sounds",
+      "words": "ar, as in hard",
+      "how": "A pure sound, clear and a little longer. Used by: ar.",
+      "pending": true
+    },
+    {
+      "id": "words-s-ch",
+      "group": "Tile sounds",
+      "words": "ch",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: ch.",
+      "pending": true
+    },
+    {
+      "id": "words-s-ear",
+      "group": "Tile sounds",
+      "words": "ear, as in hear",
+      "how": "A pure sound, clear and a little longer. Used by: ear, ere (here).",
+      "pending": true
+    },
+    {
+      "id": "words-s-ee",
+      "group": "Tile sounds",
+      "words": "ee, as in feel",
+      "how": "A pure sound, clear and a little longer. Used by: ea, ee, e (me), e (she).",
+      "pending": true
+    },
+    {
+      "id": "words-s-igh",
+      "group": "Tile sounds",
+      "words": "igh, as in right",
+      "how": "A pure sound, clear and a little longer. Used by: igh, y (my), i (like).",
+      "pending": true
+    },
+    {
+      "id": "words-s-oa",
+      "group": "Tile sounds",
+      "words": "oa, as in goat",
+      "how": "A pure sound, clear and a little longer. Used by: oa, o (go).",
+      "pending": true
+    },
+    {
+      "id": "words-s-oo-long",
+      "group": "Tile sounds",
+      "words": "oo, as in food",
+      "how": "A pure sound, clear and a little longer. Used by: oo, o (into), ou (you).",
+      "pending": true
+    },
+    {
+      "id": "words-s-oo-short",
+      "group": "Tile sounds",
+      "words": "oo, as in took",
+      "how": "A pure sound, clear and short. Used by: u (push), oo (took).",
+      "pending": true
+    },
+    {
+      "id": "words-s-or",
+      "group": "Tile sounds",
+      "words": "or, as in sort",
+      "how": "A pure sound, clear and a little longer. Used by: or, a (all).",
+      "pending": true
+    },
+    {
+      "id": "words-s-ow",
+      "group": "Tile sounds",
+      "words": "ow, as in down",
+      "how": "A pure sound, clear and a little longer. Used by: ow, ou (and ou in out).",
+      "pending": true
+    },
+    {
+      "id": "words-s-oy",
+      "group": "Tile sounds",
+      "words": "oy, as in boy",
+      "how": "A pure sound, clear and a little longer. Used by: oy.",
+      "pending": true
+    },
+    {
+      "id": "words-s-qu",
+      "group": "Tile sounds",
+      "words": "kw (qu)",
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: qu.",
+      "pending": true
+    },
+    {
+      "id": "words-s-sh",
+      "group": "Tile sounds",
+      "words": "sh",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: sh, s (sure).",
+      "pending": true
+    },
+    {
+      "id": "words-s-th",
+      "group": "Tile sounds",
+      "words": "th, as in thinks",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th.",
+      "pending": true
+    },
+    {
+      "id": "words-s-th-voiced",
+      "group": "Tile sounds",
+      "words": "th, as in they",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th (they).",
+      "pending": true
+    },
+    {
+      "id": "words-s-ur",
+      "group": "Tile sounds",
+      "words": "ur, as in turn",
+      "how": "A pure sound, clear and a little longer. Used by: ere (were).",
+      "pending": true
+    },
+    {
+      "id": "words-s-ure",
+      "group": "Tile sounds",
+      "words": "ure, as in sure",
+      "how": "A pure sound, clear and a little longer. Used by: ure (sure).",
+      "pending": true
+    },
+    {
+      "id": "words-s-wu",
+      "group": "Tile sounds",
+      "words": "w-u, as at the start of one",
+      "how": "A pure sound, clear and a little longer. Used by: o (one).",
+      "pending": true
     }
   ]
 }

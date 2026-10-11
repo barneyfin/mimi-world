@@ -63,10 +63,17 @@
     },
     setMusic: function (on) { load().music = !!on; save(); },
     // A game's own saved data: an object it can change freely, then MW.store.save() to keep the change.
+    // It creates the game's entry the first time (kept on the next save), so use it only to change things.
     game: function (id) {
       const g = load().games;
       if (!g[id] || typeof g[id] !== 'object' || Array.isArray(g[id])) g[id] = {};
       return g[id];
+    },
+    // Reading only: the game's saved data, or an empty object if it has saved nothing. It never creates anything, so a
+    // tablet that has never played a game keeps nothing for it. Don't change what it returns: use game(id) for that.
+    peek: function (id) {
+      const g = load().games[id];
+      return g && typeof g === 'object' && !Array.isArray(g) ? g : {};
     },
     // Forget a game's saved data (for its own "clear this tablet's progress" button).
     clearGame: function (id) { delete load().games[id]; save(); },
@@ -125,6 +132,8 @@
     el.addEventListener('click', function (e) { if (e.detail === 0 && !el.disabled) fn(e); });
   };
   // A copy of a drawing. Its ids (clip paths) get a number of their own, so the same drawing can be on the page twice.
+  // To draw it at another size, set its width and height; to show more or less of it (a hull as long as a word),
+  // set its viewBox too (the skill's reference.md, Drawings).
   let artCopies = 0;
   MW.art = function (name) {
     const t = document.getElementById('art-' + name);

@@ -62,7 +62,7 @@
   }
 
   function renderProgress(el) {
-    const saved = MW.store.game(ID);
+    const saved = MW.store.peek(ID);    // reading only: peek never creates anything (game(ID) is for changing it)
     MW.grownups.p(el, 'Rounds finished on this tablet: ' + (saved.rounds || 0) + '.', 'gu-lead');
   }
 })();

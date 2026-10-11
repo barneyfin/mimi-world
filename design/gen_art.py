@@ -55,8 +55,12 @@ def tok(svg):
 # ---------------------------------------------------------------- the MeeMee (same silhouette, a little more detail)
 
 def mimi(size=80, extra=""):
+    return f'<svg class="mw-mimi-art" width="{size}" height="{size}" viewBox="0 0 80 80" aria-hidden="true"{extra}>' + mimi_body() + '</svg>'
+
+
+def mimi_body():
+    """The MeeMee's shapes, in an 80 x 80 box (for drawings that hold a MeeMee)."""
     return tok(
-        f'<svg class="mw-mimi-art" width="{size}" height="{size}" viewBox="0 0 80 80" aria-hidden="true"{extra}>'
         '<path d="M14 32 L12 6 L33 21 Z" fill="@mimi" stroke="@mimi-outline" stroke-width="4" stroke-linejoin="round"/>'
         '<path d="M66 32 L68 6 L47 21 Z" fill="@mimi" stroke="@mimi-outline" stroke-width="4" stroke-linejoin="round"/>'
         '<path d="M17 25 L16 13 L27 21 Z" fill="@mimi-muzzle"/><path d="M63 25 L64 13 L53 21 Z" fill="@mimi-muzzle"/>'
@@ -71,8 +75,66 @@ def mimi(size=80, extra=""):
         '<path d="M37 51 L43 51 L40 54.5 Z" fill="@mimi-nose"/>'
         '<path d="M36.5 58 C 38 59.6, 40 59.6, 40 57 C 40 59.6, 42 59.6, 43.5 58" fill="none" stroke="@mimi-outline" stroke-width="1.6" stroke-linecap="round"/>'
         '<path d="M28 55 L18 53 M28 58 L19 60 M52 55 L62 53 M52 58 L61 60" stroke="@mimi-outline" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>'
-        '</svg>'
     )
+
+
+# ---------------------------------------------------------------- MeeMee Rescue's numbers mode (0.6.0, round 8; NumbersMode)
+# The kit puts the number itself over these drawings as text (numeral-sign on the sign, numeral-part on a tile), so one
+# drawing serves every number.
+
+NUMBERED = {"w": 140, "h": 209, "mimi": 128, "sign_y": 102.4, "sign_w": 140, "sign_h": 100}
+
+
+def numbered_mimi():
+    """A MeeMee holding up a peach sign (its number goes on the sign): 140 x 209 at full size, in a part circle.
+    The MeeMee is 128 across; the sign 140 x 100 with a 4.5 px ink edge and a peach-dark shadow 6 px down; two lilac
+    paws grip its top edge. Centred on its circle at (70, 102.5); the whole circle's is drawn at 0.86 (kit/scene.js)."""
+    n = NUMBERED
+    cx, sy = n["w"] / 2, n["sign_y"]
+    paws = ""
+    for px in (cx - 0.3 * n["sign_w"], cx + 0.3 * n["sign_w"]):
+        py = sy + 4
+        paws += (f'<ellipse cx="{f(px)}" cy="{f(py)}" rx="15" ry="10" fill="@mimi" stroke="@mimi-outline" stroke-width="3.5"/>'
+                 f'<path d="M{f(px - 5)} {f(py - 6)} V{f(py)} M{f(px)} {f(py - 7)} V{f(py)} M{f(px + 5)} {f(py - 6)} V{f(py)}" '
+                 'stroke="@mimi-outline" stroke-width="2" stroke-linecap="round"/>')
+    return (f'<svg width="{n["w"]}" height="{n["h"]}" viewBox="0 0 {n["w"]} {n["h"]}" overflow="visible" aria-hidden="true">'
+            f'<svg x="{f(cx - n["mimi"] / 2)}" y="0" width="{n["mimi"]}" height="{n["mimi"]}" viewBox="0 0 80 80" overflow="visible">' + mimi_body() + '</svg>'
+            + tok(f'<rect x="0" y="{f(sy + 6)}" width="{n["sign_w"]}" height="{n["sign_h"]}" rx="22" fill="@peach-dark"/>'
+                  f'<rect x="2.25" y="{f(sy + 2.25)}" width="{f(n["sign_w"] - 4.5)}" height="{f(n["sign_h"] - 4.5)}" rx="19.75" '
+                  'fill="@peach" stroke="@ink" stroke-width="4.5"/>' + paws)
+            + '</svg>')
+
+
+def number_tile():
+    """A number tile (its number goes on top): a moon disc 84 across with a 6 px mint rim, a 3 px ink edge and an ink
+    shadow 6 px down. 90 x 96, the disc centred on (45, 45): put it 3 px up and left of the tile's 84 px box."""
+    return ('<svg width="90" height="96" viewBox="-45 -45 90 96" overflow="visible" aria-hidden="true">'
+            + tok('<circle cx="0" cy="6" r="45" fill="@ink"/>'
+                  '<circle cx="0" cy="0" r="43.5" fill="@moon" stroke="@ink" stroke-width="3"/>'
+                  '<circle cx="0" cy="0" r="39" fill="none" stroke="@mint" stroke-width="6"/>')
+            + '</svg>')
+
+
+TRACK = {"x": 114, "y": 674, "w": 1052, "h": 108}
+
+
+def number_track(uid="track"):
+    """The number track's rail: an asteroid bar 1052 x 108 (radius 54) with a lit top edge, a shaded foot and an ink
+    edge. It sits at (114, 674) under the tiles 0 to 10 (x 128 + 94 n, tops at 686)."""
+    w, h, r, e = TRACK["w"], TRACK["h"], 54, 4.5
+    iw, ih, ir = w - 2 * e, h - 2 * e, r - e
+
+    def shape(dy=0):
+        return (f'M{f(e + ir)} {f(e + dy)} H{f(e + iw - ir)} A{f(ir)} {f(ir)} 0 0 1 {f(e + iw - ir)} {f(e + ih + dy)} '
+                f'H{f(e + ir)} A{f(ir)} {f(ir)} 0 0 1 {f(e + ir)} {f(e + dy)} Z')
+    return (f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" aria-hidden="true">'
+            + tok(f'<clipPath id="{uid}-in"><path d="{shape()}"/></clipPath>'
+                  f'<path d="{shape()}" fill="@asteroid"/>'
+                  f'<g clip-path="url(#{uid}-in)">'
+                  f'<path d="{shape()} {shape(-10)}" fill="@asteroid-crater" fill-rule="evenodd"/>'
+                  f'<path d="{shape()} {shape(8)}" fill="@asteroid-light" fill-rule="evenodd"/></g>'
+                  f'<rect x="{e / 2}" y="{e / 2}" width="{w - e}" height="{h - e}" rx="{r - e / 2}" fill="none" stroke="@ink" stroke-width="{e}"/>')
+            + '</svg>')
 
 
 # Counting patterns: offsets from a part circle's centre, and the MeeMee size for each count.

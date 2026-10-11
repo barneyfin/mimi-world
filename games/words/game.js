@@ -48,8 +48,8 @@
   });
 
   // ---------------------------------------------------------------- saved data (this game's own, on the tablet)
-  // Read without creating it, so a tablet that has never played keeps nothing for this game.
-  function saved() { const g = MW.store.get('games') || {}; return g[ID] || {}; }
+  // Read without creating it (MW.store.peek), so a tablet that has never played keeps nothing for this game.
+  function saved() { return MW.store.peek(ID); }
   function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
   function week() {
     const w = +saved().week;
@@ -88,7 +88,7 @@
     });
     findPod = MW.pod(s, POD.find[0], POD.find[1], POD.find[2]);
     MW.onTap(findPod.el, hearAgain);
-    findStars = MW.stars(s, 517, 34);
+    findStars = MW.stars(s, MW.LAYOUT.stars.cx, MW.LAYOUT.stars.y, null, { centre: true });   // centred, however many words
     findFx = MW.make('div', 'mw-layer mw-fill'); s.appendChild(findFx);
     MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
   }
@@ -103,7 +103,7 @@
     shipLayer = MW.make('div', 'mw-layer mw-fill'); s.appendChild(shipLayer);
     buildPod = MW.pod(s, POD.build[0], POD.build[1], POD.build[2]);
     MW.onTap(buildPod.el, function () { if (!(dragger && dragger.dragging())) hearAgain(); });
-    buildStars = MW.stars(s, 517, 34);
+    buildStars = MW.stars(s, MW.LAYOUT.stars.cx, MW.LAYOUT.stars.y, null, { centre: true });
     tileLayer = MW.make('div', 'mw-layer mw-fill words-tiles'); s.appendChild(tileLayer);
     buildFx = MW.make('div', 'mw-layer mw-fill'); s.appendChild(buildFx);
     MW.shell.buttons(s, ['home', 'music', 'hear'], { home: W.home, hear: hearAgain });
@@ -111,14 +111,13 @@
       counters: function () { return st.tiles.filter(function (c) { return !c.placed; }); },
       enabled: function () { return !W.st.paused && W.st.phase === 'words-build' && MW.shell.screen === BUILD; },
       onPick: function (c) { MW.log('pick', c.text); },
-      onDrop: onDrop,
-      grab: 100                                                // ovals are up to 200 px wide
+      onDrop: onDrop                                           // each tile is picked up in its own box (makeTile)
     });
   }
 
   function buildEnd() {
     const s = W.screen(END, 'All the rockets launched');
-    endStars = MW.stars(s, 450, 40, 60);
+    endStars = MW.stars(s, 640, 40, 60, { centre: true });
     endPod = MW.pod(s, 380, 120, 400); endPod.face('got-it'); endPod.el.disabled = true; endPod.el.tabIndex = -1;
     endRockets = MW.make('div', 'mw-abs words-end-rockets', { style: 'left:300px;top:590px' });
     s.appendChild(endRockets);
@@ -130,11 +129,7 @@
     MW.shell.buttons(s, ['home', 'music'], { home: W.home });
   }
 
-  function setStars(stars, done) {
-    const n = st.round.length || ROUND;
-    stars.set(done, n);
-    stars.el.style.left = Math.round(640 - (38 * n + 14 * (n - 1)) / 2) + 'px';   // centred, however many words
-  }
+  function setStars(stars, done) { stars.set(done, st.round.length || ROUND); }
 
   // ---------------------------------------------------------------- a round
   function makeRound() {
@@ -340,7 +335,10 @@
     body.appendChild(MW.make('span', 'words-tile-text', null, MW.esc(t.text)));
     el.appendChild(body);
     tileLayer.appendChild(el);
-    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null };
+    // its pick-up box (MW.dragger): 10 px each side, so neighbours' boxes meet halfway across the tray's 20 px gap and a
+    // finger anywhere on a long tile picks that tile; 20 px above and below, for a forgiving pick-up
+    const c = { el: el, text: t.text, tricky: t.tricky, spare: t.spare, k: k, w: w, x: 0, y: 0, draggable: true, placed: false, home: null,
+      grab: { w: w + TRAY.gap, h: D + 40 } };
     c.moveTo = function (x, y, size, animate) {
       c.x = x; c.y = y;
       el.classList.toggle('is-moving', !!animate && !MW.reduceMotion);
@@ -508,7 +506,6 @@
     MW.shell.show(END);
     const n = st.round.length;
     endStars.set(n, n);
-    endStars.el.style.left = Math.round(640 - (60 * n + 14 * (n - 1)) / 2) + 'px';
     endRockets.innerHTML = '';
     for (let i = 0; i < n; i++) {
       const r = MW.make('div', 'words-end-rocket');
