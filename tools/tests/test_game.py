@@ -1,6 +1,6 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
-game), the kit (0.6.0: the title banners, the store, stars, pick-up boxes, numbers mode's pieces) and MeeMee Rescue's
-numbers mode (0.6.0), on Fire and Doogee screen sizes.
+game; 0.7.0: autumn 2, the half-term switch, capitals), the kit (0.6.0: the title banners, the store, stars, pick-up boxes,
+numbers mode's pieces) and MeeMee Rescue's numbers mode (0.6.0), on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -1165,6 +1165,12 @@ WORDS_PLANET = "MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === 'words')
 PRAISE_LINES = {"words-found-it", "words-super-reading", "words-well-done"}
 W_ROUND = [{"word": "one", "step": "tiles"}, {"word": "spray", "step": "letters"}, {"word": "here", "step": "tiles"},
            {"word": "popcorn", "step": "harder"}, {"word": "my", "step": "tiles"}]
+# 0.7.0: what's in play is a grown-up's choice of half-term and week (or a whole term). The checks written for 0.6.0 play
+# autumn 1's week 5 (0.6.0's week in play), saved in the new shape; a tablet with nothing saved plays the start, autumn 2's
+# week 1.
+A1 = {"half": "autumn-1", "week": 5}
+A2 = {"half": "autumn-2", "week": 1}
+TERM = {"term": "autumn"}
 # What each sound tile says in its word (0.6.0 PRD, Lines tab; answers 13, 22 and 23): the sound ids (words-s-<id>), one
 # per tile, '-' for the e of a split pair, which says nothing
 W_SOUNDS = {
@@ -1179,6 +1185,22 @@ W_SOUNDS = {
     "said": "s e d", "you": "y oo-long", "like": "l igh k -", "push": "p oo-short sh", "day": "d ai", "cloud": "k l ow d",
     "boy": "b oy", "read": "r ee d", "play": "p l ai", "sound": "s ow n d", "joy": "j oy", "treat": "t r ee t",
 }
+# Autumn 2 (0.7.0 PRD, Words and tiles tab, with Barney's answers): what each sound tile says, one per tile, '-' for a
+# tile that says nothing. The seven words shared with autumn 1 say the same as there.
+W_SOUNDS_A2 = {
+    "their": "th-voiced air", "people": "p ee p l", "oh": "oa -", "your": "y or", "bird": "b ur d", "girl": "g ur l",
+    "pie": "p igh", "tried": "t r igh d", "blue": "b l oo-long", "true": "t r oo-long", "human": "h yoo m a n", "unit": "yoo n i t",
+    "Mr": "- -", "Mrs": "- - -", "Ms": "- -", "ask": "ar s k", "both": "b oa th", "go": "g oa", "child": "ch igh l d",
+    "kind": "k igh n d", "basic": "b ai s i k", "acorn": "ai k or n", "fever": "f ee v er", "me": "m ee",
+    "could": "k oo-short d", "would": "w oo-short d", "should": "sh oo-short d", "our": "ow er", "take": "t ai k -",
+    "same": "s ai m -", "time": "t igh m -", "like": "l igh k -", "home": "h oa m -", "woke": "w oa k -", "rude": "r oo-long d -",
+    "cute": "k yoo t -", "house": "h ow s -", "mouse": "m ow s -", "water": "w or t er", "want": "w o n t",
+    "these": "th-voiced ee z -", "even": "ee v e n", "new": "n yoo", "chew": "ch oo-long", "shriek": "sh r ee k",
+    "field": "f ee l d", "claw": "k l or", "draw": "d r or", "sure": "sh ure", "some": "s u m -", "little": "l i t l",
+    "what": "w o t", "fried": "f r igh d", "spray": "s p r ai", "game": "g ai m -", "open": "oa p e n", "float": "f l oa t",
+    "being": "b ee i ng", "eating": "ee t i ng",
+}
+A2_SHARED = ["go", "me", "like", "sure", "some", "what", "spray"]       # in both half-terms (D1)
 
 
 async def w_state(page):
@@ -1259,8 +1281,16 @@ async def w_tray(page):
                  rows: new Set(MW.wordsGame.st.tiles.filter(c => !c.placed).map(c => Math.round(c.home.y))).size }; })()""")
 
 
-async def w_open(t, page, round_):
-    """Play, then the MeeMee Rockets planet, with the round fixed."""
+async def w_choose(page, choice):
+    """Put a choice in play, saved as the Words tab saves it: {'half': id, 'week': n or 'all'}, or {'term': id}."""
+    await page.evaluate("(c) => { const g = MW.store.game('words'); delete g.term; delete g.half; delete g.week; Object.assign(g, c); MW.store.save(); }", choice)
+
+
+async def w_open(t, page, round_, choice=A1):
+    """Play, then the MeeMee Rockets planet, with the round fixed (and a choice in play: autumn 1's week 5, unless given;
+    None leaves the saved choice as it is)."""
+    if choice is not None:
+        await w_choose(page, choice)
     await page.evaluate("MW.wordsGame.nextRound = %s" % json.dumps(round_))
     if await page.evaluate("MW.shell.screen") == "screen-start":
         await t.tap(*PLAY)
@@ -1581,29 +1611,47 @@ async def test_words_steps(p):
     ctx, page, problems = await seeded(browser, [])
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
     E = lambda js, arg=None: page.evaluate(js, arg)
-    book = await E("(() => { const b = MW.wordSteps.read(MW.wordsData); return { problems: b.problems, order: b.order, weeks: b.weeks, tray: b.harderTray, start: b.startWeek }; })()")
+    book = await E("""(() => { const b = MW.wordSteps.read(MW.wordsData); return { problems: b.problems, order: b.order, tray: b.harderTray, start: b.start,
+        terms: b.terms.map(t => [t.id, t.name, t.all, t.halves.map(h => h.id)]), halves: b.halves.map(h => ({ id: h.id, name: h.name, weeks: h.weeks })) }; })()""")
     check("words: the words file reads with no problems", not book["problems"], "; ".join(book["problems"][:3]))
-    check("words: 60 words over weeks 1 to 5 (each week's 4 tricky words and 8 others), week 5 to start, the harder tray holds 10",
-          len(book["order"]) == 60 and [w["week"] for w in book["weeks"]] == [1, 2, 3, 4, 5] and all(len(w["tricky"]) == 4 and len(w["other"]) == 8 for w in book["weeks"])
-          and book["start"] == 5 and book["tray"] == 10, json.dumps(book)[:200])
-    lines = {c["id"] for c in json.loads((ROOT / "games" / "words" / "lines.json").read_text(encoding="utf-8"))["lines"]}
+    halves = {h["id"]: h for h in book["halves"]}
+    a1, a2 = halves.get("autumn-1"), halves.get("autumn-2")
+    listed = lambda h: [w for wk in h["weeks"] for w in wk["tricky"] + wk["other"]]
+    check("words: one term, autumn ('All of autumn'), with two half-terms, Autumn 1 and Autumn 2, autumn 2's week 1 to start, the harder tray holds 10",
+          book["terms"] == [["autumn", "Autumn", "All of autumn", ["autumn-1", "autumn-2"]]] and a1 and a2 and a1["name"] == "Autumn 1" and a2["name"] == "Autumn 2"
+          and book["start"] == {"half": "autumn-2", "week": 1} and book["tray"] == 10, json.dumps([book["terms"], book["start"]]))
+    check("words: autumn 1: 60 words over weeks 1 to 5 (each week's 4 tricky words and 8 others)",
+          [w["week"] for w in a1["weeks"]] == [1, 2, 3, 4, 5] and all(len(w["tricky"]) == 4 and len(w["other"]) == 8 for w in a1["weeks"])
+          and len(listed(a1)) == len(set(listed(a1))) == 60, str(len(listed(a1))))
+    check("words: autumn 2: weeks 1 to 5, 60 entries (4 tricky words and 8 others a week), 59 different words ('time' in weeks 3 and 5), 52 new to the game",
+          [w["week"] for w in a2["weeks"]] == [1, 2, 3, 4, 5] and all(len(w["tricky"]) == 4 and len(w["other"]) == 8 for w in a2["weeks"])
+          and len(listed(a2)) == 60 and len(set(listed(a2))) == 59 and listed(a2).count("time") == 2 and len(set(listed(a2)) - set(listed(a1))) == 52
+          and sorted(set(listed(a2)) & set(listed(a1))) == sorted(A2_SHARED), str(sorted(set(listed(a2)) & set(listed(a1)))))
+    check("words: 112 words in all, each once in the words file's list", len(book["order"]) == 112 == len(set(book["order"])), str(len(book["order"])))
+    w_lines = {c["id"]: c for c in json.loads((ROOT / "games" / "words" / "lines.json").read_text(encoding="utf-8"))["lines"]}
     on_page = set(await E("Object.keys(MW.audio.manifest.voice)"))
-    missing = [w for w in book["order"] if f"words-w-{w}" not in lines or f"words-w-{w}" not in on_page]
-    check("words: every word has its line in lines.json and its recording on the page", not missing, str(missing))
-    in_play = {wk: await E("(w) => MW.wordSteps.inPlay(MW.wordSteps.read(MW.wordsData), w)", wk) for wk in (1, 2, 3, 4, 5, "all")}
+    missing = [w for w in book["order"] if f"words-w-{w.lower()}" not in w_lines or ((f"words-w-{w.lower()}" in on_page) == bool(w_lines[f"words-w-{w.lower()}"].get("pending")))]
+    check("words: every word has its line in lines.json (in small letters: words-w-mr), on the page once recorded and pending until then", not missing, str(missing))
+    check("words: autumn 1's 60 words are recorded", all(f"words-w-{w}" in on_page for w in listed(a1)), str([w for w in listed(a1) if f"words-w-{w}" not in on_page]))
+    in_play = {wk: await E("(w) => MW.wordSteps.inPlay(MW.wordSteps.read(MW.wordsData), w)", {"half": "autumn-1", "week": wk}) for wk in (1, 2, 3, 4, 5, "all")}
     check("words: in play: week 1 has its 12 words, week 3 its 12 and 8 earlier tricky words, week 5 its 12 and 16 earlier tricky words, all weeks 60",
-          len(in_play[1]) == 12 and len(in_play[3]) == 20 and len(in_play[5]) == 28 and len(in_play["all"]) == 60 and set(in_play["all"]) == set(book["order"]),
+          len(in_play[1]) == 12 and len(in_play[3]) == 20 and len(in_play[5]) == 28 and len(in_play["all"]) == 60 and set(in_play["all"]) == set(listed(a1)),
           str({k: len(v) for k, v in in_play.items()}))
     check("words: week 5 in play: its tricky words, its other words, then earlier weeks' tricky words",
           in_play[5][:12] == ["all", "of", "one", "here", "magnet", "cartoon", "rabbit", "spray", "popcorn", "proud", "toy", "say"])
 
-    # every word of weeks 1 to 5, as a Find question and as a Build question at each step, through the game's own screens
-    # (with every week in play, so Find's other two words come from all of them)
-    await E("(() => { const g = MW.store.game('words'); g.week = 'all'; MW.store.save(); })()")
+    # every word of both half-terms, as a Find question and as a Build question at each step, through the game's own
+    # screens (with all of autumn in play, so Find's other two words come from every recorded word; a word whose recording
+    # isn't on the page yet is asked through the game's own screens all the same)
+    await w_choose(page, TERM)
+    term_words = await E("MW.wordSteps.inPlay(MW.wordsGame.book, { term: 'autumn' })")
+    marked = await E("(() => { const m = MW.wordSteps.marks(MW.wordsGame.book, { term: 'autumn' }); return Object.fromEntries(Object.keys(m).map(w => [w, m[w].tricky])); })()")
+    check("words: with all of autumn in play, go, me and like are plain (autumn 2 lists them as other words); sure, some and what tricky",
+          [marked.get(w) for w in A2_SHARED] == [False, False, False, True, True, True, False], str([marked.get(w) for w in A2_SHARED]))
     rows = await E("""() => {
         const G = MW.wordsGame, S = MW.wordSteps, out = [];
         MW.world.st.phase = 'map';
-        S.inPlay(G.book, 'all').forEach(w => {
+        S.inPlay(G.book, { term: 'autumn' }).forEach(w => {
           const r = { word: w, find: null, build: {} };
           G.setFind({ word: w }); G.showFind({ word: w, step: 'tiles' });
           r.find = { phase: MW.world.st.phase, screen: MW.shell.screen, words: G.st.rockets.map(x => x.word), prompt: JSON.stringify(G.st.prompt) };
@@ -1624,14 +1672,16 @@ async def test_words_steps(p):
         return out; }""")
     data = await E("MW.wordsData.words")
     ok_find = [r["word"] for r in rows if r["find"]["phase"] == "words-find" and r["find"]["screen"] == "screen-words-find"
-               and r["word"] in r["find"]["words"] and len(set(r["find"]["words"])) == 3 and set(r["find"]["words"]) <= set(in_play["all"])
-               and r["find"]["prompt"] == json.dumps([["words-find", f"words-w-{r['word']}"]]).replace(" ", "")]
-    check("words: every word of weeks 1 to 5 can be asked in Find (60), among two other words in play", len(ok_find) == 60 and len(rows) == 60,
+               and r["word"] in r["find"]["words"] and len(set(r["find"]["words"])) == 3 and set(r["find"]["words"]) <= set(term_words)
+               and r["find"]["prompt"] == json.dumps([["words-find", f"words-w-{r['word'].lower()}"]]).replace(" ", "")]
+    check("words: every word of both half-terms can be asked in Find (112), among two other words in play", len(ok_find) == 112 and len(rows) == 112,
           str(sorted(set(book["order"]) - set(ok_find))))
     bad = []
     for r in rows:
         w = r["word"]
-        tiles = data[w]["tiles"].split()
+        # the tricky part is marked only where the half-term in play lists the word as tricky (with all of autumn: the
+        # last half-term that lists it)
+        tiles = [t if marked[w] else t.strip("[]") for t in data[w]["tiles"].split()]
         letters = [("[" + ch + "]" if t.startswith("[") else ch) for t in tiles for ch in t.strip("[]")]
         spares = data[w].get("spares", "").split()
         for step, b in r["build"].items():
@@ -1640,7 +1690,7 @@ async def test_words_steps(p):
             tray_plain = sorted(x.rstrip("*") for x in b["tray"])
             if b["mode"] != b["want"] or b["places"] != want or b["sockets"] != len(want) or not b["done"] or b["built"] != w:
                 bad.append(f"{w} {step}: {b}")
-            elif b["prompt"] != json.dumps([["words-build", f"words-w-{w}"]]).replace(" ", ""):
+            elif b["prompt"] != json.dumps([["words-build", f"words-w-{w.lower()}"]]).replace(" ", ""):
                 bad.append(f"{w} {step}: prompt {b['prompt']}")
             elif sorted(b["marked"]) != sorted(x.strip("[]") for x in want if x.startswith("[")):
                 bad.append(f"{w} {step}: marked {b['marked']}")
@@ -1654,29 +1704,46 @@ async def test_words_steps(p):
                     extra.remove(ch)
                 if len(b["tray"]) != max(10, len(plain) + len(spares)) or len(set(extra)) != len(extra) or set(extra) & set(plain + spares):
                     bad.append(f"{w} {step}: harder tray {b['tray']}")
-    check("words: every word of weeks 1 to 5 can be built (240 questions: sound tiles, letters, harder letters, and secure in harder letters)",
-          not bad and len(rows) * 4 == 240, "; ".join(bad[:3]))
+                elif any(ch != ch.lower() for ch in extra):
+                    bad.append(f"{w} {step}: a capital in its harder tray that isn't its own {b['tray']}")
+    check("words: every word of both half-terms can be built (448 questions: sound tiles, letters, harder letters, and secure in harder letters)",
+          not bad and len(rows) * 4 == 448, "; ".join(bad[:3]))
     sounds = {r["word"]: " ".join(x if x else "?" for x in r["build"]["tiles"]["sounds"]) for r in rows}
     wrong = {w: [sounds.get(w), want] for w, want in W_SOUNDS.items() if sounds.get(w) != want}
-    check("words: in sound tiles every tile says its sound in its word, as on the Lines tab (60 words; tricky tiles say what they say in the word)",
-          not wrong and len(sounds) == 60, json.dumps(wrong)[:300])
+    check("words: in sound tiles every autumn 1 tile says its sound in its word, as on the 0.6.0 Lines tab (60 words; tricky tiles say what they say in the word)",
+          not wrong and len(W_SOUNDS) == 60, json.dumps(wrong)[:300])
+    wrong = {w: [sounds.get(w), want] for w, want in W_SOUNDS_A2.items() if sounds.get(w) != want}
+    same = [w for w in A2_SHARED if W_SOUNDS[w] != W_SOUNDS_A2[w]]
+    check("words: ... and every autumn 2 tile as on the 0.7.0 Words and tiles tab (59 words: ask's a says ar, our's ou ow and r er, even's e's ee then e, these's s z)",
+          not wrong and not same and len(W_SOUNDS_A2) == 59 and len(sounds) == 112, json.dumps([wrong, same])[:300])
     # the list for grown-ups to compare with the homework (like MeeMee Rescue's all-questions.md)
-    out = ["# Every question MeeMee Rockets can ask (weeks 1 to 5)", "",
+    out = ["# Every question MeeMee Rockets can ask (autumn 1 and autumn 2)", "",
            "Made by tools/tests/test_game.py from the game's own words file (games/words/words.js); don't edit it by hand.",
            "Each word is asked twice in a round: Find (tap it among three rockets) and Build (drag its tiles into the rocket).",
-           "Tricky parts are in [square brackets]: on the tiles they are the darker peach letters. Spares are marked *.",
+           "Tricky parts are in [square brackets]: on the tiles they are the darker peach letters, shown only where the half-term in",
+           "play lists the word as tricky (Tricky in). Spares are marked *.",
            "In sound tiles each tile says its sound as it is picked up (the recording words-s- and the sound; - says nothing).",
            "Harder letters adds letters from other words until the tray holds 10 tiles (a different few each time).", "",
-           "| Word | Week | Find | Sound tiles | Tiles say | Letters | Harder letters |", "|---|---|---|---|---|---|---|"]
-    week_of = {w: wk["week"] for wk in book["weeks"] for w in wk["tricky"] + wk["other"]}
+           "| Word | Listed in | Tricky in | Find | Sound tiles | Tiles say | Letters | Harder letters |", "|---|---|---|---|---|---|---|---|"]
+    where, tricky_in = {}, {}
+    for h in book["halves"]:
+        for wk in h["weeks"]:
+            for kind in ("tricky", "other"):
+                for w in wk[kind]:
+                    where.setdefault(w, []).append(f"{h['name']}, week {wk['week']}")
+                    if kind == "tricky" and h["name"] not in tricky_in.setdefault(w, []):
+                        tricky_in[w].append(h["name"])
     for r in rows:
         w = r["word"]
         b = r["build"]
-        let = " ".join(b["letters"]["places"]) + " + " + " ".join(x + "*" for x in data[w].get("spares", "").split())
-        out.append(f"| {w} | {week_of[w]} | Find the word… {w}. | {' · '.join(b['tiles']['places'])} | {' · '.join(x or '?' for x in b['tiles']['sounds'])} | {let} | {let} + {10 - len(b['letters']['tray'])} more |")
+        tiles = data[w]["tiles"].split()
+        letters = " ".join(("[" + ch + "]" if t.startswith("[") else ch) for t in tiles for ch in t.strip("[]"))
+        let = letters + " + " + " ".join(x + "*" for x in data[w].get("spares", "").split())
+        out.append(f"| {w} | {'; '.join(where[w])} | {', '.join(tricky_in.get(w, [])) or '-'} | Find the word… {w}. | {' · '.join(tiles)} | "
+                   f"{' · '.join(x or '?' for x in b['tiles']['sounds'])} | {let} | {let} + {10 - len(b['letters']['tray'])} more |")
     (ROOT / "notes" / "all-questions-words.md").write_text("\n".join(out) + "\n", encoding="utf-8", newline="\n")
-    print("   wrote notes/all-questions-words.md (60 words, 240 questions)")
-    await E("(() => { const g = MW.store.game('words'); g.week = 5; MW.store.save(); })()")
+    print("   wrote notes/all-questions-words.md (112 words, 448 questions)")
+    await w_choose(page, A1)
 
     # the steps: three days right first time at each step; a wrong try restarts that step's days; back a step only from
     # secure, after two slips in a row (answer 12 of the 0.6.0 PRD)
@@ -1717,8 +1784,10 @@ async def test_words_steps(p):
     check("words: a word never asked starts with sound tiles", all(q["step"] == "tiles" for r in rounds for q in r if q["word"] not in in_play[5][:9]))
     small = await E("(w) => MW.wordSteps.pickRound({ words: w, answers: [], size: 5 })", in_play[1][:4])
     check("words: only four words in play: a round of four", len(small) == 4 and {q["word"] for q in small} == set(in_play[1][:4]), json.dumps(small))
-    allq = await E("[MW.wordSteps.allQuestions(MW.wordSteps.read(MW.wordsData), 5).length, MW.wordSteps.allQuestions(MW.wordSteps.read(MW.wordsData), 'all').length]")
-    check("words: the game can ask 112 questions in week 5 (28 words) and 240 with weeks 1 to 5 (60 words): Find, and Build at three steps", allq == [112, 240], str(allq))
+    allq = await E("""(() => { const S = MW.wordSteps, b = S.read(MW.wordsData);
+        return [{ half: 'autumn-1', week: 5 }, { half: 'autumn-1', week: 'all' }, { half: 'autumn-2', week: 'all' }, { term: 'autumn' }].map(c => S.allQuestions(b, c).length); })()""")
+    check("words: the game can ask 112 questions in autumn 1's week 5 (28 words), 240 with its weeks 1 to 5 (60 words), 236 with autumn 2's (59) and 448 with all of autumn (112)",
+          allq == [112, 240, 236, 448], str(allq))
     gone = await E("delete MW.audio.manifest.voice['words-w-magnet'], [MW.wordsGame.inPlay().includes('magnet'), MW.wordsGame.inPlay().length]")
     check("words: a word whose recording isn't on the page stays out of play", gone == [False, 27], str(gone))
     check("words: no console errors", not problems, "; ".join(problems[:3]))
@@ -1729,8 +1798,8 @@ async def test_words_steps(p):
     t = Tablet(page, await ctx.new_cdp_session(page))
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
     now = await page.evaluate("Date.now()")
-    seed = {"week": 5, "answers": [w_ans(now - 2 * DAY, "of"), w_ans(now - DAY, "of")]}
-    await page.evaluate("(g) => { MW.store.game('words').week = g.week; MW.store.game('words').answers = g.answers; MW.store.save(); }", seed)
+    seed = {"half": "autumn-1", "week": 5, "answers": [w_ans(now - 2 * DAY, "of"), w_ans(now - DAY, "of")]}
+    await page.evaluate("(g) => { Object.assign(MW.store.game('words'), g); MW.store.save(); }", seed)
     await w_open(t, page, ["of"])
     await asyncio.sleep(0.3)
     await t.tap([r for r in await w_rockets(page) if r["word"] == "of"][0]["x"], 450)
@@ -1768,7 +1837,7 @@ async def test_words_grownups(p):
     for name, vw, vh in (("fire", 1046, 653), ("doogee", 1280, 800)):
         ctx = await browser.new_context(viewport={"width": vw, "height": vh}, has_touch=True, is_mobile=True)
         saved = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True, "crew": {"moggles": "cook", "snuffles": "lookout"}},
-                 "answers": rescue, "games": {"words": {"answers": words}}}
+                 "answers": rescue, "games": {"words": {"half": "autumn-1", "week": 5, "answers": words}}}
         await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
                                   % json.dumps(json.dumps(saved)))
         page = await ctx.new_page()
@@ -1791,6 +1860,8 @@ async def test_words_grownups(p):
         check(f"words-grownups ({name}): rows for week 5's tricky words, its other words and earlier weeks", labels == ["Tricky words", "Week 5 words", "Earlier weeks"], str(labels))
         on = await page.evaluate("Array.from(document.querySelectorAll('.words-week')).map(b => b.textContent + (b.classList.contains('is-on') ? '*' : ''))")
         check(f"words-grownups ({name}): weeks 1 to 5 to pick from, then Weeks 1–5, week 5 in play to start", on == ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5*", "Weeks 1\u20135"], str(on))
+        halves = await page.evaluate("Array.from(document.querySelectorAll('.words-half')).map(b => b.textContent + (b.classList.contains('is-on') ? '*' : ''))")
+        check(f"words-grownups ({name}): ... under autumn 1 (a 0.7.0 save keeps its half-term)", halves == ["Autumn 1*", "Autumn 2", "All of autumn"], str(halves))
         wide = await page.evaluate("(() => { const g = document.querySelector('.words-grid'); const b = g.closest('.gu-body'); return [g.scrollWidth, b.clientWidth]; })()")
         check(f"words-grownups ({name}): the grid fits without sideways scrolling", wide[0] <= wide[1], str(wide))
         await page.screenshot(path=str(SHOTS / f"{name}-words-grownups.png"))
@@ -1828,8 +1899,8 @@ async def test_words_grownups(p):
         await page.evaluate("MW.grownups.close()")
         await page.reload()
         await page.wait_for_load_state("load")
-        kept = await page.evaluate("[MW.wordsGame.week(), MW.wordsGame.answers().length]")
-        check(f"words-grownups ({name}): the week in play is remembered on the tablet", kept == [2, 0], str(kept))
+        kept = await page.evaluate("[MW.wordsGame.week(), MW.wordsGame.answers().length, MW.wordsGame.choice()]")
+        check(f"words-grownups ({name}): the week in play is remembered on the tablet", kept == [2, 0, {"half": "autumn-1", "week": 2}], str(kept))
         check(f"words-grownups ({name}): no console errors", not problems, "; ".join(problems[:3]))
         await ctx.close()
     await browser.close()
@@ -1845,7 +1916,8 @@ async def test_words_first_find(p):
         page = await ctx.new_page()
         await page.goto(ORIGIN + "/")
         await page.wait_for_load_state("load")
-        words = await page.evaluate("MW.wordSteps.inPlay(MW.wordsGame.book, 'all')")
+        await w_choose(page, TERM)                          # all of autumn: Find's other words from every recorded word
+        words = await page.evaluate("MW.wordSteps.inPlay(MW.wordsGame.book, { term: 'autumn' })")
         await page.close()
         for w in words:
             page = await ctx.new_page()                    # a fresh page: a new visit, nothing in bold drawn yet
@@ -1865,7 +1937,7 @@ async def test_words_first_find(p):
                     bad.append(f"{word}: {width:.0f} px at {size:.0f} px in a {plate:.0f} px plate")
             await page.close()
         check(f"words-first-find ({name}): every word fits its plate on the first Find of a fresh visit ({len(words)} visits)",
-              not bad and len(words) == 60 and all(w in worst for w in words), "; ".join(bad[:4]))
+              not bad and len(words) == 112 and all(w in worst for w in words), "; ".join(bad[:4]))
         check(f"words-first-find ({name}): no console errors", not problems, "; ".join(problems[:3]))
         await ctx.close()
     await browser.close()
@@ -1943,9 +2015,9 @@ async def test_words_fixes(p):
     await asyncio.sleep(1.2)
 
     # the week changed in the grown-ups area mid-round: this round keeps its words; the change starts with the next round
-    await page.evaluate("const g = MW.store.game('words'); g.week = 2; MW.store.save()")
+    await w_choose(page, {"half": "autumn-1", "week": 2})
     week2 = set(await page.evaluate("MW.wordsGame.inPlay()"))
-    await w_open(t, page, [{"word": "what", "step": "tiles"}, {"word": "love", "step": "harder"}, {"word": "she", "step": "tiles"}])
+    await w_open(t, page, [{"word": "what", "step": "tiles"}, {"word": "love", "step": "harder"}, {"word": "she", "step": "tiles"}], choice=None)
     await w_wait_said(t, "words-find words-w-what")
     await t.tap(46, 754, 3.3)                              # the grown-ups lock
     await page.evaluate("MW.grownups.show('words-progress')")
@@ -1969,12 +2041,12 @@ async def test_words_fixes(p):
             await t.tap([r for r in await w_rockets(page) if r["word"] == word][0]["x"], 450)
             s = await w_wait(page, ["words-build"])
             fill = [c["text"] for c in await w_tiles(page) if c["text"] not in "loveu"]
-            src = await page.evaluate("""(() => { const G = MW.wordsGame, f = MW.wordSteps.fillFrom(G.book, G.st.week, 'love', G.st.pool);
-                return { week: G.st.week, own: f[0], pool: f[1] }; })()""")
+            src = await page.evaluate("""(() => { const G = MW.wordsGame, f = MW.wordSteps.fillFrom(G.book, G.st.choice, 'love', G.st.pool);
+                return { week: G.st.choice.week, half: G.st.choice.half, own: f[0], pool: f[1] }; })()""")
             own2 = ["what", "she", "me", "love", "misses", "chain", "queen", "chair", "year", "cobweb", "goats", "farmyard"]
             own_letters = set("".join(w for w in own2 if w != "love")) - set("loveu")
             check("words-fixes: harder letters mid-round fill first from week 2's own words (the round's week, not week 5), which have enough letters",
-                  s["mode"] == "harder" and src["week"] == 2 and src["own"] == own2 and sorted(src["pool"]) == sorted(week2) and len(own_letters) >= 5
+                  s["mode"] == "harder" and src["week"] == 2 and src["half"] == "autumn-1" and src["own"] == own2 and sorted(src["pool"]) == sorted(week2) and len(own_letters) >= 5
                   and len(fill) == 5 and set(fill) <= own_letters, str([fill, src["week"], src["own"]]))
             await w_build(t)
     check("words-fixes: the rest of the round's Finds still use week 2's words", others and set(others) <= week2, str(others))
@@ -1983,8 +2055,8 @@ async def test_words_fixes(p):
     pl = await page.evaluate(WORDS_PLANET)
     await t.tap(pl["x"], pl["y"])
     await w_wait(page, ["words-find"])
-    pool = await page.evaluate("(MW.wordsGame.st.pool || []).length")
-    check("words-fixes: the next round uses week 5's words", pool == 28, str(pool))
+    pool = await page.evaluate("[(MW.wordsGame.st.pool || []).length, MW.wordsGame.st.choice]")
+    check("words-fixes: the next round uses week 5's words", pool == [28, {"half": "autumn-1", "week": 5}], str(pool))
     check("words-fixes: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
@@ -2076,10 +2148,16 @@ async def test_words_sounds(p):
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
     lines = {c["id"]: c for c in json.loads((ROOT / "games" / "words" / "lines.json").read_text(encoding="utf-8"))["lines"]}
     used = sorted(await page.evaluate("MW.wordSteps.soundLines(MW.wordsGame.book)"))
-    want = sorted({f"words-s-{x}" for v in W_SOUNDS.values() for x in v.split() if x != "-"})
-    check("words-sounds: the words use the 42 tile sounds on the Lines tab, each a line in lines.json and recorded on the page",
-          used == want and len(used) == 42 and all(x in lines and not lines[x].get("pending") for x in used)
-          and await page.evaluate("(ids) => ids.every(id => MW.audio.recorded(id))", used), str(sorted(set(used) ^ set(want))))
+    old42 = sorted({f"words-s-{x}" for v in W_SOUNDS.values() for x in v.split() if x != "-"})
+    want = sorted({f"words-s-{x}" for v in list(W_SOUNDS.values()) + list(W_SOUNDS_A2.values()) for x in v.split() if x != "-"})
+    new4 = sorted(set(want) - set(old42))
+    on_page = await page.evaluate("(ids) => ids.map(id => MW.audio.recorded(id))", used)
+    check("words-sounds: the words use 46 tile sounds: the 42 on the 0.6.0 Lines tab, each a line in lines.json and recorded on the page, and autumn 2's four new ones",
+          used == want and len(old42) == 42 and len(used) == 46 and new4 == ["words-s-er", "words-s-ng", "words-s-yoo", "words-s-z"]
+          and all(x in lines and not lines[x].get("pending") for x in old42) and await page.evaluate("(ids) => ids.every(id => MW.audio.recorded(id))", old42),
+          str(sorted(set(used) ^ set(want))))
+    check("words-sounds: ... the four new ones (yoo, er, ng, z) each a line in lines.json, on the page once recorded and pending until then",
+          all(x in lines for x in new4) and all(rec == (not lines[x].get("pending")) for x, rec in zip(used, on_page)), str([(x, lines.get(x, {}).get("pending")) for x in new4]))
     problems_file = await page.evaluate("MW.wordsGame.book.problems")
     check("words-sounds: every tricky tile says what it says in its word (the words file has no problems)", not problems_file, "; ".join(problems_file[:3]))
     # the words file is checked too: a tricky tile with no sound of its own, a tile with no sound, a sound for no tile
@@ -2183,8 +2261,8 @@ async def test_words_weeks(p):
     ctx, page, problems = await seeded(browser, [])
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
     E = lambda js, arg=None: page.evaluate(js, arg)
-    book = await E("(() => { const b = MW.wordsGame.book; return { order: b.order, weeks: b.weeks, label: MW.wordSteps.allLabel(b) }; })()")
-    allw = await E("MW.wordSteps.inPlay(MW.wordsGame.book, 'all')")
+    book = await E("(() => { const b = MW.wordsGame.book, h = MW.wordSteps.half(b, 'autumn-1'); return { order: b.order, weeks: h.weeks, label: MW.wordSteps.allLabel(h) }; })()")
+    allw = await E("MW.wordSteps.inPlay(MW.wordsGame.book, { half: 'autumn-1', week: 'all' })")
     week_of = {w: wk["week"] for wk in book["weeks"] for w in wk["tricky"] + wk["other"]}
     days = lambda n, step, w, start=0: [w_ans(T0 + (start + d) * DAY, w, step) for d in range(n)]
     secure = lambda w: days(3, "tiles", w) + days(3, "letters", w, 3) + days(3, "harder", w, 6)
@@ -2193,7 +2271,9 @@ async def test_words_weeks(p):
     code = re.sub(r"/\*.*?\*/|//[^\n]*", "", code, flags=re.S)                  # the code without its comments
     found = re.findall(r".{0,20}(?:[Ww]eeks?\s*['\"]?\s*\d|\d\s*–\s*\d).{0,10}", code)
     check("words-weeks: no week number is written into the code (a new half-term needs no code change)", not found, str(found[:3]))
-    await E("(() => { const g = MW.store.game('words'); g.week = 'all'; MW.store.save(); })()")
+    found = re.findall(r".{0,20}(?:autumn|spring|summer).{0,10}", code, flags=re.I)
+    check("words-weeks: no half-term or term is named in the code either (0.7.0: every name comes from the words file)", not found, str(found[:3]))
+    await w_choose(page, {"half": "autumn-1", "week": "all"})
     got = await E("[MW.wordsGame.week(), MW.wordsGame.inPlay().length]")
     check("words-weeks: with Weeks 1–5 every word of weeks 1 to 5 is in play (60, once recorded)", got == ["all", 60] and len(allw) == 60, str(got))
     gone = await E("(() => { const v = MW.audio.manifest.voice['words-w-cobweb']; delete MW.audio.manifest.voice['words-w-cobweb']; const n = MW.wordsGame.inPlay(); "
@@ -2246,9 +2326,10 @@ async def test_words_weeks(p):
 
     # harder letters' fill with Weeks 1–5: the word's own week first, then any word in play
     fill = await E("""(() => { const G = MW.wordsGame, S = MW.wordSteps, b = G.book, out = [];
-        S.inPlay(b, 'all').forEach(w => { for (let i = 0; i < 4; i++) {
-          const p = S.plan(b, w, 'harder', S.fillFrom(b, 'all', w, G.inPlay()));
-          const own = new Set(S.ownWords(b, b.words[w].week).filter(x => x !== w).join('').split(''));
+        S.inPlay(b, { half: 'autumn-1', week: 'all' }).forEach(w => { for (let i = 0; i < 4; i++) {
+          const c = { half: 'autumn-1', week: 'all' }, m = S.marks(b, c)[w];
+          const p = S.plan(b, w, 'harder', S.fillFrom(b, c, w, G.inPlay()));
+          const own = new Set(S.ownWords(b, m.half, m.week).filter(x => x !== w).join('').split(''));
           const base = new Set(b.words[w].letters.map(l => l.text).concat(b.words[w].spares));
           const avail = Array.from(own).filter(c => !base.has(c)).length;
           const extra = p.tray.slice().filter(t => t.spare && b.words[w].spares.indexOf(t.text) < 0).map(t => t.text);
@@ -2257,24 +2338,26 @@ async def test_words_weeks(p):
     bad = [f for f in fill if f["n"] != 10 or f["outside"] > max(0, len(f["extra"]) - f["avail"])]
     check("words-weeks: harder letters with Weeks 1–5 fill the tray to 10 from the word's own week first (every word, 4 times)",
           not bad and len(fill) == 240, json.dumps(bad[:3]))
-    thin = await E("""(() => { const S = MW.wordSteps, b = S.read({ harderTray: 10, weeks: [{ week: 1, tricky: ['a'], other: [] }, { week: 2, tricky: ['bc'], other: [] }],
+    thin = await E("""(() => { const S = MW.wordSteps, b = S.read({ harderTray: 10, start: { half: 'h', week: 1 }, terms: [{ id: 't', name: 'T', all: 'All of t', halves: [
+          { id: 'h', name: 'H', weeks: [{ week: 1, tricky: ['a'], other: [] }, { week: 2, tricky: ['bc'], other: [] }] }] }],
         words: { a: { tiles: 'a', sounds: {}, spares: 'z' }, bc: { tiles: 'b c', spares: 'y' } }, sounds: { a: 'a', b: 'b', c: 'k' } });
-        const p = S.plan(b, 'a', 'harder', S.fillFrom(b, 'all', 'a', ['a', 'bc'])); return p.tray.map(t => t.text).sort(); })()""")
+        const p = S.plan(b, 'a', 'harder', S.fillFrom(b, { half: 'h', week: 'all' }, 'a', ['a', 'bc'])); return p.tray.map(t => t.text).sort(); })()""")
     check("words-weeks: ... then from any word in play when its week runs out of letters", thin == ["a", "b", "c", "z"], str(thin))
     first = await E("""(() => { const S = MW.wordSteps, out = { one: new Set(), all: new Set() };
-        const b = S.read({ harderTray: 4, weeks: [{ week: 1, tricky: ['xy'], other: [] }, { week: 2, tricky: ['ab'], other: ['ac'] }],
+        const b = S.read({ harderTray: 4, start: { half: 'h', week: 1 }, terms: [{ id: 't', name: 'T', all: 'All of t', halves: [
+            { id: 'h', name: 'H', weeks: [{ week: 1, tricky: ['xy'], other: [] }, { week: 2, tricky: ['ab'], other: ['ac'] }] }] }],
           words: { xy: { tiles: 'x y', spares: 'q' }, ab: { tiles: 'a b', spares: 'z' }, ac: { tiles: 'a c', spares: 'q' } }, sounds: { a: 'a', b: 'b', c: 'k', x: 'k', y: 'y' } });
         for (let i = 0; i < 60; i++) {
-          out.one.add(S.plan(b, 'ab', 'harder', S.fillFrom(b, 2, 'ab', ['ab', 'ac', 'xy'])).tray.map(t => t.text).sort().join(''));
-          out.all.add(S.plan(b, 'ab', 'harder', S.fillFrom(b, 'all', 'ab', ['ab', 'ac', 'xy'])).tray.map(t => t.text).sort().join(''));
+          out.one.add(S.plan(b, 'ab', 'harder', S.fillFrom(b, { half: 'h', week: 2 }, 'ab', ['ab', 'ac', 'xy'])).tray.map(t => t.text).sort().join(''));
+          out.all.add(S.plan(b, 'ab', 'harder', S.fillFrom(b, { half: 'h', week: 'all' }, 'ab', ['ab', 'ac', 'xy'])).tray.map(t => t.text).sort().join(''));
         }
         return [Array.from(out.one), Array.from(out.all)]; })()""")
     check("words-weeks: the one extra letter always comes from the word's own week (c, from 'ac'), never another week in play (x, y), with one week or all",
           first == [["abcz"], ["abcz"]], str(first))
 
     # one week in play: at least 3 of 5 from that week's own words
-    await E("(() => { const g = MW.store.game('words'); g.week = 5; MW.store.save(); })()")
-    own5 = set(await E("MW.wordSteps.ownWords(MW.wordsGame.book, 5)"))
+    await w_choose(page, A1)
+    own5 = set(await E("MW.wordSteps.ownWords(MW.wordsGame.book, 'autumn-1', 5)"))
     for label, ans in (("no answers", []), ("its words mostly secure", [a for w in list(own5)[:10] for a in secure(w)]),
                        ("every one of its words secure", [a for w in own5 for a in secure(w)])):
         await E("(a) => { MW.store.game('words').answers = a; MW.store.save(); }", ans)
@@ -2339,7 +2422,8 @@ async def test_words_weeks(p):
     check("words-weeks: letters trays: s h e with c; m e with n", tray.get("she") == ["c*", "e", "h", "s"] and tray.get("me") == ["e", "m", "n*"], json.dumps(tray))
     check("words-weeks: in 'you' the spare o goes in the o's place, just as good (not a wrong drop)", tray.get("you") == [2, 0], json.dumps(tray))
 
-    # progress saved by the test build (week 5, its answers) carries on
+    # progress saved by the test build (week 5, its answers) carries on; 0.7.0 moves it once to the file's start (autumn
+    # 2's week 1: test_words_move has the rest)
     await ctx.close()
     now = T0 + 40 * DAY
     old = {"week": 5, "answers": [w_ans(T0 + d * DAY, "of") for d in range(3)] + [w_ans(T0, "magnet", first=False)]}
@@ -2348,8 +2432,12 @@ async def test_words_weeks(p):
     await page.reload()
     await page.wait_for_load_state("load")
     kept = await page.evaluate("""(() => { const m = MW.wordSteps.statuses(MW.wordsGame.answers());
-        return [MW.wordsGame.week(), MW.wordsGame.inPlay().length, m.of.step, m.magnet.step, MW.wordsGame.makeRound().length]; })()""")
-    check("words-weeks: progress saved by the test build (week 5) carries on: week 5 in play, each word's step kept", kept == [5, 28, "letters", "tiles", 5], str(kept))
+        return [MW.wordsGame.choice(), MW.wordsGame.answers().length, m.of.step, m.magnet.step]; })()""")
+    check("words-weeks: progress saved by the test build (week 5) carries on: each word's step kept (and autumn 2's week 1 in play, once)",
+          kept == [A2, 4, "letters", "tiles"], str(kept))
+    await w_choose(page, A1)
+    kept = await page.evaluate("[MW.wordsGame.inPlay().length, MW.wordsGame.makeRound().length]")
+    check("words-weeks: ... and with autumn 1's week 5 picked again, its 28 words in play", kept == [28, 5], str(kept))
     check("words-weeks: no console errors", not problems and not problems2, "; ".join((problems + problems2)[:3]))
     await browser.close()
 
@@ -2617,7 +2705,7 @@ async def test_words_allweeks_tab(p):
              + days(1, "tiles", "into") + days(3, "tiles", "out") + days(1, "letters", "out", 3) + days(1, "tiles", "feel") + days(1, "tiles", "food"))
     for name, vw, vh in (("fire", 1046, 653), ("doogee", 1280, 800)):
         ctx = await browser.new_context(viewport={"width": vw, "height": vh}, has_touch=True, is_mobile=True)
-        saved = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True}, "answers": [], "games": {"words": {"week": 5, "answers": words}}}
+        saved = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True}, "answers": [], "games": {"words": {"half": "autumn-1", "week": 5, "answers": words}}}
         await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
                                   % json.dumps(json.dumps(saved)))
         page = await ctx.new_page()
@@ -2638,8 +2726,8 @@ async def test_words_allweeks_tab(p):
             Array.from(document.querySelectorAll('.words-grid .words-cell')).map(c => c.lastChild.textContent),
             Object.fromEntries(Array.from(document.querySelectorAll('.words-grid .words-cell')).map(c => [c.lastChild.textContent, c.className.split(' ').find(x => x.startsWith('is-'))])),
             Array.from(document.querySelectorAll('.gu-body .gu-note')).map(p => p.textContent)]""")
-        tricky = [w for wk in range(1, 6) for w in await page.evaluate("(n) => MW.wordsGame.book.weeks[n - 1].tricky", wk)]
-        other = [w for wk in range(1, 6) for w in await page.evaluate("(n) => MW.wordsGame.book.weeks[n - 1].other", wk)]
+        tricky = [w for wk in range(1, 6) for w in await page.evaluate("(n) => MW.wordSteps.half(MW.wordsGame.book, 'autumn-1').weeks[n - 1].tricky", wk)]
+        other = [w for wk in range(1, 6) for w in await page.evaluate("(n) => MW.wordSteps.half(MW.wordsGame.book, 'autumn-1').weeks[n - 1].other", wk)]
         check(f"words-alltab ({name}): tapping Weeks 1–5 puts every week in play (saved on the tablet)", got[0] == "all" and got[1] == 60
               and got[2] == ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Weeks 1–5*"], json.dumps(got[:3]))
         check(f"words-alltab ({name}): the grid shows every tricky word, then every other word (60)", got[3] == ["Tricky words", "Other words"] and got[4] == tricky + other, str(got[3]))
@@ -2653,12 +2741,12 @@ async def test_words_allweeks_tab(p):
         check(f"words-alltab ({name}): the grid fits without sideways scrolling", wide[0] <= wide[1], str(wide))
         await screenshot(page, f"{name}-words-grownups-weeks-1-5.png")
         rounds = await page.evaluate("(() => { const out = new Set(); for (let i = 0; i < 200; i++) MW.wordsGame.makeRound().forEach(q => out.add(q.word)); return Array.from(out); })()")
-        check(f"words-alltab ({name}): rounds then come from every week", {week for week in [1, 2, 3, 4, 5] if any(w in rounds for w in await page.evaluate("(n) => MW.wordSteps.ownWords(MW.wordsGame.book, n)", week))} == {1, 2, 3, 4, 5},
+        check(f"words-alltab ({name}): rounds then come from every week", {week for week in [1, 2, 3, 4, 5] if any(w in rounds for w in await page.evaluate("(n) => MW.wordSteps.ownWords(MW.wordsGame.book, 'autumn-1', n)", week))} == {1, 2, 3, 4, 5},
               str(len(rounds)))
         await page.evaluate("MW.grownups.close()")
         await page.reload()
         await page.wait_for_load_state("load")
-        check(f"words-alltab ({name}): Weeks 1–5 is remembered on the tablet", await page.evaluate("MW.wordsGame.week()") == "all")
+        check(f"words-alltab ({name}): Weeks 1–5 is remembered on the tablet", await page.evaluate("MW.wordsGame.choice()") == {"half": "autumn-1", "week": "all"})
         check(f"words-alltab ({name}): no console errors", not problems, "; ".join(problems[:3]))
         await ctx.close()
     await browser.close()
@@ -2669,8 +2757,7 @@ async def test_words_newwords(p, name, vw, vh, dpr):
     print(f"\n== MeeMee Rockets: weeks 1 to 4's words ({name}) ==")
     browser, ctx, page, t, problems, _ = await open_tablet(p, f"words-new-{name}", vw, vh, dpr, mode=None)
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    await page.evaluate("(() => { const g = MW.store.game('words'); g.week = 'all'; MW.store.save(); })()")
-    await w_open(t, page, [{"word": "farmyard", "step": "tiles"}, {"word": "cobweb", "step": "harder"}])
+    await w_open(t, page, [{"word": "farmyard", "step": "tiles"}, {"word": "cobweb", "step": "harder"}], choice={"half": "autumn-1", "week": "all"})
     await w_wait_said(t, "words-find words-w-farmyard")
     rockets = await w_rockets(page)
     text = (await page.inner_text("#screen-words-find")).split()
@@ -2696,7 +2783,7 @@ async def test_words_newwords(p, name, vw, vh, dpr):
     s = await w_wait(page, ["words-build"])
     await asyncio.sleep(0.4)
     tiles = await w_tiles(page)
-    own2 = set("".join(await page.evaluate("MW.wordSteps.ownWords(MW.wordsGame.book, 2)")))
+    own2 = set("".join(await page.evaluate("MW.wordSteps.ownWords(MW.wordsGame.book, 'autumn-1', 2)")))
     extra = [c["text"] for c in tiles if c["spare"] and c["text"] != "d"]
     check(f"words-new ({name}): Build 'cobweb' in harder letters: 10 tiles in two rows, its spare d and letters from week 2's words",
           s["mode"] == "harder" and len(tiles) == 10 and len({round(c["y"]) for c in tiles}) == 2 and set(extra) <= own2, str([c["text"] for c in tiles]))
@@ -2704,6 +2791,642 @@ async def test_words_newwords(p, name, vw, vh, dpr):
     await w_build(t)
     await w_wait(page, ["words-done"], 20)
     check(f"words-new ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+# ---------------------------------------------------------------- 0.7.0: autumn 2, the half-term switch, capitals
+def a2_pending():
+    """Autumn 2's words and tile sounds still waiting for Barney's recordings (pending in lines.json)."""
+    lines = json.loads((ROOT / "games" / "words" / "lines.json").read_text(encoding="utf-8"))["lines"]
+    return {l["id"] for l in lines if l.get("pending")}
+
+
+def term_order(halves):
+    """Every word of these half-terms once, in the order first listed, with whether it is tricky: the last half-term
+    that lists it decides (the 0.7.0 PRD's D1), worked out here from the half-terms themselves."""
+    order, tricky = [], {}
+    for h in halves:
+        mine = {}
+        for wk in h["weeks"]:
+            for kind in ("tricky", "other"):
+                for w in wk[kind]:
+                    if w not in order:
+                        order.append(w)
+                    mine[w] = mine.get(w, False) or kind == "tricky"
+        tricky.update(mine)
+    return order, tricky
+
+
+async def test_words_halves(p):
+    """0.7.0 through the game's hooks: what's in play for a week, a half-term's weeks and the whole term; a shared word's
+    step and marking; "these" and "even"; capitals (Mr, Mrs, Ms) in every step; the words file's new checks."""
+    print("\n== MeeMee Rockets 0.7.0: half-terms, shared words, tiles used twice, capitals ==")
+    browser = await p.chromium.launch()
+    ctx, page, problems = await seeded(browser, [])
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    IP = "(c) => MW.wordSteps.inPlay(MW.wordsGame.book, c)"
+    halves = {h["id"]: h for h in await E("MW.wordsGame.book.halves")}
+    a1, a2 = halves["autumn-1"], halves["autumn-2"]
+    a1_words = {w for wk in a1["weeks"] for w in wk["tricky"] + wk["other"]}
+    a2_words = {w for wk in a2["weeks"] for w in wk["tricky"] + wk["other"]}
+    wk2 = {wk: await E(IP, {"half": "autumn-2", "week": wk}) for wk in (1, 2, 3, 4, 5, "all")}
+    own = lambda n: a2["weeks"][n - 1]["tricky"] + a2["weeks"][n - 1]["other"]
+    earlier = lambda n: [w for wk in a2["weeks"][:n - 1] for w in wk["tricky"]]
+    check("words-halves: autumn 2's week 1 in play: its 12 words", wk2[1] == own(1), str(wk2[1]))
+    check("words-halves: autumn 2's week 3: its 12 words, then the 8 tricky words of weeks 1 and 2 (Mr, Mrs and Ms among them)",
+          wk2[3] == own(3) + earlier(3) and len(wk2[3]) == 20 and {"Mr", "Mrs", "Ms"} <= set(wk2[3]), str(wk2[3]))
+    check("words-halves: autumn 2's week 5: its 12 words ('time' among them) and the 16 tricky words before it, 'time' once",
+          wk2[5] == own(5) + earlier(5) and len(wk2[5]) == 28 and wk2[5].count("time") == 1, str(len(wk2[5])))
+    check("words-halves: autumn 1's words don't carry into autumn 2 (only the seven it lists again: go, me, like, sure, some, what, spray)",
+          all(set(v) <= a2_words for v in wk2.values()) and not ({"my", "all", "they", "said", "here"} & set(wk2[5])), str(sorted(set(wk2[5]) - a2_words)))
+    check("words-halves: autumn 2's Weeks 1–5: all 59 of its words, 'time' once", len(wk2["all"]) == 59 and set(wk2["all"]) == a2_words and wk2["all"].count("time") == 1,
+          str(len(wk2["all"])))
+    term = await E(IP, TERM)
+    check("words-halves: all of autumn: 112 words, each once (the seven shared words and 'time' once each)",
+          len(term) == 112 and len(set(term)) == 112 and set(term) == a1_words | a2_words, str(len(term)))
+    pending = a2_pending()
+    await w_choose(page, {"half": "autumn-2", "week": 2})
+    got = await E("MW.wordsGame.inPlay()")
+    want = [w for w in wk2[2] if f"words-w-{w.lower()}" not in pending]
+    check("words-halves: in the game only recorded words are in play (autumn 2's week 2: those recorded so far)", got == want, str(got))
+
+    # rounds, with autumn 2's words treated as recorded through the hooks (no line is said)
+    fake = await E("""(() => { const v = MW.audio.manifest.voice, out = [];
+        MW.wordsGame.book.order.forEach(w => { const id = MW.wordSteps.line(w); if (!v[id]) { v[id] = { dur: 0.8 }; out.push(id); } }); return out; })()""")
+    await w_choose(page, {"half": "autumn-2", "week": 3})
+    rounds = await E("(() => { const out = []; for (let i = 0; i < 400; i++) out.push(MW.wordsGame.makeRound().map(q => q.word)); return out; })()")
+    check("words-halves: autumn 2's week 3 rounds: five words from its words in play, at least 3 of them the week's own",
+          all(len(r) == 5 and set(r) <= set(wk2[3]) and sum(1 for w in r if w in own(3)) >= 3 for r in rounds), str(rounds[:2]))
+    # all of autumn: one or two secure words, then the lowest step first, so autumn 2's new words (never asked) come
+    # before autumn 1's words already started (question 12)
+    days = lambda n, step, w, start=0: [w_ans(T0 + (start + d) * DAY, w, step) for d in range(n)]
+    secure = lambda w: days(3, "tiles", w) + days(3, "letters", w, 3) + days(3, "harder", w, 6)
+    started = sorted(a1_words)
+    answers = [a for w in started[:6] for a in secure(w)] + [a for w in started[6:] for a in days(1, "tiles", w)]
+    await E("(a) => { MW.store.game('words').answers = a; MW.store.save(); }", answers)
+    await w_choose(page, TERM)
+    rounds = await E("(() => { const out = []; for (let i = 0; i < 400; i++) out.push(MW.wordsGame.makeRound()); return out; })()")
+    new = a2_words - a1_words
+    check("words-halves: all of autumn rounds: one or two secure words, then autumn 2's new words first (never asked), before autumn 1's words already started",
+          all(len(r) == 5 and 1 <= sum(1 for q in r if q["step"] == "secure") <= 2 and all(q["word"] in new for q in r if q["step"] != "secure") for r in rounds),
+          str(rounds[:1]))
+    await E("(ids) => ids.forEach(id => delete MW.audio.manifest.voice[id])", fake)
+    await E("(() => { MW.store.game('words').answers = []; MW.store.save(); })()")
+
+    # a shared word: one step in both half-terms; marked in autumn 1, plain in autumn 2 and with all of autumn
+    await E("(a) => { MW.store.game('words').answers = a; MW.store.save(); }", days(3, "tiles", "go") + days(1, "letters", "go", 3))
+    marks = {}
+    for label, c in (("autumn 1", {"half": "autumn-1", "week": 1}), ("autumn 2", {"half": "autumn-2", "week": 2}), ("all of autumn", TERM),
+                     ("autumn 1's weeks", {"half": "autumn-1", "week": "all"}), ("autumn 2's weeks", {"half": "autumn-2", "week": "all"})):
+        await w_choose(page, c)
+        marks[label] = await E("""(() => { const G = MW.wordsGame; MW.world.st.phase = 'map'; G.nextRound = ['go']; const r = G.makeRound();
+            G.showBuild({ word: 'go', step: 'tiles' }); const out = { step: r[0].step, places: G.st.places.map(p => p.tricky),
+            marked: G.st.tiles.filter(t => t.el.classList.contains('is-tricky')).map(t => t.text), sounds: G.st.places.map(p => p.sound) };
+            G.showBuild({ word: 'go', step: 'letters' }); out.letters = G.st.tiles.filter(t => t.el.classList.contains('is-tricky')).map(t => t.text);
+            MW.world.home(); return out; })()""")
+    check("words-halves: 'go' keeps one step in both half-terms (letters, wherever it is played)", {m["step"] for m in marks.values()} == {"letters"}, json.dumps(marks))
+    check("words-halves: 'go' is marked tricky in autumn 1 (sound tiles and letters: its o)", marks["autumn 1"]["marked"] == ["o"] and marks["autumn 1"]["letters"] == ["o"]
+          and marks["autumn 1's weeks"]["marked"] == ["o"], json.dumps(marks["autumn 1"]))
+    check("words-halves: ... and plain in autumn 2 and with all of autumn (no tile marked in any step), its o still saying oa",
+          all(marks[k]["marked"] == [] and marks[k]["letters"] == [] and marks[k]["places"] == [False, False] and marks[k]["sounds"] == ["g", "oa"]
+              for k in ("autumn 2", "all of autumn", "autumn 2's weeks")), json.dumps(marks))
+    tab = {}
+    for label, c in (("autumn 1", {"half": "autumn-1", "week": 1}), ("autumn 2", {"half": "autumn-2", "week": 2}), ("all of autumn", TERM)):
+        await w_choose(page, c)
+        tab[label] = await E("""(() => { MW.grownups.openPanel(); MW.grownups.show('words-progress');
+            const c = Array.from(document.querySelectorAll('.words-grid .words-cell')).filter(c => c.lastChild.textContent === 'go');
+            const out = c.map(x => x.className); MW.grownups.close(); return out; })()""")
+    check("words-halves: the Words tab shows 'go' once, at the same step, in autumn 1, autumn 2 and all of autumn",
+          all(v == ["words-cell is-letters"] for v in tab.values()), json.dumps(tab))
+    others = await E("""(() => { const S = MW.wordSteps, b = MW.wordsGame.book;
+        return ['like', 'me', 'what', 'some', 'sure', 'spray'].map(w => [w, S.marked(b, { half: 'autumn-1', week: 5 }, w), S.marked(b, { half: 'autumn-2', week: 5 }, w), S.marked(b, { term: 'autumn' }, w)]); })()""")
+    check("words-halves: like and me tricky in autumn 1 only; what, some and sure in both; spray in neither",
+          others == [["like", True, False, False], ["me", True, False, False], ["what", True, True, True], ["some", True, True, True], ["sure", True, True, True], ["spray", False, False, False]],
+          str(others))
+    own_week = await E("(() => { const m = MW.wordSteps.marks(MW.wordsGame.book, { term: 'autumn' }); return [m.time, m.go, m.my]; })()")
+    check("words-halves: a word's own week (for the harder-letters tray) is the first week that lists it in the half-term that decides it: 'time' week 3's, 'go' autumn 2 week 2's",
+          own_week == [{"half": "autumn-2", "week": 3, "tricky": False}, {"half": "autumn-2", "week": 2, "tricky": False}, {"half": "autumn-1", "week": 1, "tricky": True}],
+          str(own_week))
+    await E("(() => { MW.store.game('words').answers = []; MW.store.save(); })()")
+
+    # "these" and "even": a tile used twice says one sound each time, left to right
+    await w_choose(page, {"half": "autumn-2", "week": 4})
+    tw = await E("""(() => { const G = MW.wordsGame, out = {}; MW.world.st.phase = 'map';
+        const said = () => MW.events.filter(e => e.type === 'words' && e.detail.startsWith('sound')).map(e => e.detail);
+        const drop = t => { const st = G.st, sl = st.ship.slots[st.next]; G.drop(t, 150 + sl.x * st.ship.scale, 195 + sl.y * st.ship.scale, false); };
+        ['these', 'even'].forEach(w => {
+          G.showBuild({ word: w, step: 'tiles' });
+          const st = G.st, n = said().length, picks = [];
+          out[w] = { sounds: st.places.map(p => p.sound) };
+          // pick up every tile in the tray, in turn, before any is placed; then build, picking up each tile before placing it
+          st.tiles.forEach(t => G.sayTile(t)); picks.push(said().slice(n));
+          const m = said().length;
+          st.places.forEach(p => { const t = st.tiles.find(c => !c.placed && c.text === p.text); G.sayTile(t); drop(t); });
+          out[w].tray = picks[0]; out[w].build = said().slice(m); out[w].done = MW.world.st.phase === 'words-built';
+          MW.world.home(); });
+        return out; })()""")
+    zid = "words-s-z" + (" not recorded yet" if "words-s-z" in pending else "")
+    check("words-halves: 'these' in sound tiles: th (as in this), e says ee, s says z, the last e nothing",
+          tw["these"]["sounds"] == ["th-voiced", "ee", "z", "-"] and tw["these"]["done"], json.dumps(tw["these"]))
+    check("words-halves: ... built left to right, the e's say ee, then nothing; the s says z (quiet until it is recorded)",
+          tw["these"]["build"] == ["sound words-s-th-voiced", "sound words-s-ee", f"sound {zid}", "sound e: none"], json.dumps(tw["these"]["build"]))
+    check("words-halves: ... and either e picked up first says ee (the e's are the same tile)",
+          tw["these"]["tray"].count("sound words-s-ee") == 2 and "sound e: none" not in tw["these"]["tray"], json.dumps(tw["these"]["tray"]))
+    check("words-halves: 'even': the first e says ee, the second e (question 4)",
+          tw["even"]["sounds"] == ["ee", "v", "e", "n"] and tw["even"]["build"] == ["sound words-s-ee", "sound words-s-v", "sound words-s-e", "sound words-s-n"],
+          json.dumps(tw["even"]))
+    bad = await E("""(() => { const d = JSON.parse(JSON.stringify(MW.wordsData)); d.words.these.sounds.e = ['ee']; d.words.even.sounds.e = ['ee', 'e', 'e'];
+        return MW.wordSteps.read(d).problems; })()""")
+    check("words-halves: a sound list of the wrong length is reported as a problem in the words file",
+          len(bad) == 2 and "these" in bad[0] + bad[1] and "even" in bad[0] + bad[1], str(bad))
+    bad = await E("""(() => { const d = JSON.parse(JSON.stringify(MW.wordsData)), h = d.terms[0].halves;
+        h[1].weeks[0].other.push('bird'); d.words.mr = { tiles: 'm r', spares: 'n' }; h[0].weeks[0].other.push('mr'); d.words.ms = { tiles: '[M] [s]', sounds: { M: '-', s: '-' }, spares: 'M' };
+        d.words.Ms.spares = 'M'; return MW.wordSteps.read(d).problems; })()""")
+    check("words-halves: the words file's other new checks: a word listed twice in a week, two words differing only in capitals, a capital spare",
+          len(bad) == 3 and any("listed twice" in b for b in bad) and any("only in capitals" in b for b in bad) and any("never a spare" in b for b in bad), str(bad))
+    shared_ok = await E("""(() => { const d = JSON.parse(JSON.stringify(MW.wordsData)); return MW.wordSteps.read(d).problems.length; })()""")
+    check("words-halves: a word in two weeks ('time') or two half-terms (go) is no longer a problem", shared_ok == 0, str(shared_ok))
+
+    # capitals: Mrs with a capital M in all three steps; its sound tiles silent; never a capital in another word's tray
+    await w_choose(page, {"half": "autumn-2", "week": 2})
+    mrs = await E("""(() => { const G = MW.wordsGame, out = {}; MW.world.st.phase = 'map';
+        ['tiles', 'letters', 'harder'].forEach(step => { G.showBuild({ word: 'Mrs', step: step }); const st = G.st;
+          const n = MW.events.length; st.tiles.forEach(t => G.sayTile(t));
+          out[step] = { places: st.places.map(p => (p.tricky ? '[' + p.text + ']' : p.text)), tray: st.tiles.map(c => c.text + (c.spare ? '*' : '')).sort(),
+            sounds: MW.events.slice(n).filter(e => e.type === 'words').map(e => e.detail), said: MW.events.slice(n).filter(e => e.type === 'say').length,
+            font: st.tiles.map(c => { const s = getComputedStyle(c.el.querySelector('.words-tile-text')); return [c.text, s.fontSize, s.fontFamily.split(',')[0].replace(/["']/g, '').trim(), s.fontWeight]; }) };
+          MW.world.home(); });
+        G.showBuild({ word: 'Mrs', step: 'letters' });
+        const st = G.st, sl = st.ship.slots[0];
+        G.drop(st.tiles.find(c => c.spare && c.text === 'm'), 150 + sl.x * st.ship.scale, 195 + sl.y * st.ship.scale, false);
+        out.small = [st.next, st.drops];
+        G.drop(st.tiles.find(c => c.text === 'M'), 150 + sl.x * st.ship.scale, 195 + sl.y * st.ship.scale, false);
+        out.capital = [st.next, st.drops]; MW.world.home(); return out; })()""")
+    check("words-halves: Mrs in sound tiles: [M] [r] [s], a capital M, all marked tricky", mrs["tiles"]["places"] == ["[M]", "[r]", "[s]"] and mrs["tiles"]["tray"] == ["M", "r", "s"],
+          json.dumps(mrs["tiles"]))
+    check("words-halves: ... its sound tiles are silent (each says nothing, nothing is spoken)",
+          sorted(mrs["tiles"]["sounds"]) == ["sound M: none", "sound r: none", "sound s: none"] and mrs["tiles"]["said"] == 0, json.dumps(mrs["tiles"]["sounds"]))
+    check("words-halves: Mrs in letters: M r s with the spare, a small m", mrs["letters"]["places"] == ["[M]", "[r]", "[s]"] and mrs["letters"]["tray"] == ["M", "m*", "r", "s"],
+          json.dumps(mrs["letters"]))
+    upper = [x for x in mrs["harder"]["tray"] if x.rstrip("*") != x.rstrip("*").lower()]
+    check("words-halves: Mrs in harder letters: 10 tiles, its capital M once, the small m, the rest small letters",
+          len(mrs["harder"]["tray"]) == 10 and upper == ["M"] and "m*" in mrs["harder"]["tray"], json.dumps(mrs["harder"]))
+    fonts = {tuple(f[1:]) for st in ("tiles", "letters", "harder") for f in mrs[st]["font"]}
+    check("words-halves: the capital M is a tile like any other: Andika, bold, the same size as the small letters", len(fonts) == 1 and list(fonts)[0][1] == "Andika",
+          str(fonts))
+    check("words-halves: a small m dropped where the capital M goes is a wrong try (it floats back); the capital goes in",
+          mrs["small"] == [0, 1] and mrs["capital"] == [1, 1], json.dumps(mrs))
+    caps = await E("""(() => { const S = MW.wordSteps, b = MW.wordsGame.book, out = [];
+        [{ half: 'autumn-2', week: 2 }, { half: 'autumn-2', week: 'all' }, { term: 'autumn' }].forEach(c => {
+          S.inPlay(b, c).forEach(w => { for (let i = 0; i < 6; i++) { ['letters', 'harder'].forEach(step => {
+            const p = S.plan(b, w, step, S.fillFrom(b, c, w), Math.random, S.marked(b, c, w));
+            const own = new Set(w.split(''));
+            p.tray.forEach(t => { if (S.isCapital(t.text) && (!own.has(t.text) || t.spare)) out.push(w + ' ' + step + ': ' + t.text); }); }); } }); });
+        const spares = b.order.filter(w => b.words[w].spares.some(S.isCapital));
+        return [out.slice(0, 5), out.length, spares]; })()""")
+    check("words-halves: no capital in any other word's tray, never as a spare or a filler (letters and harder letters, every word in play, 6 times each)",
+          caps[1] == 0 and caps[2] == [], json.dumps(caps))
+    mr = await E("['Mr', 'Mrs', 'Ms'].map(w => [MW.wordsGame.book.words[w].line, MW.wordsGame.book.words[w].spares.join(' ')])")
+    check("words-halves: Mr, Mrs and Ms: their lines words-w-mr, words-w-mrs, words-w-ms (small letters); each with the spare m",
+          mr == [["words-w-mr", "m"], ["words-w-mrs", "m"], ["words-w-ms", "m"]], str(mr))
+    check("words-halves: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_words_move(p):
+    """The one-time move (question 1): a 0.6.0 save (week 5, 'all' or no week) and a tablet with nothing saved open on
+    Autumn 2 week 1 with every answer kept; a 0.7.0 save keeps its choice; one the file doesn't have falls back to the start."""
+    print("\n== MeeMee Rockets 0.7.0: the one-time move to autumn 2 ==")
+    browser = await p.chromium.launch()
+    answers = [w_ans(T0 + d * DAY, "of") for d in range(3)] + [w_ans(T0 + d * DAY, "go") for d in range(3)] + [w_ans(T0, "magnet", first=False)]
+    cases = [
+        ("a 0.6.0 save with week 5", {"week": 5, "answers": answers}, A2, "moved"),
+        ("a 0.6.0 save with Weeks 1–5 ('all')", {"week": "all", "answers": answers}, A2, "moved"),
+        ("a 0.6.0 save with answers but no week", {"answers": answers}, A2, "moved"),
+        ("a tablet with nothing saved for the game", None, A2, "nothing"),
+        ("a 0.7.0 save: autumn 1, week 3", {"half": "autumn-1", "week": 3, "answers": answers}, {"half": "autumn-1", "week": 3}, "kept"),
+        ("a 0.7.0 save: autumn 2's Weeks 1–5", {"half": "autumn-2", "week": "all", "answers": answers}, {"half": "autumn-2", "week": "all"}, "kept"),
+        ("a 0.7.0 save: all of autumn", {"term": "autumn", "half": "autumn-1", "week": 2, "answers": answers}, TERM, "kept"),
+        ("a saved half-term the file doesn't have (spring 1)", {"half": "spring-1", "week": 1, "answers": answers}, A2, "kept"),
+        ("a saved week the file doesn't have (autumn 2, week 6)", {"half": "autumn-2", "week": 6, "answers": answers}, A2, "kept"),
+        ("a saved term the file doesn't have (spring)", {"term": "spring", "half": "spring-1", "week": 1, "answers": answers}, A2, "kept"),
+    ]
+    for label, save, want, how in cases:
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, is_mobile=True)
+        stored = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True}, "answers": [], "games": {"words": save} if save is not None else {}}
+        await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
+                                  % json.dumps(json.dumps(stored)))
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        got = await page.evaluate("""(() => { const m = MW.wordSteps.statuses(MW.wordsGame.answers()), s = JSON.parse(localStorage.getItem('mimi-world'));
+            return { choice: MW.wordsGame.choice(), answers: MW.wordsGame.answers(), steps: [MW.wordSteps.step(m, 'of'), MW.wordSteps.step(m, 'go'), MW.wordSteps.step(m, 'magnet')],
+              stored: (s.games || {}).words || null, moved: MW.events.filter(e => e.type === 'words' && e.detail.startsWith('moved')).length }; })()""")
+        await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('words-progress')")
+        await asyncio.sleep(0.2)
+        chips = await page.evaluate("Array.from(document.querySelectorAll('.words-half.is-on, .words-week.is-on')).map(b => b.textContent)")
+        await page.evaluate("MW.grownups.close()")
+        kept = got["answers"] == (save or {}).get("answers", []) and (save is None or got["steps"] == ["letters", "letters", "tiles"])
+        if how == "moved":
+            stored_ok = got["moved"] == 1 and {k: v for k, v in got["stored"].items() if k != "answers"} == A2
+        elif how == "nothing":
+            stored_ok = got["moved"] == 0 and got["stored"] is None
+        else:
+            stored_ok = got["moved"] == 0 and got["stored"] == save
+        chips_ok = chips == (["All of autumn"] if want == TERM else [{"autumn-1": "Autumn 1", "autumn-2": "Autumn 2"}[want["half"]],
+                                                                     "Weeks 1–5" if want["week"] == "all" else f"Week {want['week']}"])
+        check(f"words-move: {label}: opens on {json.dumps(want)}, every answer kept"
+              + {"moved": " (the move is saved, once)", "nothing": " (and nothing is saved for the game)", "kept": " (the save is left as it was)"}[how],
+              got["choice"] == want and kept and stored_ok and chips_ok, json.dumps([got["choice"], got["steps"], got["stored"] if how != "kept" else "", got["moved"], chips]))
+        if how == "moved" and label.endswith("week 5"):
+            # the move happens once: a grown-up's choice after it holds over a reload
+            await w_choose(page, {"half": "autumn-1", "week": 4})
+            await page.reload()
+            await page.wait_for_load_state("load")
+            again = await page.evaluate("[MW.wordsGame.choice(), MW.events.filter(e => e.type === 'words' && e.detail.startsWith('moved')).length, MW.wordsGame.answers().length]")
+            check("words-move: after the move, a grown-up's choice (autumn 1, week 4) holds over a reload, and the move doesn't happen again",
+                  again == [{"half": "autumn-1", "week": 4}, 0, len(answers)], str(again))
+        check(f"words-move: {label}: no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
+TAB_STATE = """(() => { const b = document.querySelector('.gu-body');
+    const chip = sel => Array.from(b.querySelectorAll(sel)).map(x => x.textContent + (x.classList.contains('is-on') ? '*' : ''));
+    const rows = Array.from(b.querySelectorAll('.words-grid-label')).map(l => [l.textContent, Array.from(l.nextElementSibling.querySelectorAll('.words-cell')).map(c => c.lastChild.textContent)]);
+    const g = b.querySelector('.words-grid');
+    return { headings: Array.from(b.querySelectorAll('.gu-h3')).map(h => h.textContent), halves: chip('.words-half'), weeks: chip('.words-week'),
+      notes: Array.from(b.querySelectorAll('.gu-note')).map(n => n.textContent), rows: rows,
+      cells: Object.fromEntries(Array.from(b.querySelectorAll('.words-grid .words-cell')).map(c => [c.lastChild.textContent, c.className.split(' ').find(x => x.startsWith('is-'))])),
+      wide: g ? [g.scrollWidth, b.clientWidth] : null, choice: MW.wordsGame.choice() }; })()"""
+
+
+async def tap_chip(t, page, sel, text):
+    """Tap a chip in the grown-ups area (stage px from where it is drawn), as a finger would."""
+    box = await page.evaluate("""([sel, text]) => { const b = Array.from(document.querySelectorAll(sel)).find(b => b.textContent === text);
+        b.scrollIntoView({ block: 'nearest' }); const r = b.getBoundingClientRect();
+        return [(r.left + r.width / 2 - MW.stage.offX) / MW.stage.scale, (r.top + r.height / 2 - MW.stage.offY) / MW.stage.scale]; }""", [sel, text])
+    await t.tap(*box)
+    await asyncio.sleep(0.4)
+
+
+async def test_words_tab(p, name, vw, vh, dpr):
+    """The Words tab (boards Grownups9Week and Grownups9All): the half-term row and the week row, the term chip hiding the
+    week row, the notes and the grid, with real taps, at one tablet's size."""
+    print(f"\n== MeeMee Rockets 0.7.0: the Words tab with half-terms ({name}) ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    days = lambda n, step, w, start=0: [w_ans(T0 + (start + d) * DAY, w, step) for d in range(n)]
+    secure = lambda w: days(3, "tiles", w) + days(3, "letters", w, 3) + days(3, "harder", w, 6)
+    # as on the boards: go, some and what secure; me and spray in letters; like in harder letters; sure in sound tiles
+    words = (secure("go") + secure("some") + secure("what") + days(3, "tiles", "me") + days(1, "letters", "me", 3) + days(3, "tiles", "spray")
+             + days(3, "tiles", "like") + days(3, "letters", "like", 3) + days(1, "harder", "like", 6) + days(1, "tiles", "sure"))
+    ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True)
+    saved = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True}, "answers": [], "games": {"words": {"answers": words}}}   # as saved by 0.6.0
+    await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
+                              % json.dumps(json.dumps(saved)))
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(ORIGIN + "/")
+    await page.wait_for_load_state("load")
+    t = Tablet(page, await ctx.new_cdp_session(page))
+    halves = {h["id"]: h for h in await page.evaluate("MW.wordsGame.book.halves")}
+    pending = a2_pending()
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('words-progress')")
+    await asyncio.sleep(0.4)
+    s = await page.evaluate(TAB_STATE)
+    a2 = halves["autumn-2"]
+    check(f"words-tab ({name}): a 'Half-term' heading and its row (Autumn 1, Autumn 2, All of autumn) above 'Week in play'",
+          s["headings"] == ["Half-term", "Week in play"] and s["halves"] == ["Autumn 1", "Autumn 2*", "All of autumn"], json.dumps(s["headings"] + s["halves"]))
+    check(f"words-tab ({name}): the week row: autumn 2's weeks 1 to 5, then Weeks 1–5, week 1 on (where a 0.6.0 tablet starts)",
+          s["weeks"] == ["Week 1*", "Week 2", "Week 3", "Week 4", "Week 5", "Weeks 1–5"], str(s["weeks"]))
+    check(f"words-tab ({name}): the note, as on the board: 'Autumn 2, week 1: this week's words, then the tricky words of the weeks before it. A change starts with the next round.'",
+          s["notes"][0] == "Autumn 2, week 1: this week's words, then the tricky words of the weeks before it. A change starts with the next round.", s["notes"][0])
+    later = []
+    for wk in a2["weeks"][1:]:
+        for w in wk["tricky"] + wk["other"]:
+            if w not in later:
+                later.append(w)
+    check(f"words-tab ({name}): the grid: week 1's tricky words, its other words, then later weeks' words (all autumn 2's, each once: 'time' once)",
+          s["rows"] == [["Tricky words", a2["weeks"][0]["tricky"]], ["Week 1 words", a2["weeks"][0]["other"]], ["Later weeks", later]] and len(s["cells"]) == 59,
+          json.dumps(s["rows"])[:300])
+    want = {"go": "is-secure", "some": "is-secure", "what": "is-secure", "me": "is-letters", "spray": "is-letters", "like": "is-harder", "sure": "is-tiles", "Mrs": "is-notyet"}
+    check(f"words-tab ({name}): each word shows its step, kept from autumn 1 for the shared words (as on the board)", all(s["cells"].get(w) == v for w, v in want.items()),
+          str({w: s["cells"].get(w) for w in want}))
+    waiting = [n for n in s["notes"] if n.startswith("Waiting for a recording")]
+    want_waiting = [w for w in await page.evaluate("MW.wordsGame.book.order") if f"words-w-{w.lower()}" in pending]
+    quiet = [n for n in s["notes"] if n.startswith("Tile sounds waiting")]
+    want_quiet = [x[8:] for x in await page.evaluate("MW.wordSteps.soundLines(MW.wordsGame.book)") if x in pending]
+    check(f"words-tab ({name}): the words and tile sounds still waiting for a recording are listed ({len(want_waiting)} words, {len(want_quiet)} sounds)",
+          (waiting == [f"Waiting for a recording, so not in play yet: {', '.join(want_waiting)}."] if want_waiting else not waiting)
+          and (quiet == [f"Tile sounds waiting for a recording (those tiles are quiet until then): {', '.join(want_quiet)}."] if want_quiet else not quiet), json.dumps([waiting, quiet])[:300])
+    check(f"words-tab ({name}): no problems in the words file", not any(n.startswith("To fix") for n in s["notes"]), str([n for n in s["notes"] if n.startswith("To fix")]))
+    check(f"words-tab ({name}): the grid fits without sideways scrolling", s["wide"][0] <= s["wide"][1], str(s["wide"]))
+    await screenshot(page, f"{name}-words-tab-autumn2-week1.png")
+
+    # the whole term: the week row and its heading go; the note and the grid as on the board
+    await tap_chip(t, page, ".words-half", "All of autumn")
+    s = await page.evaluate(TAB_STATE)
+    order, tricky = term_order([halves["autumn-1"], a2])
+    check(f"words-tab ({name}): tapping All of autumn puts the whole term in play; the week row and its heading aren't shown",
+          s["choice"] == TERM and s["halves"] == ["Autumn 1", "Autumn 2", "All of autumn*"] and s["headings"] == ["Half-term"] and s["weeks"] == [],
+          json.dumps([s["choice"], s["halves"], s["headings"], s["weeks"]]))
+    check(f"words-tab ({name}): the note, as on the board: 'All of autumn plays every word from both half-terms, 112 in all, leaning on the ones that need the most work. A change starts with the next round.'",
+          s["notes"][0] == "All of autumn plays every word from both half-terms, 112 in all, leaning on the ones that need the most work. A change starts with the next round.",
+          s["notes"][0])
+    check(f"words-tab ({name}): the grid: every tricky word, then every other word, each once (112), in the order first listed, go, me, like and spray with the other words",
+          s["rows"] == [["Tricky words", [w for w in order if tricky[w]]], ["Other words", [w for w in order if not tricky[w]]]] and len(s["cells"]) == 112
+          and all(w in s["rows"][1][1] for w in ("go", "me", "like", "spray")) and all(w in s["rows"][0][1] for w in ("sure", "some", "what")), json.dumps(s["rows"])[:300])
+    check(f"words-tab ({name}): ... at the same steps", all(s["cells"].get(w) == v for w, v in want.items()), str({w: s["cells"].get(w) for w in want}))
+    check(f"words-tab ({name}): ... and it fits without sideways scrolling", s["wide"][0] <= s["wide"][1], str(s["wide"]))
+    await screenshot(page, f"{name}-words-tab-all-of-autumn.png")
+    rounds = await page.evaluate("(() => { const out = new Set(); for (let i = 0; i < 200; i++) MW.wordsGame.makeRound().forEach(q => out.add(q.word)); return Array.from(out); })()")
+    recorded = [w for w in order if f"words-w-{w.lower()}" not in pending]
+    check(f"words-tab ({name}): rounds then come from every recorded word of the term", set(rounds) <= set(recorded) and len(rounds) >= 20, str(len(rounds)))
+
+    # back to a half-term: its week row comes back, on the week picked before
+    await tap_chip(t, page, ".words-half", "Autumn 1")
+    s = await page.evaluate(TAB_STATE)
+    check(f"words-tab ({name}): tapping Autumn 1: its weeks come back, on week 1 (the week picked before)",
+          s["choice"] == {"half": "autumn-1", "week": 1} and s["halves"] == ["Autumn 1*", "Autumn 2", "All of autumn"] and s["headings"] == ["Half-term", "Week in play"]
+          and s["weeks"] == ["Week 1*", "Week 2", "Week 3", "Week 4", "Week 5", "Weeks 1–5"]
+          and s["notes"][0] == "Autumn 1, week 1: this week's words, then the tricky words of the weeks before it. A change starts with the next round.", json.dumps(s["notes"][:1]))
+    a1 = halves["autumn-1"]
+    check(f"words-tab ({name}): ... and autumn 1's grid: week 1's tricky words, its other words, later weeks (60 words; go marked tricky here)",
+          [r[0] for r in s["rows"]] == ["Tricky words", "Week 1 words", "Later weeks"] and s["rows"][0][1] == a1["weeks"][0]["tricky"] and len(s["cells"]) == 60, json.dumps(s["rows"])[:200])
+    await tap_chip(t, page, ".words-week", "Week 5")
+    s = await page.evaluate(TAB_STATE)
+    check(f"words-tab ({name}): tapping Week 5: autumn 1's week 5 in play, its note and rows",
+          s["choice"] == A1 and s["notes"][0].startswith("Autumn 1, week 5: ") and [r[0] for r in s["rows"]] == ["Tricky words", "Week 5 words", "Earlier weeks"], json.dumps(s["notes"][:1]))
+    await tap_chip(t, page, ".words-week", "Weeks 1–5")
+    s = await page.evaluate(TAB_STATE)
+    check(f"words-tab ({name}): tapping Weeks 1–5: all of autumn 1's weeks, its note as before",
+          s["choice"] == {"half": "autumn-1", "week": "all"} and s["notes"][0] == "Weeks 1–5 plays every word from all five weeks, leaning on the ones that need the most work. A change starts with the next round."
+          and [r[0] for r in s["rows"]] == ["Tricky words", "Other words"] and len(s["cells"]) == 60, json.dumps(s["notes"][:1]))
+    await tap_chip(t, page, ".words-half", "Autumn 2")
+    s = await page.evaluate(TAB_STATE)
+    check(f"words-tab ({name}): tapping Autumn 2 keeps Weeks 1–5: all of autumn 2's weeks (59 words, 'time' once)",
+          s["choice"] == {"half": "autumn-2", "week": "all"} and s["weeks"][-1] == "Weeks 1–5*" and len(s["cells"]) == 59
+          and sum(len(r[1]) for r in s["rows"]) == 59, json.dumps([s["choice"], len(s["cells"])]))
+    await screenshot(page, f"{name}-words-tab-autumn2-weeks.png")
+    await tap_chip(t, page, ".words-week", "Week 3")
+    await page.evaluate("MW.grownups.close()")
+    await page.reload()
+    await page.wait_for_load_state("load")
+    check(f"words-tab ({name}): the choice holds after a reload", await page.evaluate("MW.wordsGame.choice()") == {"half": "autumn-2", "week": 3})
+    check(f"words-tab ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_words_shared(p):
+    """A shared word in real rounds: 'go' plain in autumn 2 (no tile marked, no "That's the tricky bit."), marked in autumn 1."""
+    print("\n== MeeMee Rockets 0.7.0: a shared word in autumn 1 and autumn 2 ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "words-shared", 1280, 800, 1, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    got = {}
+    for label, c in (("autumn 2", {"half": "autumn-2", "week": 2}), ("autumn 1", {"half": "autumn-1", "week": 1}), ("all of autumn", TERM)):
+        n = len(await t.said())
+        await w_open(t, page, [{"word": "go", "step": "tiles"}], choice=c)
+        await asyncio.sleep(0.3)
+        await t.tap([r for r in await w_rockets(page) if r["word"] == "go"][0]["x"], 450)
+        await w_wait(page, ["words-build"])
+        await asyncio.sleep(0.3)
+        tiles = await w_tiles(page)
+        if label == "autumn 2":
+            await screenshot(page, "words-shared-go-autumn2.png")
+        await w_build(t)
+        await w_wait_said(t, "words-you-built words-w-go", after=n)
+        await asyncio.sleep(0.2)
+        got[label] = {"marked": sorted(c["text"] for c in tiles if c["tricky"]), "tricky_bit": (await t.said())[n:].count("words-tricky-bit"),
+                      "sounds": await w_sounds_said(t, n)}
+        await w_wait(page, ["words-done"], 20)
+        await t.tap(*HOME)
+        await t.wait_screen("screen-map")
+        await asyncio.sleep(0.6)
+    check("words-shared: in autumn 2 'go' is built from plain tiles (none marked) and 'That's the tricky bit.' isn't said",
+          got["autumn 2"]["marked"] == [] and got["autumn 2"]["tricky_bit"] == 0, json.dumps(got["autumn 2"]))
+    check("words-shared: in autumn 1 its o is marked and 'That's the tricky bit.' is said", got["autumn 1"]["marked"] == ["o"] and got["autumn 1"]["tricky_bit"] == 1,
+          json.dumps(got["autumn 1"]))
+    check("words-shared: with all of autumn the later half-term decides: plain", got["all of autumn"]["marked"] == [] and got["all of autumn"]["tricky_bit"] == 0,
+          json.dumps(got["all of autumn"]))
+    check("words-shared: what each tile says doesn't change: g, then oa, in each", all(v["sounds"] == ["words-s-g", "words-s-oa"] for v in got.values()), json.dumps(got))
+    step = await page.evaluate("(() => { const m = MW.wordSteps.statuses(MW.wordsGame.answers()); return [m.go.answers, m.go.step, MW.wordsGame.answers().map(a => a.w)]; })()")
+    check("words-shared: its three answers are kept as one word's (one step wherever it is played)", step[0] == 3 and step[2] == ["go", "go", "go"], str(step))
+    check("words-shared: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_words_mrs(p, name, vw, vh, dpr):
+    """Mrs built with a capital M in a real round (board Rockets9Mrs): letters with the small m as the spare, then its silent
+    sound tiles, then Mr in harder letters, at one tablet's size."""
+    print(f"\n== MeeMee Rockets 0.7.0: Mrs with a capital M ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"words-mrs-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    week2 = {"half": "autumn-2", "week": 2}
+    s = await w_open(t, page, [{"word": "Mrs", "step": "letters"}], choice=week2)
+    await asyncio.sleep(0.4)
+    rockets = await w_rockets(page)
+    said = await t.said()
+    check(f"words-mrs ({name}): Find asks for Mrs (its line words-w-mrs: quiet until it is recorded)",
+          s["screen"] == "screen-words-find" and "Mrs" in [r["word"] for r in rockets] and "words-find words-w-mrs" in said, json.dumps([s, [r["word"] for r in rockets]]))
+    fit = await page.evaluate("MW.wordsGame.st.rockets.filter(r => r.word).map(r => [r.wordEl.textContent, r.wordEl.getBoundingClientRect().width / MW.stage.scale <= r.wordEl.parentNode.getBoundingClientRect().width / MW.stage.scale - 27.5])")
+    check(f"words-mrs ({name}): 'Mrs' on its rocket with a capital M, and every word fits its plate", any(x[0] == "Mrs" for x in fit) and all(x[1] for x in fit), str(fit))
+    await screenshot(page, f"{name}-words-mrs-find.png")
+    await t.tap([r for r in rockets if r["word"] == "Mrs"][0]["x"], 450)
+    s = await w_wait(page, ["words-build"])
+    await asyncio.sleep(0.4)
+    tiles = await w_tiles(page)
+    check(f"words-mrs ({name}): Build: Mrs in letters, M r s, every place marked as the tricky part (a whole tricky word)",
+          s["mode"] == "letters" and s["places"] == ["M", "r", "s"], json.dumps(s))
+    check(f"words-mrs ({name}): the tray: the capital M, r and s (marked) and the spare, a small m (not marked)",
+          sorted((c["text"], c["tricky"], c["spare"]) for c in tiles) == [("M", True, False), ("m", False, True), ("r", True, False), ("s", True, False)], str(tiles))
+    text = (await page.inner_text("#screen-words-build")).split()
+    check(f"words-mrs ({name}): nothing to read on Build but the tiles", sorted(text) == ["M", "m", "r", "s"], str(text))
+    n = len(await t.said())
+    await w_place(t)
+    await asyncio.sleep(0.5)
+    check(f"words-mrs ({name}): the capital M snaps into the first porthole, and 'That's the tricky bit.'",
+          (await w_state(page))["next"] == 1 and "words-tricky-bit" in (await t.said())[n:], str((await t.said())[n:]))
+    await screenshot(page, f"{name}-words-mrs-letters.png")
+    small = [c for c in await w_tiles(page) if c["text"] == "m"][0]
+    await w_drop_wrong(t, spare=True)
+    back = [c for c in await w_tiles(page) if c["text"] == "m"][0]
+    check(f"words-mrs ({name}): the small m on the word is a wrong try: it floats back",
+          (await w_state(page))["drops"] == 1 and (await w_state(page))["next"] == 1 and abs(back["x"] - small["hx"]) < 2 and abs(back["y"] - small["hy"]) < 2, str(back))
+    await w_build(t)
+    s = await w_wait(page, ["words-built", "words-done"], 5)
+    built = await page.evaluate("Array.from(document.querySelectorAll('#screen-words-build .words-ship .words-tile')).map(e => e.textContent).join('')")
+    check(f"words-mrs ({name}): Mrs built: M, r, s", built == "Mrs", built)
+    await w_wait(page, ["words-done"], 20)
+    rec = await page.evaluate("MW.wordsGame.answers().slice(-1)[0]")
+    check(f"words-mrs ({name}): saved as the word Mrs, with one wrong drop", rec["w"] == "Mrs" and rec["drops"] == 1, json.dumps(rec))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(0.6)
+
+    # sound tiles: each pick-up is silent
+    await w_open(t, page, [{"word": "Mrs", "step": "tiles"}], choice=week2)
+    await asyncio.sleep(0.3)
+    await t.tap([r for r in await w_rockets(page) if r["word"] == "Mrs"][0]["x"], 450)
+    s = await w_wait(page, ["words-build"])
+    await asyncio.sleep(0.4)
+    n = len(await t.said())
+    for c in await w_tiles(page):
+        await w_pick(t, c)
+        await asyncio.sleep(0.15)
+    await w_build(t)
+    await w_wait(page, ["words-built", "words-done"], 5)
+    check(f"words-mrs ({name}): Mrs in sound tiles: M r s, and picking up each tile says nothing",
+          s["mode"] == "tiles" and s["places"] == ["M", "r", "s"] and await w_sounds_said(t, n) == [], str(await w_sounds_said(t, n)))
+    await w_wait(page, ["words-done"], 20)
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(0.6)
+
+    # harder letters: Mr's tray of 10, its capital M once, everything else small
+    await w_open(t, page, [{"word": "Mr", "step": "harder"}], choice=week2)
+    await asyncio.sleep(0.3)
+    await t.tap([r for r in await w_rockets(page) if r["word"] == "Mr"][0]["x"], 450)
+    s = await w_wait(page, ["words-build"])
+    await asyncio.sleep(0.4)
+    tiles = await w_tiles(page)
+    caps = [c["text"] for c in tiles if c["text"] != c["text"].lower()]
+    check(f"words-mrs ({name}): Mr in harder letters: 10 tiles in two rows, one capital M (its own), the small m spare, the rest small letters",
+          s["mode"] == "harder" and len(tiles) == 10 and caps == ["M"] and any(c["text"] == "m" and c["spare"] for c in tiles)
+          and len({round(c["y"]) for c in tiles}) == 2, str([c["text"] for c in tiles]))
+    await screenshot(page, f"{name}-words-mr-harder.png")
+    await w_build(t)
+    await w_wait(page, ["words-done"], 20)
+    check(f"words-mrs ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+SPRING = """{ id: 'spring', name: 'Spring', all: 'All of spring', halves: [
+        { id: 'spring-1', name: 'Spring 1', weeks: [
+          { week: 1, tricky: ['said', 'you'], other: ['day', 'play', 'spring'] },
+          { week: 2, tricky: ['one'], other: ['toy', 'magnet'] } ] }%s ] }"""
+SPRING2 = """,
+        { id: 'spring-2', name: 'Spring 2', weeks: [ { week: 1, tricky: ['here'], other: ['say', 'boy'] } ] }"""
+
+
+async def test_words_spring(p):
+    """A third half-term added to a copy of the words data (a spring term) shows in the Words tab and plays, with no code
+    change; a second spring half-term brings its own whole-term choice, named from the file."""
+    print("\n== MeeMee Rockets 0.7.0: a spring half-term from the words file alone ==")
+    html = (DOCS / "index.html").read_text(encoding="utf-8")
+    end_terms, words_open = "\n    ],\n    sounds: {", "\n    words: {\n"
+    check("words-spring: the page holds the words file as written (one list of terms, one list of words)", html.count(end_terms) == 1 and html.count(words_open) == 1)
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    for halves in (1, 2):
+        data = SPRING % (SPRING2 if halves == 2 else "")
+        page_html = html.replace(end_terms, ",\n      " + data + end_terms).replace(
+            words_open, words_open + "      spring: { tiles: 's p r i ng', spares: 'a' },\n")
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, is_mobile=True)
+        await ctx.route(ORIGIN + "/", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=page_html))
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        t = Tablet(page, await ctx.new_cdp_session(page))
+        book = await page.evaluate("(() => { const b = MW.wordsGame.book; return [b.problems, b.terms.map(t => t.id), b.halves.map(h => h.id), b.order.length]; })()")
+        check(f"words-spring ({halves} spring half-term{'s' if halves > 1 else ''}): the words file with spring added reads with no problems",
+              book[0] == [] and book[1] == ["autumn", "spring"] and book[2][:3] == ["autumn-1", "autumn-2", "spring-1"] and book[3] == 113, json.dumps(book))
+        await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('words-progress')")
+        await asyncio.sleep(0.3)
+        s = await page.evaluate(TAB_STATE)
+        want = ["Autumn 1", "Autumn 2*", "All of autumn", "Spring 1"] + (["Spring 2", "All of spring"] if halves == 2 else [])
+        check(f"words-spring ({halves}): the Words tab's half-term row: " + ", ".join(w.rstrip("*") for w in want)
+              + ("" if halves == 2 else " (no All of spring with one half-term: its weeks are the same words)"), s["halves"] == want, str(s["halves"]))
+        if halves == 1:
+            await tap_chip(t, page, ".words-half", "Spring 1")
+            s = await page.evaluate(TAB_STATE)
+            check("words-spring (1): tapping Spring 1: its weeks (Week 1, Week 2, Weeks 1–2), week 1 on, named from the file",
+                  s["choice"] == {"half": "spring-1", "week": 1} and s["weeks"] == ["Week 1*", "Week 2", "Weeks 1–2"]
+                  and s["notes"][0] == "Spring 1, week 1: this week's words, then the tricky words of the weeks before it. A change starts with the next round.", json.dumps(s["notes"][:1]))
+            check("words-spring (1): ... its grid: week 1's tricky words, its other words, later weeks",
+                  s["rows"] == [["Tricky words", ["said", "you"]], ["Week 1 words", ["day", "play", "spring"]], ["Later weeks", ["one", "toy", "magnet"]]], json.dumps(s["rows"]))
+            check("words-spring (1): ... and its new word, not yet recorded, is listed as waiting", any("spring" in n and n.startswith("Waiting") for n in s["notes"]), str(s["notes"][-4:]))
+            await screenshot(page, "doogee-words-tab-spring.png")
+            rounds = await page.evaluate("(() => { const out = new Set(); for (let i = 0; i < 200; i++) MW.wordsGame.makeRound().forEach(q => out.add(q.word)); return Array.from(out); })()")
+            check("words-spring (1): rounds then come from spring 1's week 1 (its recorded words)", sorted(rounds) == ["day", "play", "said", "you"], str(sorted(rounds)))
+            marked = await page.evaluate("['one', 'day', 'said'].map(w => MW.wordSteps.marked(MW.wordsGame.book, { half: 'spring-1', week: 2 }, w))")
+            check("words-spring (1): spring 1's tricky words are marked from its own lists", marked == [True, False, True], str(marked))
+        else:
+            await tap_chip(t, page, ".words-half", "All of spring")
+            s = await page.evaluate(TAB_STATE)
+            check("words-spring (2): All of spring plays both spring half-terms, its note named and counted from the file",
+                  s["choice"] == {"term": "spring"} and s["weeks"] == []
+                  and s["notes"][0] == "All of spring plays every word from both half-terms, 11 in all, leaning on the ones that need the most work. A change starts with the next round.",
+                  json.dumps(s["notes"][:1]))
+        check(f"words-spring ({halves}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
+async def test_words_unrecorded(p):
+    """Nothing in the choice in play recorded yet (autumn 2's week 1 before Barney's recordings): tapping the planet goes
+    back to the map and says "That planet isn't ready yet."; the Words tab says why, only while nothing in it is recorded.
+    The words' recordings are taken off the page through the hooks, so this holds once autumn 2 is recorded too."""
+    print("\n== MeeMee Rockets 0.7.0: nothing recorded yet in the choice in play ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "words-unrecorded", 1280, 800, 1, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    off = """(c) => { const S = MW.wordSteps, v = MW.audio.manifest.voice; window.__off = window.__off || {};
+        S.inPlay(MW.wordsGame.book, c).forEach(w => { const id = S.line(w); if (v[id]) { window.__off[id] = v[id]; delete v[id]; } }); }"""
+    back = "(() => { Object.assign(MW.audio.manifest.voice, window.__off || {}); window.__off = {}; })()"
+    note = """(() => { MW.grownups.openPanel(); MW.grownups.show('words-progress');
+        const n = Array.from(document.querySelectorAll('.gu-body .gu-note')).map(p => p.textContent).filter(t => t.startsWith('Nothing in'));
+        MW.grownups.close(); return n; })()"""
+    await page.evaluate(off, A2)
+    check("words-unrecorded: a tablet with nothing saved plays autumn 2's week 1, and none of its words is recorded (here)",
+          await page.evaluate("[MW.wordsGame.choice(), MW.wordsGame.inPlay().length]") == [A2, 0])
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(0.6)
+    pl = await page.evaluate(WORDS_PLANET)
+    for k in (1, 2):
+        n = len(await t.said())
+        e0 = await page.evaluate("MW.events.length")
+        await t.tap(pl["x"], pl["y"])
+        said = await w_wait_said(t, "map-not-ready", 12, after=n)
+        await asyncio.sleep(1.5)
+        got = await page.evaluate("""(e0) => [MW.shell.screen, MW.world.st.phase, MW.events.slice(e0).some(e => e.type === 'words' && e.detail === 'no words in play'),
+            MW.events.slice(e0).some(e => e.type === 'screen' && e.detail === 'screen-words-find')]""", e0)
+        after = (await t.said())[n:]
+        check(f"words-unrecorded: tapping the planet ({'again' if k == 2 else 'first'}): its name, then back on the map with 'That planet isn't ready yet.'",
+              said and got == ["screen-map", "map", True, False] and after == ["words-name", "map-not-ready"], json.dumps([got, after]))
+        if k == 1:
+            await screenshot(page, "words-unrecorded-map.png")
+    check("words-unrecorded: ... and the round never started (no Find, no 'Ready to launch some rockets?')",
+          "words-round-ready" not in await t.said() and await page.evaluate("MW.wordsGame.st.round.length") == 0)
+    got = await page.evaluate(note)
+    check("words-unrecorded: the Words tab says so: 'Nothing in Autumn 2, week 1 is recorded yet, so MeeMee Rockets won't start until it is.'",
+          got == ["Nothing in Autumn 2, week 1 is recorded yet, so MeeMee Rockets won't start until it is."], str(got))
+    for label, c in (("autumn 2's week 2 (go and me recorded)", {"half": "autumn-2", "week": 2}), ("autumn 1's week 5", A1), ("all of autumn", TERM)):
+        await w_choose(page, c)
+        got = await page.evaluate(note)
+        check(f"words-unrecorded: no such note with {label}: something there is recorded", got == [], str(got))
+    await page.evaluate(off, {"half": "autumn-2", "week": "all"})
+    await w_choose(page, {"half": "autumn-2", "week": "all"})
+    got = await page.evaluate(note)
+    check("words-unrecorded: with autumn 2's Weeks 1–5 and none of it recorded: 'Nothing in Autumn 2, Weeks 1–5 is recorded yet, …' (named from the words file)",
+          got == ["Nothing in Autumn 2, Weeks 1–5 is recorded yet, so MeeMee Rockets won't start until it is."], str(got))
+    await page.evaluate(off, TERM)
+    await w_choose(page, TERM)
+    got = await page.evaluate(note)
+    check("words-unrecorded: with all of autumn and none of it recorded: 'Nothing in Autumn is recorded yet, …'",
+          got == ["Nothing in Autumn is recorded yet, so MeeMee Rockets won't start until it is."], str(got))
+    await page.evaluate(back)
+    await w_choose(page, A1)
+    s = await w_open(t, page, [{"word": "toy", "step": "tiles"}], choice=None)
+    check("words-unrecorded: with autumn 1's week 5 picked, the planet starts the game as before", s["screen"] == "screen-words-find", json.dumps(s))
+    check("words-unrecorded: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
 
@@ -2969,7 +3692,7 @@ async def test_kit_pieces(p, name, vw, vh, dpr):
         MW.grownups.openPanel(); MW.grownups.show('words-progress'); MW.grownups.close();
         return [JSON.stringify(MW.store.peek('words')), Object.keys(MW.store.get('games')), (localStorage.getItem('mimi-world') || '').indexOf('"words"') < 0]; })()""")
     check(f"kit ({name}): MW.store.peek reads a game's saved data without creating it (MeeMee Rockets reads this way)", fresh == ["{}", [], True], str(fresh))
-    made = await page.evaluate("""(() => { const g = MW.store.game('words'); g.week = 3; MW.store.save();
+    made = await page.evaluate("""(() => { const g = MW.store.game('words'); g.half = 'autumn-1'; g.week = 3; MW.store.save();
         return [MW.store.peek('words').week, MW.wordsGame.week(), Object.keys(MW.store.get('games'))]; })()""")
     check(f"kit ({name}): MW.store.game creates it (to change it); peek then reads what was saved", made == [3, 3, ["words"]], str(made))
     await page.evaluate("MW.store.clearGame('words')")
@@ -3985,6 +4708,15 @@ async def main():
         await test_words_allweeks_tab(p)
         await test_words_newwords(p, "fire", 1046, 653, 1.22)
         await test_words_newwords(p, "doogee", 1280, 800, 2)
+        await test_words_halves(p)
+        await test_words_move(p)
+        await test_words_tab(p, "fire", 1046, 653, 1.22)
+        await test_words_tab(p, "doogee", 1280, 800, 2)
+        await test_words_shared(p)
+        await test_words_mrs(p, "fire", 1046, 653, 1.22)
+        await test_words_mrs(p, "doogee", 1280, 800, 2)
+        await test_words_spring(p)
+        await test_words_unrecorded(p)
         await test_banners(p, "fire", 1046, 653, 1.22)
         await test_banners(p, "doogee", 1280, 800, 2)
         await test_banner_motion(p)

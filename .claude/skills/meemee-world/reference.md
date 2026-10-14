@@ -37,14 +37,24 @@ Everything the game owns starts with its id: line ids `words-…`, screen ids `s
 Data a grown-up edits without touching code (a phonics game's week-by-week word lists: MEEMEE.md, Rules) goes in a script of its own, listed first in `game.json`'s `scripts`, that sets one object on `window.MW` and does nothing else. MeeMee Rockets does this: `games/words/words.js` is
 
 ```js
-/* MeeMee Rockets: the words. The one file to edit for a new half-term (no code changes). … */
+/* MeeMee Rockets: the words. The one file to edit for a new half-term or term (no code changes). … */
 (function () {
   'use strict';
-  window.MW.wordsData = { startWeek: 5, harderTray: 10, weeks: [ … ], sounds: { … }, words: { … } };
+  window.MW.wordsData = {
+    harderTray: 10,
+    start: { half: 'autumn-2', week: 1 },          // the half-term and week in play until a grown-up picks another
+    terms: [
+      { id: 'autumn', name: 'Autumn', all: 'All of autumn', halves: [
+        { id: 'autumn-1', name: 'Autumn 1', weeks: [ { week: 1, tricky: ['go', …], other: ['feel', …] }, … ] },
+        { id: 'autumn-2', name: 'Autumn 2', weeks: [ … ] } ] }
+    ],
+    sounds: { … },                                 // each tile's usual sound ('ie': 'igh', 'M': 'm')
+    words: { … }                                   // every word once: its tiles, its own sounds, its spares
+  };
 })();
 ```
 
-with `"scripts": ["words.js", "steps.js", "moments.js", "game.js"]`. The game's own scripts load after it and read `MW.wordsData` (check it's there: `MW.wordsData || { weeks: [], words: {} }`). Explain the file's format in a comment at its top, for whoever edits it next; check what's in it when the game loads and list any problems in the game's grown-ups tab rather than failing. The build checks it like any of the game's scripts (raw colours, sound, `</script>`). Name the object after the game (`MW.<id>Data`).
+with `"scripts": ["words.js", "steps.js", "moments.js", "game.js"]`. Since 0.7.0 the file holds every half-term, and a grown-up picks the half-term and the week (MEEMEE.md, Rules): every name the Words tab shows ("Autumn 1", "Weeks 1–5", "All of autumn") comes from the file, so a new half-term or term is data only. `start` is only for a tablet with no choice saved (or one the file no longer has): changing it later doesn't move tablets that already have a choice saved, so for a new half-term a grown-up picks it in the Words tab on each tablet. A word has one entry in `words` and may be listed in several weeks and half-terms (one step wherever it is played; it is marked tricky only where the half-term in play lists it as tricky). Words and tiles may use capitals (Mr), each word's line id is in small letters (`words-w-mr`), and a tile that appears twice in a word can say a different sound each time (`these: { sounds: { e: ['ee', '-'] } }`). The comment at the top of `words.js` explains the rest. The game's own scripts load after it and read `MW.wordsData` (check it's there: `MW.wordsData || { terms: [], words: {} }`). Explain the file's format in a comment at its top, for whoever edits it next; check what's in it when the game loads and list any problems in the game's grown-ups tab rather than failing. The build checks it like any of the game's scripts (raw colours, sound, `</script>`). Name the object after the game (`MW.<id>Data`).
 
 ## Joining the world: `MW.world.game(def)`
 
@@ -171,7 +181,7 @@ When the game itself starts something new (another round from its end screen, a 
 
 ## Saving: `MW.store`
 
-`MW.store.game(id)` returns the game's own saved object (created empty the first time, and kept on the next save); change it, then call `MW.store.save()`. Use it only where the game changes something. To read without creating anything, use `MW.store.peek(id)`: the saved object, or an empty one if the game has saved nothing, so a tablet that has never played the game keeps nothing for it (MeeMee Rockets reads its answers and week this way; its grown-ups tab too). Don't change what `peek` returns. `MW.store.clearGame(id)` forgets it (for the game's own "Clear this tablet's progress" button in its grown-ups tab; MeeMee Rescue's button clears only its own answers). It lives on the tablet only (browser storage can be cleared, so it's a convenience, not a record). Don't add settings at the top level (`MW.store.setting`): those are the world's and MeeMee Rescue's.
+`MW.store.game(id)` returns the game's own saved object (created empty the first time, and kept on the next save); change it, then call `MW.store.save()`. Use it only where the game changes something. To read without creating anything, use `MW.store.peek(id)`: the saved object, or an empty one if the game has saved nothing, so a tablet that has never played the game keeps nothing for it (MeeMee Rockets reads its answers and the half-term and week in play this way; its grown-ups tab too). Don't change what `peek` returns. `MW.store.clearGame(id)` forgets it (for the game's own "Clear this tablet's progress" button in its grown-ups tab; MeeMee Rescue's button clears only its own answers). It lives on the tablet only (browser storage can be cleared, so it's a convenience, not a record). Don't add settings at the top level (`MW.store.setting`): those are the world's and MeeMee Rescue's.
 
 ## The grown-ups area
 

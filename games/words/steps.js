@@ -9,16 +9,22 @@
    Right first time: found and built with no wrong tap, no wrong drop and no hint. A wrong try restarts that step's
    three days. A word goes back only from secure (answer 12 of the 0.6.0 PRD): two slips in a row (answers not right
    first time) take it back to harder letters, for three more days right first time; a right answer in between clears
-   the first slip.
-   What's in play: one week (that week's words and the tricky words of the weeks before it), or every week ('all', the
-   Words tab's "Weeks 1–5").
+   the first slip. A word has one step wherever it is played (0.7.0, D1): progress is kept by word.
+   What's in play (0.7.0): a grown-up's choice, one of
+     a week        { half, week }: that week's words and the tricky words of the same half-term's earlier weeks;
+     its weeks     { half, week: 'all' }: every word of one half-term (the Words tab's "Weeks 1–5");
+     a whole term  { term }: every word of all its half-terms, each once ("All of autumn").
+   A word is marked tricky only where the half-term in play lists it as tricky; with a whole term in play, the last of
+   its half-terms that lists it decides (D1). Where it isn't tricky, none of its tiles is marked; what each says is
+   the same.
    A round: five different words (or every word in play, if fewer), one or two secure ones for review and the rest not
    yet secure.
-     One week: the rest at random, and at least 3 of the 5 from the chosen week's own words while it has that many in
-               play (answer 10).
-     All weeks: the rest from the lowest step first (not yet, sound tiles, letters, harder letters), at random within a
-               step (answer 8).
-   Pure functions of the words file and the saved answers, so they are easy to test. */
+     One week:          the rest at random, and at least 3 of the 5 from the chosen week's own words while it has that
+                        many in play (answer 10).
+     Its weeks, a term: the rest from the lowest step first (not yet, sound tiles, letters, harder letters), at random
+                        within a step (answer 8; 0.7.0 question 12).
+   Pure functions of the words file and the saved answers, so they are easy to test. No half-term, term or week is
+   named here: they all come from the words file. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -26,10 +32,11 @@
 
   S.STEPS = ['notyet', 'tiles', 'letters', 'harder', 'secure'];
   S.NAMES = { notyet: 'Not yet', tiles: 'Sound tiles', letters: 'Letters', harder: 'Harder letters', secure: 'Secure' };
-  S.ALL = 'all';                 // every week in play (saved as the week)
+  S.ALL = 'all';                 // every week of a half-term in play (saved as the week)
   S.SILENT = '-';                // a tile that says nothing (the e of a split pair)
   S.SLIPS = 2;                   // slips in a row that take a secure word back to harder letters
   function rank(step) { return S.STEPS.indexOf(step); }
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
 
   function day(t) {
     const d = new Date(t);
@@ -42,61 +49,130 @@
     return a;
   }
   S.shuffle = shuffle;
+  // A capital letter ('M'): it only ever goes into its own word's tray.
+  S.isCapital = function (ch) { return ch !== ch.toLowerCase(); };
+  // A word's line: "words-w-" and the word in small letters ("words-w-mrs").
+  S.line = function (w) { return 'words-w-' + String(w).toLowerCase(); };
 
   // ---------------------------------------------------------------- the words file
   // 'h [ere]' -> [{ text: 'h', tricky: false }, { text: 'ere', tricky: true }]
   S.tiles = function (spec) {
     return String(spec).trim().split(/\s+/).map(function (t) {
-      const m = /^\[([a-z]+)\]$/.exec(t);
+      const m = /^\[([A-Za-z]+)\]$/.exec(t);
       return m ? { text: m[1], tricky: true } : { text: t, tricky: false };
     });
   };
-  // Every word with its week, whether it is one of that week's tricky words, its tiles (each with what it says), letters
-  // and spares. Problems in the file (a word with no tiles, tiles that don't spell it, a tile with no sound) are listed,
-  // not thrown, so the tests and the grown-ups area can say what is wrong.
+  // The file's terms, their half-terms and weeks, and every word listed in them (once each), with its tiles (each with
+  // what it says), letters and spares. Problems in the file (a word with no tiles, tiles that don't spell it, a tile
+  // with no sound, a word twice in one week) are listed, not thrown, so the tests and the grown-ups area can say what
+  // is wrong.
+  //   book.terms   [{ id, name, all, halves: [half, ...] }]
+  //   book.halves  every half-term, in the file's order: [{ id, name, term, weeks: [{ week, tricky: [...], other: [...] }] }]
+  //   book.words   { word: { word, line, tiles, letters, spares, says } }; book.order: every word once, as first listed
+  //   book.start   { half, week }: the file's start (a half-term and week it has)
   S.read = function (data) {
-    const out = { words: {}, order: [], weeks: [], problems: [], harderTray: +data.harderTray || 10, startWeek: +data.startWeek || 1,
-      sounds: {} };
+    data = data && typeof data === 'object' ? data : {};
+    const out = { words: {}, order: [], terms: [], halves: [], problems: [], harderTray: +data.harderTray || 10,
+      start: null, sounds: {} };
+    const problem = function (text) { out.problems.push(text); };
     const usual = data.sounds && typeof data.sounds === 'object' ? data.sounds : {};
     const goodId = function (id) { return id === S.SILENT || /^[a-z]+(-[a-z]+)*$/.test(String(id)); };
     Object.keys(usual).forEach(function (g) {
       if (goodId(usual[g])) out.sounds[g] = usual[g];
-      else out.problems.push('sounds: ' + g + ' should be a sound id, such as "ai"');
+      else problem('sounds: ' + g + ' should be a sound id, such as "ai"');
     });
-    (data.weeks || []).forEach(function (wk) {
-      const n = +wk.week;
-      out.weeks.push({ week: n, tricky: (wk.tricky || []).slice(), other: (wk.other || []).slice() });
-      [['tricky', true], ['other', false]].forEach(function (kind) {
-        (wk[kind[0]] || []).forEach(function (w) {
-          const spec = (data.words || {})[w];
-          if (!spec || !spec.tiles) { out.problems.push(w + ': no tiles in the words file'); return; }
-          if (out.words[w]) { out.problems.push(w + ': in two weeks'); return; }
-          const tiles = S.tiles(spec.tiles);
-          if (tiles.map(function (t) { return t.text; }).join('') !== w) out.problems.push(w + ': its tiles spell ' + tiles.map(function (t) { return t.text; }).join(''));
-          if (!/^[a-z]+$/.test(w)) out.problems.push(w + ': only lower-case letters, please');
-          // what each tile says: the word's own sound for it, or the tile's usual sound
-          const own = spec.sounds && typeof spec.sounds === 'object' ? spec.sounds : {};
-          Object.keys(own).forEach(function (k) {
-            if (!tiles.some(function (t) { return t.text === k; })) out.problems.push(w + ': its sounds name ' + k + ', which isn\'t one of its tiles');
-            else if (!goodId(own[k])) out.problems.push(w + ': the sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+    const specs = data.words && typeof data.words === 'object' ? data.words : {};
+    const tried = {}, lower = {};
+    // a word's entry, read the first time it is listed (null if it has none)
+    function entry(w) {
+      if (has(tried, w)) return out.words[w] || null;
+      tried[w] = true;
+      const spec = has(specs, w) ? specs[w] : null;
+      if (!spec || !spec.tiles) { problem(w + ': no tiles in the words file'); return null; }
+      const tiles = S.tiles(spec.tiles);
+      const spelt = tiles.map(function (t) { return t.text; }).join('');
+      if (spelt !== w) problem(w + ': its tiles spell ' + spelt);
+      if (!/^[A-Za-z]+$/.test(w)) problem(w + ': only letters, please');
+      const low = w.toLowerCase();
+      if (has(lower, low)) problem(w + ' and ' + lower[low] + ': two words that differ only in capitals (they would share a recording)');
+      else lower[low] = w;
+      // what each tile says: the word's own sound for it (one for each time the tile appears, if a list), or its usual
+      // sound
+      const own = spec.sounds && typeof spec.sounds === 'object' ? spec.sounds : {};
+      Object.keys(own).forEach(function (k) {
+        const n = tiles.filter(function (t) { return t.text === k; }).length;
+        if (!n) problem(w + ': its sounds name ' + k + ', which isn\'t one of its tiles');
+        else if (Array.isArray(own[k])) {
+          if (own[k].length !== n) problem(w + ': its sounds for ' + k + ' list ' + own[k].length + ', but it has ' + n + ' ' + k + ' tile' + (n === 1 ? '' : 's'));
+          if (!own[k].every(goodId)) problem(w + ': each sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+        } else if (!goodId(own[k])) problem(w + ': the sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+      });
+      const times = {};
+      tiles.forEach(function (t) {
+        const i = times[t.text] = (times[t.text] || 0) + 1;      // the i-th time this tile appears, from the left
+        let mine = null;
+        if (has(own, t.text)) {
+          const v = Array.isArray(own[t.text]) ? own[t.text][i - 1] : own[t.text];
+          if (v !== undefined && goodId(v)) mine = v;
+        }
+        t.sound = mine !== null ? mine : (out.sounds[t.text] || null);
+        if (t.tricky && mine === null) problem(w + ': say what its tricky tile ' + t.text + ' says in its sounds');
+        else if (!t.sound) problem(w + ': no sound for its tile ' + t.text);
+      });
+      const letters = [];
+      tiles.forEach(function (t) { t.text.split('').forEach(function (ch) { letters.push({ text: ch, tricky: t.tricky }); }); });
+      const spares = String(spec.spares || '').trim().split(/\s+/).filter(Boolean);
+      spares.forEach(function (s) { if (!/^[a-z]$/.test(s)) problem(w + ': the spare ' + s + ' should be one small letter (a capital is never a spare)'); });
+      out.words[w] = { word: w, line: S.line(w), tiles: tiles, letters: letters, spares: spares, says: spec.says || '' };
+      return out.words[w];
+    }
+    if (!Array.isArray(data.terms)) problem('terms: the words file needs its terms, each with its half-terms and their weeks');
+    const termIds = {}, halfIds = {};
+    (Array.isArray(data.terms) ? data.terms : []).forEach(function (tm, ti) {
+      if (!tm || typeof tm !== 'object') { problem('terms: term ' + (ti + 1) + ' isn\'t a term'); return; }
+      const id = String(tm.id || '');
+      if (!id || has(termIds, id)) { problem('terms: term ' + (ti + 1) + ' needs an id of its own'); return; }
+      termIds[id] = true;
+      const term = { id: id, name: String(tm.name || id), all: typeof tm.all === 'string' ? tm.all : '', halves: [] };
+      out.terms.push(term);
+      (Array.isArray(tm.halves) ? tm.halves : []).forEach(function (hf, hi) {
+        const hid = hf && typeof hf === 'object' ? String(hf.id || '') : '';
+        if (!hid || has(halfIds, hid)) { problem(term.name + ': half-term ' + (hi + 1) + ' needs an id of its own'); return; }
+        halfIds[hid] = true;
+        const half = { id: hid, name: String(hf.name || hid), term: id, weeks: [] };
+        const nums = {};
+        (Array.isArray(hf.weeks) ? hf.weeks : []).forEach(function (wk) {
+          const n = wk && typeof wk === 'object' ? +wk.week : NaN;
+          if (!(n >= 1) || Math.floor(n) !== n || has(nums, n)) { problem(half.name + ': each week needs a number of its own (1, 2, 3…)'); return; }
+          nums[n] = true;
+          const week = { week: n, tricky: [], other: [] };
+          const listed = {};
+          ['tricky', 'other'].forEach(function (kind) {
+            (Array.isArray(wk[kind]) ? wk[kind] : []).forEach(function (w) {
+              w = String(w);
+              if (has(listed, w)) { problem(half.name + ', week ' + n + ': ' + w + ' is listed twice'); return; }
+              listed[w] = true;
+              if (!entry(w)) return;
+              week[kind].push(w);
+              if (out.order.indexOf(w) < 0) out.order.push(w);
+            });
           });
-          tiles.forEach(function (t) {
-            const mine = Object.prototype.hasOwnProperty.call(own, t.text) && goodId(own[t.text]);
-            t.sound = mine ? own[t.text] : (out.sounds[t.text] || null);
-            if (t.tricky && !mine) out.problems.push(w + ': say what its tricky tile ' + t.text + ' says in its sounds');
-            else if (!t.sound) out.problems.push(w + ': no sound for its tile ' + t.text);
-          });
-          const letters = [];
-          tiles.forEach(function (t) { t.text.split('').forEach(function (ch) { letters.push({ text: ch, tricky: t.tricky }); }); });
-          const spares = String(spec.spares || '').trim().split(/\s+/).filter(Boolean);
-          spares.forEach(function (s) { if (!/^[a-z]$/.test(s)) out.problems.push(w + ': the spare ' + s + ' should be one letter'); });
-          out.words[w] = { word: w, week: n, tricky: kind[1], tiles: tiles, letters: letters, spares: spares, says: spec.says || '' };
-          out.order.push(w);
+          half.weeks.push(week);
         });
+        half.weeks.sort(function (a, b) { return a.week - b.week; });
+        term.halves.push(half);
+        out.halves.push(half);
       });
     });
-    out.weeks.sort(function (a, b) { return a.week - b.week; });
-    if (!out.weeks.some(function (wk) { return wk.week === out.startWeek; }) && out.weeks.length) out.startWeek = out.weeks[out.weeks.length - 1].week;
+    // the start: a half-term and a week the file has (or else the last half-term's first week)
+    const st = data.start && typeof data.start === 'object' ? data.start : {};
+    const sh = S.half(out, st.half);
+    if (sh && S.weekOf(sh, +st.week)) out.start = { half: sh.id, week: +st.week };
+    else {
+      problem('start: the words file has no ' + (sh ? sh.name + ', week ' + st.week : 'half-term ' + (st.half || '(none given)')));
+      const last = out.halves.filter(function (h) { return h.weeks.length; }).slice(-1)[0];
+      if (last) out.start = { half: last.id, week: last.weeks[0].week };
+    }
     return out;
   };
   // A tile's recorded sound: the line id, or null for a tile that says nothing.
@@ -109,31 +185,87 @@
     });
     return out;
   };
-  // The all-weeks choice's name, from the words file: "Weeks 1–5" (an en dash), or null with fewer than two weeks.
-  S.allLabel = function (book) {
-    if (book.weeks.length < 2) return null;
-    return 'Weeks ' + book.weeks[0].week + '–' + book.weeks[book.weeks.length - 1].week;
-  };
 
-  // The words in play for a week: that week's words (tricky, then other) and the tricky words of the weeks before it.
-  // For 'all', every word, week by week (each week's tricky words, then its other words).
-  S.inPlay = function (book, week) {
-    const out = [];
-    if (week === S.ALL) {
-      book.weeks.forEach(function (wk) { out.push.apply(out, wk.tricky.concat(wk.other)); });
-    } else {
-      book.weeks.forEach(function (wk) {
-        if (wk.week === week) out.push.apply(out, wk.tricky.concat(wk.other));
-      });
-      book.weeks.forEach(function (wk) {
-        if (wk.week < week) out.push.apply(out, wk.tricky);
-      });
-    }
-    return out.filter(function (w) { return book.words[w]; });
+  // ---------------------------------------------------------------- half-terms, terms and choices
+  S.half = function (book, id) { return book.halves.filter(function (h) { return h.id === id; })[0] || null; };
+  S.term = function (book, id) { return book.terms.filter(function (t) { return t.id === id; })[0] || null; };
+  S.weekOf = function (half, n) { return half ? half.weeks.filter(function (x) { return x.week === n; })[0] || null : null; };
+  // A half-term's all-weeks choice's name, from the words file: "Weeks 1–5" (an en dash), or null with fewer than two weeks.
+  S.allLabel = function (half) {
+    if (!half || half.weeks.length < 2) return null;
+    return 'Weeks ' + half.weeks[0].week + '–' + half.weeks[half.weeks.length - 1].week;
   };
-  // A week's own words (its tricky words and its other words).
-  S.ownWords = function (book, week) {
-    const wk = book.weeks.filter(function (x) { return x.week === week; })[0];
+  // A term's whole-term choice's name, from the words file ("All of autumn"), or null: a term with fewer than two
+  // half-terms (its one half-term's weeks are the same words), or with no name for it.
+  S.termLabel = function (term) { return term && term.all && term.halves.length >= 2 ? term.all : null; };
+  S.start = function (book) { return book.start ? { half: book.start.half, week: book.start.week } : { half: null, week: null }; };
+  // A grown-up's choice as saved, checked against the words file: { term } (a whole term), { half, week } (a week, or
+  // S.ALL for the half-term's weeks together). Anything else (nothing saved, a choice saved before 0.7.0 with no
+  // half-term in it, or one the file no longer has) is the file's start.
+  S.choice = function (book, saved) {
+    saved = saved && typeof saved === 'object' ? saved : {};
+    if (saved.term !== undefined && saved.term !== null) {
+      const t = S.term(book, saved.term);
+      return S.termLabel(t) ? { term: t.id } : S.start(book);
+    }
+    const h = S.half(book, saved.half);
+    if (h && saved.week === S.ALL && S.allLabel(h)) return { half: h.id, week: S.ALL };
+    if (h && saved.week !== S.ALL && S.weekOf(h, +saved.week)) return { half: h.id, week: +saved.week };
+    return S.start(book);
+  };
+  S.wide = function (c) { return !!(c.term || c.week === S.ALL); };      // every word of a half-term or a term in play
+  // The half-terms a choice covers: its half-term, or each half-term of its term.
+  S.halvesOf = function (book, c) {
+    if (c.term) { const t = S.term(book, c.term); return t ? t.halves : []; }
+    const h = S.half(book, c.half);
+    return h ? [h] : [];
+  };
+  // Each word's marking for a choice: { half, week, tricky }: the half-term that decides it (the one in play; with a
+  // whole term, the last of its half-terms that lists the word), whether that half-term lists it as tricky, and the
+  // word's own week there (the first week that lists it: "time" is week 3's). A word the choice doesn't cover (only
+  // through the test hooks) is decided as if every half-term in the file were in play.
+  S.marks = function (book, c) {
+    const out = {};
+    const scan = function (halves) {
+      halves.forEach(function (h) {
+        const seen = {};
+        h.weeks.forEach(function (wk) {
+          [['tricky', true], ['other', false]].forEach(function (k) {
+            wk[k[0]].forEach(function (w) {
+              if (!seen[w]) { seen[w] = true; out[w] = { half: h.id, week: wk.week, tricky: k[1] }; }
+              else if (k[1]) out[w].tricky = true;
+            });
+          });
+        });
+      });
+    };
+    scan(book.halves);
+    scan(S.halvesOf(book, c));
+    return out;
+  };
+  // Is the word marked tricky with this choice in play?
+  S.marked = function (book, c, w) { const m = S.marks(book, c)[w]; return m ? m.tricky : true; };
+
+  // The words in play for a choice (before recordings are checked), each once:
+  //   a week       that week's words (tricky, then other), then the tricky words of its half-term's earlier weeks;
+  //   its weeks    every word of the half-term, week by week (each week's tricky words, then its other words);
+  //   a term       every word of its half-terms, half-term by half-term, in the order the file first lists it.
+  S.inPlay = function (book, c) {
+    const out = [];
+    const add = function (list) { list.forEach(function (w) { if (book.words[w] && out.indexOf(w) < 0) out.push(w); }); };
+    if (S.wide(c)) {
+      S.halvesOf(book, c).forEach(function (h) { h.weeks.forEach(function (wk) { add(wk.tricky); add(wk.other); }); });
+      return out;
+    }
+    const h = S.half(book, c.half);
+    if (!h) return out;
+    h.weeks.forEach(function (wk) { if (wk.week === c.week) { add(wk.tricky); add(wk.other); } });
+    h.weeks.forEach(function (wk) { if (wk.week < c.week) add(wk.tricky); });
+    return out;
+  };
+  // A week's own words (its tricky words and its other words), in a half-term.
+  S.ownWords = function (book, half, week) {
+    const wk = S.weekOf(S.half(book, half), week);
     return wk ? wk.tricky.concat(wk.other).filter(function (w) { return book.words[w]; }) : [];
   };
 
@@ -172,7 +304,7 @@
 
   // ---------------------------------------------------------------- a round
   // opts: { words: the words in play, answers, size: 5, rand,
-  //         lowest: true with every week in play (the words on the lowest step first),
+  //         lowest: true with a half-term's weeks or a whole term in play (the words on the lowest step first),
   //         own: the chosen week's own words in play (one week in play: at least 3 of them a round) } -> [{ word, step }]
   S.pickRound = function (opts) {
     const rand = opts.rand || Math.random;
@@ -222,14 +354,17 @@
   //   tiles    one tile per sound ('ay'), no spares; each says its sound in this word when picked up (sound);
   //   letters  one tile per letter, with the word's spares;
   //   harder   as letters, then the tray filled up to book.harderTray with letters from other words
-  //            (fill: the words to take them from, in order of preference), each a letter not already in the tray.
+  //            (fill: the words to take them from, in order of preference), each a letter not already in the tray and
+  //            never a capital (a capital only ever goes into its own word's tray).
+  // marked: false when the half-term in play doesn't list the word as tricky: then no place or tile is marked (S.marked).
   // -> { mode, places: [{ text, tricky, sound }], tray: [{ text, tricky, spare, sound }] } (the tray shuffled)
-  S.plan = function (book, word, step, fill, rand) {
+  S.plan = function (book, word, step, fill, rand, marked) {
     rand = rand || Math.random;
     const e = book.words[word];
     const mode = S.mode(step);
+    const mark = marked !== false;
     const places = (mode === 'tiles' ? e.tiles : e.letters).map(function (t) {
-      return { text: t.text, tricky: t.tricky, sound: mode === 'tiles' ? t.sound : null };
+      return { text: t.text, tricky: mark && t.tricky, sound: mode === 'tiles' ? t.sound : null };
     });
     const tray = places.map(function (p) { return { text: p.text, tricky: p.tricky, spare: false, sound: p.sound }; });
     if (mode !== 'tiles') e.spares.forEach(function (s) { tray.push({ text: s, tricky: false, spare: true, sound: null }); });
@@ -239,7 +374,7 @@
       (fill || []).forEach(function (group) {
         const letters = [];
         group.filter(function (w) { return w !== word && book.words[w]; }).forEach(function (w) {
-          w.split('').forEach(function (ch) { if (!have[ch] && letters.indexOf(ch) < 0) letters.push(ch); });
+          w.split('').forEach(function (ch) { if (!S.isCapital(ch) && !have[ch] && letters.indexOf(ch) < 0) letters.push(ch); });
         });
         shuffle(letters, rand).forEach(function (ch) {
           if (tray.length >= book.harderTray || have[ch]) return;
@@ -251,22 +386,23 @@
     return { mode: mode, places: places, tray: shuffle(tray, rand) };
   };
   // Where harder letters' extra letters come from, in order of preference:
-  //   one week in play   that week's words, then the other words in play, then any word in the file;
-  //   every week (all)   the word's own week's words, then any word in play, then any word in the file (answer 9).
+  //   one week in play           that week's words, then the other words in play, then any word in the file;
+  //   its weeks, or a whole term the word's own week's words (in the half-term that decides its marking), then any
+  //                              word in play, then any word in the file (answer 9).
   // pool: the words in play this round (the recorded ones); without it, every word in play.
-  S.fillFrom = function (book, week, word, pool) {
-    const inPlay = pool || S.inPlay(book, week);
-    if (week === S.ALL) {
-      const e = book.words[word];
-      return [e ? S.ownWords(book, e.week) : [], inPlay, book.order];
+  S.fillFrom = function (book, c, word, pool) {
+    const inPlay = pool || S.inPlay(book, c);
+    if (S.wide(c)) {
+      const m = S.marks(book, c)[word];
+      return [m ? S.ownWords(book, m.half, m.week) : [], inPlay, book.order];
     }
-    return [S.ownWords(book, week), inPlay, book.order];
+    return [S.ownWords(book, c.half, c.week), inPlay, book.order];
   };
 
-  // Every question the game can ask for a week (or 'all'): each word in play, to find and to build at each step.
-  S.allQuestions = function (book, week) {
+  // Every question the game can ask for a choice: each word in play, to find and to build at each step.
+  S.allQuestions = function (book, c) {
     const out = [];
-    S.inPlay(book, week).forEach(function (w) {
+    S.inPlay(book, c).forEach(function (w) {
       out.push({ word: w, kind: 'find' });
       ['tiles', 'letters', 'harder'].forEach(function (m) { out.push({ word: w, kind: 'build', mode: m }); });
     });

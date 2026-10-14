@@ -578,8 +578,9 @@ button { font-family: var(--font-andika); }
 @keyframes words-spanner-tap { 0%, 100% { transform: none; } 50% { transform: rotate(-14deg); } }
 
 /* ---------------------------------------------------------------- grown-ups: the Words tab */
-.words-week { border-color: var(--night-button); background: transparent; }
-.words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
+/* the half-term chips (each half-term, then the whole term's) and the week chips: one look (WordGrid card) */
+.words-half, .words-week { border-color: var(--night-button); background: transparent; }
+.words-half.is-on, .words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
 .words-grid { display: grid; grid-template-columns: 158px 1fr; column-gap: 0; row-gap: 12px; align-items: start; margin: 14px 0 12px; max-width: 1120px; }
 .words-grid-label { color: var(--text-2); padding-top: 10px; }
 .words-grid-cells { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -675,10 +676,10 @@ button { font-family: var(--font-andika); }
 <template id="art-words-socket-4"><svg width="263.5" height="120" viewBox="0 0 263.5 120" overflow="visible" aria-hidden="true"><rect class="f-peach-dark s-ink" x="0" y="0" width="263.5" height="120" rx="60" stroke-width="4"/><rect class="s-planet-peach" x="5" y="5" width="253.5" height="110" rx="55" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="255.3" cy="81.4" r="2"/><circle class="f-ink" cx="225" cy="111.7" r="2"/><circle class="f-ink" cx="38.6" cy="111.7" r="2"/><circle class="f-ink" cx="8.3" cy="81.4" r="2"/><circle class="f-ink" cx="8.3" cy="38.6" r="2"/><circle class="f-ink" cx="38.6" cy="8.3" r="2"/><circle class="f-ink" cx="225" cy="8.3" r="2"/><circle class="f-ink" cx="255.3" cy="38.6" r="2"/><rect class="f-night-raised s-ink" x="8" y="8" width="247.5" height="104" rx="52" stroke-width="3"/><rect class="s-mint" x="16" y="16" width="231.5" height="88" rx="44" fill="none" stroke-width="4" stroke-dasharray="3 10" stroke-linecap="round"/></svg></template>
 <template id="art-words-tile-4"><svg width="247.5" height="104" viewBox="0 0 247.5 104" overflow="visible" aria-hidden="true"><g class="words-glow"><rect class="s-spark" x="-12" y="-12" width="271.5" height="128" rx="64" fill="none" stroke-width="12"/></g><g class="words-loose"><rect class="f-peach-dark s-ink" x="2" y="2" width="243.5" height="100" rx="50" stroke-width="4"/><rect class="s-planet-peach" x="7" y="7" width="233.5" height="90" rx="45" fill="none" stroke-width="2.5"/><circle class="f-ink" cx="238" cy="69.6" r="2.2"/><circle class="f-ink" cx="213.1" cy="94.5" r="2.2"/><circle class="f-ink" cx="34.4" cy="94.5" r="2.2"/><circle class="f-ink" cx="9.5" cy="69.6" r="2.2"/><circle class="f-ink" cx="9.5" cy="34.4" r="2.2"/><circle class="f-ink" cx="34.4" cy="9.5" r="2.2"/><circle class="f-ink" cx="213.1" cy="9.5" r="2.2"/><circle class="f-ink" cx="238" cy="34.4" r="2.2"/><rect class="f-moon s-ink" x="10.4" y="10.4" width="226.7" height="83.2" rx="41.6" stroke-width="3"/><path class="s-cat-white" d="M25 41.6 C 29.1 27, 39.5 20.8, 52 19.8" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 81.1 H216.3" stroke-width="5" stroke-linecap="round"/></g><g class="words-set"><rect class="f-moon s-ink" x="1.5" y="1.5" width="244.5" height="101" rx="50.5" stroke-width="3"/><path class="s-cat-white" d="M20.8 41.6 C 25 25, 37.4 15.6, 52 13.5" fill="none" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path class="s-moon-dim" d="M31.2 88.4 H216.3" stroke-width="5" stroke-linecap="round"/></g></svg></template>
 <script>
-window.MW = { VERSION: '0.6.0' };
-window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"rescue-find-number":{"dur":1.75},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74},"words-w-feel":{"dur":1.1},"words-w-food":{"dur":1.13},"words-w-sort":{"dur":1.21},"words-w-down":{"dur":0.94},"words-w-right":{"dur":1.09},"words-w-hard":{"dur":0.93},"words-w-took":{"dur":0.76},"words-w-hear":{"dur":0.72},"words-w-misses":{"dur":1.2},"words-w-chain":{"dur":0.95},"words-w-queen":{"dur":1.0},"words-w-chair":{"dur":0.9},"words-w-year":{"dur":1.03},"words-w-cobweb":{"dur":1.24},"words-w-goats":{"dur":0.84},"words-w-farmyard":{"dur":1.37},"words-w-green":{"dur":0.96},"words-w-brown":{"dur":0.97},"words-w-train":{"dur":0.94},"words-w-thinks":{"dur":1.01},"words-w-drum":{"dur":0.83},"words-w-splat":{"dur":1.13},"words-w-paint":{"dur":0.78},"words-w-frog":{"dur":0.72},"words-w-day":{"dur":0.72},"words-w-cloud":{"dur":1.32},"words-w-boy":{"dur":0.77},"words-w-read":{"dur":1.13},"words-w-play":{"dur":0.8},"words-w-sound":{"dur":1.2},"words-w-joy":{"dur":0.98},"words-w-treat":{"dur":0.8},"words-s-a":{"dur":0.48},"words-s-b":{"dur":0.36},"words-s-d":{"dur":0.38},"words-s-e":{"dur":0.36},"words-s-f":{"dur":0.72},"words-s-g":{"dur":0.39},"words-s-h":{"dur":0.34},"words-s-i":{"dur":0.39},"words-s-j":{"dur":0.46},"words-s-k":{"dur":0.42},"words-s-l":{"dur":0.68},"words-s-m":{"dur":0.71},"words-s-n":{"dur":0.78},"words-s-o":{"dur":0.43},"words-s-p":{"dur":0.39},"words-s-r":{"dur":0.72},"words-s-s":{"dur":0.7},"words-s-t":{"dur":0.35},"words-s-u":{"dur":0.33},"words-s-v":{"dur":0.9},"words-s-w":{"dur":0.34},"words-s-y":{"dur":0.4},"words-s-ai":{"dur":0.8},"words-s-air":{"dur":0.85},"words-s-ar":{"dur":0.91},"words-s-ch":{"dur":0.42},"words-s-ear":{"dur":0.63},"words-s-ee":{"dur":0.96},"words-s-igh":{"dur":0.88},"words-s-oa":{"dur":0.83},"words-s-oo-long":{"dur":0.77},"words-s-oo-short":{"dur":0.35},"words-s-or":{"dur":0.64},"words-s-ow":{"dur":0.82},"words-s-oy":{"dur":0.57},"words-s-qu":{"dur":0.38},"words-s-sh":{"dur":0.56},"words-s-th":{"dur":0.64},"words-s-th-voiced":{"dur":0.87},"words-s-ur":{"dur":0.74},"words-s-ure":{"dur":0.67},"words-s-wu":{"dur":0.49}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
+window.MW = { VERSION: '0.7.0' };
+window.MW_AUDIO = {"voice":{"map-welcome":{"dur":3.09},"map-not-ready":{"dur":2.28},"crew-jobs":{"dur":3.06},"crew-ready":{"dur":1.92},"name-moggles":{"dur":1.36},"name-snuffles":{"dur":1.56},"is-the":{"dur":0.8},"job-lookout":{"dur":0.81},"job-engineer":{"dur":1.22},"job-navigator":{"dur":1.39},"job-cook":{"dur":0.94},"num-mid-0":{"dur":1.04},"num-mid-1":{"dur":0.78},"num-mid-2":{"dur":0.86},"num-mid-3":{"dur":0.86},"num-mid-4":{"dur":0.75},"num-mid-5":{"dur":0.99},"num-mid-6":{"dur":0.83},"num-mid-7":{"dur":1.18},"num-mid-8":{"dur":0.73},"num-mid-9":{"dur":1.18},"num-mid-10":{"dur":0.51},"num-end-0":{"dur":1.02},"num-end-1":{"dur":0.57},"num-end-2":{"dur":0.49},"num-end-3":{"dur":0.59},"num-end-4":{"dur":0.74},"num-end-5":{"dur":0.8},"num-end-6":{"dur":0.7},"num-end-7":{"dur":0.83},"num-end-8":{"dur":0.64},"num-end-9":{"dur":0.93},"num-end-10":{"dur":0.65},"and":{"dur":1.0},"make":{"dur":1.02},"q-lets-make":{"dur":1.13},"q-weve-got":{"dur":2.17},"q-how-many-more":{"dur":1.14},"q-how-many-altogether":{"dur":2.37},"q-count-on-from":{"dur":2.19},"praise-found-it":{"dur":1.3},"praise-thats-right":{"dur":1.0},"praise-super-counting":{"dur":1.44},"praise-brilliant-rescuing":{"dur":2.16},"praise-well-done":{"dur":1.2},"again-try-again":{"dur":1.43},"again-look-again":{"dur":1.78},"again-count-with-me":{"dur":1.54},"tap-scruffles":{"dur":2.04},"too-many":{"dur":2.26},"round-ready":{"dur":2.1},"round-rescued-all":{"dur":3.28},"round-another":{"dur":0.99},"map-mimi-rescue":{"dur":1.76},"rescue-find-number":{"dur":1.75},"words-name":{"dur":1.97},"words-round-ready":{"dur":2.73},"words-round-done":{"dur":1.99},"words-round-another":{"dur":0.79},"words-find":{"dur":2.14},"words-that-word":{"dur":2.27},"words-found-it":{"dur":1.02},"words-super-reading":{"dur":1.17},"words-well-done":{"dur":1.02},"words-build":{"dur":2.51},"words-you-built":{"dur":2.05},"words-tricky-bit":{"dur":1.85},"words-try-again":{"dur":1.11},"words-look-together":{"dur":1.36},"words-w-all":{"dur":0.88},"words-w-of":{"dur":0.65},"words-w-one":{"dur":0.83},"words-w-here":{"dur":1.0},"words-w-magnet":{"dur":1.51},"words-w-cartoon":{"dur":1.43},"words-w-rabbit":{"dur":1.52},"words-w-spray":{"dur":1.34},"words-w-popcorn":{"dur":1.32},"words-w-proud":{"dur":1.03},"words-w-toy":{"dur":0.51},"words-w-say":{"dur":1.23},"words-w-go":{"dur":0.68},"words-w-my":{"dur":0.85},"words-w-into":{"dur":0.75},"words-w-out":{"dur":0.82},"words-w-what":{"dur":0.8},"words-w-she":{"dur":0.92},"words-w-me":{"dur":1.02},"words-w-love":{"dur":0.79},"words-w-they":{"dur":0.86},"words-w-some":{"dur":0.9},"words-w-were":{"dur":0.87},"words-w-sure":{"dur":0.92},"words-w-said":{"dur":0.97},"words-w-you":{"dur":0.73},"words-w-like":{"dur":0.91},"words-w-push":{"dur":0.74},"words-w-feel":{"dur":1.1},"words-w-food":{"dur":1.13},"words-w-sort":{"dur":1.21},"words-w-down":{"dur":0.94},"words-w-right":{"dur":1.09},"words-w-hard":{"dur":0.93},"words-w-took":{"dur":0.76},"words-w-hear":{"dur":0.72},"words-w-misses":{"dur":1.2},"words-w-chain":{"dur":0.95},"words-w-queen":{"dur":1.0},"words-w-chair":{"dur":0.9},"words-w-year":{"dur":1.03},"words-w-cobweb":{"dur":1.24},"words-w-goats":{"dur":0.84},"words-w-farmyard":{"dur":1.37},"words-w-green":{"dur":0.96},"words-w-brown":{"dur":0.97},"words-w-train":{"dur":0.94},"words-w-thinks":{"dur":1.01},"words-w-drum":{"dur":0.83},"words-w-splat":{"dur":1.13},"words-w-paint":{"dur":0.78},"words-w-frog":{"dur":0.72},"words-w-day":{"dur":0.72},"words-w-cloud":{"dur":1.32},"words-w-boy":{"dur":0.77},"words-w-read":{"dur":1.13},"words-w-play":{"dur":0.8},"words-w-sound":{"dur":1.2},"words-w-joy":{"dur":0.98},"words-w-treat":{"dur":0.8},"words-w-their":{"dur":0.9},"words-w-people":{"dur":0.82},"words-w-oh":{"dur":0.69},"words-w-your":{"dur":0.84},"words-w-mr":{"dur":0.77},"words-w-mrs":{"dur":0.72},"words-w-ms":{"dur":0.79},"words-w-ask":{"dur":0.76},"words-w-could":{"dur":0.54},"words-w-would":{"dur":0.51},"words-w-should":{"dur":0.68},"words-w-our":{"dur":0.67},"words-w-house":{"dur":0.65},"words-w-mouse":{"dur":0.7},"words-w-water":{"dur":0.65},"words-w-want":{"dur":1.1},"words-w-little":{"dur":0.63},"words-w-bird":{"dur":0.68},"words-w-girl":{"dur":0.65},"words-w-pie":{"dur":0.76},"words-w-tried":{"dur":0.91},"words-w-blue":{"dur":0.6},"words-w-true":{"dur":0.63},"words-w-human":{"dur":0.78},"words-w-unit":{"dur":0.83},"words-w-both":{"dur":0.61},"words-w-child":{"dur":0.8},"words-w-kind":{"dur":0.89},"words-w-basic":{"dur":0.74},"words-w-acorn":{"dur":0.73},"words-w-fever":{"dur":0.83},"words-w-take":{"dur":0.76},"words-w-same":{"dur":0.86},"words-w-time":{"dur":0.86},"words-w-home":{"dur":0.75},"words-w-woke":{"dur":0.71},"words-w-rude":{"dur":0.77},"words-w-cute":{"dur":0.66},"words-w-these":{"dur":0.84},"words-w-even":{"dur":0.68},"words-w-new":{"dur":0.81},"words-w-chew":{"dur":0.82},"words-w-shriek":{"dur":0.85},"words-w-field":{"dur":1.05},"words-w-claw":{"dur":0.72},"words-w-draw":{"dur":0.82},"words-w-fried":{"dur":1.18},"words-w-game":{"dur":0.7},"words-w-open":{"dur":0.64},"words-w-float":{"dur":0.68},"words-w-being":{"dur":0.71},"words-w-eating":{"dur":0.7},"words-s-a":{"dur":0.39},"words-s-b":{"dur":0.32},"words-s-d":{"dur":0.35},"words-s-e":{"dur":0.33},"words-s-f":{"dur":0.53},"words-s-g":{"dur":0.37},"words-s-h":{"dur":0.31},"words-s-i":{"dur":0.31},"words-s-j":{"dur":0.32},"words-s-k":{"dur":0.41},"words-s-l":{"dur":0.64},"words-s-m":{"dur":0.44},"words-s-n":{"dur":0.5},"words-s-o":{"dur":0.36},"words-s-p":{"dur":0.33},"words-s-r":{"dur":0.7},"words-s-s":{"dur":0.28},"words-s-t":{"dur":0.33},"words-s-u":{"dur":0.34},"words-s-v":{"dur":0.57},"words-s-w":{"dur":0.31},"words-s-y":{"dur":0.3},"words-s-ai":{"dur":0.73},"words-s-air":{"dur":0.75},"words-s-ar":{"dur":0.88},"words-s-ch":{"dur":0.35},"words-s-ear":{"dur":0.52},"words-s-ee":{"dur":0.91},"words-s-igh":{"dur":0.86},"words-s-oa":{"dur":0.76},"words-s-oo-long":{"dur":0.68},"words-s-oo-short":{"dur":0.31},"words-s-or":{"dur":0.63},"words-s-ow":{"dur":0.77},"words-s-oy":{"dur":0.42},"words-s-qu":{"dur":0.42},"words-s-sh":{"dur":0.58},"words-s-th":{"dur":0.59},"words-s-th-voiced":{"dur":0.29},"words-s-ur":{"dur":0.61},"words-s-ure":{"dur":0.55},"words-s-wu":{"dur":0.38},"words-s-yoo":{"dur":0.67},"words-s-er":{"dur":0.76},"words-s-ng":{"dur":0.76},"words-s-z":{"dur":0.63}},"effects":{"chime":{"dur":0.61},"pop":{"dur":0.12},"whoosh":{"dur":0.34},"twinkle":{"dur":0.9},"tune":{"dur":2.6}},"music":{"dur":159.85,"fade":1.5}};
 window.MW_GAMES = [{"id":"rescue","name":"MeeMee Rescue","planet":0,"badge":"mimi","say":"map-mimi-rescue"},{"id":"words","name":"MeeMee Rockets","planet":1,"badge":"words-badge","say":"words-name"}];
-window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"rescue-find-number","group":"Numbers mode","words":"Find the number."},{"id":"words-name","group":"Map","words":"MeeMee Rockets!"},{"id":"words-round-ready","group":"Rounds","words":"Ready to launch some rockets?"},{"id":"words-round-done","group":"Rounds","words":"You launched all the rockets!"},{"id":"words-round-another","group":"Rounds","words":"Another go?"},{"id":"words-find","group":"Find","words":"Find the word…"},{"id":"words-that-word","group":"Find","words":"That word is…"},{"id":"words-found-it","group":"Praise","words":"You found it!"},{"id":"words-super-reading","group":"Praise","words":"Super reading!"},{"id":"words-well-done","group":"Praise","words":"Well done!"},{"id":"words-build","group":"Build","words":"Now build the word…"},{"id":"words-you-built","group":"Build","words":"You built the word…"},{"id":"words-tricky-bit","group":"Build","words":"That's the tricky bit."},{"id":"words-try-again","group":"Trying again","words":"Let's try again."},{"id":"words-look-together","group":"Trying again","words":"Let's look together."},{"id":"words-w-all","group":"Week 5 words","words":"all"},{"id":"words-w-of","group":"Week 5 words","words":"of"},{"id":"words-w-one","group":"Week 5 words","words":"one"},{"id":"words-w-here","group":"Week 5 words","words":"here"},{"id":"words-w-magnet","group":"Week 5 words","words":"magnet"},{"id":"words-w-cartoon","group":"Week 5 words","words":"cartoon"},{"id":"words-w-rabbit","group":"Week 5 words","words":"rabbit"},{"id":"words-w-spray","group":"Week 5 words","words":"spray"},{"id":"words-w-popcorn","group":"Week 5 words","words":"popcorn"},{"id":"words-w-proud","group":"Week 5 words","words":"proud"},{"id":"words-w-toy","group":"Week 5 words","words":"toy"},{"id":"words-w-say","group":"Week 5 words","words":"say"},{"id":"words-w-go","group":"Tricky words, weeks 1 to 4","words":"go"},{"id":"words-w-my","group":"Tricky words, weeks 1 to 4","words":"my"},{"id":"words-w-into","group":"Tricky words, weeks 1 to 4","words":"into"},{"id":"words-w-out","group":"Tricky words, weeks 1 to 4","words":"out"},{"id":"words-w-what","group":"Tricky words, weeks 1 to 4","words":"what"},{"id":"words-w-she","group":"Tricky words, weeks 1 to 4","words":"she"},{"id":"words-w-me","group":"Tricky words, weeks 1 to 4","words":"me"},{"id":"words-w-love","group":"Tricky words, weeks 1 to 4","words":"love"},{"id":"words-w-they","group":"Tricky words, weeks 1 to 4","words":"they"},{"id":"words-w-some","group":"Tricky words, weeks 1 to 4","words":"some"},{"id":"words-w-were","group":"Tricky words, weeks 1 to 4","words":"were"},{"id":"words-w-sure","group":"Tricky words, weeks 1 to 4","words":"sure"},{"id":"words-w-said","group":"Tricky words, weeks 1 to 4","words":"said"},{"id":"words-w-you","group":"Tricky words, weeks 1 to 4","words":"you"},{"id":"words-w-like","group":"Tricky words, weeks 1 to 4","words":"like"},{"id":"words-w-push","group":"Tricky words, weeks 1 to 4","words":"push"},{"id":"words-w-feel","group":"Other words, weeks 1 to 4","words":"feel"},{"id":"words-w-food","group":"Other words, weeks 1 to 4","words":"food"},{"id":"words-w-sort","group":"Other words, weeks 1 to 4","words":"sort"},{"id":"words-w-down","group":"Other words, weeks 1 to 4","words":"down"},{"id":"words-w-right","group":"Other words, weeks 1 to 4","words":"right"},{"id":"words-w-hard","group":"Other words, weeks 1 to 4","words":"hard"},{"id":"words-w-took","group":"Other words, weeks 1 to 4","words":"took"},{"id":"words-w-hear","group":"Other words, weeks 1 to 4","words":"hear"},{"id":"words-w-misses","group":"Other words, weeks 1 to 4","words":"misses"},{"id":"words-w-chain","group":"Other words, weeks 1 to 4","words":"chain"},{"id":"words-w-queen","group":"Other words, weeks 1 to 4","words":"queen"},{"id":"words-w-chair","group":"Other words, weeks 1 to 4","words":"chair"},{"id":"words-w-year","group":"Other words, weeks 1 to 4","words":"year"},{"id":"words-w-cobweb","group":"Other words, weeks 1 to 4","words":"cobweb"},{"id":"words-w-goats","group":"Other words, weeks 1 to 4","words":"goats"},{"id":"words-w-farmyard","group":"Other words, weeks 1 to 4","words":"farmyard"},{"id":"words-w-green","group":"Other words, weeks 1 to 4","words":"green"},{"id":"words-w-brown","group":"Other words, weeks 1 to 4","words":"brown"},{"id":"words-w-train","group":"Other words, weeks 1 to 4","words":"train"},{"id":"words-w-thinks","group":"Other words, weeks 1 to 4","words":"thinks"},{"id":"words-w-drum","group":"Other words, weeks 1 to 4","words":"drum"},{"id":"words-w-splat","group":"Other words, weeks 1 to 4","words":"splat"},{"id":"words-w-paint","group":"Other words, weeks 1 to 4","words":"paint"},{"id":"words-w-frog","group":"Other words, weeks 1 to 4","words":"frog"},{"id":"words-w-day","group":"Other words, weeks 1 to 4","words":"day"},{"id":"words-w-cloud","group":"Other words, weeks 1 to 4","words":"cloud"},{"id":"words-w-boy","group":"Other words, weeks 1 to 4","words":"boy"},{"id":"words-w-read","group":"Other words, weeks 1 to 4","words":"read"},{"id":"words-w-play","group":"Other words, weeks 1 to 4","words":"play"},{"id":"words-w-sound","group":"Other words, weeks 1 to 4","words":"sound"},{"id":"words-w-joy","group":"Other words, weeks 1 to 4","words":"joy"},{"id":"words-w-treat","group":"Other words, weeks 1 to 4","words":"treat"},{"id":"words-s-a","group":"Tile sounds","words":"a"},{"id":"words-s-b","group":"Tile sounds","words":"b"},{"id":"words-s-d","group":"Tile sounds","words":"d"},{"id":"words-s-e","group":"Tile sounds","words":"e"},{"id":"words-s-f","group":"Tile sounds","words":"f"},{"id":"words-s-g","group":"Tile sounds","words":"g"},{"id":"words-s-h","group":"Tile sounds","words":"h"},{"id":"words-s-i","group":"Tile sounds","words":"i"},{"id":"words-s-j","group":"Tile sounds","words":"j"},{"id":"words-s-k","group":"Tile sounds","words":"k (for c and k)"},{"id":"words-s-l","group":"Tile sounds","words":"l"},{"id":"words-s-m","group":"Tile sounds","words":"m"},{"id":"words-s-n","group":"Tile sounds","words":"n"},{"id":"words-s-o","group":"Tile sounds","words":"o"},{"id":"words-s-p","group":"Tile sounds","words":"p"},{"id":"words-s-r","group":"Tile sounds","words":"r"},{"id":"words-s-s","group":"Tile sounds","words":"s"},{"id":"words-s-t","group":"Tile sounds","words":"t"},{"id":"words-s-u","group":"Tile sounds","words":"u"},{"id":"words-s-v","group":"Tile sounds","words":"v"},{"id":"words-s-w","group":"Tile sounds","words":"w"},{"id":"words-s-y","group":"Tile sounds","words":"y, as in yes"},{"id":"words-s-ai","group":"Tile sounds","words":"ai, as in rain"},{"id":"words-s-air","group":"Tile sounds","words":"air, as in chair"},{"id":"words-s-ar","group":"Tile sounds","words":"ar, as in hard"},{"id":"words-s-ch","group":"Tile sounds","words":"ch"},{"id":"words-s-ear","group":"Tile sounds","words":"ear, as in hear"},{"id":"words-s-ee","group":"Tile sounds","words":"ee, as in feel"},{"id":"words-s-igh","group":"Tile sounds","words":"igh, as in right"},{"id":"words-s-oa","group":"Tile sounds","words":"oa, as in goat"},{"id":"words-s-oo-long","group":"Tile sounds","words":"oo, as in food"},{"id":"words-s-oo-short","group":"Tile sounds","words":"oo, as in took"},{"id":"words-s-or","group":"Tile sounds","words":"or, as in sort"},{"id":"words-s-ow","group":"Tile sounds","words":"ow, as in down"},{"id":"words-s-oy","group":"Tile sounds","words":"oy, as in boy"},{"id":"words-s-qu","group":"Tile sounds","words":"kw (qu)"},{"id":"words-s-sh","group":"Tile sounds","words":"sh"},{"id":"words-s-th","group":"Tile sounds","words":"th, as in thinks"},{"id":"words-s-th-voiced","group":"Tile sounds","words":"th, as in they"},{"id":"words-s-ur","group":"Tile sounds","words":"ur, as in turn"},{"id":"words-s-ure","group":"Tile sounds","words":"ure, as in sure"},{"id":"words-s-wu","group":"Tile sounds","words":"w-u, as at the start of one"}];
+window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee World!"},{"id":"map-not-ready","group":"Map","words":"That planet isn't ready yet."},{"id":"crew-jobs","group":"Crew","words":"Let's give the crew their jobs!"},{"id":"crew-ready","group":"Crew","words":"The crew are ready!"},{"id":"name-moggles","group":"Crew","words":"Moggles…"},{"id":"name-snuffles","group":"Crew","words":"Snuffles…"},{"id":"is-the","group":"Crew","words":"is the…"},{"id":"job-lookout","group":"Crew","words":"lookout."},{"id":"job-engineer","group":"Crew","words":"engineer."},{"id":"job-navigator","group":"Crew","words":"navigator."},{"id":"job-cook","group":"Crew","words":"cook."},{"id":"num-mid-0","group":"Numbers, mid-sentence","words":"zero"},{"id":"num-mid-1","group":"Numbers, mid-sentence","words":"one"},{"id":"num-mid-2","group":"Numbers, mid-sentence","words":"two"},{"id":"num-mid-3","group":"Numbers, mid-sentence","words":"three"},{"id":"num-mid-4","group":"Numbers, mid-sentence","words":"four"},{"id":"num-mid-5","group":"Numbers, mid-sentence","words":"five"},{"id":"num-mid-6","group":"Numbers, mid-sentence","words":"six"},{"id":"num-mid-7","group":"Numbers, mid-sentence","words":"seven"},{"id":"num-mid-8","group":"Numbers, mid-sentence","words":"eight"},{"id":"num-mid-9","group":"Numbers, mid-sentence","words":"nine"},{"id":"num-mid-10","group":"Numbers, mid-sentence","words":"ten"},{"id":"num-end-0","group":"Numbers, end of sentence","words":"zero"},{"id":"num-end-1","group":"Numbers, end of sentence","words":"one"},{"id":"num-end-2","group":"Numbers, end of sentence","words":"two"},{"id":"num-end-3","group":"Numbers, end of sentence","words":"three"},{"id":"num-end-4","group":"Numbers, end of sentence","words":"four"},{"id":"num-end-5","group":"Numbers, end of sentence","words":"five"},{"id":"num-end-6","group":"Numbers, end of sentence","words":"six"},{"id":"num-end-7","group":"Numbers, end of sentence","words":"seven"},{"id":"num-end-8","group":"Numbers, end of sentence","words":"eight"},{"id":"num-end-9","group":"Numbers, end of sentence","words":"nine"},{"id":"num-end-10","group":"Numbers, end of sentence","words":"ten"},{"id":"and","group":"Joining words","words":"and"},{"id":"make","group":"Joining words","words":"make"},{"id":"q-lets-make","group":"Questions","words":"Let's make…"},{"id":"q-weve-got","group":"Questions","words":"We've got…"},{"id":"q-how-many-more","group":"Questions","words":"How many more?"},{"id":"q-how-many-altogether","group":"Questions","words":"How many altogether?"},{"id":"q-count-on-from","group":"Questions","words":"Let's count on from…"},{"id":"praise-found-it","group":"Praise","words":"You found it!"},{"id":"praise-thats-right","group":"Praise","words":"That's right!"},{"id":"praise-super-counting","group":"Praise","words":"Super counting!"},{"id":"praise-brilliant-rescuing","group":"Praise","words":"Brilliant rescuing!"},{"id":"praise-well-done","group":"Praise","words":"Well done!"},{"id":"again-try-again","group":"Try again","words":"Let's try again."},{"id":"again-look-again","group":"Try again","words":"Let's look again."},{"id":"again-count-with-me","group":"Try again","words":"Count them with me."},{"id":"tap-scruffles","group":"Checking","words":"Tap Scruffles when you're ready."},{"id":"too-many","group":"Too many","words":"That's too many. Take one back."},{"id":"round-ready","group":"Rounds","words":"Ready for a rescue?"},{"id":"round-rescued-all","group":"Rounds","words":"You rescued all the MeeMee!"},{"id":"round-another","group":"Rounds","words":"Another rescue?"},{"id":"map-mimi-rescue","group":"Map","words":"MeeMee Rescue!"},{"id":"rescue-find-number","group":"Numbers mode","words":"Find the number."},{"id":"words-name","group":"Map","words":"MeeMee Rockets!"},{"id":"words-round-ready","group":"Rounds","words":"Ready to launch some rockets?"},{"id":"words-round-done","group":"Rounds","words":"You launched all the rockets!"},{"id":"words-round-another","group":"Rounds","words":"Another go?"},{"id":"words-find","group":"Find","words":"Find the word…"},{"id":"words-that-word","group":"Find","words":"That word is…"},{"id":"words-found-it","group":"Praise","words":"You found it!"},{"id":"words-super-reading","group":"Praise","words":"Super reading!"},{"id":"words-well-done","group":"Praise","words":"Well done!"},{"id":"words-build","group":"Build","words":"Now build the word…"},{"id":"words-you-built","group":"Build","words":"You built the word…"},{"id":"words-tricky-bit","group":"Build","words":"That's the tricky bit."},{"id":"words-try-again","group":"Trying again","words":"Let's try again."},{"id":"words-look-together","group":"Trying again","words":"Let's look together."},{"id":"words-w-all","group":"Week 5 words","words":"all"},{"id":"words-w-of","group":"Week 5 words","words":"of"},{"id":"words-w-one","group":"Week 5 words","words":"one"},{"id":"words-w-here","group":"Week 5 words","words":"here"},{"id":"words-w-magnet","group":"Week 5 words","words":"magnet"},{"id":"words-w-cartoon","group":"Week 5 words","words":"cartoon"},{"id":"words-w-rabbit","group":"Week 5 words","words":"rabbit"},{"id":"words-w-spray","group":"Week 5 words","words":"spray"},{"id":"words-w-popcorn","group":"Week 5 words","words":"popcorn"},{"id":"words-w-proud","group":"Week 5 words","words":"proud"},{"id":"words-w-toy","group":"Week 5 words","words":"toy"},{"id":"words-w-say","group":"Week 5 words","words":"say"},{"id":"words-w-go","group":"Tricky words, weeks 1 to 4","words":"go"},{"id":"words-w-my","group":"Tricky words, weeks 1 to 4","words":"my"},{"id":"words-w-into","group":"Tricky words, weeks 1 to 4","words":"into"},{"id":"words-w-out","group":"Tricky words, weeks 1 to 4","words":"out"},{"id":"words-w-what","group":"Tricky words, weeks 1 to 4","words":"what"},{"id":"words-w-she","group":"Tricky words, weeks 1 to 4","words":"she"},{"id":"words-w-me","group":"Tricky words, weeks 1 to 4","words":"me"},{"id":"words-w-love","group":"Tricky words, weeks 1 to 4","words":"love"},{"id":"words-w-they","group":"Tricky words, weeks 1 to 4","words":"they"},{"id":"words-w-some","group":"Tricky words, weeks 1 to 4","words":"some"},{"id":"words-w-were","group":"Tricky words, weeks 1 to 4","words":"were"},{"id":"words-w-sure","group":"Tricky words, weeks 1 to 4","words":"sure"},{"id":"words-w-said","group":"Tricky words, weeks 1 to 4","words":"said"},{"id":"words-w-you","group":"Tricky words, weeks 1 to 4","words":"you"},{"id":"words-w-like","group":"Tricky words, weeks 1 to 4","words":"like"},{"id":"words-w-push","group":"Tricky words, weeks 1 to 4","words":"push"},{"id":"words-w-feel","group":"Other words, weeks 1 to 4","words":"feel"},{"id":"words-w-food","group":"Other words, weeks 1 to 4","words":"food"},{"id":"words-w-sort","group":"Other words, weeks 1 to 4","words":"sort"},{"id":"words-w-down","group":"Other words, weeks 1 to 4","words":"down"},{"id":"words-w-right","group":"Other words, weeks 1 to 4","words":"right"},{"id":"words-w-hard","group":"Other words, weeks 1 to 4","words":"hard"},{"id":"words-w-took","group":"Other words, weeks 1 to 4","words":"took"},{"id":"words-w-hear","group":"Other words, weeks 1 to 4","words":"hear"},{"id":"words-w-misses","group":"Other words, weeks 1 to 4","words":"misses"},{"id":"words-w-chain","group":"Other words, weeks 1 to 4","words":"chain"},{"id":"words-w-queen","group":"Other words, weeks 1 to 4","words":"queen"},{"id":"words-w-chair","group":"Other words, weeks 1 to 4","words":"chair"},{"id":"words-w-year","group":"Other words, weeks 1 to 4","words":"year"},{"id":"words-w-cobweb","group":"Other words, weeks 1 to 4","words":"cobweb"},{"id":"words-w-goats","group":"Other words, weeks 1 to 4","words":"goats"},{"id":"words-w-farmyard","group":"Other words, weeks 1 to 4","words":"farmyard"},{"id":"words-w-green","group":"Other words, weeks 1 to 4","words":"green"},{"id":"words-w-brown","group":"Other words, weeks 1 to 4","words":"brown"},{"id":"words-w-train","group":"Other words, weeks 1 to 4","words":"train"},{"id":"words-w-thinks","group":"Other words, weeks 1 to 4","words":"thinks"},{"id":"words-w-drum","group":"Other words, weeks 1 to 4","words":"drum"},{"id":"words-w-splat","group":"Other words, weeks 1 to 4","words":"splat"},{"id":"words-w-paint","group":"Other words, weeks 1 to 4","words":"paint"},{"id":"words-w-frog","group":"Other words, weeks 1 to 4","words":"frog"},{"id":"words-w-day","group":"Other words, weeks 1 to 4","words":"day"},{"id":"words-w-cloud","group":"Other words, weeks 1 to 4","words":"cloud"},{"id":"words-w-boy","group":"Other words, weeks 1 to 4","words":"boy"},{"id":"words-w-read","group":"Other words, weeks 1 to 4","words":"read"},{"id":"words-w-play","group":"Other words, weeks 1 to 4","words":"play"},{"id":"words-w-sound","group":"Other words, weeks 1 to 4","words":"sound"},{"id":"words-w-joy","group":"Other words, weeks 1 to 4","words":"joy"},{"id":"words-w-treat","group":"Other words, weeks 1 to 4","words":"treat"},{"id":"words-w-their","group":"Autumn 2 tricky words","words":"their"},{"id":"words-w-people","group":"Autumn 2 tricky words","words":"people"},{"id":"words-w-oh","group":"Autumn 2 tricky words","words":"oh"},{"id":"words-w-your","group":"Autumn 2 tricky words","words":"your"},{"id":"words-w-mr","group":"Autumn 2 tricky words","words":"Mr"},{"id":"words-w-mrs","group":"Autumn 2 tricky words","words":"Mrs"},{"id":"words-w-ms","group":"Autumn 2 tricky words","words":"Ms"},{"id":"words-w-ask","group":"Autumn 2 tricky words","words":"ask"},{"id":"words-w-could","group":"Autumn 2 tricky words","words":"could"},{"id":"words-w-would","group":"Autumn 2 tricky words","words":"would"},{"id":"words-w-should","group":"Autumn 2 tricky words","words":"should"},{"id":"words-w-our","group":"Autumn 2 tricky words","words":"our"},{"id":"words-w-house","group":"Autumn 2 tricky words","words":"house"},{"id":"words-w-mouse","group":"Autumn 2 tricky words","words":"mouse"},{"id":"words-w-water","group":"Autumn 2 tricky words","words":"water"},{"id":"words-w-want","group":"Autumn 2 tricky words","words":"want"},{"id":"words-w-little","group":"Autumn 2 tricky words","words":"little"},{"id":"words-w-bird","group":"Autumn 2 other words","words":"bird"},{"id":"words-w-girl","group":"Autumn 2 other words","words":"girl"},{"id":"words-w-pie","group":"Autumn 2 other words","words":"pie"},{"id":"words-w-tried","group":"Autumn 2 other words","words":"tried"},{"id":"words-w-blue","group":"Autumn 2 other words","words":"blue"},{"id":"words-w-true","group":"Autumn 2 other words","words":"true"},{"id":"words-w-human","group":"Autumn 2 other words","words":"human"},{"id":"words-w-unit","group":"Autumn 2 other words","words":"unit"},{"id":"words-w-both","group":"Autumn 2 other words","words":"both"},{"id":"words-w-child","group":"Autumn 2 other words","words":"child"},{"id":"words-w-kind","group":"Autumn 2 other words","words":"kind"},{"id":"words-w-basic","group":"Autumn 2 other words","words":"basic"},{"id":"words-w-acorn","group":"Autumn 2 other words","words":"acorn"},{"id":"words-w-fever","group":"Autumn 2 other words","words":"fever"},{"id":"words-w-take","group":"Autumn 2 other words","words":"take"},{"id":"words-w-same","group":"Autumn 2 other words","words":"same"},{"id":"words-w-time","group":"Autumn 2 other words","words":"time"},{"id":"words-w-home","group":"Autumn 2 other words","words":"home"},{"id":"words-w-woke","group":"Autumn 2 other words","words":"woke"},{"id":"words-w-rude","group":"Autumn 2 other words","words":"rude"},{"id":"words-w-cute","group":"Autumn 2 other words","words":"cute"},{"id":"words-w-these","group":"Autumn 2 other words","words":"these"},{"id":"words-w-even","group":"Autumn 2 other words","words":"even"},{"id":"words-w-new","group":"Autumn 2 other words","words":"new"},{"id":"words-w-chew","group":"Autumn 2 other words","words":"chew"},{"id":"words-w-shriek","group":"Autumn 2 other words","words":"shriek"},{"id":"words-w-field","group":"Autumn 2 other words","words":"field"},{"id":"words-w-claw","group":"Autumn 2 other words","words":"claw"},{"id":"words-w-draw","group":"Autumn 2 other words","words":"draw"},{"id":"words-w-fried","group":"Autumn 2 other words","words":"fried"},{"id":"words-w-game","group":"Autumn 2 other words","words":"game"},{"id":"words-w-open","group":"Autumn 2 other words","words":"open"},{"id":"words-w-float","group":"Autumn 2 other words","words":"float"},{"id":"words-w-being","group":"Autumn 2 other words","words":"being"},{"id":"words-w-eating","group":"Autumn 2 other words","words":"eating"},{"id":"words-s-a","group":"Tile sounds","words":"a"},{"id":"words-s-b","group":"Tile sounds","words":"b"},{"id":"words-s-d","group":"Tile sounds","words":"d"},{"id":"words-s-e","group":"Tile sounds","words":"e"},{"id":"words-s-f","group":"Tile sounds","words":"f"},{"id":"words-s-g","group":"Tile sounds","words":"g"},{"id":"words-s-h","group":"Tile sounds","words":"h"},{"id":"words-s-i","group":"Tile sounds","words":"i"},{"id":"words-s-j","group":"Tile sounds","words":"j"},{"id":"words-s-k","group":"Tile sounds","words":"k (for c and k)"},{"id":"words-s-l","group":"Tile sounds","words":"l"},{"id":"words-s-m","group":"Tile sounds","words":"m"},{"id":"words-s-n","group":"Tile sounds","words":"n"},{"id":"words-s-o","group":"Tile sounds","words":"o"},{"id":"words-s-p","group":"Tile sounds","words":"p"},{"id":"words-s-r","group":"Tile sounds","words":"r"},{"id":"words-s-s","group":"Tile sounds","words":"s"},{"id":"words-s-t","group":"Tile sounds","words":"t"},{"id":"words-s-u","group":"Tile sounds","words":"u"},{"id":"words-s-v","group":"Tile sounds","words":"v"},{"id":"words-s-w","group":"Tile sounds","words":"w"},{"id":"words-s-y","group":"Tile sounds","words":"y, as in yes"},{"id":"words-s-ai","group":"Tile sounds","words":"ai, as in rain"},{"id":"words-s-air","group":"Tile sounds","words":"air, as in chair"},{"id":"words-s-ar","group":"Tile sounds","words":"ar, as in hard"},{"id":"words-s-ch","group":"Tile sounds","words":"ch"},{"id":"words-s-ear","group":"Tile sounds","words":"ear, as in hear"},{"id":"words-s-ee","group":"Tile sounds","words":"ee, as in feel"},{"id":"words-s-igh","group":"Tile sounds","words":"igh, as in right"},{"id":"words-s-oa","group":"Tile sounds","words":"oa, as in goat"},{"id":"words-s-oo-long","group":"Tile sounds","words":"oo, as in food"},{"id":"words-s-oo-short","group":"Tile sounds","words":"oo, as in took"},{"id":"words-s-or","group":"Tile sounds","words":"or, as in sort"},{"id":"words-s-ow","group":"Tile sounds","words":"ow, as in down"},{"id":"words-s-oy","group":"Tile sounds","words":"oy, as in boy"},{"id":"words-s-qu","group":"Tile sounds","words":"kw (qu)"},{"id":"words-s-sh","group":"Tile sounds","words":"sh"},{"id":"words-s-th","group":"Tile sounds","words":"th, as in thinks"},{"id":"words-s-th-voiced","group":"Tile sounds","words":"th, as in they"},{"id":"words-s-ur","group":"Tile sounds","words":"ur, as in turn"},{"id":"words-s-ure","group":"Tile sounds","words":"ure, as in sure"},{"id":"words-s-wu","group":"Tile sounds","words":"w-u, as at the start of one"},{"id":"words-s-yoo","group":"Tile sounds","words":"yoo, as in unit"},{"id":"words-s-er","group":"Tile sounds","words":"er, as in water"},{"id":"words-s-ng","group":"Tile sounds","words":"ng, as in sing"},{"id":"words-s-z","group":"Tile sounds","words":"z"}];
 </script>
 <script>
 /* MeeMee World kit: core.
@@ -3584,52 +3585,86 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 </script>
 <script>
 /* ---- games/words ---- */
-/* MeeMee Rockets: the words. The one file to edit for a new half-term (no code changes).
+/* MeeMee Rockets: the words. The one file to edit for a new half-term or term (no code changes).
 
-   weeks       each week of the class's list: its tricky words, then its other words (the sounded-out ones). The Words
-               tab offers each week, then all of them together, named from the first and last weeks here ("Weeks 1–5").
-   startWeek   the week in play until a grown-up picks another in the grown-ups area (Words tab).
+   terms       the school terms, in order. Each has an id ('autumn'), a name ('Autumn'), all: the name of the choice
+               that plays the whole term ('All of autumn', shown in the Words tab once the term has two half-terms or
+               more), and its half-terms (halves), in order. Each half-term has an id ('autumn-2'), a name
+               ('Autumn 2') and its weeks:
+     weeks     each week of the class's list: its tricky words, then its other words (the sounded-out ones). The Words
+               tab offers each half-term, then the whole term; under a half-term, each of its weeks, then all of them
+               together, named from its first and last weeks here ("Weeks 1–5"). A week's words, once picked, are in
+               play with the tricky words of the same half-term's earlier weeks (not another half-term's).
+               A word may be listed in more than one week, in one half-term ("time", weeks 3 and 5) or in several
+               (go, autumn 1 and autumn 2): it has one entry in words below, and one step wherever it is played. It is
+               marked tricky only where the half-term in play lists it as tricky; with a whole term in play, the last
+               half-term that lists it decides. A word listed twice in the same week is a mistake.
+   start       the half-term and week in play until a grown-up picks another in the grown-ups area (Words tab). A tablet
+               with nothing picked, or with a choice this file no longer has, plays this. Changing it later doesn't move
+               a tablet that already has a choice saved (every tablet that had played by 0.7.0 has Autumn 2, week 1
+               saved): for a new half-term, pick it in the Words tab on each tablet.
    harderTray  how many tiles the tray holds in harder letters: the word's letters, its spares, then letters from
-               other words (the week in play's; with every week in play, the word's own week's first).
+               other words (the week in play's; with a half-term's weeks or a whole term in play, the word's own week's
+               first). A capital letter never fills another word's tray.
    sounds      what each tile says when it is picked up in the sound tiles step: its usual sound, as a sound id. Each
                id is a recording: the line "words-s-" and the id in lines.json ("ai" is "words-s-ai"), recorded on the
                recording page. Letters that make one sound share it: c and k both say "k"; ai, ay and ey say "ai".
                oo has no usual sound (it says "oo" as in food, or "oo" as in took): each word with oo says which.
-   words       every word, with:
+   words       every word once, with:
      tiles     its sound tiles, left to right, with a space between them: 'c ar t oo n'. Letters that make one
                sound ('ar', 'ay', 'ere') are one tile. Square brackets mark the tricky part: 'h [ere]'.
                A split pair marks both its tiles ('s [o] m [e]'); a whole tricky word marks every tile ('[o] [ne]').
+               Capital letters are written as the class writes them ('[M] [r] [s]'): a capital is a tile like any
+               other, but it only ever goes into its own word's tray. Two words that differ only in capitals are a
+               mistake.
      sounds    the tiles that say something other than their usual sound in this word, as { tile: sound id }:
                { ere: 'ear' }. Every tricky tile says what it says in this word ("ai" in "said" says "e"), so each
                tricky tile is listed here. '-' is a tile that says nothing (the e of a split pair: in "some" the o
-               says the pair's sound, "u", and the e says nothing).
-     spares    the extra letters for letters mode, with a space between them: 'i e'. Pick letters the word doesn't
-               have. A spare that repeats a letter of the word is just as good as the word's own letter, so it isn't
-               a wrong choice ("you" keeps o, decided 10 October 2026).
+               says the pair's sound, "u", and the e says nothing). A tile that appears more than once can say
+               something different each time: a list, one sound per time it appears, left to right
+               (these: { e: ['ee', '-'] }). One sound, not in a list, covers every time the tile appears.
+     spares    the extra letters for letters mode, with a space between them: 'i e'. Small letters only (a capital is
+               never a spare). Pick letters the word doesn't have. A spare that repeats a letter of the word is just as
+               good as the word's own letter, so it isn't a wrong choice ("you" keeps o, decided 10 October 2026); a
+               small m is a different letter from a capital M, so it is a wrong choice for Mr, Mrs and Ms.
      says      what the tricky part says (for grown-ups; the game doesn't show it).
 
-   Every word also needs its line in lines.json ("words-w-" and the word, such as "words-w-magnet"), recorded on the
-   recording page. A word whose recording isn't there yet stays out of play until it is, and a tile whose sound isn't
-   recorded yet is quiet. The grown-ups' Words tab lists both, and anything in this file that doesn't add up. */
+   Every word also needs its line in lines.json ("words-w-" and the word in small letters, such as "words-w-magnet"
+   and "words-w-mrs"), recorded on the recording page. A word whose recording isn't there yet stays out of play until it
+   is, and a tile whose sound isn't recorded yet is quiet. The grown-ups' Words tab lists both, and anything in this
+   file that doesn't add up. */
 (function () {
   'use strict';
   window.MW.wordsData = {
-    startWeek: 5,
     harderTray: 10,
-    weeks: [
-      { week: 1, tricky: ['go', 'my', 'into', 'out'], other: ['feel', 'food', 'sort', 'down', 'right', 'hard', 'took', 'hear'] },
-      { week: 2, tricky: ['what', 'she', 'me', 'love'], other: ['misses', 'chain', 'queen', 'chair', 'year', 'cobweb', 'goats', 'farmyard'] },
-      { week: 3, tricky: ['they', 'some', 'were', 'sure'], other: ['green', 'brown', 'train', 'thinks', 'drum', 'splat', 'paint', 'frog'] },
-      { week: 4, tricky: ['said', 'you', 'like', 'push'], other: ['day', 'cloud', 'boy', 'read', 'play', 'sound', 'joy', 'treat'] },
-      { week: 5, tricky: ['all', 'of', 'one', 'here'], other: ['magnet', 'cartoon', 'rabbit', 'spray', 'popcorn', 'proud', 'toy', 'say'] }
+    start: { half: 'autumn-2', week: 1 },
+    terms: [
+      { id: 'autumn', name: 'Autumn', all: 'All of autumn', halves: [
+        { id: 'autumn-1', name: 'Autumn 1', weeks: [
+          { week: 1, tricky: ['go', 'my', 'into', 'out'], other: ['feel', 'food', 'sort', 'down', 'right', 'hard', 'took', 'hear'] },
+          { week: 2, tricky: ['what', 'she', 'me', 'love'], other: ['misses', 'chain', 'queen', 'chair', 'year', 'cobweb', 'goats', 'farmyard'] },
+          { week: 3, tricky: ['they', 'some', 'were', 'sure'], other: ['green', 'brown', 'train', 'thinks', 'drum', 'splat', 'paint', 'frog'] },
+          { week: 4, tricky: ['said', 'you', 'like', 'push'], other: ['day', 'cloud', 'boy', 'read', 'play', 'sound', 'joy', 'treat'] },
+          { week: 5, tricky: ['all', 'of', 'one', 'here'], other: ['magnet', 'cartoon', 'rabbit', 'spray', 'popcorn', 'proud', 'toy', 'say'] }
+        ] },
+        { id: 'autumn-2', name: 'Autumn 2', weeks: [
+          { week: 1, tricky: ['their', 'people', 'oh', 'your'], other: ['bird', 'girl', 'pie', 'tried', 'blue', 'true', 'human', 'unit'] },
+          { week: 2, tricky: ['Mr', 'Mrs', 'Ms', 'ask'], other: ['both', 'go', 'child', 'kind', 'basic', 'acorn', 'fever', 'me'] },
+          { week: 3, tricky: ['could', 'would', 'should', 'our'], other: ['take', 'same', 'time', 'like', 'home', 'woke', 'rude', 'cute'] },
+          { week: 4, tricky: ['house', 'mouse', 'water', 'want'], other: ['these', 'even', 'new', 'chew', 'shriek', 'field', 'claw', 'draw'] },
+          { week: 5, tricky: ['sure', 'some', 'little', 'what'], other: ['time', 'fried', 'spray', 'game', 'open', 'float', 'being', 'eating'] }
+        ] }
+      ] }
     ],
     sounds: {
       a: 'a', b: 'b', c: 'k', d: 'd', e: 'e', f: 'f', g: 'g', h: 'h', i: 'i', j: 'j', k: 'k', l: 'l', m: 'm',
-      n: 'n', o: 'o', p: 'p', r: 'r', s: 's', t: 't', u: 'u', v: 'v', w: 'w', y: 'y',
-      ai: 'ai', air: 'air', ar: 'ar', ay: 'ai', ch: 'ch', ea: 'ee', ear: 'ear', ee: 'ee', igh: 'igh', ll: 'l',
-      oa: 'oa', or: 'or', ou: 'ow', ow: 'ow', oy: 'oy', qu: 'qu', sh: 'sh', ss: 's', th: 'th', ure: 'ure'
+      n: 'n', o: 'o', p: 'p', r: 'r', s: 's', t: 't', u: 'u', v: 'v', w: 'w', y: 'y', M: 'm',
+      ai: 'ai', air: 'air', ar: 'ar', aw: 'or', ay: 'ai', ch: 'ch', ea: 'ee', ear: 'ear', ee: 'ee', er: 'er',
+      ew: 'oo-long', ie: 'igh', igh: 'igh', ir: 'ur', le: 'l', ll: 'l', ng: 'ng', oa: 'oa', or: 'or', ou: 'ow',
+      ow: 'ow', oy: 'oy', qu: 'qu', sh: 'sh', ss: 's', th: 'th', tt: 't', ue: 'oo-long', ure: 'ure'
     },
     words: {
+      // ---------------------------------------------------------------- autumn 1
       // week 5
       all: { tiles: '[a] ll', sounds: { a: 'or' }, spares: 'o', says: 'a says "or"' },
       of: { tiles: 'o [f]', sounds: { f: 'v' }, spares: 'v', says: 'f says "v"' },
@@ -3638,13 +3673,13 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       magnet: { tiles: 'm a g n e t', spares: 'i' },
       cartoon: { tiles: 'c ar t oo n', sounds: { oo: 'oo-long' }, spares: 'k' },
       rabbit: { tiles: 'r a b b i t', spares: 'd' },
-      spray: { tiles: 's p r ay', spares: 'i e' },
+      spray: { tiles: 's p r ay', spares: 'i e' },                      // autumn 2 too (week 5)
       popcorn: { tiles: 'p o p c or n', spares: 'k' },
       proud: { tiles: 'p r ou d', spares: 'w' },
       toy: { tiles: 't oy', spares: 'i' },
       say: { tiles: 's ay', spares: 'i' },
       // week 1
-      go: { tiles: 'g [o]', sounds: { o: 'oa' }, spares: 'a', says: 'o says "oa"' },
+      go: { tiles: 'g [o]', sounds: { o: 'oa' }, spares: 'a', says: 'o says "oa"' },    // autumn 2 too, not tricky there
       my: { tiles: 'm [y]', sounds: { y: 'igh' }, spares: 'i', says: 'y says "igh"' },
       into: { tiles: 'i n t [o]', sounds: { o: 'oo-long' }, spares: 'u', says: 'o says "oo"' },
       out: { tiles: '[ou] t', sounds: { ou: 'ow' }, spares: 'w', says: 'ou says "ow"' },
@@ -3657,9 +3692,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       took: { tiles: 't oo k', sounds: { oo: 'oo-short' }, spares: 'c' },
       hear: { tiles: 'h ear', spares: 'i' },
       // week 2
-      what: { tiles: '[wh] [a] t', sounds: { wh: 'w', a: 'o' }, spares: 'o', says: 'wh says "w", a says "o"' },
+      what: { tiles: '[wh] [a] t', sounds: { wh: 'w', a: 'o' }, spares: 'o', says: 'wh says "w", a says "o"' },   // autumn 2 too
       she: { tiles: 'sh [e]', sounds: { e: 'ee' }, spares: 'c', says: 'e says "ee"' },
-      me: { tiles: 'm [e]', sounds: { e: 'ee' }, spares: 'n', says: 'e says "ee"' },
+      me: { tiles: 'm [e]', sounds: { e: 'ee' }, spares: 'n', says: 'e says "ee"' },    // autumn 2 too, not tricky there
       love: { tiles: 'l [o] [ve]', sounds: { o: 'u', ve: 'v' }, spares: 'u', says: 'o says "u", ve says "v"' },
       misses: { tiles: 'm i ss e s', spares: 'z' },
       chain: { tiles: 'ch ai n', spares: 'y' },
@@ -3671,9 +3706,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       farmyard: { tiles: 'f ar m y ar d', spares: 'b' },
       // week 3
       they: { tiles: 'th [ey]', sounds: { th: 'th-voiced', ey: 'ai' }, spares: 'a', says: 'ey says "ai"' },
-      some: { tiles: 's [o] m [e]', sounds: { o: 'u', e: '-' }, spares: 'u', says: 'o-e says "u" (a split pair)' },
+      some: { tiles: 's [o] m [e]', sounds: { o: 'u', e: '-' }, spares: 'u', says: 'o-e says "u" (a split pair)' },   // autumn 2 too
       were: { tiles: 'w [ere]', sounds: { ere: 'ur' }, spares: 'u', says: 'ere says "ur"' },
-      sure: { tiles: '[s] [ure]', sounds: { s: 'sh', ure: 'ure' }, spares: 'h', says: 'the whole word: s says "sh"' },
+      sure: { tiles: '[s] [ure]', sounds: { s: 'sh', ure: 'ure' }, spares: 'h', says: 'the whole word: s says "sh"' },   // autumn 2 too
       green: { tiles: 'g r ee n', spares: 'a' },
       brown: { tiles: 'b r ow n', spares: 'u' },
       train: { tiles: 't r ai n', spares: 'y' },
@@ -3685,7 +3720,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       // week 4
       said: { tiles: 's [ai] d', sounds: { ai: 'e' }, spares: 'e', says: 'ai says "e"' },
       you: { tiles: 'y [ou]', sounds: { ou: 'oo-long' }, spares: 'o', says: 'ou says "oo"' },
-      like: { tiles: 'l [i] k [e]', sounds: { i: 'igh', e: '-' }, spares: 'c', says: 'i-e says "igh" (a split pair)' },
+      like: { tiles: 'l [i] k [e]', sounds: { i: 'igh', e: '-' }, spares: 'c', says: 'i-e says "igh" (a split pair)' },   // autumn 2 too, not tricky there
       push: { tiles: 'p [u] sh', sounds: { u: 'oo-short' }, spares: 'o', says: 'u says "oo", as in book' },
       day: { tiles: 'd ay', spares: 'i' },
       cloud: { tiles: 'c l ou d', spares: 'w' },
@@ -3694,7 +3729,68 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       play: { tiles: 'p l ay', spares: 'i' },
       sound: { tiles: 's ou n d', spares: 'w' },
       joy: { tiles: 'j oy', spares: 'i' },
-      treat: { tiles: 't r ea t', spares: 'i' }
+      treat: { tiles: 't r ea t', spares: 'i' },
+
+      // ---------------------------------------------------------------- autumn 2 (go, me, like, sure, some, what and
+      // spray are above, from autumn 1)
+      // week 1
+      their: { tiles: 'th [eir]', sounds: { th: 'th-voiced', eir: 'air' }, spares: 'a', says: 'eir says "air"' },
+      people: { tiles: 'p [eo] p [le]', sounds: { eo: 'ee', le: 'l' }, spares: 'b', says: 'eo says "ee", le says "l"' },   // le isn't taught yet
+      oh: { tiles: '[o] [h]', sounds: { o: 'oa', h: '-' }, spares: 'w', says: 'the whole word: o says "oa", h says nothing' },
+      your: { tiles: 'y [our]', sounds: { our: 'or' }, spares: 'e', says: 'our says "or"' },
+      bird: { tiles: 'b ir d', spares: 'u' },
+      girl: { tiles: 'g ir l', spares: 'u' },
+      pie: { tiles: 'p ie', spares: 'y' },
+      tried: { tiles: 't r ie d', spares: 'y' },
+      blue: { tiles: 'b l ue', spares: 'w' },
+      true: { tiles: 't r ue', spares: 'w' },
+      human: { tiles: 'h u m a n', sounds: { u: 'yoo' }, spares: 'e' },
+      unit: { tiles: 'u n i t', sounds: { u: 'yoo' }, spares: 'y' },
+      // week 2: Mr, Mrs and Ms start with a capital M; the tiles stay quiet and the word's recording says it. The spare is
+      // a small m, so the capital has to be picked.
+      Mr: { tiles: '[M] [r]', sounds: { M: '-', r: '-' }, spares: 'm', says: 'short for "mister"; the tiles stay quiet' },
+      Mrs: { tiles: '[M] [r] [s]', sounds: { M: '-', r: '-', s: '-' }, spares: 'm', says: 'short for "missiz"; the tiles stay quiet' },
+      Ms: { tiles: '[M] [s]', sounds: { M: '-', s: '-' }, spares: 'm', says: 'said "mizz"; the tiles stay quiet' },
+      ask: { tiles: '[a] s k', sounds: { a: 'ar' }, spares: 'c', says: 'a says "ar"' },
+      both: { tiles: 'b o th', sounds: { o: 'oa' }, spares: 'f' },
+      child: { tiles: 'ch i l d', sounds: { i: 'igh' }, spares: 'y' },
+      kind: { tiles: 'k i n d', sounds: { i: 'igh' }, spares: 'c' },
+      basic: { tiles: 'b a s i c', sounds: { a: 'ai' }, spares: 'k' },
+      acorn: { tiles: 'a c or n', sounds: { a: 'ai' }, spares: 'k' },
+      fever: { tiles: 'f e v er', sounds: { e: 'ee' }, spares: 'u' },
+      // week 3
+      could: { tiles: 'c [oul] d', sounds: { oul: 'oo-short' }, spares: 'k', says: 'oul says "oo", as in book' },
+      would: { tiles: 'w [oul] d', sounds: { oul: 'oo-short' }, spares: 'h', says: 'oul says "oo", as in book' },
+      should: { tiles: 'sh [oul] d', sounds: { oul: 'oo-short' }, spares: 'e', says: 'oul says "oo", as in book' },
+      our: { tiles: '[ou] [r]', sounds: { ou: 'ow', r: 'er' }, spares: 'w', says: 'the whole word: ou says "ow", r says "er"' },
+      take: { tiles: 't a k e', sounds: { a: 'ai', e: '-' }, spares: 'c' },
+      same: { tiles: 's a m e', sounds: { a: 'ai', e: '-' }, spares: 'c' },
+      time: { tiles: 't i m e', sounds: { i: 'igh', e: '-' }, spares: 'y' },             // weeks 3 and 5
+      home: { tiles: 'h o m e', sounds: { o: 'oa', e: '-' }, spares: 'a' },
+      woke: { tiles: 'w o k e', sounds: { o: 'oa', e: '-' }, spares: 'c' },
+      rude: { tiles: 'r u d e', sounds: { u: 'oo-long', e: '-' }, spares: 'o' },
+      cute: { tiles: 'c u t e', sounds: { u: 'yoo', e: '-' }, spares: 'k' },
+      // week 4
+      house: { tiles: 'h ou s [e]', sounds: { e: '-' }, spares: 'w', says: 'e says nothing' },
+      mouse: { tiles: 'm ou s [e]', sounds: { e: '-' }, spares: 'w', says: 'e says nothing' },
+      water: { tiles: 'w [a] t er', sounds: { a: 'or' }, spares: 'o', says: 'a says "or"' },
+      want: { tiles: 'w [a] n t', sounds: { a: 'o' }, spares: 'o', says: 'a says "o"' },
+      these: { tiles: 'th e s e', sounds: { th: 'th-voiced', e: ['ee', '-'], s: 'z' }, spares: 'z' },   // e-e split pair
+      even: { tiles: 'e v e n', sounds: { e: ['ee', 'e'] }, spares: 'i' },               // the second e says "e"
+      new: { tiles: 'n ew', sounds: { ew: 'yoo' }, spares: 'u' },
+      chew: { tiles: 'ch ew', spares: 'o' },
+      shriek: { tiles: 'sh r ie k', sounds: { ie: 'ee' }, spares: 'c' },
+      field: { tiles: 'f ie l d', sounds: { ie: 'ee' }, spares: 'a' },
+      claw: { tiles: 'c l aw', spares: 'k' },
+      draw: { tiles: 'd r aw', spares: 'b' },
+      // week 5
+      little: { tiles: 'l i tt [le]', sounds: { le: 'l' }, spares: 'd', says: 'le says "l"' },
+      fried: { tiles: 'f r ie d', spares: 'y' },
+      game: { tiles: 'g a m e', sounds: { a: 'ai', e: '-' }, spares: 'y' },
+      open: { tiles: 'o p e n', sounds: { o: 'oa' }, spares: 'i' },
+      float: { tiles: 'f l oa t', spares: 'w' },
+      being: { tiles: 'b e i ng', sounds: { e: 'ee' }, spares: 'd' },
+      eating: { tiles: 'ea t i ng', spares: 'k' }
     }
   };
 })();
@@ -3710,16 +3806,22 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
    Right first time: found and built with no wrong tap, no wrong drop and no hint. A wrong try restarts that step's
    three days. A word goes back only from secure (answer 12 of the 0.6.0 PRD): two slips in a row (answers not right
    first time) take it back to harder letters, for three more days right first time; a right answer in between clears
-   the first slip.
-   What's in play: one week (that week's words and the tricky words of the weeks before it), or every week ('all', the
-   Words tab's "Weeks 1–5").
+   the first slip. A word has one step wherever it is played (0.7.0, D1): progress is kept by word.
+   What's in play (0.7.0): a grown-up's choice, one of
+     a week        { half, week }: that week's words and the tricky words of the same half-term's earlier weeks;
+     its weeks     { half, week: 'all' }: every word of one half-term (the Words tab's "Weeks 1–5");
+     a whole term  { term }: every word of all its half-terms, each once ("All of autumn").
+   A word is marked tricky only where the half-term in play lists it as tricky; with a whole term in play, the last of
+   its half-terms that lists it decides (D1). Where it isn't tricky, none of its tiles is marked; what each says is
+   the same.
    A round: five different words (or every word in play, if fewer), one or two secure ones for review and the rest not
    yet secure.
-     One week: the rest at random, and at least 3 of the 5 from the chosen week's own words while it has that many in
-               play (answer 10).
-     All weeks: the rest from the lowest step first (not yet, sound tiles, letters, harder letters), at random within a
-               step (answer 8).
-   Pure functions of the words file and the saved answers, so they are easy to test. */
+     One week:          the rest at random, and at least 3 of the 5 from the chosen week's own words while it has that
+                        many in play (answer 10).
+     Its weeks, a term: the rest from the lowest step first (not yet, sound tiles, letters, harder letters), at random
+                        within a step (answer 8; 0.7.0 question 12).
+   Pure functions of the words file and the saved answers, so they are easy to test. No half-term, term or week is
+   named here: they all come from the words file. */
 (function () {
   'use strict';
   const MW = window.MW;
@@ -3727,10 +3829,11 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   S.STEPS = ['notyet', 'tiles', 'letters', 'harder', 'secure'];
   S.NAMES = { notyet: 'Not yet', tiles: 'Sound tiles', letters: 'Letters', harder: 'Harder letters', secure: 'Secure' };
-  S.ALL = 'all';                 // every week in play (saved as the week)
+  S.ALL = 'all';                 // every week of a half-term in play (saved as the week)
   S.SILENT = '-';                // a tile that says nothing (the e of a split pair)
   S.SLIPS = 2;                   // slips in a row that take a secure word back to harder letters
   function rank(step) { return S.STEPS.indexOf(step); }
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
 
   function day(t) {
     const d = new Date(t);
@@ -3743,61 +3846,130 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     return a;
   }
   S.shuffle = shuffle;
+  // A capital letter ('M'): it only ever goes into its own word's tray.
+  S.isCapital = function (ch) { return ch !== ch.toLowerCase(); };
+  // A word's line: "words-w-" and the word in small letters ("words-w-mrs").
+  S.line = function (w) { return 'words-w-' + String(w).toLowerCase(); };
 
   // ---------------------------------------------------------------- the words file
   // 'h [ere]' -> [{ text: 'h', tricky: false }, { text: 'ere', tricky: true }]
   S.tiles = function (spec) {
     return String(spec).trim().split(/\s+/).map(function (t) {
-      const m = /^\[([a-z]+)\]$/.exec(t);
+      const m = /^\[([A-Za-z]+)\]$/.exec(t);
       return m ? { text: m[1], tricky: true } : { text: t, tricky: false };
     });
   };
-  // Every word with its week, whether it is one of that week's tricky words, its tiles (each with what it says), letters
-  // and spares. Problems in the file (a word with no tiles, tiles that don't spell it, a tile with no sound) are listed,
-  // not thrown, so the tests and the grown-ups area can say what is wrong.
+  // The file's terms, their half-terms and weeks, and every word listed in them (once each), with its tiles (each with
+  // what it says), letters and spares. Problems in the file (a word with no tiles, tiles that don't spell it, a tile
+  // with no sound, a word twice in one week) are listed, not thrown, so the tests and the grown-ups area can say what
+  // is wrong.
+  //   book.terms   [{ id, name, all, halves: [half, ...] }]
+  //   book.halves  every half-term, in the file's order: [{ id, name, term, weeks: [{ week, tricky: [...], other: [...] }] }]
+  //   book.words   { word: { word, line, tiles, letters, spares, says } }; book.order: every word once, as first listed
+  //   book.start   { half, week }: the file's start (a half-term and week it has)
   S.read = function (data) {
-    const out = { words: {}, order: [], weeks: [], problems: [], harderTray: +data.harderTray || 10, startWeek: +data.startWeek || 1,
-      sounds: {} };
+    data = data && typeof data === 'object' ? data : {};
+    const out = { words: {}, order: [], terms: [], halves: [], problems: [], harderTray: +data.harderTray || 10,
+      start: null, sounds: {} };
+    const problem = function (text) { out.problems.push(text); };
     const usual = data.sounds && typeof data.sounds === 'object' ? data.sounds : {};
     const goodId = function (id) { return id === S.SILENT || /^[a-z]+(-[a-z]+)*$/.test(String(id)); };
     Object.keys(usual).forEach(function (g) {
       if (goodId(usual[g])) out.sounds[g] = usual[g];
-      else out.problems.push('sounds: ' + g + ' should be a sound id, such as "ai"');
+      else problem('sounds: ' + g + ' should be a sound id, such as "ai"');
     });
-    (data.weeks || []).forEach(function (wk) {
-      const n = +wk.week;
-      out.weeks.push({ week: n, tricky: (wk.tricky || []).slice(), other: (wk.other || []).slice() });
-      [['tricky', true], ['other', false]].forEach(function (kind) {
-        (wk[kind[0]] || []).forEach(function (w) {
-          const spec = (data.words || {})[w];
-          if (!spec || !spec.tiles) { out.problems.push(w + ': no tiles in the words file'); return; }
-          if (out.words[w]) { out.problems.push(w + ': in two weeks'); return; }
-          const tiles = S.tiles(spec.tiles);
-          if (tiles.map(function (t) { return t.text; }).join('') !== w) out.problems.push(w + ': its tiles spell ' + tiles.map(function (t) { return t.text; }).join(''));
-          if (!/^[a-z]+$/.test(w)) out.problems.push(w + ': only lower-case letters, please');
-          // what each tile says: the word's own sound for it, or the tile's usual sound
-          const own = spec.sounds && typeof spec.sounds === 'object' ? spec.sounds : {};
-          Object.keys(own).forEach(function (k) {
-            if (!tiles.some(function (t) { return t.text === k; })) out.problems.push(w + ': its sounds name ' + k + ', which isn\'t one of its tiles');
-            else if (!goodId(own[k])) out.problems.push(w + ': the sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+    const specs = data.words && typeof data.words === 'object' ? data.words : {};
+    const tried = {}, lower = {};
+    // a word's entry, read the first time it is listed (null if it has none)
+    function entry(w) {
+      if (has(tried, w)) return out.words[w] || null;
+      tried[w] = true;
+      const spec = has(specs, w) ? specs[w] : null;
+      if (!spec || !spec.tiles) { problem(w + ': no tiles in the words file'); return null; }
+      const tiles = S.tiles(spec.tiles);
+      const spelt = tiles.map(function (t) { return t.text; }).join('');
+      if (spelt !== w) problem(w + ': its tiles spell ' + spelt);
+      if (!/^[A-Za-z]+$/.test(w)) problem(w + ': only letters, please');
+      const low = w.toLowerCase();
+      if (has(lower, low)) problem(w + ' and ' + lower[low] + ': two words that differ only in capitals (they would share a recording)');
+      else lower[low] = w;
+      // what each tile says: the word's own sound for it (one for each time the tile appears, if a list), or its usual
+      // sound
+      const own = spec.sounds && typeof spec.sounds === 'object' ? spec.sounds : {};
+      Object.keys(own).forEach(function (k) {
+        const n = tiles.filter(function (t) { return t.text === k; }).length;
+        if (!n) problem(w + ': its sounds name ' + k + ', which isn\'t one of its tiles');
+        else if (Array.isArray(own[k])) {
+          if (own[k].length !== n) problem(w + ': its sounds for ' + k + ' list ' + own[k].length + ', but it has ' + n + ' ' + k + ' tile' + (n === 1 ? '' : 's'));
+          if (!own[k].every(goodId)) problem(w + ': each sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+        } else if (!goodId(own[k])) problem(w + ': the sound for ' + k + ' should be a sound id, such as "ai", or "-"');
+      });
+      const times = {};
+      tiles.forEach(function (t) {
+        const i = times[t.text] = (times[t.text] || 0) + 1;      // the i-th time this tile appears, from the left
+        let mine = null;
+        if (has(own, t.text)) {
+          const v = Array.isArray(own[t.text]) ? own[t.text][i - 1] : own[t.text];
+          if (v !== undefined && goodId(v)) mine = v;
+        }
+        t.sound = mine !== null ? mine : (out.sounds[t.text] || null);
+        if (t.tricky && mine === null) problem(w + ': say what its tricky tile ' + t.text + ' says in its sounds');
+        else if (!t.sound) problem(w + ': no sound for its tile ' + t.text);
+      });
+      const letters = [];
+      tiles.forEach(function (t) { t.text.split('').forEach(function (ch) { letters.push({ text: ch, tricky: t.tricky }); }); });
+      const spares = String(spec.spares || '').trim().split(/\s+/).filter(Boolean);
+      spares.forEach(function (s) { if (!/^[a-z]$/.test(s)) problem(w + ': the spare ' + s + ' should be one small letter (a capital is never a spare)'); });
+      out.words[w] = { word: w, line: S.line(w), tiles: tiles, letters: letters, spares: spares, says: spec.says || '' };
+      return out.words[w];
+    }
+    if (!Array.isArray(data.terms)) problem('terms: the words file needs its terms, each with its half-terms and their weeks');
+    const termIds = {}, halfIds = {};
+    (Array.isArray(data.terms) ? data.terms : []).forEach(function (tm, ti) {
+      if (!tm || typeof tm !== 'object') { problem('terms: term ' + (ti + 1) + ' isn\'t a term'); return; }
+      const id = String(tm.id || '');
+      if (!id || has(termIds, id)) { problem('terms: term ' + (ti + 1) + ' needs an id of its own'); return; }
+      termIds[id] = true;
+      const term = { id: id, name: String(tm.name || id), all: typeof tm.all === 'string' ? tm.all : '', halves: [] };
+      out.terms.push(term);
+      (Array.isArray(tm.halves) ? tm.halves : []).forEach(function (hf, hi) {
+        const hid = hf && typeof hf === 'object' ? String(hf.id || '') : '';
+        if (!hid || has(halfIds, hid)) { problem(term.name + ': half-term ' + (hi + 1) + ' needs an id of its own'); return; }
+        halfIds[hid] = true;
+        const half = { id: hid, name: String(hf.name || hid), term: id, weeks: [] };
+        const nums = {};
+        (Array.isArray(hf.weeks) ? hf.weeks : []).forEach(function (wk) {
+          const n = wk && typeof wk === 'object' ? +wk.week : NaN;
+          if (!(n >= 1) || Math.floor(n) !== n || has(nums, n)) { problem(half.name + ': each week needs a number of its own (1, 2, 3…)'); return; }
+          nums[n] = true;
+          const week = { week: n, tricky: [], other: [] };
+          const listed = {};
+          ['tricky', 'other'].forEach(function (kind) {
+            (Array.isArray(wk[kind]) ? wk[kind] : []).forEach(function (w) {
+              w = String(w);
+              if (has(listed, w)) { problem(half.name + ', week ' + n + ': ' + w + ' is listed twice'); return; }
+              listed[w] = true;
+              if (!entry(w)) return;
+              week[kind].push(w);
+              if (out.order.indexOf(w) < 0) out.order.push(w);
+            });
           });
-          tiles.forEach(function (t) {
-            const mine = Object.prototype.hasOwnProperty.call(own, t.text) && goodId(own[t.text]);
-            t.sound = mine ? own[t.text] : (out.sounds[t.text] || null);
-            if (t.tricky && !mine) out.problems.push(w + ': say what its tricky tile ' + t.text + ' says in its sounds');
-            else if (!t.sound) out.problems.push(w + ': no sound for its tile ' + t.text);
-          });
-          const letters = [];
-          tiles.forEach(function (t) { t.text.split('').forEach(function (ch) { letters.push({ text: ch, tricky: t.tricky }); }); });
-          const spares = String(spec.spares || '').trim().split(/\s+/).filter(Boolean);
-          spares.forEach(function (s) { if (!/^[a-z]$/.test(s)) out.problems.push(w + ': the spare ' + s + ' should be one letter'); });
-          out.words[w] = { word: w, week: n, tricky: kind[1], tiles: tiles, letters: letters, spares: spares, says: spec.says || '' };
-          out.order.push(w);
+          half.weeks.push(week);
         });
+        half.weeks.sort(function (a, b) { return a.week - b.week; });
+        term.halves.push(half);
+        out.halves.push(half);
       });
     });
-    out.weeks.sort(function (a, b) { return a.week - b.week; });
-    if (!out.weeks.some(function (wk) { return wk.week === out.startWeek; }) && out.weeks.length) out.startWeek = out.weeks[out.weeks.length - 1].week;
+    // the start: a half-term and a week the file has (or else the last half-term's first week)
+    const st = data.start && typeof data.start === 'object' ? data.start : {};
+    const sh = S.half(out, st.half);
+    if (sh && S.weekOf(sh, +st.week)) out.start = { half: sh.id, week: +st.week };
+    else {
+      problem('start: the words file has no ' + (sh ? sh.name + ', week ' + st.week : 'half-term ' + (st.half || '(none given)')));
+      const last = out.halves.filter(function (h) { return h.weeks.length; }).slice(-1)[0];
+      if (last) out.start = { half: last.id, week: last.weeks[0].week };
+    }
     return out;
   };
   // A tile's recorded sound: the line id, or null for a tile that says nothing.
@@ -3810,31 +3982,87 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     });
     return out;
   };
-  // The all-weeks choice's name, from the words file: "Weeks 1–5" (an en dash), or null with fewer than two weeks.
-  S.allLabel = function (book) {
-    if (book.weeks.length < 2) return null;
-    return 'Weeks ' + book.weeks[0].week + '–' + book.weeks[book.weeks.length - 1].week;
-  };
 
-  // The words in play for a week: that week's words (tricky, then other) and the tricky words of the weeks before it.
-  // For 'all', every word, week by week (each week's tricky words, then its other words).
-  S.inPlay = function (book, week) {
-    const out = [];
-    if (week === S.ALL) {
-      book.weeks.forEach(function (wk) { out.push.apply(out, wk.tricky.concat(wk.other)); });
-    } else {
-      book.weeks.forEach(function (wk) {
-        if (wk.week === week) out.push.apply(out, wk.tricky.concat(wk.other));
-      });
-      book.weeks.forEach(function (wk) {
-        if (wk.week < week) out.push.apply(out, wk.tricky);
-      });
-    }
-    return out.filter(function (w) { return book.words[w]; });
+  // ---------------------------------------------------------------- half-terms, terms and choices
+  S.half = function (book, id) { return book.halves.filter(function (h) { return h.id === id; })[0] || null; };
+  S.term = function (book, id) { return book.terms.filter(function (t) { return t.id === id; })[0] || null; };
+  S.weekOf = function (half, n) { return half ? half.weeks.filter(function (x) { return x.week === n; })[0] || null : null; };
+  // A half-term's all-weeks choice's name, from the words file: "Weeks 1–5" (an en dash), or null with fewer than two weeks.
+  S.allLabel = function (half) {
+    if (!half || half.weeks.length < 2) return null;
+    return 'Weeks ' + half.weeks[0].week + '–' + half.weeks[half.weeks.length - 1].week;
   };
-  // A week's own words (its tricky words and its other words).
-  S.ownWords = function (book, week) {
-    const wk = book.weeks.filter(function (x) { return x.week === week; })[0];
+  // A term's whole-term choice's name, from the words file ("All of autumn"), or null: a term with fewer than two
+  // half-terms (its one half-term's weeks are the same words), or with no name for it.
+  S.termLabel = function (term) { return term && term.all && term.halves.length >= 2 ? term.all : null; };
+  S.start = function (book) { return book.start ? { half: book.start.half, week: book.start.week } : { half: null, week: null }; };
+  // A grown-up's choice as saved, checked against the words file: { term } (a whole term), { half, week } (a week, or
+  // S.ALL for the half-term's weeks together). Anything else (nothing saved, a choice saved before 0.7.0 with no
+  // half-term in it, or one the file no longer has) is the file's start.
+  S.choice = function (book, saved) {
+    saved = saved && typeof saved === 'object' ? saved : {};
+    if (saved.term !== undefined && saved.term !== null) {
+      const t = S.term(book, saved.term);
+      return S.termLabel(t) ? { term: t.id } : S.start(book);
+    }
+    const h = S.half(book, saved.half);
+    if (h && saved.week === S.ALL && S.allLabel(h)) return { half: h.id, week: S.ALL };
+    if (h && saved.week !== S.ALL && S.weekOf(h, +saved.week)) return { half: h.id, week: +saved.week };
+    return S.start(book);
+  };
+  S.wide = function (c) { return !!(c.term || c.week === S.ALL); };      // every word of a half-term or a term in play
+  // The half-terms a choice covers: its half-term, or each half-term of its term.
+  S.halvesOf = function (book, c) {
+    if (c.term) { const t = S.term(book, c.term); return t ? t.halves : []; }
+    const h = S.half(book, c.half);
+    return h ? [h] : [];
+  };
+  // Each word's marking for a choice: { half, week, tricky }: the half-term that decides it (the one in play; with a
+  // whole term, the last of its half-terms that lists the word), whether that half-term lists it as tricky, and the
+  // word's own week there (the first week that lists it: "time" is week 3's). A word the choice doesn't cover (only
+  // through the test hooks) is decided as if every half-term in the file were in play.
+  S.marks = function (book, c) {
+    const out = {};
+    const scan = function (halves) {
+      halves.forEach(function (h) {
+        const seen = {};
+        h.weeks.forEach(function (wk) {
+          [['tricky', true], ['other', false]].forEach(function (k) {
+            wk[k[0]].forEach(function (w) {
+              if (!seen[w]) { seen[w] = true; out[w] = { half: h.id, week: wk.week, tricky: k[1] }; }
+              else if (k[1]) out[w].tricky = true;
+            });
+          });
+        });
+      });
+    };
+    scan(book.halves);
+    scan(S.halvesOf(book, c));
+    return out;
+  };
+  // Is the word marked tricky with this choice in play?
+  S.marked = function (book, c, w) { const m = S.marks(book, c)[w]; return m ? m.tricky : true; };
+
+  // The words in play for a choice (before recordings are checked), each once:
+  //   a week       that week's words (tricky, then other), then the tricky words of its half-term's earlier weeks;
+  //   its weeks    every word of the half-term, week by week (each week's tricky words, then its other words);
+  //   a term       every word of its half-terms, half-term by half-term, in the order the file first lists it.
+  S.inPlay = function (book, c) {
+    const out = [];
+    const add = function (list) { list.forEach(function (w) { if (book.words[w] && out.indexOf(w) < 0) out.push(w); }); };
+    if (S.wide(c)) {
+      S.halvesOf(book, c).forEach(function (h) { h.weeks.forEach(function (wk) { add(wk.tricky); add(wk.other); }); });
+      return out;
+    }
+    const h = S.half(book, c.half);
+    if (!h) return out;
+    h.weeks.forEach(function (wk) { if (wk.week === c.week) { add(wk.tricky); add(wk.other); } });
+    h.weeks.forEach(function (wk) { if (wk.week < c.week) add(wk.tricky); });
+    return out;
+  };
+  // A week's own words (its tricky words and its other words), in a half-term.
+  S.ownWords = function (book, half, week) {
+    const wk = S.weekOf(S.half(book, half), week);
     return wk ? wk.tricky.concat(wk.other).filter(function (w) { return book.words[w]; }) : [];
   };
 
@@ -3873,7 +4101,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   // ---------------------------------------------------------------- a round
   // opts: { words: the words in play, answers, size: 5, rand,
-  //         lowest: true with every week in play (the words on the lowest step first),
+  //         lowest: true with a half-term's weeks or a whole term in play (the words on the lowest step first),
   //         own: the chosen week's own words in play (one week in play: at least 3 of them a round) } -> [{ word, step }]
   S.pickRound = function (opts) {
     const rand = opts.rand || Math.random;
@@ -3923,14 +4151,17 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   //   tiles    one tile per sound ('ay'), no spares; each says its sound in this word when picked up (sound);
   //   letters  one tile per letter, with the word's spares;
   //   harder   as letters, then the tray filled up to book.harderTray with letters from other words
-  //            (fill: the words to take them from, in order of preference), each a letter not already in the tray.
+  //            (fill: the words to take them from, in order of preference), each a letter not already in the tray and
+  //            never a capital (a capital only ever goes into its own word's tray).
+  // marked: false when the half-term in play doesn't list the word as tricky: then no place or tile is marked (S.marked).
   // -> { mode, places: [{ text, tricky, sound }], tray: [{ text, tricky, spare, sound }] } (the tray shuffled)
-  S.plan = function (book, word, step, fill, rand) {
+  S.plan = function (book, word, step, fill, rand, marked) {
     rand = rand || Math.random;
     const e = book.words[word];
     const mode = S.mode(step);
+    const mark = marked !== false;
     const places = (mode === 'tiles' ? e.tiles : e.letters).map(function (t) {
-      return { text: t.text, tricky: t.tricky, sound: mode === 'tiles' ? t.sound : null };
+      return { text: t.text, tricky: mark && t.tricky, sound: mode === 'tiles' ? t.sound : null };
     });
     const tray = places.map(function (p) { return { text: p.text, tricky: p.tricky, spare: false, sound: p.sound }; });
     if (mode !== 'tiles') e.spares.forEach(function (s) { tray.push({ text: s, tricky: false, spare: true, sound: null }); });
@@ -3940,7 +4171,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
       (fill || []).forEach(function (group) {
         const letters = [];
         group.filter(function (w) { return w !== word && book.words[w]; }).forEach(function (w) {
-          w.split('').forEach(function (ch) { if (!have[ch] && letters.indexOf(ch) < 0) letters.push(ch); });
+          w.split('').forEach(function (ch) { if (!S.isCapital(ch) && !have[ch] && letters.indexOf(ch) < 0) letters.push(ch); });
         });
         shuffle(letters, rand).forEach(function (ch) {
           if (tray.length >= book.harderTray || have[ch]) return;
@@ -3952,22 +4183,23 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     return { mode: mode, places: places, tray: shuffle(tray, rand) };
   };
   // Where harder letters' extra letters come from, in order of preference:
-  //   one week in play   that week's words, then the other words in play, then any word in the file;
-  //   every week (all)   the word's own week's words, then any word in play, then any word in the file (answer 9).
+  //   one week in play           that week's words, then the other words in play, then any word in the file;
+  //   its weeks, or a whole term the word's own week's words (in the half-term that decides its marking), then any
+  //                              word in play, then any word in the file (answer 9).
   // pool: the words in play this round (the recorded ones); without it, every word in play.
-  S.fillFrom = function (book, week, word, pool) {
-    const inPlay = pool || S.inPlay(book, week);
-    if (week === S.ALL) {
-      const e = book.words[word];
-      return [e ? S.ownWords(book, e.week) : [], inPlay, book.order];
+  S.fillFrom = function (book, c, word, pool) {
+    const inPlay = pool || S.inPlay(book, c);
+    if (S.wide(c)) {
+      const m = S.marks(book, c)[word];
+      return [m ? S.ownWords(book, m.half, m.week) : [], inPlay, book.order];
     }
-    return [S.ownWords(book, week), inPlay, book.order];
+    return [S.ownWords(book, c.half, c.week), inPlay, book.order];
   };
 
-  // Every question the game can ask for a week (or 'all'): each word in play, to find and to build at each step.
-  S.allQuestions = function (book, week) {
+  // Every question the game can ask for a choice: each word in play, to find and to build at each step.
+  S.allQuestions = function (book, c) {
     const out = [];
-    S.inPlay(book, week).forEach(function (w) {
+    S.inPlay(book, c).forEach(function (w) {
       out.push({ word: w, kind: 'find' });
       ['tiles', 'letters', 'harder'].forEach(function (m) { out.push({ word: w, kind: 'build', mode: m }); });
     });
@@ -4175,8 +4407,8 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
      Build  the word's rocket lies on its side with empty portholes; its tiles are loose in the tray. "Now build the
             word… one." He drags the tiles into the portholes, left to right. In the sound tiles step a tile says its
             sound as it is picked up. The last tile lights the engines and the launch lights, and the rocket launches.
-   The words, their tiles, sounds and spares are in words.js; each word's step and how rounds are chosen in steps.js;
-   the crew's job moments in moments.js.
+   The words, their tiles, sounds and spares are in words.js, by term, half-term and week; each word's step, what's in
+   play and how rounds are chosen in steps.js; the crew's job moments in moments.js.
    It joins the world with MW.world.game below: the world gives it the start screen, the map, pausing, Home and the
    grown-ups area (its Words tab is at the end of this file). */
 (function () {
@@ -4203,10 +4435,10 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // third of a second apart, so they chase from the back to the nose (game.css). Lit and steady with reduce motion.
   const LAMPS = { step: 92, rows: [[44, 168], [90, 15]], end: 25, groups: 3, stagger: 1000 / 3, art: 23 };
 
-  const BOOK = S.read(MW.wordsData || { weeks: [], words: {} });
+  const BOOK = S.read(MW.wordsData || { terms: [], words: {} });
   const st = { round: [], qi: 0, item: null, prompt: null, praise: [], timers: [], tapped: 0, drops: 0, hinted: false,
     trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null,
-    pool: null, week: null, repeat: null, pauses: 0, lamps: [] };
+    pool: null, choice: null, marks: null, repeat: null, pauses: 0, lamps: [] };
   const G = MW.wordsGame = { st: st, book: BOOK, nextRound: null };
   let findPod, buildPod, endPod, findStars, buildStars, endStars, findFx, buildFx, tileLayer, trayEl, shipLayer, dragger, again, endRockets;
   let moments = null;
@@ -4230,29 +4462,40 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         if (MW.shell.screen === FIND && moments.lookoutShown()) later(W.st.token, 1800, function () { moments.lookoutDown(); });
       }
     },
-    onHome: leave
+    onHome: leave,
+    init: moveToStart
   });
 
   // ---------------------------------------------------------------- saved data (this game's own, on the tablet)
   // Read without creating it (MW.store.peek), so a tablet that has never played keeps nothing for this game.
   function saved() { return MW.store.peek(ID); }
   function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
-  // The week in play: a week's number, or S.ALL for every week (the Words tab's "Weeks 1–5"). A week saved before 0.6.0
-  // (week 5) carries on; one no longer in the words file gives way to the file's start week.
-  function week() {
-    const v = saved().week;
-    if (v === S.ALL && S.allLabel(BOOK)) return S.ALL;
-    const w = +v;
-    return BOOK.weeks.some(function (x) { return x.week === w; }) ? w : BOOK.startWeek;
+  // What's in play, as a grown-up picked it in the Words tab and checked against the words file (S.choice): a week of a
+  // half-term { half, week }, a half-term's weeks together { half, week: S.ALL }, or a whole term { term }. Nothing
+  // picked, a choice saved before 0.7.0 (it has no half-term) or one the file no longer has: the file's start.
+  function choice() { return S.choice(BOOK, saved()); }
+  function week() { const c = choice(); return c.term ? null : c.week; }
+  // The one-time move to the file's start (0.7.0, question 1): a tablet whose saved choice has no half-term in it (a
+  // week or "all" saved by 0.6.0) moves to the start (Autumn 2, week 1), which is then saved; its answers stay as they
+  // are. A tablet that has saved nothing for this game keeps nothing (it plays the start anyway).
+  function moveToStart() {
+    const v = saved();
+    if (!Object.keys(v).length || (v.half !== undefined && v.half !== null) || (v.term !== undefined && v.term !== null)) return;
+    const s = S.start(BOOK), g = MW.store.game(ID);
+    g.half = s.half; g.week = s.week;
+    MW.store.save();
+    MW.log('words', 'moved to the start: ' + s.half + ' ' + s.week);
   }
   function recorded(w) { return MW.audio.recorded(line(w)); }
-  function line(w) { return 'words-w-' + w; }
-  // The words in play: the week's words and earlier weeks' tricky words (or every week's words), once their
-  // recordings are on the page.
-  function inPlay() { return S.inPlay(BOOK, week()).filter(recorded); }
-  // A round keeps the words and the week it started with: a week picked in the grown-ups area starts with the next round.
+  function line(w) { return S.line(w); }
+  // The words in play: the choice's words, once their recordings are on the page.
+  function inPlay() { return S.inPlay(BOOK, choice()).filter(recorded); }
+  // A round keeps the words, the choice and the marking it started with: a choice made in the grown-ups area starts
+  // with the next round.
   function roundPool() { return st.pool || inPlay(); }
-  function roundWeek() { return st.week || week(); }
+  function roundChoice() { return st.choice || choice(); }
+  // Is a word marked tricky in the half-term in play (D1)? Where it isn't, none of its tiles is marked.
+  function marked(w) { const m = (st.marks || S.marks(BOOK, roundChoice()))[w]; return m ? m.tricky : true; }
 
   // ---------------------------------------------------------------- the screens
   function buildFind() {
@@ -4333,9 +4576,9 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         return { word: w, step: s === 'notyet' ? 'tiles' : s };
       });
     }
-    const wk = week();
-    if (wk === S.ALL) return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, lowest: true });
-    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, own: S.ownWords(BOOK, wk) });
+    const c = choice();
+    if (S.wide(c)) return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, lowest: true });
+    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, own: S.ownWords(BOOK, c.half, c.week) });
   }
 
   async function startRound() {
@@ -4343,12 +4586,20 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     clearBoard();
     st.round = makeRound();
     st.pool = inPlay();
-    st.week = week();
+    st.choice = choice();
+    st.marks = S.marks(BOOK, st.choice);
     st.qi = 0;
     st.trickySaid = false;
     st.praise = [];
     MW.log('words', 'round ' + JSON.stringify(st.round));
-    if (!st.round.length) { MW.log('words', 'no words in play'); W.home(); return; }
+    if (!st.round.length) {
+      // nothing in the choice in play is recorded yet (a new half-term before its recordings): back to the map, and say
+      // so with the world's own line, as the map does for a planet that isn't ready (kit/world.js, notReady)
+      MW.log('words', 'no words in play');
+      W.home();
+      if (W.st.phase === 'map' && !W.st.paused) W.speak([['map-not-ready']]);
+      return;
+    }
     W.st.phase = 'words-starting';
     moments.clear();
     await fontReady();                                         // measure the words in bold Andika itself, not a stand-in
@@ -4592,7 +4843,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   function showBuild(item) {
     st.item = item;
     clearBoard();
-    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek(), item.word, roundPool()));
+    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundChoice(), item.word, roundPool()), Math.random, marked(item.word));
     st.places = st.plan.places;
     st.next = 0;
     st.drops = 0;
@@ -4630,11 +4881,19 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
   // pair says nothing (answers 13, 21 and 22 of the 0.6.0 PRD).
   function sayTile(c) {
     if (!st.plan || st.plan.mode !== 'tiles') return;
-    const id = S.soundLine(c.sound);
+    const id = S.soundLine(soundOf(c));
     if (!id) { MW.log('words', 'sound ' + c.text + ': none'); return; }
     if (!MW.audio.recorded(id)) { MW.log('words', 'sound ' + id + ' not recorded yet'); return; }
     MW.log('words', 'sound ' + id);
     W.speak([[id]]);
+  }
+
+  // What a tile says as it is picked up. Tiles with the same letters are just as good as each other, so where a word has
+  // a tile twice that says different things (0.7.0: "these", "even"), the one picked up says the sound of the next place
+  // still waiting for those letters, left to right: the first e of "these" placed says "ee", the other says nothing.
+  function soundOf(c) {
+    for (let i = st.next; i < st.places.length; i++) if (st.places[i].text === c.text) return st.places[i].sound;
+    return c.sound;
   }
 
   function wrongDrop(c) {
@@ -4772,7 +5031,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     [findPod, buildPod, endPod].forEach(function (p) { if (p) p.lightsOff(); });
     if (again) again.classList.remove('mw-pulse');
     if (moments) moments.clear();
-    st.item = null; st.prompt = null; st.pool = null; st.week = null; st.repeat = null;
+    st.item = null; st.prompt = null; st.pool = null; st.choice = null; st.marks = null; st.repeat = null;
   }
 
   // ---------------------------------------------------------------- grown-ups: the Words tab
@@ -4792,36 +5051,91 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     return 'Weeks ' + (run ? list[0] + ' to ' + list[list.length - 1] : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]);
   }
   const COUNT = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
-  function pickWeek(GU, value) {
-    const g = MW.store.game(ID); g.week = value; MW.store.save();
+  // The grown-up's choice, saved on the tablet (it starts with the next round). The saved half-term and week stay
+  // while a whole term is on, so picking a half-term again goes back to them.
+  function pickHalf(GU, h) {
+    const c = choice(), g = MW.store.game(ID);
+    const prev = c.term ? saved().week : c.week;
+    // the same week in this half-term if it has one (or its weeks together), otherwise its first week
+    const keep = prev === S.ALL ? !!S.allLabel(h) : !!S.weekOf(h, +prev);
+    delete g.term;
+    g.half = h.id;
+    g.week = keep ? (prev === S.ALL ? S.ALL : +prev) : (h.weeks.length ? h.weeks[0].week : null);
+    MW.store.save();
+    MW.log('words', 'half ' + h.id + ' ' + g.week);
+    GU.show('words-progress');
+  }
+  function pickTerm(GU, tm) {
+    const c = choice(), g = MW.store.game(ID);
+    if (!c.term) { g.half = c.half; g.week = c.week; }
+    g.term = tm.id;
+    MW.store.save();
+    MW.log('words', 'term ' + tm.id);
+    GU.show('words-progress');
+  }
+  function pickWeek(GU, h, value) {
+    const g = MW.store.game(ID);
+    delete g.term;
+    g.half = h.id; g.week = value;
+    MW.store.save();
     MW.log('words', 'week ' + value);
     GU.show('words-progress');
   }
   function renderProgress(el) {
     const GU = MW.grownups;
     const map = S.statuses(answers());
-    const wk = week();
-    const all = wk === S.ALL;
-    const allLabel = S.allLabel(BOOK);
-    GU.h3(el, 'Week in play');
-    const r = GU.row(el);
-    BOOK.weeks.forEach(function (x) {
-      GU.btn(r, 'Week ' + x.week, function () { pickWeek(GU, x.week); }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+    const c = choice();
+    const term = c.term ? S.term(BOOK, c.term) : null;
+    const half = term ? null : S.half(BOOK, c.half);
+    const all = S.wide(c);
+    const wk = term ? null : c.week;
+    const allLabel = S.allLabel(half);
+    const marks = S.marks(BOOK, c);
+    // the half-terms, each term's after its half-terms ("Autumn 1", "Autumn 2", "All of autumn"), named from the file
+    GU.h3(el, 'Half-term');
+    const hr = GU.row(el);
+    BOOK.terms.forEach(function (tm) {
+      tm.halves.forEach(function (h) {
+        GU.btn(hr, h.name, function () { pickHalf(GU, h); }, 'gu-choice words-half' + (half && h.id === half.id ? ' is-on' : ''));
+      });
+      const label = S.termLabel(tm);
+      if (label) GU.btn(hr, label, function () { pickTerm(GU, tm); }, 'gu-choice words-half words-term' + (term && term.id === tm.id ? ' is-on' : ''));
     });
-    // after the last week, every week together ("Weeks 1–5", named from the words file)
-    if (allLabel) GU.btn(r, allLabel, function () { pickWeek(GU, S.ALL); }, 'gu-choice words-week words-week-all' + (all ? ' is-on' : ''));
-    if (all) {
-      const n = BOOK.weeks.length;
+    // the picked half-term's weeks, then all of them together ("Weeks 1–5"); not shown with a whole term on
+    if (half) {
+      GU.h3(el, 'Week in play');
+      const r = GU.row(el);
+      half.weeks.forEach(function (x) {
+        GU.btn(r, 'Week ' + x.week, function () { pickWeek(GU, half, x.week); }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+      });
+      if (allLabel) GU.btn(r, allLabel, function () { pickWeek(GU, half, S.ALL); }, 'gu-choice words-week words-week-all' + (wk === S.ALL ? ' is-on' : ''));
+    }
+    if (term) {
+      const n = term.halves.length;
+      GU.p(el, MW.esc(term.all) + ' plays every word from ' + (n === 2 ? 'both half-terms' : 'all ' + (COUNT[n] || n) + ' half-terms') + ', '
+        + S.inPlay(BOOK, c).length + ' in all, leaning on the ones that need the most work. A change starts with the next round.', 'gu-note');
+    } else if (all) {
+      const n = half.weeks.length;
       GU.p(el, MW.esc(allLabel) + ' plays every word from all ' + (COUNT[n] || n) + ' weeks, leaning on the ones that need the most work. '
         + 'A change starts with the next round.', 'gu-note');
-    } else {
-      const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
-      GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    } else if (half) {
+      const tricky = half.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
+      GU.p(el, MW.esc(half.name) + ', week ' + wk + ': this week\'s words, then the tricky words of the weeks before it. '
+        + (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    }
+    // nothing in the choice in play recorded yet: the game won't start (it says "That planet isn't ready yet.")
+    if (S.inPlay(BOOK, c).length && !inPlay().length) {
+      const what = term ? term.name : half.name + ', ' + (all ? allLabel : 'week ' + wk);
+      GU.p(el, 'Nothing in ' + MW.esc(what) + ' is recorded yet, so MeeMee Rockets won\'t start until it is.', 'gu-note');
     }
 
+    // the grid: each word once, with its step
     const grid = MW.make('div', 'words-grid');
+    const shown = {};
     const row = function (label, words) {
+      words = words.filter(function (w, i, list) { return BOOK.words[w] && !shown[w] && list.indexOf(w) === i; });
       if (!words.length) return;
+      words.forEach(function (w) { shown[w] = true; });
       grid.appendChild(MW.make('div', 'words-grid-label label', null, MW.esc(label)));
       const cells = MW.make('div', 'words-grid-cells');
       words.forEach(function (w) { cells.appendChild(cell(S.step(map, w), w)); });
@@ -4829,21 +5143,24 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     };
     const flat = function (weeks, pick) { return [].concat.apply([], weeks.map(pick)); };
     if (all) {
-      // every week: every tricky word, then every other word
-      row('Tricky words', flat(BOOK.weeks, function (x) { return x.tricky; }));
-      row('Other words', flat(BOOK.weeks, function (x) { return x.other; }));
-    } else {
-      const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
+      // a half-term's weeks or a whole term: every tricky word, then every other word, in the order the file first lists
+      // them; a word's row is where the half-term that decides its marking puts it (go is a tricky word in autumn 1 and
+      // another word in autumn 2, so with all of autumn it is with the other words)
+      const words = S.inPlay(BOOK, c);
+      row('Tricky words', words.filter(function (w) { return marks[w] && marks[w].tricky; }));
+      row('Other words', words.filter(function (w) { return !(marks[w] && marks[w].tricky); }));
+    } else if (half) {
+      const now = S.weekOf(half, wk) || { tricky: [], other: [] };
       row('Tricky words', now.tricky);
       row('Week ' + wk + ' words', now.other);
-      row('Earlier weeks', flat(BOOK.weeks.filter(function (x) { return x.week < wk; }), function (x) { return x.tricky; }));
-      row('Later weeks', flat(BOOK.weeks.filter(function (x) { return x.week > wk; }), function (x) { return x.tricky.concat(x.other); }));
+      row('Earlier weeks', flat(half.weeks.filter(function (x) { return x.week < wk; }), function (x) { return x.tricky; }));
+      row('Later weeks', flat(half.weeks.filter(function (x) { return x.week > wk; }), function (x) { return x.tricky.concat(x.other); }));
     }
     el.appendChild(grid);
     const legend = MW.make('div', 'words-legend');
     S.STEPS.forEach(function (s) { legend.appendChild(cell(s, S.NAMES[s])); });
     el.appendChild(legend);
-    const earlierOther = !all && BOOK.weeks.some(function (x) { return x.week < wk && x.other.length; });
+    const earlierOther = !all && half && half.weeks.some(function (x) { return x.week < wk && x.other.length; });
     GU.p(el, 'Each word is built with <b>sound tiles</b> until it is right first time (no wrong tap or drop, no hint) on three different days. '
       + 'Then it moves to <b>letters</b>: one tile per letter, with a spare or two; then to <b>harder letters</b>, with the tray filled to '
       + BOOK.harderTray + ' tiles. Three more days right first time at each step; after harder letters it is <b>secure</b>. '
@@ -4852,7 +5169,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
         : 'Each round has five words, at least three of them from the week in play (all of its words, if fewer are recorded): '
           + 'one or two secure ones to review and the rest needing work. ')
       + 'When there aren\'t enough words that need work, more secure ones fill the round.'
-      + (!all && BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : '')
+      + (!all && half && half.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : '')
       + (earlierOther && allLabel ? ' Earlier weeks\' other words come up with ' + MW.esc(allLabel) + '.' : ''), 'gu-note');
     const waiting = BOOK.order.filter(function (w) { return !recorded(w); });
     if (waiting.length) GU.p(el, 'Waiting for a recording, so not in play yet: ' + MW.esc(waiting.join(', ')) + '.', 'gu-note');
@@ -4866,7 +5183,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
     let armed = 0;
     GU.btn(clear, 'Clear this tablet\'s progress', function (b) {
       if (Date.now() - armed < 4000) {
-        const g = MW.store.game(ID); delete g.answers; MW.store.save();   // this game's answers only; the week stays
+        const g = MW.store.game(ID); delete g.answers; MW.store.save();   // this game's answers only; the choice stays
         MW.log('words', 'progress cleared');
         GU.show('words-progress');
       } else {
@@ -4878,7 +5195,7 @@ window.MW_SCRIPT = [{"id":"map-welcome","group":"Map","words":"Welcome to MeeMee
 
   // ---------------------------------------------------------------- test hooks
   G.start = startRound; G.showFind = showFind; G.showBuild = showBuild; G.setFind = setFind; G.drop = onDrop; G.tapRocket = tapRocket; G.home = W.home; G.makeRound = makeRound;
-  G.inPlay = inPlay; G.week = week; G.answers = answers; G.sayTile = sayTile; G.LAMPS = LAMPS;
+  G.inPlay = inPlay; G.week = week; G.choice = choice; G.marked = marked; G.answers = answers; G.sayTile = sayTile; G.LAMPS = LAMPS;
 })();
 
 </script>

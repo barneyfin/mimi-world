@@ -66,8 +66,9 @@
 @keyframes words-spanner-tap { 0%, 100% { transform: none; } 50% { transform: rotate(-14deg); } }
 
 /* ---------------------------------------------------------------- grown-ups: the Words tab */
-.words-week { border-color: var(--night-button); background: transparent; }
-.words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
+/* the half-term chips (each half-term, then the whole term's) and the week chips: one look (WordGrid card) */
+.words-half, .words-week { border-color: var(--night-button); background: transparent; }
+.words-half.is-on, .words-week.is-on { background: var(--mint); border-color: var(--mint); color: var(--numeral); }
 .words-grid { display: grid; grid-template-columns: 158px 1fr; column-gap: 0; row-gap: 12px; align-items: start; margin: 14px 0 12px; max-width: 1120px; }
 .words-grid-label { color: var(--text-2); padding-top: 10px; }
 .words-grid-cells { display: flex; flex-wrap: wrap; gap: 10px; }

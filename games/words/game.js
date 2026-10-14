@@ -4,8 +4,8 @@
      Build  the word's rocket lies on its side with empty portholes; its tiles are loose in the tray. "Now build the
             word… one." He drags the tiles into the portholes, left to right. In the sound tiles step a tile says its
             sound as it is picked up. The last tile lights the engines and the launch lights, and the rocket launches.
-   The words, their tiles, sounds and spares are in words.js; each word's step and how rounds are chosen in steps.js;
-   the crew's job moments in moments.js.
+   The words, their tiles, sounds and spares are in words.js, by term, half-term and week; each word's step, what's in
+   play and how rounds are chosen in steps.js; the crew's job moments in moments.js.
    It joins the world with MW.world.game below: the world gives it the start screen, the map, pausing, Home and the
    grown-ups area (its Words tab is at the end of this file). */
 (function () {
@@ -32,10 +32,10 @@
   // third of a second apart, so they chase from the back to the nose (game.css). Lit and steady with reduce motion.
   const LAMPS = { step: 92, rows: [[44, 168], [90, 15]], end: 25, groups: 3, stagger: 1000 / 3, art: 23 };
 
-  const BOOK = S.read(MW.wordsData || { weeks: [], words: {} });
+  const BOOK = S.read(MW.wordsData || { terms: [], words: {} });
   const st = { round: [], qi: 0, item: null, prompt: null, praise: [], timers: [], tapped: 0, drops: 0, hinted: false,
     trickySaid: false, rockets: [], tiles: [], places: [], next: 0, ship: null, plan: null,
-    pool: null, week: null, repeat: null, pauses: 0, lamps: [] };
+    pool: null, choice: null, marks: null, repeat: null, pauses: 0, lamps: [] };
   const G = MW.wordsGame = { st: st, book: BOOK, nextRound: null };
   let findPod, buildPod, endPod, findStars, buildStars, endStars, findFx, buildFx, tileLayer, trayEl, shipLayer, dragger, again, endRockets;
   let moments = null;
@@ -59,29 +59,40 @@
         if (MW.shell.screen === FIND && moments.lookoutShown()) later(W.st.token, 1800, function () { moments.lookoutDown(); });
       }
     },
-    onHome: leave
+    onHome: leave,
+    init: moveToStart
   });
 
   // ---------------------------------------------------------------- saved data (this game's own, on the tablet)
   // Read without creating it (MW.store.peek), so a tablet that has never played keeps nothing for this game.
   function saved() { return MW.store.peek(ID); }
   function answers() { return Array.isArray(saved().answers) ? saved().answers : []; }
-  // The week in play: a week's number, or S.ALL for every week (the Words tab's "Weeks 1–5"). A week saved before 0.6.0
-  // (week 5) carries on; one no longer in the words file gives way to the file's start week.
-  function week() {
-    const v = saved().week;
-    if (v === S.ALL && S.allLabel(BOOK)) return S.ALL;
-    const w = +v;
-    return BOOK.weeks.some(function (x) { return x.week === w; }) ? w : BOOK.startWeek;
+  // What's in play, as a grown-up picked it in the Words tab and checked against the words file (S.choice): a week of a
+  // half-term { half, week }, a half-term's weeks together { half, week: S.ALL }, or a whole term { term }. Nothing
+  // picked, a choice saved before 0.7.0 (it has no half-term) or one the file no longer has: the file's start.
+  function choice() { return S.choice(BOOK, saved()); }
+  function week() { const c = choice(); return c.term ? null : c.week; }
+  // The one-time move to the file's start (0.7.0, question 1): a tablet whose saved choice has no half-term in it (a
+  // week or "all" saved by 0.6.0) moves to the start (Autumn 2, week 1), which is then saved; its answers stay as they
+  // are. A tablet that has saved nothing for this game keeps nothing (it plays the start anyway).
+  function moveToStart() {
+    const v = saved();
+    if (!Object.keys(v).length || (v.half !== undefined && v.half !== null) || (v.term !== undefined && v.term !== null)) return;
+    const s = S.start(BOOK), g = MW.store.game(ID);
+    g.half = s.half; g.week = s.week;
+    MW.store.save();
+    MW.log('words', 'moved to the start: ' + s.half + ' ' + s.week);
   }
   function recorded(w) { return MW.audio.recorded(line(w)); }
-  function line(w) { return 'words-w-' + w; }
-  // The words in play: the week's words and earlier weeks' tricky words (or every week's words), once their
-  // recordings are on the page.
-  function inPlay() { return S.inPlay(BOOK, week()).filter(recorded); }
-  // A round keeps the words and the week it started with: a week picked in the grown-ups area starts with the next round.
+  function line(w) { return S.line(w); }
+  // The words in play: the choice's words, once their recordings are on the page.
+  function inPlay() { return S.inPlay(BOOK, choice()).filter(recorded); }
+  // A round keeps the words, the choice and the marking it started with: a choice made in the grown-ups area starts
+  // with the next round.
   function roundPool() { return st.pool || inPlay(); }
-  function roundWeek() { return st.week || week(); }
+  function roundChoice() { return st.choice || choice(); }
+  // Is a word marked tricky in the half-term in play (D1)? Where it isn't, none of its tiles is marked.
+  function marked(w) { const m = (st.marks || S.marks(BOOK, roundChoice()))[w]; return m ? m.tricky : true; }
 
   // ---------------------------------------------------------------- the screens
   function buildFind() {
@@ -162,9 +173,9 @@
         return { word: w, step: s === 'notyet' ? 'tiles' : s };
       });
     }
-    const wk = week();
-    if (wk === S.ALL) return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, lowest: true });
-    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, own: S.ownWords(BOOK, wk) });
+    const c = choice();
+    if (S.wide(c)) return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, lowest: true });
+    return S.pickRound({ words: inPlay(), answers: answers(), size: ROUND, own: S.ownWords(BOOK, c.half, c.week) });
   }
 
   async function startRound() {
@@ -172,12 +183,20 @@
     clearBoard();
     st.round = makeRound();
     st.pool = inPlay();
-    st.week = week();
+    st.choice = choice();
+    st.marks = S.marks(BOOK, st.choice);
     st.qi = 0;
     st.trickySaid = false;
     st.praise = [];
     MW.log('words', 'round ' + JSON.stringify(st.round));
-    if (!st.round.length) { MW.log('words', 'no words in play'); W.home(); return; }
+    if (!st.round.length) {
+      // nothing in the choice in play is recorded yet (a new half-term before its recordings): back to the map, and say
+      // so with the world's own line, as the map does for a planet that isn't ready (kit/world.js, notReady)
+      MW.log('words', 'no words in play');
+      W.home();
+      if (W.st.phase === 'map' && !W.st.paused) W.speak([['map-not-ready']]);
+      return;
+    }
     W.st.phase = 'words-starting';
     moments.clear();
     await fontReady();                                         // measure the words in bold Andika itself, not a stand-in
@@ -421,7 +440,7 @@
   function showBuild(item) {
     st.item = item;
     clearBoard();
-    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundWeek(), item.word, roundPool()));
+    st.plan = S.plan(BOOK, item.word, item.step, S.fillFrom(BOOK, roundChoice(), item.word, roundPool()), Math.random, marked(item.word));
     st.places = st.plan.places;
     st.next = 0;
     st.drops = 0;
@@ -459,11 +478,19 @@
   // pair says nothing (answers 13, 21 and 22 of the 0.6.0 PRD).
   function sayTile(c) {
     if (!st.plan || st.plan.mode !== 'tiles') return;
-    const id = S.soundLine(c.sound);
+    const id = S.soundLine(soundOf(c));
     if (!id) { MW.log('words', 'sound ' + c.text + ': none'); return; }
     if (!MW.audio.recorded(id)) { MW.log('words', 'sound ' + id + ' not recorded yet'); return; }
     MW.log('words', 'sound ' + id);
     W.speak([[id]]);
+  }
+
+  // What a tile says as it is picked up. Tiles with the same letters are just as good as each other, so where a word has
+  // a tile twice that says different things (0.7.0: "these", "even"), the one picked up says the sound of the next place
+  // still waiting for those letters, left to right: the first e of "these" placed says "ee", the other says nothing.
+  function soundOf(c) {
+    for (let i = st.next; i < st.places.length; i++) if (st.places[i].text === c.text) return st.places[i].sound;
+    return c.sound;
   }
 
   function wrongDrop(c) {
@@ -601,7 +628,7 @@
     [findPod, buildPod, endPod].forEach(function (p) { if (p) p.lightsOff(); });
     if (again) again.classList.remove('mw-pulse');
     if (moments) moments.clear();
-    st.item = null; st.prompt = null; st.pool = null; st.week = null; st.repeat = null;
+    st.item = null; st.prompt = null; st.pool = null; st.choice = null; st.marks = null; st.repeat = null;
   }
 
   // ---------------------------------------------------------------- grown-ups: the Words tab
@@ -621,36 +648,91 @@
     return 'Weeks ' + (run ? list[0] + ' to ' + list[list.length - 1] : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]);
   }
   const COUNT = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
-  function pickWeek(GU, value) {
-    const g = MW.store.game(ID); g.week = value; MW.store.save();
+  // The grown-up's choice, saved on the tablet (it starts with the next round). The saved half-term and week stay
+  // while a whole term is on, so picking a half-term again goes back to them.
+  function pickHalf(GU, h) {
+    const c = choice(), g = MW.store.game(ID);
+    const prev = c.term ? saved().week : c.week;
+    // the same week in this half-term if it has one (or its weeks together), otherwise its first week
+    const keep = prev === S.ALL ? !!S.allLabel(h) : !!S.weekOf(h, +prev);
+    delete g.term;
+    g.half = h.id;
+    g.week = keep ? (prev === S.ALL ? S.ALL : +prev) : (h.weeks.length ? h.weeks[0].week : null);
+    MW.store.save();
+    MW.log('words', 'half ' + h.id + ' ' + g.week);
+    GU.show('words-progress');
+  }
+  function pickTerm(GU, tm) {
+    const c = choice(), g = MW.store.game(ID);
+    if (!c.term) { g.half = c.half; g.week = c.week; }
+    g.term = tm.id;
+    MW.store.save();
+    MW.log('words', 'term ' + tm.id);
+    GU.show('words-progress');
+  }
+  function pickWeek(GU, h, value) {
+    const g = MW.store.game(ID);
+    delete g.term;
+    g.half = h.id; g.week = value;
+    MW.store.save();
     MW.log('words', 'week ' + value);
     GU.show('words-progress');
   }
   function renderProgress(el) {
     const GU = MW.grownups;
     const map = S.statuses(answers());
-    const wk = week();
-    const all = wk === S.ALL;
-    const allLabel = S.allLabel(BOOK);
-    GU.h3(el, 'Week in play');
-    const r = GU.row(el);
-    BOOK.weeks.forEach(function (x) {
-      GU.btn(r, 'Week ' + x.week, function () { pickWeek(GU, x.week); }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+    const c = choice();
+    const term = c.term ? S.term(BOOK, c.term) : null;
+    const half = term ? null : S.half(BOOK, c.half);
+    const all = S.wide(c);
+    const wk = term ? null : c.week;
+    const allLabel = S.allLabel(half);
+    const marks = S.marks(BOOK, c);
+    // the half-terms, each term's after its half-terms ("Autumn 1", "Autumn 2", "All of autumn"), named from the file
+    GU.h3(el, 'Half-term');
+    const hr = GU.row(el);
+    BOOK.terms.forEach(function (tm) {
+      tm.halves.forEach(function (h) {
+        GU.btn(hr, h.name, function () { pickHalf(GU, h); }, 'gu-choice words-half' + (half && h.id === half.id ? ' is-on' : ''));
+      });
+      const label = S.termLabel(tm);
+      if (label) GU.btn(hr, label, function () { pickTerm(GU, tm); }, 'gu-choice words-half words-term' + (term && term.id === tm.id ? ' is-on' : ''));
     });
-    // after the last week, every week together ("Weeks 1–5", named from the words file)
-    if (allLabel) GU.btn(r, allLabel, function () { pickWeek(GU, S.ALL); }, 'gu-choice words-week words-week-all' + (all ? ' is-on' : ''));
-    if (all) {
-      const n = BOOK.weeks.length;
+    // the picked half-term's weeks, then all of them together ("Weeks 1–5"); not shown with a whole term on
+    if (half) {
+      GU.h3(el, 'Week in play');
+      const r = GU.row(el);
+      half.weeks.forEach(function (x) {
+        GU.btn(r, 'Week ' + x.week, function () { pickWeek(GU, half, x.week); }, 'gu-choice words-week' + (x.week === wk ? ' is-on' : ''));
+      });
+      if (allLabel) GU.btn(r, allLabel, function () { pickWeek(GU, half, S.ALL); }, 'gu-choice words-week words-week-all' + (wk === S.ALL ? ' is-on' : ''));
+    }
+    if (term) {
+      const n = term.halves.length;
+      GU.p(el, MW.esc(term.all) + ' plays every word from ' + (n === 2 ? 'both half-terms' : 'all ' + (COUNT[n] || n) + ' half-terms') + ', '
+        + S.inPlay(BOOK, c).length + ' in all, leaning on the ones that need the most work. A change starts with the next round.', 'gu-note');
+    } else if (all) {
+      const n = half.weeks.length;
       GU.p(el, MW.esc(allLabel) + ' plays every word from all ' + (COUNT[n] || n) + ' weeks, leaning on the ones that need the most work. '
         + 'A change starts with the next round.', 'gu-note');
-    } else {
-      const tricky = BOOK.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
-      GU.p(el, (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    } else if (half) {
+      const tricky = half.weeks.filter(function (x) { return !x.other.length; }).map(function (x) { return x.week; });
+      GU.p(el, MW.esc(half.name) + ', week ' + wk + ': this week\'s words, then the tricky words of the weeks before it. '
+        + (tricky.length ? weeksText(tricky) + ': tricky words only until their other words are recorded. ' : '') + 'A change starts with the next round.', 'gu-note');
+    }
+    // nothing in the choice in play recorded yet: the game won't start (it says "That planet isn't ready yet.")
+    if (S.inPlay(BOOK, c).length && !inPlay().length) {
+      const what = term ? term.name : half.name + ', ' + (all ? allLabel : 'week ' + wk);
+      GU.p(el, 'Nothing in ' + MW.esc(what) + ' is recorded yet, so MeeMee Rockets won\'t start until it is.', 'gu-note');
     }
 
+    // the grid: each word once, with its step
     const grid = MW.make('div', 'words-grid');
+    const shown = {};
     const row = function (label, words) {
+      words = words.filter(function (w, i, list) { return BOOK.words[w] && !shown[w] && list.indexOf(w) === i; });
       if (!words.length) return;
+      words.forEach(function (w) { shown[w] = true; });
       grid.appendChild(MW.make('div', 'words-grid-label label', null, MW.esc(label)));
       const cells = MW.make('div', 'words-grid-cells');
       words.forEach(function (w) { cells.appendChild(cell(S.step(map, w), w)); });
@@ -658,21 +740,24 @@
     };
     const flat = function (weeks, pick) { return [].concat.apply([], weeks.map(pick)); };
     if (all) {
-      // every week: every tricky word, then every other word
-      row('Tricky words', flat(BOOK.weeks, function (x) { return x.tricky; }));
-      row('Other words', flat(BOOK.weeks, function (x) { return x.other; }));
-    } else {
-      const now = BOOK.weeks.filter(function (x) { return x.week === wk; })[0] || { tricky: [], other: [] };
+      // a half-term's weeks or a whole term: every tricky word, then every other word, in the order the file first lists
+      // them; a word's row is where the half-term that decides its marking puts it (go is a tricky word in autumn 1 and
+      // another word in autumn 2, so with all of autumn it is with the other words)
+      const words = S.inPlay(BOOK, c);
+      row('Tricky words', words.filter(function (w) { return marks[w] && marks[w].tricky; }));
+      row('Other words', words.filter(function (w) { return !(marks[w] && marks[w].tricky); }));
+    } else if (half) {
+      const now = S.weekOf(half, wk) || { tricky: [], other: [] };
       row('Tricky words', now.tricky);
       row('Week ' + wk + ' words', now.other);
-      row('Earlier weeks', flat(BOOK.weeks.filter(function (x) { return x.week < wk; }), function (x) { return x.tricky; }));
-      row('Later weeks', flat(BOOK.weeks.filter(function (x) { return x.week > wk; }), function (x) { return x.tricky.concat(x.other); }));
+      row('Earlier weeks', flat(half.weeks.filter(function (x) { return x.week < wk; }), function (x) { return x.tricky; }));
+      row('Later weeks', flat(half.weeks.filter(function (x) { return x.week > wk; }), function (x) { return x.tricky.concat(x.other); }));
     }
     el.appendChild(grid);
     const legend = MW.make('div', 'words-legend');
     S.STEPS.forEach(function (s) { legend.appendChild(cell(s, S.NAMES[s])); });
     el.appendChild(legend);
-    const earlierOther = !all && BOOK.weeks.some(function (x) { return x.week < wk && x.other.length; });
+    const earlierOther = !all && half && half.weeks.some(function (x) { return x.week < wk && x.other.length; });
     GU.p(el, 'Each word is built with <b>sound tiles</b> until it is right first time (no wrong tap or drop, no hint) on three different days. '
       + 'Then it moves to <b>letters</b>: one tile per letter, with a spare or two; then to <b>harder letters</b>, with the tray filled to '
       + BOOK.harderTray + ' tiles. Three more days right first time at each step; after harder letters it is <b>secure</b>. '
@@ -681,7 +766,7 @@
         : 'Each round has five words, at least three of them from the week in play (all of its words, if fewer are recorded): '
           + 'one or two secure ones to review and the rest needing work. ')
       + 'When there aren\'t enough words that need work, more secure ones fill the round.'
-      + (!all && BOOK.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : '')
+      + (!all && half && half.weeks.some(function (x) { return x.week > wk; }) ? ' Later weeks are not in play.' : '')
       + (earlierOther && allLabel ? ' Earlier weeks\' other words come up with ' + MW.esc(allLabel) + '.' : ''), 'gu-note');
     const waiting = BOOK.order.filter(function (w) { return !recorded(w); });
     if (waiting.length) GU.p(el, 'Waiting for a recording, so not in play yet: ' + MW.esc(waiting.join(', ')) + '.', 'gu-note');
@@ -695,7 +780,7 @@
     let armed = 0;
     GU.btn(clear, 'Clear this tablet\'s progress', function (b) {
       if (Date.now() - armed < 4000) {
-        const g = MW.store.game(ID); delete g.answers; MW.store.save();   // this game's answers only; the week stays
+        const g = MW.store.game(ID); delete g.answers; MW.store.save();   // this game's answers only; the choice stays
         MW.log('words', 'progress cleared');
         GU.show('words-progress');
       } else {
@@ -707,5 +792,5 @@
 
   // ---------------------------------------------------------------- test hooks
   G.start = startRound; G.showFind = showFind; G.showBuild = showBuild; G.setFind = setFind; G.drop = onDrop; G.tapRocket = tapRocket; G.home = W.home; G.makeRound = makeRound;
-  G.inPlay = inPlay; G.week = week; G.answers = answers; G.sayTile = sayTile; G.LAMPS = LAMPS;
+  G.inPlay = inPlay; G.week = week; G.choice = choice; G.marked = marked; G.answers = answers; G.sayTile = sayTile; G.LAMPS = LAMPS;
 })();
