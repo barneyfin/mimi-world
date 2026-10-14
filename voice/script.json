@@ -907,6 +907,422 @@
       "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… magnet.\")."
     },
     {
+      "id": "words-w-their",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "their",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… their.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-people",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "people",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… people.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-oh",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "oh",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… oh.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-your",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "your",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… your.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-mr",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "Mr",
+      "how": "Say it \"mister\". Clear, falling at the end: always the last word of a sentence (\"Find the word… mister.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-mrs",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "Mrs",
+      "how": "Say it \"missiz\". Clear, falling at the end: always the last word of a sentence (\"Find the word… missiz.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-ms",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "Ms",
+      "how": "Say it \"mizz\". Clear, falling at the end: always the last word of a sentence (\"Find the word… mizz.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-ask",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "ask",
+      "how": "With \"ar\", as the class says it. Clear, falling at the end: always the last word of a sentence (\"Find the word… ask.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-could",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "could",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… could.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-would",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "would",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… would.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-should",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "should",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… should.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-our",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "our",
+      "how": "Said \"ow-er\". Clear, falling at the end: always the last word of a sentence (\"Find the word… our.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-house",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "house",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… house.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-mouse",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "mouse",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… mouse.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-water",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "water",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… water.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-want",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "want",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… want.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-little",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 tricky words",
+      "words": "little",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… little.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-bird",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "bird",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… bird.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-girl",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "girl",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… girl.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-pie",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "pie",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… pie.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-tried",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "tried",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… tried.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-blue",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "blue",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… blue.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-true",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "true",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… true.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-human",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "human",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… human.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-unit",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "unit",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… unit.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-both",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "both",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… both.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-child",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "child",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… child.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-kind",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "kind",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… kind.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-basic",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "basic",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… basic.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-acorn",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "acorn",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… acorn.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-fever",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "fever",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… fever.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-take",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "take",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… take.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-same",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "same",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… same.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-time",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "time",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… time.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-home",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "home",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… home.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-woke",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "woke",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… woke.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-rude",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "rude",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… rude.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-cute",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "cute",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… cute.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-these",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "these",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… these.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-even",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "even",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… even.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-new",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "new",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… new.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-chew",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "chew",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… chew.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-shriek",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "shriek",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… shriek.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-field",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "field",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… field.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-claw",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "claw",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… claw.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-draw",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "draw",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… draw.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-fried",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "fried",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… fried.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-game",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "game",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… game.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-open",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "open",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… open.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-float",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "float",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… float.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-being",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "being",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… being.\").",
+      "pending": true
+    },
+    {
+      "id": "words-w-eating",
+      "game": "MeeMee Rockets",
+      "group": "Autumn 2 other words",
+      "words": "eating",
+      "how": "Clear, falling at the end: always the last word of a sentence (\"Find the word… eating.\").",
+      "pending": true
+    },
+    {
       "id": "words-s-a",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
@@ -932,7 +1348,7 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "e",
-      "how": "A pure sound, clear and short. Used by: e, ai (said)."
+      "how": "A pure sound, clear and short. Used by: e, ai (said); autumn 2: e (even)."
     },
     {
       "id": "words-s-f",
@@ -981,7 +1397,7 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "l",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: l, ll."
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: l, ll; autumn 2: le (people, little)."
     },
     {
       "id": "words-s-m",
@@ -1002,7 +1418,7 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "o",
-      "how": "A pure sound, clear and short. Used by: o, a (what)."
+      "how": "A pure sound, clear and short. Used by: o, a (what); autumn 2: a (want)."
     },
     {
       "id": "words-s-p",
@@ -1030,7 +1446,7 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "t",
-      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: t."
+      "how": "A pure sound, short and crisp, with no \"uh\" after it. Used by: t; autumn 2: tt."
     },
     {
       "id": "words-s-u",
@@ -1065,21 +1481,21 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ai, as in rain",
-      "how": "A pure sound, clear and a little longer. Used by: ai, ay, ey (they)."
+      "how": "A pure sound, clear and a little longer. Used by: ai, ay, ey (they); autumn 2: a (basic, acorn, take, same, game)."
     },
     {
       "id": "words-s-air",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "air, as in chair",
-      "how": "A pure sound, clear and a little longer. Used by: air."
+      "how": "A pure sound, clear and a little longer. Used by: air; autumn 2: eir (their)."
     },
     {
       "id": "words-s-ar",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ar, as in hard",
-      "how": "A pure sound, clear and a little longer. Used by: ar."
+      "how": "A pure sound, clear and a little longer. Used by: ar; autumn 2: a (ask)."
     },
     {
       "id": "words-s-ch",
@@ -1100,49 +1516,49 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ee, as in feel",
-      "how": "A pure sound, clear and a little longer. Used by: ea, ee, e (me), e (she)."
+      "how": "A pure sound, clear and a little longer. Used by: ea, ee, e (me), e (she); autumn 2: eo (people), e (fever, these, even, being), ie (shriek, field)."
     },
     {
       "id": "words-s-igh",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "igh, as in right",
-      "how": "A pure sound, clear and a little longer. Used by: igh, y (my), i (like)."
+      "how": "A pure sound, clear and a little longer. Used by: igh, y (my), i (like); autumn 2: ie, i (child, kind, time)."
     },
     {
       "id": "words-s-oa",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oa, as in goat",
-      "how": "A pure sound, clear and a little longer. Used by: oa, o (go)."
+      "how": "A pure sound, clear and a little longer. Used by: oa, o (go); autumn 2: o (oh, both, home, woke, open)."
     },
     {
       "id": "words-s-oo-long",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oo, as in food",
-      "how": "A pure sound, clear and a little longer. Used by: oo, o (into), ou (you)."
+      "how": "A pure sound, clear and a little longer. Used by: oo, o (into), ou (you); autumn 2: ue, ew, u (rude)."
     },
     {
       "id": "words-s-oo-short",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "oo, as in took",
-      "how": "A pure sound, clear and short. Used by: u (push), oo (took)."
+      "how": "A pure sound, clear and short. Used by: u (push), oo (took); autumn 2: oul (could, would, should)."
     },
     {
       "id": "words-s-or",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "or, as in sort",
-      "how": "A pure sound, clear and a little longer. Used by: or, a (all)."
+      "how": "A pure sound, clear and a little longer. Used by: or, a (all); autumn 2: aw, our (your), a (water)."
     },
     {
       "id": "words-s-ow",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ow, as in down",
-      "how": "A pure sound, clear and a little longer. Used by: ow, ou (and ou in out)."
+      "how": "A pure sound, clear and a little longer. Used by: ow, ou (and ou in out); autumn 2: ou (our)."
     },
     {
       "id": "words-s-oy",
@@ -1177,14 +1593,14 @@
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "th, as in they",
-      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th (they)."
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: th (they); autumn 2: th (their, these)."
     },
     {
       "id": "words-s-ur",
       "game": "MeeMee Rockets",
       "group": "Tile sounds",
       "words": "ur, as in turn",
-      "how": "A pure sound, clear and a little longer. Used by: ere (were)."
+      "how": "A pure sound, clear and a little longer. Used by: ere (were); autumn 2: ir."
     },
     {
       "id": "words-s-ure",
@@ -1199,6 +1615,38 @@
       "group": "Tile sounds",
       "words": "w-u, as at the start of one",
       "how": "A pure sound, clear and a little longer. Used by: o (one)."
+    },
+    {
+      "id": "words-s-yoo",
+      "game": "MeeMee Rockets",
+      "group": "Tile sounds",
+      "words": "yoo, as in unit",
+      "how": "A pure sound, clear and a little longer. Used by: u (human, unit, cute), ew (new).",
+      "pending": true
+    },
+    {
+      "id": "words-s-er",
+      "game": "MeeMee Rockets",
+      "group": "Tile sounds",
+      "words": "er, as in water",
+      "how": "A pure sound, clear and short. Used by: er (fever, water), r (our).",
+      "pending": true
+    },
+    {
+      "id": "words-s-ng",
+      "game": "MeeMee Rockets",
+      "group": "Tile sounds",
+      "words": "ng, as in sing",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: ng.",
+      "pending": true
+    },
+    {
+      "id": "words-s-z",
+      "game": "MeeMee Rockets",
+      "group": "Tile sounds",
+      "words": "z",
+      "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: s (these).",
+      "pending": true
     }
   ]
 }
