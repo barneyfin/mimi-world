@@ -1,6 +1,7 @@
 /* MeeMee World kit: the pieces of a game screen.
    The part–whole diagram (counting look, and the numbers look of MeeMee Rescue's numbers mode), the asteroid tray, the
-   number track, Scruffles's pod, progress stars, the equation, sparkles and hint ghosts.
+   number track, Scruffles's pod, progress stars, the equation (with the minus sentence and its gap from 0.8.0),
+   sparkles and hint ghosts.
    Positions follow the design system's GameScreen and NumbersMode (1280x800 stage). */
 (function () {
   'use strict';
@@ -14,7 +15,8 @@
     pod: { x: 830, y: 70, w: 400 },
     tray: { x: 745, y: 515 },
     traySlots: [],
-    equation: { x: 180, y: 700, w: 400, h: 80 },
+    equation: { x: 180, y: 700, w: 400, h: 80 },              // the number sentence's usual place, under the diagram
+    equationShip: { x: 790, y: 528, w: 440, h: 100 },         // 0.8.0: under Scruffles, clear of the number track
     stars: { x: 517, y: 34, cx: 640 },     // x: the left edge of five stars; cx: the middle, for MW.stars(…, { centre: true })
     dropSlack: 22,            // a drop this far outside a circle's rim still counts as inside
     // numbers mode (0.6.0): the numbered MeeMee in a circle (the whole's drawn at 0.86), and the number track along the
@@ -314,19 +316,68 @@
     return gapPx;
   }
 
-  // ---------------------------------------------------------------- the equation
+  // ---------------------------------------------------------------- the equation (the number sentence; Equation card)
+  // show(a, b, w): MeeMee Rescue's "3 + 4 = 7", after a right answer. minus(w, t, r, gap) (0.8.0): "7 − 4 = 3" (the
+  // minus sign, U+2212), whole, then the part going, then what is left; gap 0, 1 or 2 puts the gap ring (84 across,
+  // moon-dim with a dashed mint rim) in that number's place while the question is asked, null none. fill(n): the
+  // gap's number arrives, and the ring becomes n. gap(): the ring's box in stage px { x, y, w, h } (where it is, or is
+  // moving to), or null, for a tile dropped on it. at('under' | 'ship', animate): its place, under the diagram
+  // (MW.LAYOUT.equation, as before) or under Scruffles (MW.LAYOUT.equationShip); animate moves it over 260 ms (the
+  // snap's ease-out), or with reduce motion it fades in at its new place. It logs 'equation' events for the tests.
   MW.equation = function (parent) {
+    const places = { under: L.equation, ship: L.equationShip };
     const e = L.equation;
     const el = abs(MW.make('div', 'mw-equation equation', { 'aria-live': 'polite' }), e.x, e.y);
     el.style.width = e.w + 'px'; el.style.height = e.h + 'px';
     parent.appendChild(el);
+    let where = 'under', ring = null;
+    // stop a move or a fade that is still going: the sentence is at its place at once
+    function settle() { el.classList.remove('is-moving', 'is-arriving'); el.style.transform = ''; }
     return {
       el: el,
       show: function (a, b, w) {
+        ring = null;
         el.innerHTML = '<span>' + a + '</span><span class="op">+</span><span>' + b + '</span><span class="op">=</span><span>' + w + '</span>';
         el.classList.add('is-shown');
       },
-      hide: function () { el.classList.remove('is-shown'); el.innerHTML = ''; }
+      hide: function () { ring = null; el.classList.remove('is-shown'); el.innerHTML = ''; },
+      minus: function (w, t, r, gap) {
+        const nums = [w, t, r], k = gap === 0 || gap === 1 || gap === 2 ? gap : null;
+        const part = function (i) { return i === k ? '<span class="mw-equation-gap"></span>' : '<span>' + nums[i] + '</span>'; };
+        el.innerHTML = part(0) + '<span class="op">\u2212</span>' + part(1) + '<span class="op">=</span>' + part(2);
+        ring = k === null ? null : el.querySelector('.mw-equation-gap');
+        el.classList.add('is-shown');
+        const said = nums.map(function (n, i) { return i === k ? '?' : n; });
+        MW.log('equation', 'minus ' + said[0] + '-' + said[1] + '=' + said[2]);
+      },
+      fill: function (n) {
+        if (!ring) return;
+        ring.parentNode.replaceChild(MW.make('span', null, null, String(n)), ring);
+        ring = null;
+        MW.log('equation', 'fill ' + n);
+      },
+      gap: function () {
+        if (!ring || !el.classList.contains('is-shown')) return null;
+        // measured inside the sentence, so a move still going (a transform on the whole sentence) doesn't change it
+        const b = places[where], s = MW.stage.scale || 1, er = el.getBoundingClientRect(), gr = ring.getBoundingClientRect();
+        if (!gr.width) return null;                           // its screen isn't showing
+        return { x: b.x + (gr.left - er.left) / s, y: b.y + (gr.top - er.top) / s, w: gr.width / s, h: gr.height / s };
+      },
+      at: function (name, animate) {
+        const to = name === 'ship' ? 'ship' : 'under', a = places[where], b = places[to];
+        where = to;
+        settle();
+        el.style.left = b.x + 'px'; el.style.top = b.y + 'px'; el.style.width = b.w + 'px'; el.style.height = b.h + 'px';
+        MW.log('equation', 'at ' + to);
+        if (!animate || a === b || !el.classList.contains('is-shown')) return;
+        void el.offsetWidth;                                  // start from the beginning, even straight after another
+        if (MW.reduceMotion) { el.classList.add('is-arriving'); return; }
+        // drawn where it was, then slides to its new place (its middle from one box's middle to the other's)
+        el.style.transform = 'translate(' + (a.x + a.w / 2 - b.x - b.w / 2) + 'px,' + (a.y + a.h / 2 - b.y - b.h / 2) + 'px)';
+        void el.offsetWidth;
+        el.classList.add('is-moving');
+        el.style.transform = '';
+      }
     };
   };
 

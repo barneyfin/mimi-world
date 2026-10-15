@@ -7,7 +7,8 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GAMES = ROOT / "games"
-PLANETS = 3                     # the map's planets: 0 ringed mint, 1 indigo, 2 small peach (kit/map.js)
+PLANETS = 5                     # the map's places: 0 ringed mint planet, 1 indigo planet, 2 small peach planet,
+                                # 3 the rocks in the asteroid belt, 4 the space station (kit/map.js; game.json's "planet")
 LEGACY = {"rescue"}             # older than the naming rules (prefixed line ids and screen ids)
 
 

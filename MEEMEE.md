@@ -1,6 +1,6 @@
 # MeeMee World
 
-Barney's maths and phonics games for a five-year-old, set in space with the family's three cats. MeeMee World is the set; each game is a planet on its home map. MeeMee Rescue (number bonds to 10) is the first game and the worked example for every game after it.
+Barney's maths and phonics games for a five-year-old, set in space with the family's three cats. MeeMee World is the set; each game takes a place on its home map. MeeMee Rescue (number bonds to 10) is the first game and the worked example for every game after it.
 
 This file holds the rules for every MeeMee World game. MeeMee World is a sibling of Barney's browser arcade, not part of it: it takes the arcade's way of working and its safety rules (ARCADE.md, in the Retro Games folder) and adapts them for a young child on a tablet. The kit's own docs (`README.md`, `CLAUDE.md` and the skill in `.claude/skills/meemee-world/`) add to these rules and never loosen them. If the two disagree, stop and ask Barney which wins. These rules change only when Barney decides.
 
@@ -46,5 +46,5 @@ One page holds every game (decided 10 October 2026): one bookmark, one approval 
 
 These are Barney's to decide. Raise them when they become relevant; don't settle them alone.
 
-- **More than three planets.** The map has room for three games. A fourth needs a new map layout.
+- **More than five places.** The map has five places: three planets, a cluster of rocks in the asteroid belt and a space station (decided 15 October 2026). A game takes one; the rest stay locked and say so when tapped. A sixth needs a new map layout.
 - **Progress across tablets.** Kept separately on each tablet for now; sharing it would need an account or a sync, which the "nothing leaves the tablet" rule rules out today.

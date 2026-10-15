@@ -1,7 +1,7 @@
 /* MeeMee World kit: the world shell (phase 5; title banners from 0.6.0).
    What every game shares, so a game is only its own play:
-     the start screen (Play: sound and full screen start on that first tap), the home map with a planet for each game,
-     the title banners (the set's name as the map first opens, a game's as its planet is tapped), the crew screen,
+     the start screen (Play: sound and full screen start on that first tap), the home map with a place for each game,
+     the title banners (the set's name as the map first opens, a game's as its place is tapped), the crew screen,
      pausing (grown-ups area open, tablet upright, screen off), the grown-ups area, and updates.
    One page holds every game (decided 10 October). A game joins by calling MW.world.game({...}) when its script loads;
    its folder's game.json (read by the build, here as MW_GAMES) says its name, planet, badge and spoken name.
@@ -211,10 +211,13 @@
       W.home();
     }
   }
+  // A place with no game yet: "That place isn't ready yet." (0.8.0). While that line is still pending, the older
+  // "That planet isn't ready yet." says it instead, so a tap is never silent (checked before the call: say() skips a
+  // line that isn't recorded, and stops whatever was being said first).
   function notReady() {
     if (st.phase !== 'map' || st.paused) return;
     MW.log('map', 'locked');
-    W.speak([['map-not-ready']]);
+    W.speak([[MW.audio.recorded('map-place-not-ready') ? 'map-place-not-ready' : 'map-not-ready']]);
   }
   // The crew screen: "Let's give the crew their jobs!" The player drags each cat onto a job.
   function openCrew() {

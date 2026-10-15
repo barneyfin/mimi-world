@@ -5,6 +5,7 @@ the template, and the build must say so. The real games must pass.
 """
 import json
 import pathlib
+import re
 import shutil
 import sys
 import tempfile
@@ -62,11 +63,18 @@ def append(path, text):
 def main():
     real = G.load()
     if not FREE:
-        print("Every planet has a game, so the template can't be added to test the build's checks.")
-        print("A fourth game needs a new map layout first (MEEMEE.md, Open decisions).")
+        print("Every place on the map has a game, so the template can't be added to test the build's checks.")
+        print("A sixth game needs a new map layout first (MEEMEE.md, Open decisions).")
         sys.exit(0)
     p = problems_for(real)
     check("the real games pass the build's checks", not p, "; ".join(p[:3]))
+
+    # 0.8.0: the map has five places, and its drawing (design/gen_scenes.py), its buttons (kit/map.js) and the build
+    # (tools/games.py) agree on them
+    drawn = [(x, y) for x, y, _, _ in gen_scenes.MAP["planets"]] + [(x, y) for x, y, _ in gen_scenes.MAP["places"]]
+    buttons = [(int(x), int(y)) for x, y in re.findall(r"\{ x: (\d+), y: (\d+), tap:", (ROOT / "kit" / "map.js").read_text(encoding="utf-8"))]
+    check("the map has five places, at the same positions in its drawing and its buttons", G.PLANETS == 5 and drawn == buttons and len(drawn) == 5,
+          json.dumps([G.PLANETS, drawn, buttons]))
 
     cases = [
         ("a renamed copy of the template passes", None, None),
@@ -84,7 +92,8 @@ def main():
         ("a game playing sound itself", lambda d: append(d / "game.js", "\nconst ctx = new AudioContext();\n"), "plays sound itself"),
         ("a game using speech synthesis", lambda d: append(d / "game.js", "\nspeechSynthesis.speak(x);\n"), "plays sound itself"),
         ("an id that isn't the folder's name", lambda d: edit_json(d / "game.json", id="other"), "but the folder is"),
-        ("a planet that isn't on the map", lambda d: edit_json(d / "game.json", planet=5), "planet must be"),
+        ("a planet that isn't on the map (5: a sixth place, after the rocks and the station)", lambda d: edit_json(d / "game.json", planet=5), "planet must be 0 to 4"),
+        ("a planet that isn't a number", lambda d: edit_json(d / "game.json", planet="3"), "planet must be 0 to 4"),
         ("a planet another game has", lambda d: edit_json(d / "game.json", planet=0), "already rescue's"),
         ("a badge that isn't a drawing", lambda d: edit_json(d / "game.json", badge="nothing"), "badge"),
         ("a spoken name that isn't a line", lambda d: edit_json(d / "game.json", say="nothing"), "say"),
@@ -108,6 +117,22 @@ def main():
                 check(f"build: {label}", not p, "; ".join(p[:3]))
             else:
                 check(f"build: {label} stops the build", any(expect in x for x in p), "; ".join(p[:2]) or "no problem found")
+
+    # 0.8.0: a game can take the rocks (3) or the station (4), while they are free; two games can't share a place
+    for place, what in ((3, "the rocks"), (4, "the station")):
+        if place not in FREE:
+            check(f"build: a game on place {place} ({what}) builds", True, f"skipped: place {place} has a game")
+            continue
+        with tempfile.TemporaryDirectory() as tmp:
+            d = copy_template(tmp, edit=lambda d: edit_json(d / "game.json", planet=place))
+            p = problems_for(real + [G.load_folder(d)])
+            check(f"build: a game on place {place} ({what}) builds", not p, "; ".join(p[:3]))
+    with tempfile.TemporaryDirectory() as tmp:
+        place = FREE[-1]
+        one = copy_template(tmp, "probe", lambda d: edit_json(d / "game.json", planet=place))
+        two = copy_template(tmp, "probetwo", lambda d: edit_json(d / "game.json", planet=place))
+        p = problems_for(real + [G.load_folder(one), G.load_folder(two)])
+        check(f"build: two new games on one place ({place}) stops the build", any(f"planet {place} is already probe's" in x for x in p), "; ".join(p[:2]) or "no problem found")
 
     # things that look a bit like colours or sound, but aren't: the build must not complain
     harmless = """

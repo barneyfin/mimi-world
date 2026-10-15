@@ -18,6 +18,14 @@
       "how": "Gentle, no disappointment."
     },
     {
+      "id": "map-place-not-ready",
+      "game": "MeeMee World",
+      "group": "Map",
+      "words": "That place isn't ready yet.",
+      "how": "Gentle, a little sorry; the end of the sentence.",
+      "pending": true
+    },
+    {
       "id": "crew-jobs",
       "game": "MeeMee World",
       "group": "Crew",

@@ -12,7 +12,7 @@ Use token names only (as classes `f-<token>` fill, `s-<token>` stroke, `bg-<toke
 
 - `night` is the ground of every screen; `night-raised` and `night-button` are one and two steps up (panels, nav buttons).
 - `mint` is the maths' structure: lines and rims of the diagram, pill rims, the current star, focus rings, halos that say "tap me". Not for decoration.
-- `peach` is action and reward: Play and Hear-again buttons, earned stars, the success ring, `+` and `=`. `peach-dark` is its pressed shadow.
+- `peach` is action and reward: Play and Hear-again buttons, earned stars, the success ring, `+`, `−` and `=`. `peach-dark` is its pressed shadow.
 - `moon` holds numbers and words: filled circles, pills and cards, with text in `numeral`. Something still waiting for its answer is `moon-dim` with a dashed rim.
 - `mimi` (lilac) is the MeeMee and nothing else, apart from lilac galaxies.
 - The cats' colours (`scruffles-grey…`, `moggles-black`, `cat-white` and their eyes and noses) are for the cats only.
@@ -24,15 +24,17 @@ Use token names only (as classes `f-<token>` fill, `s-<token>` stroke, `bg-<toke
 
 Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l* and *1* clearly different. Bold for anything the child sees.
 
-- For the child: `numeral-whole` (140 px), `equation` (64 px), `numeral-part` (52 px, also on a number tile), `numeral-sign` (84 px, on a numbered MeeMee's sign). A phonics game sets its letters and words in Andika at a similar size, in `numeral` on `moon`. Andika stays for letters too (decided 10 October 2026); check its letter shapes against the child's reading book when the game is played (MEEMEE.md, Rules).
+- For the child: `numeral-whole` (140 px), `equation` (64 px, the number sentence), `numeral-part` (52 px, also on a number tile), `numeral-sign` (84 px, on a numbered MeeMee's sign). A phonics game sets its letters and words in Andika at a similar size, in `numeral` on `moon`. Andika stays for letters too (decided 10 October 2026); check its letter shapes against the child's reading book when the game is played (MEEMEE.md, Rules).
 - The kit's title banners are the only other words the child sees: the set's or a game's name, for about 2 seconds while it is spoken, in `banner` (Andika bold, 84 px) in `numeral` on a `moon` plaque with an 8 px `mint` rim, a 4 px `ink` edge and a solid `ink` shadow, centred with its top at 292, the game's badge at its left (design system, TitleBanner). The kit shows them from each `game.json`; a game doesn't. Draw a game's badge in a 100 × 100 box, filling it as the template's star does: the banner shows it at 112 px.
 - For grown-ups: `title` (30), `button-label` (22), `body` (19), `label` (17).
+- **The number sentence** (Equation card; `MW.equation`): numbers in `moon`, `+`, `−` and `=` in `peach`, 22 px apart. The minus is the minus sign (U+2212), never a hyphen. A subtraction reads whole, then the part going, then what is left (7 − 4 = 3). Its **gap**, where the answer goes while the question is asked, is a tile-sized ring (84 across) of `moon-dim` with a 5 px dashed `mint` rim, and can sit in any of its three places. Its usual place is under the diagram (left 180, top 700, 400 × 80); during a question with the number track at the bottom it sits under Scruffles (left 790, top 528, 440 × 100).
 
 ## Size and layout
 
 - Every screen is drawn on a 1280 × 800 stage and scaled to fit the tablet (0.82 on the Fire, 1.0 on the Doogee). Lay things out in stage pixels; never reflow.
 - On the Fire, 80 stage px is about 11 mm. Anything tapped is at least `button-nav` (84 px); anything dragged is drawn at about `mimi-size` (80) inside a `mimi-grab` (120) area. Nothing tapped sits closer than `space-m` (24) to the edge.
 - Fixed places on every game screen (the kit puts them there): Home top-left (24, 20); Music top-right (1172, 26, or 1052 when Hear-again is there); Hear-again (1160, 20); progress stars top-centre (five from 517, 34: centred on 640 for any other number, `MW.stars(…, { centre: true })`); the grown-ups lock bottom-left (24, 732). Keep these corners clear.
+- **The home map** (SolarMap card) has five places, and each game takes one: 0 the ringed mint planet, 1 the indigo planet, 2 the small peach planet, 3 a cluster of four big rocks at the bottom of the asteroid belt (the tray's rock drawn small, in the `asteroid` colours, with a `spark`), 4 a space station on the outer orbit above the big central planet (a `moon` hub with a window band, two `planet-indigo` solar wings, a `spark` antenna light, all outlined in `ink`). A place with a game is in full colour with a soft `mint` halo and its badge; one still to come is dimmed (a planet to 45%, the rocks and the station to 62%) with a `text-3` lock badge, and says "That place isn't ready yet." when tapped. Every place's tap area is at least 120 across, whatever its drawn size; the rocks and the station 240, so a tap anywhere on their drawing is heard (decided 15 October 2026). A new game takes a free place; existing places never move.
 - The child's hand comes from the right, so put what they drag from on the right and the thing being worked on (the maths, the word) on the left, where a hand won't cover it. Scruffles's ship usually sits top-right (`MW.LAYOUT.pod`: 830, 70, 400 wide).
 
 ## Characters and drawings
@@ -51,7 +53,7 @@ Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l*
 - A dragged thing grows to 1.12 and lifts on a soft shadow; one finger drags at a time.
 - Success: the ring (450 ms), sparkles (`MW.sparkles`: grow in 300 ms, gone by 1.2 s), Scruffles's got-it face, the ship's lights (about 4 s), a chime.
 - A hop (`mw-hop`, 420 ms) is the one way something bounces for attention.
-- A title banner fades and grows in over 260 ms, stays for its line and at least 2 seconds, and fades out over 260 ms. The number track slides down out of sight and back over 260 ms. A dragged number tile grows to 1.1 and tilts 5 degrees; a numbered MeeMee pops up to carry a right answer (260 ms, the snap's timing). With reduce motion each is a fade. A title banner shows only when its line is recorded: never a silent banner.
+- A title banner fades and grows in over 260 ms, stays for its line and at least 2 seconds, and fades out over 260 ms. The number track slides down out of sight and back over 260 ms, and the number sentence moves between its two places over 260 ms (the snap's ease-out). A dragged number tile grows to 1.1 and tilts 5 degrees; a numbered MeeMee pops up to carry a right answer (260 ms, the snap's timing). With reduce motion each is a fade. A title banner shows only when its line is recorded: never a silent banner.
 - Nothing bigger than a character flashes more than 3 times a second; small lights may flash up to 3 times a second, and anything else repeating takes at least a second per cycle; the whole screen never flashes.
 - Reduce motion (`MW.reduceMotion` and the CSS media query): movement becomes a fade or an instant change; flashing lights stay steadily lit.
 

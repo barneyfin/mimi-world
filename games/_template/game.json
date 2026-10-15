@@ -5,5 +5,5 @@
   "badge": "starter-badge",
   "say": "starter-name",
   "scripts": ["game.js"],
-  "about": "Copy this folder to games/<id>/ and change every 'starter' to the new id. planet: 0 ringed mint (MeeMee Rescue's), 1 indigo, 2 small peach; badge: the drawing on the planet's badge; say: the line said when the planet is tapped; scripts: the game's code, in loading order."
+  "about": "Copy this folder to games/<id>/ and change every 'starter' to the new id. planet: its place on the map, one no other game has: 0 the ringed mint planet (MeeMee Rescue's), 1 the indigo planet (MeeMee Rockets'), 2 the small peach planet, 3 the rocks in the asteroid belt, 4 the space station; badge: the drawing on the place's badge; say: the line said when the place is tapped; scripts: the game's code, in loading order."
 }

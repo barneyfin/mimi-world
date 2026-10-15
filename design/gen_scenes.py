@@ -14,12 +14,16 @@ def sky(uid="sky"):
     return '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true">' + sky_art(uid) + '</svg>'
 
 
-# The home map (phase 4; a planet per game from phase 5): where things sit on the 1280 x 800 stage. kit/map.js puts
-# its buttons over these. A game names its planet (0, 1 or 2) in its game.json.
+# The home map (phase 4; a planet per game from phase 5; five places from 0.8.0): where things sit on the 1280 x 800
+# stage. kit/map.js puts its buttons over these. A game names its place (0 to 4) as "planet" in its game.json: the
+# three planets first, then the places that aren't planets (decided 15 October 2026, mock-up rounds 10 and 11).
 MAP = {
     "planets": [(330, 300, 58, "mint"),       # 0: the ringed mint planet with a moon (MeeMee Rescue)
-                (1010, 560, 46, "indigo"),    # 1
-                (1150, 250, 30, "peach")],    # 2
+                (1010, 560, 46, "indigo"),    # 1: the indigo planet (MeeMee Rockets)
+                (1150, 250, 30, "peach")],    # 2: the small peach planet
+    "places": [(690, 628, "asteroids"),       # 3: a cluster of big rocks at the bottom of the asteroid belt
+               (860, 182, "station")],        # 4: a space station on the outer orbit, above the big planet
+    "clear": {"asteroids": 130, "station": 120},   # the belt's dots keep this far from each place
     "sun": (640, 430, 64),
     "crew_spot": (250, 598),
 }
@@ -27,7 +31,8 @@ MAP = {
 
 def map_art(uid="map", taken=(0,)):
     """The home map: an alien solar system. Its own night ground, so it covers the game screens' sky.
-    taken: the planets that have a game, drawn lit with a halo; the others are dimmed (still to come)."""
+    taken: the places that have a game, drawn lit with a halo; the others are dimmed (still to come): a planet to 45%,
+    the rocks and the station to 62%."""
     sky = (nebula() + starfield(21, 110, [(180, 150, 940, 560)]) + galaxy(1130, 90, 20, 0.8, "lilac", 4)
            + galaxy(140, 120, -24, 0.62, "peach", 6) + galaxy(150, 700, -30, 0.7, "mint", 9)
            + cross_star(860, 90, 0.8) + cross_star(470, 700, 0.7) + spark(1230, 420, 0.7) + spark(70, 330, 0.6))
@@ -41,6 +46,8 @@ def map_art(uid="map", taken=(0,)):
         y = sy + 190 * math.sin(a) + (4 if i % 2 == 0 else -3)
         if 140 < x < 520 and 330 < y < 600:
             continue                           # the crew's corner stays clear
+        if any(math.hypot(x - px, y - py) < MAP["clear"][kind] for px, py, kind in MAP["places"]):
+            continue                           # and so do the rocks and the station
         belt += f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{3 + (i * 7 % 5)}" fill="@{"asteroid" if i % 2 else "planet-indigo-light"}"/>'
     cx, cy = MAP["crew_spot"]
 
@@ -56,19 +63,84 @@ def map_art(uid="map", taken=(0,)):
         x, y, r, ramp = MAP["planets"][i]
         return planet(x, y, r, ramp, f"{uid}-l{k}", bands=6 if r > 40 else 5, craters=[(0.2, -0.3, 0.14)] if r > 40 else ())
 
-    empty = [i for i in range(len(MAP["planets"])) if i not in taken]
+    # the places that aren't planets (3 and 4): lit as a planet is, with a mint halo, or dimmed to 62%
+    places_dim, places_lit = "", ""
+    for k, (x, y, kind) in enumerate(MAP["places"]):
+        pic = asteroid_cluster(x, y) if kind == "asteroids" else station(x, y)
+        if len(MAP["planets"]) + k in taken:
+            places_lit += tok(f'<circle cx="{x}" cy="{y}" r="104" fill="none" stroke="@mint" stroke-width="10" opacity="0.3"/>') + pic
+        else:
+            places_dim += pic
+
+    planets = range(len(MAP["planets"]))
+    empty = [i for i in planets if i not in taken]
     return (
         '<svg width="1280" height="800" viewBox="0 0 1280 800" aria-hidden="true">'
         + tok('<rect width="1280" height="800" fill="@night"/>') + sky
         + tok(orbits + belt
               + f'<circle cx="{sx}" cy="{sy}" r="112" fill="@peach" opacity="0.10"/><circle cx="{sx}" cy="{sy}" r="86" fill="@peach" opacity="0.16"/>')
         + planet(sx, sy, sr, "peach", f"{uid}-sun", bands=6)
-        + "".join(lit(i) for i in sorted(taken))
+        + "".join(lit(i) for i in sorted(taken) if i in planets)
         + ('<g opacity="0.45">' + "".join(dim(k, i) for k, i in enumerate(empty)) + '</g>' if empty else '')
+        + ('<g opacity="0.62">' + places_dim + '</g>' if places_dim else '') + places_lit
         + tok(f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="@mint" opacity="0.12"/>'
               f'<ellipse cx="{cx}" cy="{cy}" rx="210" ry="26" fill="none" stroke="@mint" stroke-width="3" stroke-dasharray="2 12" '
               'stroke-linecap="round" opacity="0.7"/>')
         + '</svg>'
+    )
+
+
+# The map's two places that aren't planets (0.8.0; the design system's SolarMap, mock-up rounds 10 and 11).
+ROCK = "M30 120 C 20 60, 90 20, 170 28 C 250 14, 350 30, 375 90 C 398 150, 362 210, 280 214 C 200 226, 110 222, 60 200 C 30 186, 34 160, 30 120 Z"
+
+
+def rock(cx, cy, w, h, rot, craters=()):
+    """One small asteroid: shaded underside, lit top, a crater or two, ink outline (the tray's rock, small)."""
+    sx, sy = w / 400, h / 232
+    t = f'translate({cx - w / 2:.1f} {cy - h / 2:.1f}) rotate({rot} {w / 2:.1f} {h / 2:.1f})'
+    body = (f'<g transform="{t}">'
+            f'<path transform="scale({sx:.4f} {sy:.4f})" d="{ROCK}" fill="@asteroid-crater"/>'
+            f'<path transform="translate({-w * 0.03:.1f} {-h * 0.07:.1f}) scale({sx * 0.94:.4f} {sy * 0.86:.4f})" d="{ROCK}" fill="@asteroid"/>'
+            f'<path transform="translate({w * 0.12:.1f} {h * 0.06:.1f}) scale({sx * 0.62:.4f} {sy * 0.3:.4f})" d="{ROCK}" fill="@asteroid-light" opacity="0.8"/>')
+    for (dx, dy, r) in craters:
+        body += (f'<ellipse cx="{w * dx:.1f}" cy="{h * dy:.1f}" rx="{r:.1f}" ry="{r * 0.62:.1f}" fill="@asteroid-deep"/>'
+                 f'<path d="M{w * dx - r:.1f} {h * dy:.1f} A{r:.1f} {r * 0.62:.1f} 0 0 0 {w * dx + r:.1f} {h * dy:.1f}" fill="none" stroke="@asteroid-light" stroke-width="1.5"/>')
+    body += f'<path transform="scale({sx:.4f} {sy:.4f})" d="{ROCK}" fill="none" stroke="@ink" stroke-width="{3.5 / sx:.1f}"/></g>'
+    return body
+
+
+def asteroid_cluster(cx, cy):
+    """A cluster of big rocks in the belt: a future asteroid game's place on the map."""
+    k = 1.55
+    return tok(rock(cx - 50 * k, cy + 16 * k, 44 * k, 30 * k, -12, [(0.6, 0.55, 6)])
+               + rock(cx + 6 * k, cy - 6 * k, 78 * k, 50 * k, 6, [(0.35, 0.5, 9), (0.7, 0.62, 6)])
+               + rock(cx + 56 * k, cy - 34 * k, 32 * k, 22 * k, 24, [(0.5, 0.55, 4.5)])
+               + rock(cx + 50 * k, cy + 30 * k, 26 * k, 18 * k, -20)
+               + spark(cx - 30 * k, cy - 36 * k, 0.6))
+
+
+def station(x, y, k=1.35):
+    """A small space station: a round hub with windows, two solar wings and an antenna light."""
+    return f'<g transform="translate({x} {y}) scale({k})">' + _station(0, 0) + '</g>'
+
+
+def _station(cx, cy):
+    wing = lambda x0: (f'<rect x="{x0}" y="{cy - 15}" width="40" height="30" rx="3" fill="@planet-indigo" stroke="@ink" stroke-width="3.5"/>'
+                       + "".join(f'<path d="M{x0 + k * 10} {cy - 13} V{cy + 13}" stroke="@planet-indigo-light" stroke-width="2" opacity="0.8"/>' for k in (1, 2, 3))
+                       + f'<path d="M{x0 + 2} {cy} H{x0 + 38}" stroke="@planet-indigo-light" stroke-width="2" opacity="0.8"/>')
+    return tok(
+        f'<path d="M{cx - 66} {cy} H{cx + 66}" stroke="@ink" stroke-width="9" stroke-linecap="round"/>'
+        f'<path d="M{cx - 66} {cy} H{cx + 66}" stroke="@asteroid-light" stroke-width="4" stroke-linecap="round"/>'
+        + wing(cx - 86) + wing(cx + 46)
+        + f'<path d="M{cx} {cy - 24} V{cy - 42}" stroke="@ink" stroke-width="3.5" stroke-linecap="round"/>'
+        f'<circle cx="{cx}" cy="{cy - 45}" r="4.5" fill="@spark" stroke="@ink" stroke-width="2.5"/>'
+        f'<ellipse cx="{cx}" cy="{cy + 6}" rx="34" ry="10" fill="@night-button" stroke="@ink" stroke-width="3.5"/>'
+        f'<circle cx="{cx}" cy="{cy}" r="24" fill="@moon" stroke="@ink" stroke-width="4"/>'
+        f'<path d="M{cx - 24} {cy + 2} A24 24 0 0 0 {cx + 24} {cy + 2} A24 10 0 0 1 {cx - 24} {cy + 2} Z" fill="@white-shade"/>'
+        + f'<rect x="{cx - 22}" y="{cy - 5}" width="44" height="9" fill="@night-raised"/>'
+        + "".join(f'<path d="M{cx + dx} {cy - 5} V{cy + 4}" stroke="@moon" stroke-width="2.5"/>' for dx in (-14, -5, 4, 13))
+        + f'<path d="M{cx - 24} {cy - 5} H{cx + 24} M{cx - 24} {cy + 4} H{cx + 24}" stroke="@ink" stroke-width="2"/>'
+        + f'<path d="M{cx - 17} {cy - 14} A20 20 0 0 1 {cx - 4} {cy - 20}" fill="none" stroke="@highlight" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>'
     )
 
 
@@ -105,7 +177,7 @@ def spark_svg():
 def templates(taken=(0,), extra=None):
     """Every drawing the kit clones at run time, as <template id="art-NAME"> elements.
     MW.art gives each copy's ids (clip paths) a number of its own, so a drawing can be on screen more than once.
-    taken: the map's planets that have a game. extra: the games' own drawings, {name: svg}."""
+    taken: the map's places that have a game. extra: the games' own drawings, {name: svg}."""
     return "\n".join(f'<template id="art-{k}">{v}</template>' for k, v in art_dict(taken, extra).items())
 
 

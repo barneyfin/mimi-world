@@ -1,6 +1,7 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
 game; 0.7.0: autumn 2, the half-term switch, capitals), the kit (0.6.0: the title banners, the store, stars, pick-up boxes,
-numbers mode's pieces) and MeeMee Rescue's numbers mode (0.6.0), on Fire and Doogee screen sizes.
+numbers mode's pieces; 0.8.0: the map's five places and the minus sentence) and MeeMee Rescue's numbers mode (0.6.0), on
+Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -1081,30 +1082,78 @@ async def test_carryover(p):
 TPL_PORT = 8793
 
 
+# The shapes that draw place i on the map (0.8.0): a planet by its clip circle; the rocks by the rock groups (each with
+# its shaded underside) and the sparkle within place 3's tap area; the station by its group at place 4's middle.
+SHAPES_JS = """const L = MW.LAYOUT.map.planets, svg = document.querySelector('#screen-map > svg.mw-layer'), k = MW.stage.scale;
+    const mid = e => { const r = e.getBoundingClientRect(); return [(r.left + r.width / 2 - MW.stage.offX) / k, (r.top + r.height / 2 - MW.stage.offY) / k]; };
+    const near = (e, p) => { const m = mid(e); return Math.hypot(m[0] - p.x, m[1] - p.y) < p.tap / 2; };
+    const GEO = 'path, rect, circle, ellipse';
+    const shapes = i => { const p = L[i];
+        if (i === 3) return Array.from(svg.querySelectorAll('g[transform*=" rotate("]')).filter(g => g.querySelector('.f-asteroid-crater') && near(g, p))
+            .reduce((a, g) => a.concat(Array.from(g.querySelectorAll(GEO))), []).concat(Array.from(svg.querySelectorAll('path.f-spark')).filter(e => near(e, p)));
+        if (i === 4) { const g = svg.querySelector('g[transform^="translate(' + p.x + ' ' + p.y + ')"]'); return g ? Array.from(g.querySelectorAll(GEO)) : []; }
+        return Array.from(svg.querySelectorAll('clipPath circle')).filter(c => +c.getAttribute('cx') === p.x && +c.getAttribute('cy') === p.y); };"""
+# Each place on the map as drawn and as buttons (0.8.0): whose game it has, its tap area, whether it is lit with a mint
+# halo and its badge, or dimmed with its lock badge.
+PLACES_INFO = """(() => { """ + SHAPES_JS + """
+    const dimmed = e => !!e.closest('g[opacity="0.45"], g[opacity="0.62"]'), at = (e, p) => +e.getAttribute('cx') === p.x && +e.getAttribute('cy') === p.y;
+    const box = e => [e.offsetLeft, e.offsetTop, e.offsetWidth, e.offsetHeight];
+    const buttons = Array.from(document.querySelectorAll('#screen-map .mw-planet'));
+    const locks = Array.from(document.querySelectorAll('#screen-map .mw-planet-lock')).map(box);
+    const badges = Array.from(document.querySelectorAll('#screen-map .mw-planet-badge')).map(box);
+    const same = (b, q) => b[0] === q.x && b[1] === q.y && b[2] === q.d && b[3] === q.d;
+    return L.map((p, i) => { const d = shapes(i), g = MW.world.games.find(g => g.planet === i);
+        return { i: i, game: g ? g.name : null, label: buttons[i].getAttribute('aria-label'), tap: box(buttons[i]),
+                 lit: d.length > 0 && !d.some(dimmed), dim: d.length > 0 && d.every(dimmed),
+                 halo: Array.from(svg.querySelectorAll('circle.s-mint[stroke-width="10"][opacity="0.3"]')).filter(c => at(c, p) && !dimmed(c)).length,
+                 badge: badges.some(b => same(b, p.badge)), lock: locks.some(b => same(b, p.lock)) }; }); })()"""
+
+
+def place_ok(info, game):
+    """A place with a game: lit, a mint halo and its badge, no lock. One without: dimmed, its lock, no halo or badge."""
+    if game:
+        return info["game"] == game and info["label"] == game and info["lit"] and info["halo"] == 1 and info["badge"] and not info["lock"]
+    return info["game"] is None and info["label"] == "A place that isn't ready yet" and info["dim"] and info["halo"] == 0 and info["lock"] and not info["badge"]
+
+
 async def test_template(p):
+    """The starter game on each free place in turn (0.8.0: the small peach planet, the rocks and the station, while they
+    are free). The first keeps the names its checks had before."""
     print("\n== a new game joins the world (the template) ==")
-    import shutil
-    import subprocess
     sys.path.insert(0, str(ROOT / "tools"))
     import games as G
     taken = {g.get("planet") for g in G.load()}
     free = [i for i in range(G.PLANETS) if i not in taken]
     if not free:
-        check("template: a new game joins the world", True, "skipped: every planet has a game")
+        check("template: a new game joins the world", True, "skipped: every place has a game")
         return
     here = pathlib.Path(__file__).resolve().parent
-    out, src = here / "serve-template", here / "serve-template-src" / "starter"
+    out = here / "serve-template"
+    out.mkdir(exist_ok=True)
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", TPL_PORT), functools.partial(Quiet, directory=str(out)))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        for k, place in enumerate(free):
+            await template_on(p, G, taken, place, "template" if k == 0 else f"template (place {place})", here, out)
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+async def template_on(p, G, taken, place, label, here, out):
+    import shutil
+    import subprocess
+    first = label == "template"
+    src = here / "serve-template-src" / "starter"
     if src.parent.exists():
         shutil.rmtree(src.parent)
     shutil.copytree(ROOT / "games" / "_template", src, ignore=shutil.ignore_patterns("__pycache__"))
     gj = json.loads((src / "game.json").read_text(encoding="utf-8"))
-    gj["planet"] = free[0]
+    gj["planet"] = place
     (src / "game.json").write_text(json.dumps(gj), encoding="utf-8")
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "build.py"), "--no-audio", "--out", str(out), "--extra-game", str(src)],
                        capture_output=True, text=True)
-    check("template: builds into a test copy with no problems", r.returncode == 0 and "Starter game" in r.stdout, (r.stdout + r.stderr)[-300:])
-    srv = http.server.ThreadingHTTPServer(("127.0.0.1", TPL_PORT), functools.partial(Quiet, directory=str(out)))
-    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    check(f"{label}: builds into a test copy with no problems", r.returncode == 0 and "Starter game" in r.stdout, (r.stdout + r.stderr)[-300:])
     browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
     ctx = await browser.new_context(viewport={"width": 1046, "height": 653}, device_scale_factor=1.22, has_touch=True, is_mobile=True)
     page = await ctx.new_page()
@@ -1119,42 +1168,46 @@ async def test_template(p):
     await t.wait_screen("screen-map")
     planets = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-planet')).map(b => b.getAttribute('aria-label'))")
     locks = await page.evaluate("document.querySelectorAll('#screen-map .mw-planet-lock').length")
-    check("template: its planet is on the map, MeeMee Rescue's is still first, the rest still to come",
-          planets[0] == "MeeMee Rescue" and planets[free[0]] == "Starter game" and locks == G.PLANETS - len(taken) - 1, json.dumps([planets, locks]))
+    check(f"{label}: its planet is on the map, MeeMee Rescue's is still first, the rest still to come",
+          planets[0] == "MeeMee Rescue" and planets[place] == "Starter game" and locks == G.PLANETS - len(taken) - 1, json.dumps([planets, locks]))
+    info = await page.evaluate(PLACES_INFO)
+    others = [i for i in range(G.PLANETS) if i not in taken and i != place]
+    check(f"{label}: its place ({place}) shows its badge and a mint halo; the other free places ({', '.join(map(str, others))}) stay dimmed with their locks",
+          place_ok(info[place], "Starter game") and all(place_ok(info[i], None) for i in others), json.dumps([info[place]] + [info[i] for i in others]))
     await asyncio.sleep(1.2)
-    await page.screenshot(path=str(SHOTS / "template-1-map.png"))
-    pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % free[0])
+    await page.screenshot(path=str(SHOTS / ("template-1-map.png" if first else f"template-place{place}-map.png")))
+    pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % place)
     await t.tap(pl["x"], pl["y"])
     ok = await t.wait_screen("screen-starter-play", 2)
     said = await t.said()
-    check("template: tapping its planet opens its screen (its name isn't recorded yet, so no banner: straight away)",
+    check(f"{label}: tapping its planet opens its screen (its name isn't recorded yet, so no banner: straight away)",
           ok and await page.evaluate("[MW.audio.recorded('starter-name'), MW.events.some(e => e.type === 'banner' && e.detail === 'up Starter game')]") == [False, False],
           str(said[-3:]))
     await asyncio.sleep(0.3)
-    await page.screenshot(path=str(SHOTS / "template-2-screen.png"))
+    if first:
+        await page.screenshot(path=str(SHOTS / "template-2-screen.png"))
     for _ in range(3):
         await t.tap(640, 400)
         await asyncio.sleep(0.25)
     back = await t.wait_screen("screen-map", 5)
-    check("template: three taps on the star finish it and go home", back and await page.evaluate("MW.store.game('starter').rounds") == 1)
+    check(f"{label}: three taps on the star finish it and go home", back and await page.evaluate("MW.store.game('starter').rounds") == 1)
     await asyncio.sleep(0.5)
     await t.tap(pl["x"], pl["y"])
     await t.wait_screen("screen-starter-play")
     await t.tap(66, 62)
-    check("template: Home on its screen goes back to the map", await t.wait_screen("screen-map", 5))
+    check(f"{label}: Home on its screen goes back to the map", await t.wait_screen("screen-map", 5))
     await asyncio.sleep(0.5)
     rp = await page.evaluate("MW.LAYOUT.map.planets[0]")
     await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
     await t.tap(rp["x"], rp["y"])
     s = await t.wait_phase(["asking", "open"])
-    check("template: MeeMee Rescue still plays beside it", s["screen"] == "screen-game", json.dumps(s))
+    check(f"{label}: MeeMee Rescue still plays beside it", s["screen"] == "screen-game", json.dumps(s))
     await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('starter-progress')")
     await asyncio.sleep(0.3)
     text = await page.inner_text(".gu-body")
-    check("template: its tab in the grown-ups area shows its saved data", "Rounds finished on this tablet: 1." in text, text[:80])
-    check("template: no console errors", not problems, "; ".join(problems[:3]))
+    check(f"{label}: its tab in the grown-ups area shows its saved data", "Rounds finished on this tablet: 1." in text, text[:80])
+    check(f"{label}: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
-    srv.shutdown()
 
 
 # ---------------------------------------------------------------- MeeMee Rockets (games/words): the tricky-words game
@@ -4671,6 +4724,411 @@ async def test_numbers_decided(p, name, vw, vh, dpr):
     await browser.close()
 
 
+# ---------------------------------------------------------------- 0.8.0: the map's five places, and the minus sentence
+STUB_PLACE_LINE = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
+    MW.audio.recorded = id => id === 'map-place-not-ready' || window.__recorded(id); })()"""
+UNSTUB_PLACE_LINE = "(() => { if (window.__recorded) { MW.audio.recorded = window.__recorded; delete window.__recorded; } })()"
+
+
+async def tap_said(t, sx, sy):
+    """Tap a point on the map; the lines said because of it, and the screen afterwards."""
+    n = len(await t.said())
+    await t.tap(sx, sy)
+    await asyncio.sleep(0.5)
+    return (await t.said())[n:], await t.page.evaluate("MW.shell.screen")
+
+
+# Taps the review found silent when the rocks' and the station's tap areas were 170 across (0.8.0): the station's wing
+# ends and the outer rocks. With 240 (Barney, 15 October 2026) a tap anywhere on their drawings is heard.
+FAR_TAPS = {3: [(590, 652), (605, 660), (780, 676)], 4: [(750, 182), (972, 190)]}
+# Where taps on each place's drawing land: every shape's outline sampled along its length (and the outer edge of its ink
+# outline), each landing on the place's button, its badge or its lock, or on something else; and the drawing's left,
+# right, top and bottom ends. owner() names what a tap at a stage point lands on.
+REACH_JS = """(places => { """ + SHAPES_JS + """
+    const buttons = document.querySelectorAll('#screen-map .mw-planet');
+    const owner = (x, y) => { const e = document.elementFromPoint(MW.stage.offX + x * k, MW.stage.offY + y * k);
+        const b = e && e.closest('.mw-planet, .mw-planet-badge, .mw-planet-lock, button');
+        if (!b) return 'nothing';
+        const i = Array.prototype.indexOf.call(buttons, b);
+        if (i >= 0) return 'place ' + i;
+        for (let j = 0; j < L.length; j++) {
+            if (b.classList.contains('mw-planet-badge') && b.offsetLeft === L[j].badge.x && b.offsetTop === L[j].badge.y) return 'place ' + j + ' badge';
+            if (b.classList.contains('mw-planet-lock') && b.offsetLeft === L[j].lock.x && b.offsetTop === L[j].lock.y) return 'place ' + j + ' lock'; }
+        return b.className || b.tagName; };
+    return places.map(i => { const p = L[i], pts = [], s = shapes(i);
+        s.forEach(el => { const m = el.getCTM(), n = el.getTotalLength(), sw = parseFloat(el.getAttribute('stroke-width') || 0) * Math.hypot(m.a, m.b) / 2;
+            for (let j = 0; j <= 48; j++) { const q = el.getPointAtLength(n * j / 48), x = m.a * q.x + m.c * q.y + m.e, y = m.b * q.x + m.d * q.y + m.f;
+                pts.push([x, y]);
+                if (sw) { const d = Math.hypot(x - p.x, y - p.y) || 1; pts.push([x + (x - p.x) / d * sw, y + (y - p.y) / d * sw]); } } });
+        const mine = o => o === 'place ' + i || o === 'place ' + i + ' badge' || o === 'place ' + i + ' lock';
+        const missed = pts.map(q => [Math.round(q[0]), Math.round(q[1]), owner(q[0], q[1])]).filter(q => !mine(q[2]));
+        const end = f => { const q = pts.reduce((a, b) => f(b, a) ? b : a); return [Math.round(q[0] * 10) / 10, Math.round(q[1] * 10) / 10, owner(q[0], q[1])]; };
+        return { i: i, shapes: s.length, points: pts.length, missed: missed.length, misses: missed.slice(0, 6),
+                 far: Math.round(pts.reduce((a, q) => Math.max(a, Math.hypot(q[0] - p.x, q[1] - p.y)), 0) * 10) / 10,
+                 ends: { left: end((a, b) => a[0] < b[0]), right: end((a, b) => a[0] > b[0]), top: end((a, b) => a[1] < b[1]), bottom: end((a, b) => a[1] > b[1]) } }; }); })"""
+# What each place's tap area (a circle, tap across) comes near: every other place's button, badge and lock, the crew,
+# Music and the grown-ups lock, each with its distance from the circle's middle (to the nearest point of its box), and
+# whether a tap on its own middle still lands on it.
+OVERLAP_JS = """(places => { const L = MW.LAYOUT.map.planets, k = MW.stage.scale;
+    const sb = e => { const r = e.getBoundingClientRect(); return [(r.left - MW.stage.offX) / k, (r.top - MW.stage.offY) / k, r.width / k, r.height / k]; };
+    const things = Array.from(document.querySelectorAll('#screen-map .mw-planet')).map((b, j) => ['place ' + j, b, j]);
+    document.querySelectorAll('#screen-map .mw-planet-badge, #screen-map .mw-planet-lock').forEach(e => { const kind = e.classList.contains('mw-planet-badge') ? 'badge' : 'lock';
+        const j = L.findIndex(q => q[kind].x === e.offsetLeft && q[kind].y === e.offsetTop); things.push(['place ' + j + ' ' + kind, e, j]); });
+    things.push(['the crew', document.querySelector('#screen-map .mw-map-crew-btn'), -1], ['Music', document.querySelector('#screen-map .mw-music'), -1],
+                ['the grown-ups lock', document.querySelector('.mw-gate'), -1]);
+    return places.map(i => { const p = L[i], r = p.tap / 2;
+        const near = things.filter(n => n[2] !== i).map(n => { const b = sb(n[1]), cx = Math.max(b[0], Math.min(p.x, b[0] + b[2])), cy = Math.max(b[1], Math.min(p.y, b[1] + b[3]));
+            const top = document.elementFromPoint(MW.stage.offX + (b[0] + b[2] / 2) * k, MW.stage.offY + (b[1] + b[3] / 2) * k);
+            return [n[0], Math.round(Math.hypot(cx - p.x, cy - p.y)), !!top && n[1].contains(top)]; }).sort((a, b) => a[1] - b[1]);
+        return { i: i, r: r, things: near.length, inside: near.filter(n => n[1] <= r), covered: near.filter(n => !n[2]).map(n => n[0]), nearest: near.slice(0, 3) }; }); })"""
+WHAT = {3: "the rocks", 4: "the station"}
+
+
+def reach_ok(r):
+    mine = (f"place {r['i']}", f"place {r['i']} badge", f"place {r['i']} lock")
+    return r["shapes"] > 0 and r["missed"] == 0 and all(e[2] in mine for e in r["ends"].values())
+
+
+def far_points(r):
+    """The review's points for a place, then its drawing's left, right, top and bottom ends."""
+    return [tuple(q) for q in FAR_TAPS[r["i"]]] + [(e[0], e[1]) for e in r["ends"].values()]
+
+
+async def test_places(p, name, vw, vh, dpr):
+    """The map has five places: the three planets, the rocks and the station. A place with no game is dimmed with its
+    lock and says "That place isn't ready yet." when tapped ("That planet isn't ready yet." while that line is pending).
+    A tap anywhere on the rocks' or the station's drawing is heard (their tap areas are 240 across), locked and lit, and
+    those tap areas reach nothing else. MeeMee Rescue and MeeMee Rockets open as before."""
+    print(f"\n== the map's five places ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"places-{name}", vw, vh, dpr, mode="tap")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(1.0)
+    await page.screenshot(path=str(SHOTS / f"places-{name}-map.png"))
+    sys.path.insert(0, str(ROOT / "tools"))
+    import games as G
+    games = {g["planet"]: g["name"] for g in G.load()}           # from each game.json: after 0.8.0's part A, 0 and 1
+    free = [i for i in range(G.PLANETS) if i not in games]
+    info = await page.evaluate(PLACES_INFO)
+    check(f"places ({name}): the map has five places; each with a game ({', '.join(f'{g} on {i}' for i, g in games.items())}) is lit, with its badge and a mint halo",
+          len(info) == 5 and G.PLANETS == 5 and {i["i"]: i["game"] for i in info if i["game"]} == games and all(place_ok(info[i], g) for i, g in games.items()),
+          json.dumps([info[i] for i in games]))
+    if free:
+        check(f"places ({name}): the places with no game ({', '.join(map(str, free))}) are dimmed, each with its lock badge and no halo",
+              all(place_ok(info[i], None) for i in free), json.dumps([info[i] for i in free]))
+    else:
+        check(f"places ({name}): the places with no game are dimmed, each with its lock badge and no halo", True, "skipped: every place has a game")
+    taps = await page.evaluate("MW.LAYOUT.map.planets.map(p => p.tap)")
+    centred = all(abs(i["tap"][0] + i["tap"][2] / 2 - pl["x"]) < 0.6 and abs(i["tap"][1] + i["tap"][3] / 2 - pl["y"]) < 0.6
+                  for i, pl in zip(info, await page.evaluate("MW.LAYOUT.map.planets")))
+    check(f"places ({name}): every place is a big target, centred on it (the rocks and the station: 240 across)",
+          centred and min(i["tap"][2] for i in info) >= 120 and [info[3]["tap"][2], info[4]["tap"][2]] == [240, 240] and taps[3:] == [240, 240], json.dumps(taps))
+
+    # a tap anywhere on the rocks' or the station's drawing lands on that place, and their tap areas reach nothing else
+    reach = await page.evaluate(REACH_JS, [3, 4])
+    looks = " and ".join(f"{WHAT[r['i']]} {'lit' if r['i'] in games else 'locked'}" for r in reach)
+    check(f"places ({name}): a tap anywhere on the drawing of {looks} lands on that place (every outline, its outer edge, and the drawing's far ends)",
+          all(reach_ok(r) for r in reach), json.dumps(reach))
+    over = await page.evaluate(OVERLAP_JS, [3, 4])
+    check(f"places ({name}): the rocks' and the station's tap areas reach no other place's button, badge or lock, the crew, Music or the grown-ups lock",
+          all(o["things"] >= 9 and not o["inside"] and not o["covered"] for o in over), json.dumps(over))
+
+    if free:
+        # while "That place isn't ready yet." is pending: "That planet isn't ready yet.", never silence
+        rec = await page.evaluate("[MW.audio.recorded('map-place-not-ready'), MW.audio.recorded('map-not-ready')]")
+        got = []
+        for i in free:
+            pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % i)
+            got.append([i] + list(await tap_said(t, pl["x"], pl["y"])))
+        tried = await page.evaluate("MW.events.filter(e => e.type === 'audio-fail' && e.detail.indexOf('map-place-not-ready') >= 0).length")
+        check(f"places ({name}): while the new line is pending, each locked place says 'That planet isn't ready yet.' and stays on the map",
+              rec == [False, True] and all(g[1] == ["map-not-ready"] and g[2] == "screen-map" for g in got) and tried == 0, json.dumps([rec, got, tried]))
+        ends = [r for r in reach if r["i"] in free]
+        got = []
+        for r in ends:
+            for x, y in far_points(r):
+                got.append([r["i"], x, y] + list(await tap_said(t, x, y)))
+        check(f"places ({name}): taps at the far ends of {' and '.join(WHAT[r['i']] for r in ends) or 'the rocks and the station'} (the review's points, and each drawing's left, right, top and bottom) are heard too",
+              all(g[3] == ["map-not-ready"] and g[4] == "screen-map" for g in got), json.dumps(got) if ends else "skipped: both have a game")
+
+        # once it is recorded (stubbed here: the recording isn't made yet), "That place isn't ready yet."
+        await page.evaluate(STUB_PLACE_LINE)
+        got = []
+        for i in free:
+            pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % i)
+            got.append([i] + list(await tap_said(t, pl["x"], pl["y"])))
+        if 4 in free:
+            lock = await page.evaluate("MW.LAYOUT.map.planets[4].lock")
+            got.append(["station's lock badge"] + list(await tap_said(t, lock["x"] + lock["d"] / 2, lock["y"] + lock["d"] / 2)))
+        check(f"places ({name}): once it is recorded, each locked place (and the station's lock badge) says 'That place isn't ready yet.'",
+              all(g[1] == ["map-place-not-ready"] and g[2] == "screen-map" for g in got), json.dumps(got))
+        await page.evaluate(UNSTUB_PLACE_LINE)
+        await asyncio.sleep(1.0)
+    else:
+        for what in ("while the new line is pending, each locked place says 'That planet isn't ready yet.'",
+                     "taps at the far ends of the rocks and the station are heard too",
+                     "once it is recorded, each locked place says 'That place isn't ready yet.'"):
+            check(f"places ({name}): {what}", True, "skipped: every place has a game")
+
+    # MeeMee Rescue and MeeMee Rockets open as before
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    await t.tap(*RESCUE)
+    s = await t.wait_phase(["asking", "open"])
+    check(f"places ({name}): MeeMee Rescue's planet opens it as before (its banner, then the round)",
+          s["screen"] == "screen-game" and "map-mimi-rescue" in await t.said() and await page.evaluate("MW.events.some(e => e.type === 'banner' && e.detail === 'gone MeeMee Rescue')"), json.dumps(s))
+    await t.tap(*HOME_BTN)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(0.5)
+    s = await w_open(t, page, [{"word": "one", "step": "tiles"}])
+    check(f"places ({name}): MeeMee Rockets' planet opens it as before (its banner, then Find)",
+          s["screen"] == "screen-words-find" and "words-name" in await t.said(), json.dumps(s))
+    await t.tap(*HOME_BTN)
+    check(f"places ({name}): Home goes back to the map", await t.wait_screen("screen-map"))
+    check(f"places ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+    await places_lit(p, name, vw, vh, dpr, [i for i in (3, 4) if i in free])
+
+
+async def places_lit(p, name, vw, vh, dpr, spots):
+    """The rocks and the station with a game on each (the starter game, and a second copy of it), in a test copy built
+    into the template test's folders: lit with their badges and halos, a tap anywhere on their drawings opens their game,
+    and their tap areas still reach nothing else."""
+    import shutil
+    import subprocess
+    label = f"places lit ({name})"
+    if not spots:
+        check(f"{label}: the rocks and the station with a game on them", True, "skipped: neither is free for the starter game")
+        return
+    here = pathlib.Path(__file__).resolve().parent
+    out, srcs = here / "serve-template", here / "serve-template-src"
+    if srcs.exists():
+        shutil.rmtree(srcs)
+    made = {}
+    for gid, place in zip(("starter", "startertwo"), spots):
+        d = srcs / gid
+        shutil.copytree(ROOT / "games" / "_template", d, ignore=shutil.ignore_patterns("__pycache__"))
+        for f in d.iterdir():
+            if f.is_file():
+                f.write_text(f.read_text(encoding="utf-8").replace("starter", gid), encoding="utf-8")
+        gj = json.loads((d / "game.json").read_text(encoding="utf-8"))
+        gj["planet"] = place
+        gj["name"] = "Starter game" if gid == "starter" else "Starter game two"
+        (d / "game.json").write_text(json.dumps(gj), encoding="utf-8")
+        made[place] = (gid, gj["name"])
+    cmd = [sys.executable, str(ROOT / "tools" / "build.py"), "--no-audio", "--out", str(out)]
+    for gid, _ in made.values():
+        cmd += ["--extra-game", str(srcs / gid)]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    check(f"{label}: a test copy with the starter game on {' and '.join(WHAT[i] for i in spots)} builds", r.returncode == 0, (r.stdout + r.stderr)[-300:])
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", TPL_PORT), functools.partial(Quiet, directory=str(out)))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+        ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True)
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(f"http://127.0.0.1:{TPL_PORT}/")
+        await page.wait_for_load_state("load")
+        t = Tablet(page, await ctx.new_cdp_session(page))
+        await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+        await t.tap(*PLAY)
+        await t.wait_screen("screen-map")
+        await asyncio.sleep(1.0)
+        await page.screenshot(path=str(SHOTS / f"places-{name}-lit.png"))
+        info = await page.evaluate(PLACES_INFO)
+        check(f"{label}: {' and '.join(WHAT[i] for i in spots)} are lit, each with its badge and a mint halo",
+              all(place_ok(info[i], made[i][1]) for i in spots), json.dumps([info[i] for i in spots]))
+        reach = await page.evaluate(REACH_JS, spots)
+        check(f"{label}: a tap anywhere on their drawings lands on that place or its badge (every outline, its outer edge, and the drawing's far ends)",
+              all(reach_ok(x) for x in reach), json.dumps(reach))
+        over = await page.evaluate(OVERLAP_JS, spots)
+        check(f"{label}: their tap areas reach no other place's button, badge or lock, the crew, Music or the grown-ups lock",
+              all(o["things"] >= 9 and not o["inside"] and not o["covered"] for o in over), json.dumps(over))
+        got = []
+        for x in reach:
+            gid = made[x["i"]][0]
+            for sx, sy in far_points(x):
+                await t.tap(sx, sy)
+                opened = await t.wait_screen(f"screen-{gid}-play", 3)
+                await t.tap(*HOME_BTN)
+                back = await t.wait_screen("screen-map", 5)
+                await asyncio.sleep(0.3)
+                got.append([x["i"], sx, sy, opened, back])
+        check(f"{label}: taps at their far ends (the review's points, and each drawing's left, right, top and bottom) open their game",
+              all(g[3] and g[4] for g in got), json.dumps(got))
+        check(f"{label}: no console errors", not problems, "; ".join(problems[:3]))
+        await browser.close()
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+# The number sentence as it is on the screen: its box, each part (text, ring or sign, colours, box in stage px) and gap()
+EQ_INFO = """(() => { const e = window.__eq, el = e.el, k = MW.stage.scale;
+    const sb = r => [(r.left - MW.stage.offX) / k, (r.top - MW.stage.offY) / k, r.width / k, r.height / k];
+    const parts = Array.from(el.children).map(c => { const cs = getComputedStyle(c);
+        return { text: c.textContent, ring: c.classList.contains('mw-equation-gap'), op: c.classList.contains('op'), color: cs.color,
+                 bg: cs.backgroundColor, rim: [cs.borderTopStyle, cs.borderTopWidth, cs.borderTopColor], box: sb(c.getBoundingClientRect()) }; });
+    return { shown: el.classList.contains('is-shown'), box: [el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight],
+             seen: sb(el.getBoundingClientRect()), parts: parts, gap: e.gap(), html: el.innerHTML,
+             log: MW.events.filter(x => x.type === 'equation').map(x => x.detail) }; })()"""
+COLOURS = """(names => { const d = document.createElement('div'); document.body.appendChild(d); const out = {};
+    names.forEach(n => { d.style.color = 'var(--' + n + ')'; out[n] = getComputedStyle(d).color; }); d.remove(); return out; })"""
+EQ_SCREEN = """(() => { const s = document.getElementById('screen-kittest');
+    const d = MW.diagram(s); d.look('numbers'); d.set({ whole: 7, left: 3, right: 4, missing: 'left' });
+    MW.pod(s, MW.LAYOUT.pod.x, MW.LAYOUT.pod.y, MW.LAYOUT.pod.w); MW.stars(s, 517, 34).set(0);
+    window.__tr = MW.numberTrack(s); window.__eq = MW.equation(s); })()"""
+
+
+def near(a, b, tol=0.6):
+    return a is not None and b is not None and all(abs(x - y) <= tol for x, y in zip(a, b))
+
+
+def gap_box(g):
+    return [g["x"], g["y"], g["w"], g["h"]] if g else None
+
+
+async def test_equation(p, name, vw, vh, dpr):
+    """MW.equation: MeeMee Rescue's sentence as before; the minus sentence with no gap and with each of its three gaps;
+    fill; gap() where the ring is on the screen; its two places, under the diagram and under Scruffles."""
+    print(f"\n== the number sentence ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"equation-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await page.evaluate(KIT_SCREEN)
+    await page.evaluate(EQ_SCREEN)
+    tok = await page.evaluate(COLOURS, ["moon", "peach", "mint", "moon-dim"])
+    under, ship = [180, 700, 400, 80], [790, 528, 440, 100]
+
+    # MeeMee Rescue's sentence, exactly as before
+    await page.evaluate("window.__eq.show(3, 4, 7)")
+    eq = await page.evaluate(EQ_INFO)
+    check(f"equation ({name}): MeeMee Rescue's sentence is as before: 3 + 4 = 7 under the diagram (180, 700, 400 × 80)",
+          eq["html"] == '<span>3</span><span class="op">+</span><span>4</span><span class="op">=</span><span>7</span>' and eq["shown"] and eq["box"] == under
+          and eq["gap"] is None and eq["log"] == [], json.dumps([eq["html"], eq["box"], eq["log"]]))
+    await page.evaluate("window.__eq.hide()")
+    eq = await page.evaluate(EQ_INFO)
+    check(f"equation ({name}): ... and hide() takes it away", eq["html"] == "" and not eq["shown"], eq["html"])
+
+    # the minus sentence with no gap: the minus sign (not a hyphen), in peach like = ; numbers in moon
+    await page.evaluate("window.__eq.minus(7, 4, 3)")
+    eq = await page.evaluate(EQ_INFO)
+    texts = [x["text"] for x in eq["parts"]]
+    colours = [x["color"] for x in eq["parts"]]
+    check(f"equation ({name}): minus(7, 4, 3) shows 7 − 4 = 3 at once, with the minus sign (U+2212), no gap",
+          texts == ["7", "−", "4", "=", "3"] and "-" not in "".join(texts) and eq["shown"] and eq["gap"] is None
+          and not any(x["ring"] for x in eq["parts"]) and eq["log"][-1:] == ["minus 7-4=3"], json.dumps([texts, eq["log"]]))
+    check(f"equation ({name}): ... − and = in peach, the numbers in moon",
+          colours == [tok["moon"], tok["peach"], tok["moon"], tok["peach"], tok["moon"]], json.dumps([colours, tok]))
+    await page.evaluate("window.__eq.minus(7, 4, 3, null)")
+    check(f"equation ({name}): ... and the same with gap null", [x["text"] for x in (await page.evaluate(EQ_INFO))["parts"]] == ["7", "−", "4", "=", "3"])
+
+    # each of the three gaps: the ring in that number's place, 84 across, moon-dim with a 5 px dashed mint rim
+    for k, want in ((0, "minus ?-4=3"), (1, "minus 7-?=3"), (2, "minus 7-4=?")):
+        await page.evaluate(f"window.__eq.minus(7, 4, 3, {k})")
+        await asyncio.sleep(0.05)
+        eq = await page.evaluate(EQ_INFO)
+        ring = eq["parts"][2 * k]
+        others = [x["text"] for i, x in enumerate(eq["parts"]) if i != 2 * k]
+        expect = [x for i, x in enumerate(["7", "−", "4", "=", "3"]) if i != 2 * k]
+        check(f"equation ({name}): gap {k}: the ring stands in for {'7 4 3'.split()[k]}, 84 across, moon-dim, 5 px dashed mint rim",
+              ring["ring"] and ring["text"] == "" and others == expect and near(ring["box"][2:], [84, 84]) and ring["bg"] == tok["moon-dim"]
+              and ring["rim"] == ["dashed", "5px", tok["mint"]] and sum(x["ring"] for x in eq["parts"]) == 1, json.dumps(ring))
+        check(f"equation ({name}): gap {k}: gap() is the ring's box on the screen, and the log says '{want}'",
+              near(gap_box(eq["gap"]), ring["box"]) and eq["log"][-1] == want, json.dumps([eq["gap"], ring["box"], eq["log"][-1:]]))
+
+    # fill: the ring becomes the number; nothing more to fill
+    await page.evaluate("window.__eq.fill(3)")
+    eq = await page.evaluate(EQ_INFO)
+    check(f"equation ({name}): fill(3) turns the ring into 3: 7 − 4 = 3, and gap() is null",
+          [x["text"] for x in eq["parts"]] == ["7", "−", "4", "=", "3"] and not any(x["ring"] for x in eq["parts"]) and eq["gap"] is None
+          and eq["log"][-1] == "fill 3", json.dumps([eq["parts"], eq["log"][-2:]]))
+    n = len(eq["log"])
+    await page.evaluate("window.__eq.fill(5)")
+    eq = await page.evaluate(EQ_INFO)
+    check(f"equation ({name}): ... a second fill does nothing", [x["text"] for x in eq["parts"]] == ["7", "−", "4", "=", "3"] and len(eq["log"]) == n)
+    await page.evaluate("window.__eq.minus(10, 6, 4, 0); window.__eq.fill(10)")
+    eq = await page.evaluate(EQ_INFO)
+    check(f"equation ({name}): filling the first gap: ? − 6 = 4 becomes 10 − 6 = 4", [x["text"] for x in eq["parts"]] == ["10", "−", "6", "=", "4"],
+          json.dumps([x["text"] for x in eq["parts"]]))
+
+    # its place under Scruffles, and back
+    await page.evaluate("window.__eq.minus(7, 4, 3, 2); window.__eq.at('ship')")
+    await asyncio.sleep(0.4)
+    eq = await page.evaluate(EQ_INFO)
+    ring = eq["parts"][4]
+    check(f"equation ({name}): at('ship') puts it under Scruffles (790, 528, 440 × 100) at once, the ring inside it",
+          eq["box"] == ship and near(eq["seen"], ship) and ring["box"][0] >= 790 and ring["box"][0] + ring["box"][2] <= 1230
+          and ring["box"][1] >= 528 and ring["box"][1] + ring["box"][3] <= 628 and eq["log"][-1] == "at ship", json.dumps([eq["box"], eq["seen"], ring["box"], eq["log"][-1:]]))
+    check(f"equation ({name}): ... gap() is the ring's box there", near(gap_box(eq["gap"]), ring["box"]), json.dumps([eq["gap"], ring["box"]]))
+    track = await stage_box(page, "window.__tr.el.querySelector('svg')")
+    pod = await stage_box(page, "document.querySelector('#screen-kittest .mw-pod svg')")
+    check(f"equation ({name}): ... clear of the number track, below Scruffles's ship",
+          eq["seen"][1] + eq["seen"][3] <= track[1] and ring["box"][1] + ring["box"][3] <= track[1], json.dumps([eq["seen"], ring["box"], track, pod]))
+    await page.screenshot(path=str(SHOTS / f"equation-{name}-ship.png"))
+    await page.evaluate("window.__eq.at('under', true)")
+    moving = gap_box(await page.evaluate("window.__eq.gap()"))
+    await asyncio.sleep(0.5)
+    eq = await page.evaluate(EQ_INFO)
+    check(f"equation ({name}): at('under', true) takes it back under the diagram; gap() says where the ring is going even while it moves",
+          eq["box"] == under and near(eq["seen"], under) and near(moving, eq["parts"][4]["box"]) and near(gap_box(eq["gap"]), eq["parts"][4]["box"])
+          and eq["log"][-1] == "at under", json.dumps([eq["box"], eq["seen"], moving, eq["gap"]]))
+    await page.evaluate("window.__eq.fill(3); window.__tr.hide()")
+    await asyncio.sleep(0.5)
+    await page.screenshot(path=str(SHOTS / f"equation-{name}-under.png"))
+    await page.evaluate("window.__eq.hide()")
+    check(f"equation ({name}): hidden, gap() is null", await page.evaluate("window.__eq.gap()") is None)
+    check(f"equation ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_equation_motion(p):
+    """The sentence moves between its places over 260 ms on the snap's ease-out; with reduce motion it fades in at its
+    new place. What moves is read from the animations the browser runs, so a busy machine can't fool the check."""
+    print("\n== the number sentence: motion ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    runs = """(() => window.__eq.el.getAnimations().map(a => [a.transitionProperty || a.animationName, a.effect.getTiming().duration]).sort())()"""
+    look = """(() => { const el = window.__eq.el, r = el.getBoundingClientRect(), k = MW.stage.scale, cs = getComputedStyle(el);
+        return [Math.round((r.left - MW.stage.offX) / k + r.width / k / 2), Math.round((r.top - MW.stage.offY) / k + r.height / k / 2), +(+cs.opacity).toFixed(2)]; })()"""
+    under, ship = [380, 740], [1010, 578]                     # the middles of its two places
+    for reduce in (False, True):
+        label = "reduce motion" if reduce else "motion"
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, reduced_motion="reduce" if reduce else "no-preference")
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        await page.evaluate(KIT_SCREEN)
+        await page.evaluate(EQ_SCREEN)
+        await page.evaluate("window.__eq.minus(7, 4, 3, 2)")
+        await asyncio.sleep(0.45)
+        for to, frm, there in (("ship", under, ship), ("under", ship, under)):
+            first = await page.evaluate(f"(() => {{ window.__eq.at('{to}', true); return [{runs}, {look}]; }})()")
+            await asyncio.sleep(0.12)
+            mid = await page.evaluate(look)
+            await asyncio.sleep(0.4)
+            end = await page.evaluate(f"[{runs}, {look}]")
+            if reduce:
+                check(f"equation ({label}): at('{to}', true) fades it in at its new place (260 ms) without moving",
+                      first[0] == [["mw-arrive", 260]] and first[1][:2] == there and first[1][2] < 0.1 and mid[:2] == there
+                      and end == [[], there + [1]], json.dumps([first, mid, end]))
+            else:
+                timing = await page.evaluate("(() => { const cs = getComputedStyle(window.__eq.el); return [cs.transitionProperty, cs.transitionDuration, cs.transitionTimingFunction]; })()")
+                check(f"equation ({label}): at('{to}', true) slides it from where it was to its new place over 260 ms on the snap's ease-out",
+                      first[0] == [["transform", 260]] and first[1] == frm + [1] and end == [[], there + [1]]
+                      and "transform" in timing[0] and "cubic-bezier(0.2, 0.8, 0.2, 1)" in timing[2], json.dumps([first, mid, end, timing]))
+        got = await page.evaluate(f"(() => {{ window.__eq.at('ship'); const a = [{runs}, {look}]; window.__eq.at('under'); return [a, [{runs}, {look}]]; }})()")
+        check(f"equation ({label}): at(place) without animate is there at once, with nothing moving or fading",
+              got == [[[], ship + [1]], [[], under + [1]]], json.dumps(got))
+        check(f"equation ({label}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -4733,6 +5191,11 @@ async def main():
         await test_numbers_taps(p)
         await test_numbers_decided(p, "fire", 1046, 653, 1.22)
         await test_numbers_decided(p, "doogee", 1280, 800, 2)
+        await test_places(p, "fire", 1046, 653, 1.22)
+        await test_places(p, "doogee", 1280, 800, 2)
+        await test_equation(p, "fire", 1046, 653, 1.22)
+        await test_equation(p, "doogee", 1280, 800, 2)
+        await test_equation_motion(p)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)} of {len(RESULTS)} checks passed")

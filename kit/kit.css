@@ -60,6 +60,12 @@ button { font-family: var(--font-andika); }
 .mw-circle.is-hinting { box-shadow: 0 0 0 14px rgba(127, 217, 196, 0.22); }
 .mw-equation { opacity: 0; transition: opacity 300ms ease-out; pointer-events: none; }
 .mw-equation.is-shown { opacity: 1; }
+/* the minus sentence's gap (0.8.0, Equation card): a tile-sized ring, waiting for its number */
+.mw-equation-gap { flex: none; box-sizing: border-box; width: 84px; height: 84px; border-radius: var(--radius-round);
+  background: var(--moon-dim); border: 5px dashed var(--mint); }
+/* moving between its two places: 260 ms on the snap's ease-out; with reduce motion it fades in at the new place */
+.mw-equation.is-moving { transition: opacity 300ms ease-out, transform 260ms cubic-bezier(.2,.8,.2,1); }
+.mw-equation.is-arriving { animation: mw-arrive 260ms ease-out; }
 
 /* ---------------------------------------------------------------- the MeeMee (counters) */
 .mw-counters .mw-mimi, .mw-mimi { position: absolute; left: 0; top: 0; width: var(--mimi-grab); height: var(--mimi-grab);
@@ -280,5 +286,6 @@ button { font-family: var(--font-andika); }
   .mw-track { transition: opacity 260ms ease-out; }
   .mw-track.is-away { transform: none; opacity: 0; }
   .mw-number-tile.is-moving, .mw-number-tile-body { transition: none; }
+  .mw-equation.is-moving { transition: opacity 300ms ease-out; }
 }
 @keyframes mw-spark-fade { 0% { opacity: 0; } 20% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }

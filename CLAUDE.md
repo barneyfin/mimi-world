@@ -1,6 +1,6 @@
 # MeeMee World
 
-Barney's maths and phonics games for a five-year-old, played on two tablets: one web page with a home map where each game is a planet.
+Barney's maths and phonics games for a five-year-old, played on two tablets: one web page with a home map where each game takes a place.
 
 - `MEEMEE.md` holds the rules for every game. Read it before any work here. The kit's docs add to it; if they disagree, stop and ask Barney which wins.
 - For any game work, use the `meemee-world` skill (`.claude/skills/meemee-world/`) and read its `reference.md` and `design.md` before writing code.

@@ -14,6 +14,13 @@
       "how": "Gentle, no disappointment."
     },
     {
+      "id": "map-place-not-ready",
+      "group": "Map",
+      "words": "That place isn't ready yet.",
+      "how": "Gentle, a little sorry; the end of the sentence.",
+      "pending": true
+    },
+    {
       "id": "crew-jobs",
       "group": "Crew",
       "words": "Let's give the crew their jobs!",
