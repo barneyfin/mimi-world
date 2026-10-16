@@ -11,7 +11,7 @@ Read `MEEMEE.md` (in the folder root) first: it holds the rules every game follo
 - [reference.md](reference.md): how a game joins the world, the kit's functions, the voice lines, the build and the tests.
 - [design.md](design.md): the look and the words: colours, layout, characters, motion, what Scruffles says and how.
 
-For a finished example, read `games/rescue/` (MeeMee Rescue: number bonds on the part–whole diagram; `rescue.js` shows a full round, hints, celebrations, grown-ups tabs, and a second way of answering, numbers mode, chosen in Settings, with its own progress). Start a new game from `games/_template/`, which is small and shows every part a game needs. Learn from their structure; do not copy MeeMee Rescue's play, lines or art into another game.
+For a finished example, read `games/rescue/` (MeeMee Rescue: number bonds on the part–whole diagram; `rescue.js` shows a full round, hints, celebrations, grown-ups tabs, and a second way of answering, numbers mode, chosen in Settings, with its own progress). `games/takehome/` (Take MeeMee Home, subtraction) is the newest game on the same diagram: three steps a grown-up picks, each with its own progress, and the minus sentence. Start a new game from `games/_template/`, which is small and shows every part a game needs. Learn from their structure; do not copy MeeMee Rescue's play, lines or art into another game.
 
 ## Folder
 
@@ -32,7 +32,7 @@ Mimi World/                (the folder keeps the old spelling; the set is spelt 
 
 1. **Agree it first.** A new game needs a PRD that Barney has approved (MEEMEE.md, "How a new game gets made"). If there isn't one, stop and ask.
 2. **Name it.** An invented title in the MeeMee World style ("MeeMee Rescue"), and a short lower-case id ("words"). The id goes in front of everything the game owns: its line ids (`words-…`), screen ids (`screen-words-…`), drawing names (`words-…`), grown-ups tab ids and saved data.
-3. **Copy** `games/_template/` to `games/<id>/`. The template's id is `starter`: change every `starter` in every file (`game.json`, `lines.json`, `game.js`, `art.py`, `game.css`) to the new id, and its name "Starter game" to the new title. Pick a free place on the map for `planet` in `game.json` (0 to 4, reference.md; 0 is MeeMee Rescue's and 1 MeeMee Rockets', and the build stops if two games share one). Then replace the starter's placeholder play (tap the star three times) with the real game.
+3. **Copy** `games/_template/` to `games/<id>/`. The template's id is `starter`: change every `starter` in every file (`game.json`, `lines.json`, `game.js`, `art.py`, `game.css`) to the new id, and its name "Starter game" to the new title. Pick a free place on the map for `planet` in `game.json` (0 to 4, reference.md; 0 is MeeMee Rescue's, 1 MeeMee Rockets' and 2 Take MeeMee Home's, and the build stops if two games share one). Then replace the starter's placeholder play (tap the star three times) with the real game.
 4. **Write the lines** in `lines.json`, all `"pending": true`, before the code (reference.md, Voice lines). Keep them short, warm and in the class's words (design.md, Words).
 5. **Write the game** in its own scripts, joined to the world with `MW.world.game({...})`. Use the kit for screens, buttons, speech, dragging, saving and the grown-ups tab.
 6. **Draw** anything new in `art.py` with colour tokens only, in the design system's style (design.md). New drawings should go into the design system too: tell Barney.

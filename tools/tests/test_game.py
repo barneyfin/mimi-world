@@ -1,7 +1,7 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
 game; 0.7.0: autumn 2, the half-term switch, capitals), the kit (0.6.0: the title banners, the store, stars, pick-up boxes,
-numbers mode's pieces; 0.8.0: the map's five places and the minus sentence) and MeeMee Rescue's numbers mode (0.6.0), on
-Fire and Doogee screen sizes.
+numbers mode's pieces; 0.8.0: the map's five places and the minus sentence), MeeMee Rescue's numbers mode (0.6.0) and Take
+MeeMee Home (0.8.0: subtraction, its three steps, its progress and its grown-ups tab), on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -4808,7 +4808,7 @@ async def test_places(p, name, vw, vh, dpr):
     await page.screenshot(path=str(SHOTS / f"places-{name}-map.png"))
     sys.path.insert(0, str(ROOT / "tools"))
     import games as G
-    games = {g["planet"]: g["name"] for g in G.load()}           # from each game.json: after 0.8.0's part A, 0 and 1
+    games = {g["planet"]: g["name"] for g in G.load()}           # from each game.json: with 0.8.0's part B, 0, 1 and 2
     free = [i for i in range(G.PLANETS) if i not in games]
     info = await page.evaluate(PLACES_INFO)
     check(f"places ({name}): the map has five places; each with a game ({', '.join(f'{g} on {i}' for i, g in games.items())}) is lit, with its badge and a mint halo",
@@ -5129,6 +5129,1400 @@ async def test_equation_motion(p):
     await browser.close()
 
 
+# ---------------------------------------------------------------- 0.8.0: Take MeeMee Home (games/takehome), subtraction
+TH_PLACE = "MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === 'takehome').planet]"
+TH_STEPS = ("take", "left", "numbers")
+TH_PRAISE = {"praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done"}
+TH_UNDER, TH_SHIP = [180, 700], [790, 528]              # the sentence's two places (its box's top-left corner)
+# What the game screen shows (stage px): the round's step and question, the diagram, the MeeMee, the tiles, the sentence
+TH_STATE = """(() => { const R = MW.takehome, s = R.st, d = R.diagram(), tr = R.track(), e = R.equation(), g = document.getElementById('screen-takehome-play');
+    const shown = el => getComputedStyle(el).display !== 'none' && !el.closest('.mw-off');
+    return { phase: MW.world.st.phase, qi: s.qi, step: R.step(), target: s.target, answer: s.answer, tries: s.tries, misses: s.misses,
+             hinted: s.hinted, placed: s.placed ? s.placed.n : null, screen: MW.shell.screen, look: d.look(),
+             whole: s.counters.filter(c => c.where === 'whole').length, going: s.counters.filter(c => c.where === 'right').length,
+             staying: s.counters.filter(c => c.where === 'left').length, fixed: s.fixed.length, dim: s.dimmed.length, hoppers: s.hoppers.length,
+             carried: ['whole', 'left', 'right'].map(k => d.carried(k)), away: tr.away(), track: shown(tr.el) && !tr.away(),
+             out: tr.tiles.filter(t => t.out()).map(t => t.n),
+             ghosts: g.querySelectorAll('.mw-ghost').length, lit: g.querySelectorAll('.mw-ghost.is-lit').length,
+             face: g.querySelector('.mw-pod').dataset.face, ready: g.querySelector('.mw-pod').classList.contains('is-ready'),
+             lights: g.querySelector('.mw-pod').classList.contains('is-celebrating'),
+             home: !R.homePlanet().classList.contains('is-hidden'),
+             sentence: e.el.classList.contains('is-shown') ? Array.from(e.el.children).map(c => c.classList.contains('mw-equation-gap') ? '_' : c.textContent).join(' ') : '',
+             at: [e.el.offsetLeft, e.el.offsetTop],
+             wholeNum: shown(d.circles.whole.querySelector('.numeral-whole')) && getComputedStyle(d.circles.whole.querySelector('.numeral-whole')).visibility !== 'hidden'
+                       ? d.circles.whole.textContent : null,
+             pills: ['left', 'right'].map(k => { const p = d.pills[k]; return shown(p) ? p.textContent + (p.classList.contains('is-waiting') ? '~' : '') : null; }),
+             waiting: ['whole', 'left', 'right'].filter(k => d.circles[k].classList.contains('is-waiting')),
+             success: ['whole', 'left', 'right'].filter(k => d.circles[k].classList.contains('is-success')),
+             stars: Array.from(g.querySelectorAll('.mw-stars svg')).map(x => x.dataset.state).join(',') }; })()"""
+TH_EQ = "MW.events.filter(e => e.type === 'equation').map(e => e.detail)"
+TH_N = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+
+
+def th_q(step, q):
+    """A question as the game has it: whole, take (going home), left (staying), missing (the empty circle)."""
+    m = q.get("missing") or ("right" if step == "take" else "left")
+    return {"whole": q["whole"], "take": q["take"], "left": q["whole"] - q["take"], "missing": m}
+
+
+def th_answer(q):
+    return q["whole"] if q["missing"] == "whole" else (q["take"] if q["missing"] == "right" else q["left"])
+
+
+def th_prompt(step, q, qi):
+    """What Scruffles says for a question (lines.md, How they join up), as the say log has it. While "Move them into the
+    dotted circle." and "Find the number." are pending they are left out (as MeeMee Rescue's "Find the number.")."""
+    q = th_q(step, q)
+    w, t, r = q["whole"], q["take"], q["left"]
+    whole = f"num-mid-{w} takehome-meemee"
+    going = f"num-mid-{t} takehome-{'is' if t == 1 else 'are'}-going"
+    staying = f"num-mid-{r} takehome-{'is' if r == 1 else 'are'}-staying"
+    if step == "take":
+        p = [whole, going]
+    elif q["missing"] == "left":
+        p = [whole, going, "takehome-how-many-left"]
+    elif q["missing"] == "right":
+        p = [whole, staying, "takehome-how-many-going"]
+    else:
+        p = [going, staying, "takehome-how-many-altogether"]
+    return " ".join(p + (["tap-scruffles"] if qi < 2 else []))
+
+
+def th_said_sentence(q):
+    return f"num-mid-{q['whole']} takehome-take-away num-mid-{q['take']} takehome-is num-end-{q['whole'] - q['take']}"
+
+
+def th_text(q, gap=None):
+    """The sentence as TH_STATE shows it: '7 − 4 = 3', with _ for the gap."""
+    parts = [str(q["whole"]), "−", str(q["take"]), "=", str(q["whole"] - q["take"])]
+    if gap is not None:
+        parts[{"whole": 0, "right": 2, "left": 4}[gap]] = "_"
+    return " ".join(parts)
+
+
+async def th_state(page):
+    return await page.evaluate(TH_STATE)
+
+
+async def th_wait(page, phases, timeout=25):
+    for _ in range(int(timeout / 0.1)):
+        s = await th_state(page)
+        if s["phase"] in phases:
+            return s
+        await asyncio.sleep(0.1)
+    return await th_state(page)
+
+
+async def th_until(page, js, timeout=15):
+    for _ in range(int(timeout / 0.1)):
+        if await page.evaluate(js):
+            return True
+        await asyncio.sleep(0.1)
+    return False
+
+
+async def th_set(page, step=None, round_=None, wholes=None):
+    """This game's own saved choices (its step, its wholes in play) and the next round, as a grown-up and the tests set them."""
+    await page.evaluate("""(a) => { const g = MW.store.game('takehome'); if (a.step) g.step = a.step; if (a.wholes) g.wholes = a.wholes; MW.store.save();
+        if (a.round) MW.takehome.nextRound = a.round; }""", {"step": step, "round": round_, "wholes": wholes})
+
+
+async def th_open(t, page, step, round_):
+    """Play (if on the start screen), then place 2 on the map: the round, in this step."""
+    await th_set(page, step, round_)
+    if await page.evaluate("MW.shell.screen") == "screen-start":
+        await t.tap(*PLAY)
+        await t.wait_screen("screen-map")
+    pl = await page.evaluate(TH_PLACE)
+    await t.tap(pl["x"], pl["y"])
+    return await th_wait(page, ["takehome-open"], 25)
+
+
+async def th_move(t, n, to=(560, 478)):
+    """Step 1: n MeeMee dragged from the whole (a touch in its middle picks up the nearest) into the going-home part."""
+    for _ in range(n):
+        await t.drag(380, 205, *to)
+
+
+async def th_back(t, page, n, to=(900, 300)):
+    """Step 1: n MeeMee dragged back out of the going-home part."""
+    for _ in range(n):
+        xy = await page.evaluate("(() => { const c = MW.takehome.st.counters.filter(c => c.where === 'right').pop(); return [c.x, c.y]; })()")
+        await t.drag(xy[0], xy[1], *to)
+
+
+async def th_gap(page):
+    g = await page.evaluate("MW.takehome.equation().gap()")
+    return (g["x"] + g["w"] / 2, g["y"] + g["h"] / 2) if g else None
+
+
+async def th_end_question(t, page, step, q, qi, name, shot=None):
+    """After a right check: wait for the MeeMee going home to set off, then check the ending (the same for every step)."""
+    q = th_q(step, q)
+    ok = await th_until(page, "MW.events.some(e => e.type === 'home' && e.t > (window.__thq || 0))" if q["take"] else
+                        "MW.events.some(e => e.type === 'say' && e.detail.indexOf('takehome-take-away') >= 0 && e.t > (window.__thq || 0))", 20)
+    await asyncio.sleep(0.45)
+    s = await th_state(page)
+    if shot:
+        await screenshot(page, shot)
+    hops = await page.evaluate("MW.events.filter(e => e.type === 'hop' && e.t > (window.__thq || 0)).map(e => e.detail)")
+    ans = th_answer(q)
+    carried = [None, None, None] if step == "take" else [q["whole"] if step == "numbers" or q["missing"] == "whole" else None,
+                                                         q["left"] if step == "numbers" or q["missing"] == "left" else None,
+                                                         q["take"] if step == "numbers" or q["missing"] == "right" else None]
+    check(f"takehome-{step} ({name}): question {qi + 1} ({th_text(q)}): the answer is carried, the success ring, the track away, the sentence complete under the "
+          f"diagram, the home planet, {q['take']} MeeMee hopping home",
+          ok and s["sentence"] == th_text(q) and s["at"] == TH_UNDER and s["home"] and s["success"] == [q["missing"]] and not s["track"]
+          and s["carried"] == carried and len(hops) == q["take"] and all(h.endswith(("1030,652", "1160,670", "900,666")) for h in hops),
+          json.dumps([s, hops, ans]))
+    return s
+
+
+async def th_round(t, page, step, round_, name, shots, before=None):
+    """Play a whole round right first time (all five), checking each question's look and words, the sentence's events, the
+    ending and the stars. shots: {question number: (ask shot, right shot)}; before: {question number: async fn}, done once
+    the question is up."""
+    # the sentence's events since the round started (then since the last question ended)
+    eq0 = await page.evaluate("(() => { const r = MW.events.filter(e => e.type === 'round').pop(); return MW.events.filter(e => e.type === 'equation' && e.t < r.t).length; })()")
+    for qi, q0 in enumerate(round_):
+        q = th_q(step, q0)
+        s = await th_wait(page, ["takehome-open"], 25)
+        if before and qi in before:
+            await before[qi]()
+            s = await th_state(page)
+        await n_quiet(t)
+        said = await t.said()
+        check(f"takehome-{step} ({name}): question {qi + 1} ({th_text(q, q['missing'])}) asked: '{th_prompt(step, q, qi)}'",
+              s["qi"] == qi and said[-1:] == [th_prompt(step, q, qi)] and s["stars"] == ",".join(["done"] * qi + ["current"] + ["todo"] * (4 - qi)),
+              json.dumps([said[-1:], s["stars"]]))
+        ask, right = shots.get(qi, (None, None))
+        if step == "take":
+            check(f"takehome-take ({name}): question {qi + 1}: {q['whole']} MeeMee in the whole (no numeral), the going-home part waits, its pill says {q['take']}, "
+                  f"the other pill a waiting '?'; the home planet shows, no track, no sentence",
+                  s["whole"] == q["whole"] and s["wholeNum"] is None and s["waiting"] == ["right"] and s["pills"] == ["?~", str(q["take"])]
+                  and s["home"] and not s["track"] and s["sentence"] == "" and s["look"] == "counting", json.dumps(s))
+            if ask:
+                await th_move(t, 2)
+                x0, y0 = await t.screen(380, 205)
+                x1, y1 = await t.screen(500, 352)
+                await touch(t, "touchStart", [(50, (x0, y0))])
+                for k in range(1, 9):
+                    await touch(t, "touchMove", [(50, (x0 + (x1 - x0) * k / 8, y0 + (y1 - y0) * k / 8))])
+                    await asyncio.sleep(0.02)
+                await asyncio.sleep(0.3)
+                await screenshot(page, ask)
+                x2, y2 = await t.screen(560, 478)
+                await touch(t, "touchMove", [(50, (x2, y2))])
+                await asyncio.sleep(0.05)
+                await touch(t, "touchEnd", [])
+                await asyncio.sleep(0.4)
+                await th_move(t, q["take"] - 3)
+            else:
+                await th_move(t, q["take"])
+            s = await th_state(page)
+            check(f"takehome-take ({name}): question {qi + 1}: {q['take']} MeeMee moved into the going-home part, the ship's lights glow",
+                  s["going"] == q["take"] and s["whole"] == q["left"] and s["ready"] and s["phase"] == "takehome-open", json.dumps(s))
+        else:
+            given = {"whole": q["whole"], "left": q["left"], "right": q["take"]}
+            if step == "left":
+                check(f"takehome-left ({name}): question {qi + 1}: the whole's {q['whole']} and the going-home part's {q['take']} as MeeMee, the staying part waits; "
+                      f"no pills; the sentence waits under Scruffles ({th_text(q, 'left')}); the track; no home planet",
+                      s["fixed"] == q["whole"] + q["take"] and s["carried"] == [None, None, None] and s["waiting"] == ["left"] and s["pills"] == [None, None]
+                      and s["sentence"] == th_text(q, "left") and s["at"] == TH_SHIP and s["track"] and not s["home"], json.dumps(s))
+            else:
+                want = [None if k == q["missing"] else given[k] for k in ("whole", "left", "right")]
+                check(f"takehome-numbers ({name}): question {qi + 1}: a numbered MeeMee in each given circle, the empty one waits; the sentence's gap in its place "
+                      f"({th_text(q, q['missing'])}) under Scruffles; the track; no home planet",
+                      s["carried"] == want and s["fixed"] == 0 and s["waiting"] == [q["missing"]] and s["pills"] == [None, None]
+                      and s["sentence"] == th_text(q, q["missing"]) and s["at"] == TH_SHIP and s["track"] and not s["home"] and s["look"] == "numbers", json.dumps(s))
+            ans = th_answer(q)
+            c = CENTRES[q["missing"]]
+            if ask:
+                held = {"left": (282, 560), "right": (640, 585), "whole": (470, 300)}[q["missing"]]
+                await n_hold(t, *tile_xy(ans), *held, touch_id=51)
+                await screenshot(page, ask)
+                x2, y2 = await t.screen(*c)
+                await touch(t, "touchMove", [(51, (x2, y2))])
+                await asyncio.sleep(0.05)
+                await touch(t, "touchEnd", [])
+                await asyncio.sleep(0.4)
+                how = "in the empty circle"
+            elif qi % 2:
+                g = await th_gap(page)
+                await t.drag(*tile_xy(ans), *g)
+                how = "on the sentence's gap"
+            else:
+                await t.drag(*tile_xy(ans), c[0] + 20, c[1] - 15)
+                how = "in the empty circle"
+            s = await th_state(page)
+            tile = await page.evaluate("(n => { const t = MW.takehome.track().tile(n); return [t.x, t.y]; })(%d)" % ans)
+            check(f"takehome-{step} ({name}): question {qi + 1}: tile {ans} dropped {how} sits in the circle, the gap shows {ans}, the ship's lights glow",
+                  s["placed"] == ans and tile == list(c) and s["sentence"] == th_text(q) and s["ready"], json.dumps([s, tile]))
+        await page.evaluate("window.__thq = performance.now()")
+        await n_check(t)
+        s = await th_state(page)
+        check(f"takehome-{step} ({name}): question {qi + 1}: a tap on Scruffles checks it: right, the got-it face and the ship's lights",
+              s["phase"] == "takehome-celebrate" and s["face"] == "got-it" and s["lights"], json.dumps(s))
+        s = await th_end_question(t, page, step, q, qi, name, right)
+        if step == "take":
+            check(f"takehome-take ({name}): question {qi + 1}: the MeeMee left in the whole slid into the staying part and were counted: its pill {q['left']}, "
+                  f"the whole shows {q['whole']}",
+                  s["staying"] == q["left"] and s["whole"] == 0 and s["pills"] == [str(q["left"]), str(q["take"])] and s["wholeNum"] == str(q["whole"]), json.dumps(s))
+        said = await t.said()
+        i = len(said) - 1 - said[::-1].index(th_said_sentence(q)) if th_said_sentence(q) in said else -1
+        check(f"takehome-{step} ({name}): question {qi + 1}: praise, then the sentence said: '{th_said_sentence(q)}'",
+              i > 0 and said[i - 1] in TH_PRAISE, json.dumps(said[-3:]))
+        eq = (await page.evaluate(TH_EQ))[eq0:]
+        want = (["at under"] if step == "take" else ["at ship", f"minus {th_text(q, q['missing']).replace(' ', '').replace('_', '?').replace('−', '-')}", f"fill {ans}"])
+        want_end = [f"minus {th_text(q).replace(' ', '').replace('−', '-')}"] if step == "take" else ["at under"]
+        check(f"takehome-{step} ({name}): question {qi + 1}: the sentence's events: {', '.join(want + want_end)}",
+              eq == want + want_end, json.dumps(eq))
+        eq0 += len(eq)
+    s = await th_wait(page, ["takehome-done"], 25)
+    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 15)
+    await asyncio.sleep(0.6)
+    said = await t.said()
+    check(f"takehome-{step} ({name}): after five, the end screen: five stars; 'All the MeeMee are home!', then 'Another trip?'",
+          ok and await page.evaluate("MW.shell.screen") == "screen-takehome-end" and said[-2:] == ["takehome-round-done", "takehome-round-another"]
+          and await page.evaluate("Array.from(document.querySelectorAll('#screen-takehome-end .mw-stars svg')).map(x => x.dataset.state).join(',')") == ",".join(["done"] * 5),
+          json.dumps(said[-3:]))
+
+
+async def test_takehome_round(p, step, name, vw, vh, dpr):
+    """A whole round of one step, right first time, played by touch, with the boards' screenshots."""
+    print(f"\n== Take MeeMee Home: a round of step {TH_STEPS.index(step) + 1} ({step}, {name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-{step}-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rounds = {"take": [{"whole": 7, "take": 4}, {"whole": 5, "take": 2}, {"whole": 9, "take": 3}, {"whole": 3, "take": 1}, {"whole": 10, "take": 6}],
+              "left": [{"whole": 7, "take": 4}, {"whole": 8, "take": 5}, {"whole": 6, "take": 1}, {"whole": 10, "take": 3}, {"whole": 4, "take": 2}],
+              "numbers": [{"whole": 7, "take": 4, "missing": "right"}, {"whole": 7, "take": 4, "missing": "whole"}, {"whole": 6, "take": 2, "missing": "left"},
+                          {"whole": 9, "take": 1, "missing": "right"}, {"whole": 10, "take": 3, "missing": "whole"}]}
+    s = await th_open(t, page, step, rounds[step])
+    said = await t.said()
+    check(f"takehome-{step} ({name}): place 2 opens Take MeeMee Home in this step: 'Let's take the MeeMee home!', then question 1",
+          s["screen"] == "screen-takehome-play" and s["step"] == step and s["qi"] == 0 and "takehome-round-ready" in said
+          and said.index("takehome-round-ready") < len(said) - 1, json.dumps([s, said[-3:]]))
+    k = {"take": "s1", "left": "s2", "numbers": "s3"}[step]
+    shots = {0: (f"takehome-{name}-{k}-ask.png", f"takehome-{name}-{k}-right.png")}
+    before = {}
+    if step == "numbers":
+        async def whole_shot():                                # board s3-whole: ? − 4 = 3, the second question, before it is answered
+            await asyncio.sleep(0.3)
+            await screenshot(page, f"takehome-{name}-s3-whole.png")
+        before = {1: whole_shot}
+    await th_round(t, page, step, rounds[step], name, shots, before)
+    await asyncio.sleep(1.2)
+    await screenshot(page, f"takehome-{name}-{step}-end.png")
+    saved = await page.evaluate("JSON.parse(localStorage.getItem('mimi-world'))")
+    mine = saved["games"]["takehome"]["answers"]
+    check(f"takehome-{step} ({name}): five answers saved in this game's own record for this step, each right first time; MeeMee Rescue's answers untouched",
+          list(mine) == [step] and len(mine[step]) == 5 and all(a["tries"] == 0 and a["hint"] is False for a in mine[step])
+          and [(a["whole"], a["take"], a["missing"]) for a in mine[step]] == [(q["whole"], q["take"], th_q(step, q)["missing"]) for q in rounds[step]]
+          and saved["answers"] == [], json.dumps(saved["games"]["takehome"])[:300])
+    check(f"takehome-{step} ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+TH_HOPPED = "document.querySelectorAll('#screen-takehome-play .mw-counters .mw-mimi.is-hop').length"
+
+
+async def test_takehome_wrong_take(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """Step 1's wrong checks: a calm line each time and nothing punishes; too many has its own line; a MeeMee dropped
+    outside the going-home part floats back; two wrong checks bring the hint (the places light up as the MeeMee to move
+    are counted); the answer still has to be given, and a hinted fact isn't right first time."""
+    print(f"\n== Take MeeMee Home: step 1's wrong checks and the hint ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-wrong-take-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    s = await th_open(t, page, "take", [{"whole": 7, "take": 4}, {"whole": 5, "take": 2}, {"whole": 6, "take": 3}, {"whole": 8, "take": 2}, {"whole": 4, "take": 1}])
+    await n_quiet(t)
+    n0 = len(await t.said())
+    await n_check(t)                                         # nothing moved yet: too few
+    s = await th_state(page)
+    check(f"takehome-wrong-take ({name}): Scruffles tapped with none moved: 'Let's look again.', the try-again face, one try, no hint",
+          (await t.said())[n0:] == ["again-look-again"] and s["face"] == "try-again" and s["tries"] == 1 and not s["hinted"] and s["phase"] == "takehome-open", json.dumps(s))
+    await asyncio.sleep(1.8)
+    s = await th_state(page)
+    check(f"takehome-wrong-take ({name}): ... and Scruffles is soon thinking again (no red, nothing taken away)", s["face"] == "thinking" and s["whole"] == 7, json.dumps(s))
+    # a MeeMee dropped outside the going-home part (in the sky, on the staying part) floats back to its place in the whole
+    n0 = len(await t.said())
+    for to in ((660, 120), (210, 470)):
+        await t.drag(380, 205, *to)
+        await asyncio.sleep(0.4)
+    home = await page.evaluate("MW.takehome.st.counters.every(c => c.where === 'whole' && Math.abs(c.x - c.home.x) < 0.5 && Math.abs(c.y - c.home.y) < 0.5)")
+    s = await th_state(page)
+    check(f"takehome-wrong-take ({name}): a MeeMee dropped in the sky or on the staying part floats back to its place in the whole (not a try, nothing said)",
+          home and s["going"] == 0 and s["tries"] == 1 and (await t.said())[n0:] == [], json.dumps(s))
+    # too many: its own line, and not the hint
+    await th_move(t, 6)
+    await n_check(t)
+    s = await th_state(page)
+    check(f"takehome-wrong-take ({name}): six moved for 7 − 4: 'That's too many. Take one back.' (a try, never the hint)",
+          (await t.said())[-1:] == ["too-many"] and s["tries"] == 2 and not s["hinted"] and s["going"] == 6, json.dumps(s))
+    await n_quiet(t)
+    await th_back(t, page, 4)
+    s = await th_state(page)
+    check(f"takehome-wrong-take ({name}): four taken back out of the going-home part float back into the whole",
+          s["going"] == 2 and s["whole"] == 5, json.dumps(s))
+    # two in, a third wrong check (too few): the hint, the two places still to fill lit as the MeeMee to move are counted
+    hopped0 = await page.evaluate(TH_HOPPED)
+    await n_check(t)
+    s = await th_state(page)
+    said = await t.said()
+    check(f"takehome-wrong-take ({name}): then too few: 'Count them with me. One, two, three, four.', with a ghost in each place still to fill (2)",
+          said[-1:] == ["again-count-with-me num-mid-1 num-mid-2 num-mid-3 num-end-4"] and s["hinted"] and s["ghosts"] == 2 and s["tries"] == 3,
+          json.dumps([said[-1:], s]))
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    s = await th_state(page)
+    hopped = await page.evaluate(TH_HOPPED)
+    check(f"takehome-wrong-take ({name}): ... the ghosts light as they are counted, the MeeMee hop as they're counted, and the answer still has to be given",
+          s["lit"] == 2 and hopped >= 4 and s["phase"] == "takehome-open" and s["going"] == 2, json.dumps([s, hopped0, hopped]))
+    await screenshot(page, f"takehome-{name}-s1-hint.png")
+    await th_move(t, 2)
+    s = await th_state(page)
+    slots = await page.evaluate("(() => { const d = MW.takehome.diagram(); return d.slots('right', 4).map(p => [p.x, p.y]); })()")
+    placed = await page.evaluate("MW.takehome.st.counters.filter(c => c.where === 'right').map(c => [c.x, c.y])")
+    check(f"takehome-wrong-take ({name}): the two moved in take the lit places", s["going"] == 4 and sorted(placed) == sorted(slots), json.dumps([placed, slots]))
+    await n_check(t)
+    s = await th_state(page)
+    rec = await page.evaluate("MW.takehome.answers('take').slice(-1)[0]")
+    check(f"takehome-wrong-take ({name}): four and a tap: right; saved with 3 wrong checks and the hint", s["phase"] == "takehome-celebrate"
+          and rec["tries"] == 3 and rec["hint"] is True and s["ghosts"] == 0, json.dumps([s, rec]))
+    # 5 − 2, right first time; the statuses: 7 − 4 not right first time (no day), 5 − 2 one day
+    await th_wait(page, ["takehome-open"], 25)
+    await th_move(t, 2)
+    await n_check(t)
+    await th_wait(page, ["takehome-celebrate"], 5)
+    days = await page.evaluate("(() => { const m = MW.takehomeFacts.statuses(MW.takehome.answers('take')); return [m['7:4'].days.length, m['7:4'].status, m['5:2'].days.length]; })()")
+    check(f"takehome-wrong-take ({name}): a hinted fact isn't right first time (7 − 4: no day towards secure; 5 − 2: one)", days == [0, "practising", 1], json.dumps(days))
+    check(f"takehome-wrong-take ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_takehome_wrong_left(p, name, vw, vh, dpr):
+    """Step 2's wrong checks: a wrong number floats back and the gap comes back; a tile dropped elsewhere floats back; two
+    wrong checks bring the hint (the MeeMee going home fade in the whole, the ones left are counted into the empty circle
+    with ghosts); the number still has to be dragged. Board s2-hint."""
+    print(f"\n== Take MeeMee Home: step 2's wrong checks and the hint ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-wrong-left-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await th_open(t, page, "left", [{"whole": 7, "take": 4}, {"whole": 6, "take": 2}, {"whole": 9, "take": 5}, {"whole": 5, "take": 1}, {"whole": 3, "take": 2}])
+    await n_quiet(t)
+    await t.drag(*tile_xy(5), 210, 470)
+    s = await th_state(page)
+    check(f"takehome-wrong-left ({name}): tile 5 in the empty circle: the gap shows 5", s["placed"] == 5 and s["sentence"] == "7 − 4 = 5", json.dumps(s))
+    await n_check(t)
+    s = await th_state(page)
+    check(f"takehome-wrong-left ({name}): a wrong number: 'Let's try again.', the try-again face, the tile floats back and the gap comes back",
+          (await t.said())[-1:] == ["again-try-again"] and s["face"] == "try-again" and s["placed"] is None and s["out"] == [] and s["sentence"] == "7 − 4 = _"
+          and s["tries"] == 1 and not s["hinted"] and not s["ready"], json.dumps(s))
+    await asyncio.sleep(1.2)
+    n0 = len(await t.said())
+    for n, to in ((8, (900, 330)), (6, (380, 205)), (2, (550, 470))):     # the sky, the whole, the going-home part
+        await t.drag(*tile_xy(n), *to)
+    s = await th_state(page)
+    check(f"takehome-wrong-left ({name}): tiles dropped in the sky or on a given circle float back to the track (not a try, nothing said)",
+          s["out"] == [] and s["placed"] is None and s["tries"] == 1 and (await t.said())[n0:] == [] and s["sentence"] == "7 − 4 = _", json.dumps(s))
+    # the second wrong number: the hint
+    await t.drag(*tile_xy(2), 215, 465)
+    await n_check(t)
+    s = await th_state(page)
+    said = await t.said()
+    order = await page.evaluate("(() => { const w = MW.takehome.st.fixed.filter(c => c.where === 'whole'); const xs = w.map(c => c.x).sort((a, b) => b - a);"
+                                " return [w.filter(c => c.el.classList.contains('takehome-dim')).map(c => c.x).sort((a, b) => b - a), xs.slice(0, 4)]; })()")
+    check(f"takehome-wrong-left ({name}): a second wrong number: 'Count them with me. One, two, three.'; the 4 going home fade in the whole (its 4 rightmost), "
+          f"3 ghosts in the empty circle",
+          said[-1:] == ["again-count-with-me num-mid-1 num-mid-2 num-end-3"] and s["hinted"] and s["dim"] == 4 and order[0] == order[1] and s["ghosts"] == 3
+          and s["tries"] == 2 and s["sentence"] == "7 − 4 = _", json.dumps([said[-1:], s, order]))
+    # board s2-hint: two of the three counted
+    await th_until(page, "document.querySelectorAll('#screen-takehome-play .mw-ghost.is-lit').length >= 2", 8)
+    await screenshot(page, f"takehome-{name}-s2-hint.png")
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    s = await th_state(page)
+    check(f"takehome-wrong-left ({name}): ... the ghosts light as the ones left are counted, and stay, with the faded MeeMee, until the number is dragged",
+          s["lit"] == 3 and s["dim"] == 4 and s["phase"] == "takehome-open" and s["placed"] is None, json.dumps(s))
+    await t.drag(*tile_xy(3), 210, 470)
+    await n_check(t)
+    s = await th_state(page)
+    rec = await page.evaluate("MW.takehome.answers('left').slice(-1)[0]")
+    check(f"takehome-wrong-left ({name}): tile 3: right, the MeeMee back to full, the ghosts gone; saved with 2 wrong checks and the hint",
+          s["phase"] == "takehome-celebrate" and s["dim"] == 0 and s["ghosts"] == 0 and s["carried"] == [None, 3, None] and rec["tries"] == 2 and rec["hint"] is True,
+          json.dumps([s, rec]))
+    check(f"takehome-wrong-left ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_takehome_wrong_numbers(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """Step 3's hints, by where the gap is; Hear-again cuts a hint short; an answer of 0 never gets the hint."""
+    print(f"\n== Take MeeMee Home: step 3's wrong checks and the hints ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-wrong-numbers-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rnd = [{"whole": 7, "take": 4, "missing": "right"}, {"whole": 7, "take": 4, "missing": "whole"}, {"whole": 5, "take": 5, "missing": "left"},
+           {"whole": 7, "take": 0, "missing": "left"}, {"whole": 6, "take": 0, "missing": "right"}]
+    await th_open(t, page, "numbers", rnd)
+
+    async def wrong(*tiles, at=None):
+        for n in tiles:
+            await n_quiet(t)
+            s0 = await th_state(page)
+            await t.drag(*tile_xy(n), *(at or CENTRES[s0["target"]]))
+            await n_check(t)
+
+    # 7 − ? = 3: the numbers come back as MeeMee; the 3 staying fade in the whole; the rest counted into the going-home circle
+    await wrong(2, 5)
+    s = await th_state(page)
+    order = await page.evaluate("(() => { const w = MW.takehome.st.fixed.filter(c => c.where === 'whole'); const xs = w.map(c => c.x).sort((a, b) => a - b);"
+                                " return [w.filter(c => c.el.classList.contains('takehome-dim')).map(c => c.x).sort((a, b) => a - b), xs.slice(0, 3)]; })()")
+    check(f"takehome-wrong-numbers ({name}): 7 − ? = 3, two wrong numbers: the whole's 7 and the staying 3 come back as MeeMee, the 3 staying fade in the whole "
+          f"(its leftmost), 4 ghosts in the going-home circle; 'Count them with me. One… four.'",
+          s["hinted"] and s["carried"] == [None, None, None] and s["fixed"] == 10 and s["dim"] == 3 and order[0] == order[1] and s["ghosts"] == 4
+          and (await t.said())[-1:] == ["again-count-with-me num-mid-1 num-mid-2 num-mid-3 num-end-4"], json.dumps([s, order]))
+    await asyncio.sleep(0.5)
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.5)
+    s = await th_state(page)
+    check(f"takehome-wrong-numbers ({name}): Hear-again during the hint takes it away: the numbered MeeMee back, nothing faded, no ghosts; the question again",
+          not s["hinted"] and s["carried"] == [7, 3, None] and s["fixed"] == 0 and s["dim"] == 0 and s["ghosts"] == 0
+          and (await t.said())[-1:] == [th_prompt("numbers", rnd[0], 0)], json.dumps(s))
+    await wrong(6)
+    s = await th_state(page)
+    check(f"takehome-wrong-numbers ({name}): the next wrong number gives the hint again in full", s["hinted"] and s["fixed"] == 10 and s["tries"] == 3, json.dumps(s))
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    await screenshot(page, f"takehome-{name}-s3-hint-part.png")
+    await t.drag(*tile_xy(4), 550, 470)
+    await n_check(t)
+    s = await th_state(page)
+    faded = await page.evaluate("document.querySelectorAll('#screen-takehome-play .mw-counters .mw-mimi.is-rescued').length")
+    check(f"takehome-wrong-numbers ({name}): tile 4: right; the hint's MeeMee fade away and the given circles carry their numbers again",
+          s["phase"] == "takehome-celebrate" and s["carried"] == [7, 3, 4] and faded == 10, json.dumps([s, faded]))
+    # ? − 4 = 3: both parts' MeeMee, counted into the whole
+    await th_wait(page, ["takehome-open"], 25)
+    await wrong(8, 6)
+    s = await th_state(page)
+    check(f"takehome-wrong-numbers ({name}): ? − 4 = 3, two wrong numbers: both parts come back as MeeMee (3 and 4), counted into the whole (7 ghosts), nothing fades",
+          s["hinted"] and s["carried"] == [None, None, None] and s["fixed"] == 7 and s["dim"] == 0 and s["ghosts"] == 7
+          and (await t.said())[-1:] == ["again-count-with-me num-mid-1 num-mid-2 num-mid-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"], json.dumps(s))
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    await screenshot(page, f"takehome-{name}-s3-hint-whole.png")
+    await t.drag(*tile_xy(7), 380, 205)
+    await n_check(t)
+    check(f"takehome-wrong-numbers ({name}): tile 7 completes ? − 4 = 3", (await th_state(page))["phase"] == "takehome-celebrate")
+    # 5 − 5 = ?: an answer of 0 never gets the hint
+    await th_wait(page, ["takehome-open"], 25)
+    n0 = len(await t.said())
+    await wrong(1, 2, 3)
+    await n_quiet(t)
+    s = await th_state(page)
+    check(f"takehome-wrong-numbers ({name}): 5 − 5 = ? (a zero fact), three wrong numbers: 'Let's try again.' each time, never the hint (no MeeMee, no ghosts)",
+          (await t.said())[n0:] == ["again-try-again"] * 3 and not s["hinted"] and s["fixed"] == 0 and s["ghosts"] == 0 and s["tries"] == 3, json.dumps(s))
+    await t.drag(*tile_xy(0), 210, 470)
+    await n_check(t)
+    rec = await page.evaluate("MW.takehome.answers('numbers').slice(-1)[0]")
+    check(f"takehome-wrong-numbers ({name}): ... the 0 tile answers it (saved with 3 wrong checks, no hint)", rec["whole"] == 5 and rec["take"] == 5 and rec["tries"] == 3
+          and rec["hint"] is False, json.dumps(rec))
+    # 7 − 0 = ?: a zero fact whose answer isn't 0 gets the hint: nothing fades, 7 counted into the staying circle
+    s = await th_wait(page, ["takehome-open"], 25)
+    check(f"takehome-wrong-numbers ({name}): 7 − 0 = ? asked 'Seven… MeeMee. Zero… are going home. How many are left?'",
+          (await t.said())[-1:] == ["num-mid-7 takehome-meemee num-mid-0 takehome-are-going takehome-how-many-left"], json.dumps((await t.said())[-1:]))
+    await wrong(5, 6)
+    s = await th_state(page)
+    check(f"takehome-wrong-numbers ({name}): 7 − 0 = ?, two wrong numbers: the hint (7 MeeMee in the whole, the going-home part's 0 as no MeeMee, nothing fades, 7 ghosts)",
+          s["hinted"] and s["fixed"] == 7 and s["dim"] == 0 and s["ghosts"] == 7, json.dumps(s))
+    await t.drag(*tile_xy(7), 210, 470)
+    await n_check(t)
+    await th_wait(page, ["takehome-celebrate"], 5)
+    # 6 − ? = 6: answer 0, no hint; nobody hops home
+    await th_wait(page, ["takehome-open"], 25)
+    n0 = len(await t.said())
+    await wrong(2, 1)
+    await n_quiet(t)
+    s = await th_state(page)
+    check(f"takehome-wrong-numbers ({name}): 6 − ? = 6 (answer 0), two wrong numbers: no hint", not s["hinted"] and s["ghosts"] == 0
+          and (await t.said())[n0:] == ["again-try-again"] * 2, json.dumps(s))
+    await page.evaluate("window.__thq = performance.now()")
+    await t.drag(*tile_xy(0), 550, 470)
+    await n_check(t)
+    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-6 takehome-take-away num-mid-0 takehome-is num-end-6')", 15)
+    await asyncio.sleep(1.5)
+    hops = await page.evaluate("MW.events.filter(e => (e.type === 'hop' || e.type === 'home') && e.t > window.__thq).length")
+    check(f"takehome-wrong-numbers ({name}): 6 − 0 = 6: 'Six take away zero is six.', and nobody hops home", ok and hops == 0, str(hops))
+    check(f"takehome-wrong-numbers ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_takehome_drag(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """Step 1: a touch anywhere in the whole picks up a MeeMee; one dropped outside the going-home part floats back; one can
+    be taken back out. Steps 2 and 3: a tile dropped on the gap lands in the circle and fills the gap; taken out, the gap
+    comes back; another tile replaces it."""
+    print(f"\n== Take MeeMee Home: dragging and dropping ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-drag-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await page.evaluate("MW.takehome.ask({ whole: 7, take: 4 }, 'take')")
+    holding = "(() => { const c = MW.takehome.st.counters.find(c => c.lifted); return c ? c.where : null; })()"
+    got = []
+    # the whole's rim and the spaces between its MeeMee (7 of them, about 41 px), and its middle
+    for x, y in ((380, 98), (488, 205), (380, 312), (272, 205), (300, 130), (460, 280), (380, 205), (330, 205)):
+        await n_hold(t, x, y, 660, 120, touch_id=60)
+        got.append([x, y, await page.evaluate(holding)])
+        await touch(t, "touchEnd", [])
+        await asyncio.sleep(0.4)
+    back = await page.evaluate("MW.takehome.st.counters.every(c => c.where === 'whole' && Math.abs(c.x - c.home.x) < 0.5 && Math.abs(c.y - c.home.y) < 0.5)")
+    check(f"takehome-drag ({name}): a touch anywhere in the whole (its rim, between its MeeMee, its middle) picks up a MeeMee; dropped in the sky, each floats back to its place",
+          all(g[2] == "whole" for g in got) and back, json.dumps(got))
+    await n_hold(t, 380, 50, 660, 120, touch_id=61)
+    outside = await page.evaluate(holding)
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.3)
+    check(f"takehome-drag ({name}): a touch above the whole (outside its rim) picks nothing up", outside is None, str(outside))
+    misses = "MW.events.filter(e => (e.type === 'drop' && e.detail === 'miss') || (e.type === 'sfx' && e.detail === 'whoosh')).length"
+    check(f"takehome-drag ({name}): ... while a MeeMee dropped in the sky is a miss, with the whoosh (one of each per drop)",
+          await page.evaluate(misses) == 2 * len(got), str(await page.evaluate(misses)))
+    # a child touching the MeeMee to count them: taps (and a short drag) that end inside the whole, near its foot, its top
+    # and its sides, far from the MeeMee's own place, put it back quietly: no whoosh, no miss, nothing said
+    n0, said0 = await page.evaluate(misses), len(await t.said())
+    for x, y in ((380, 330), (330, 312), (440, 312), (380, 92), (262, 205)):
+        await t.tap(x, y)
+        await asyncio.sleep(0.35)
+    await t.drag(380, 318, 470, 290)
+    await asyncio.sleep(0.4)
+    quiet = await page.evaluate("MW.takehome.st.counters.every(c => c.where === 'whole' && Math.abs(c.x - c.home.x) < 0.5 && Math.abs(c.y - c.home.y) < 0.5)")
+    check(f"takehome-drag ({name}): taps at the foot of the whole (380, 330), near its foot, at its top and side, and a short drag inside it, say nothing, "
+          f"log no miss and no whoosh, and every MeeMee is back in its place",
+          await page.evaluate(misses) == n0 and len(await t.said()) == said0 and quiet and (await th_state(page))["tries"] == 0,
+          json.dumps([await page.evaluate(misses) - n0, (await t.said())[said0:]]))
+    await th_move(t, 2)
+    xy = await page.evaluate("(() => { const c = MW.takehome.st.counters.filter(c => c.where === 'right')[0]; return [c.x, c.y]; })()")
+    await t.drag(*xy, 380, 205)
+    s = await th_state(page)
+    moved = await page.evaluate("MW.takehome.st.counters.filter(c => c.where === 'whole').every(c => Math.abs(c.x - c.home.x) < 0.5 && Math.abs(c.y - c.home.y) < 0.5)")
+    check(f"takehome-drag ({name}): one taken back out of the going-home part goes back to its own place in the whole", s["going"] == 1 and s["whole"] == 6 and moved, json.dumps(s))
+    big = await page.evaluate("MW.takehome.st.counters.filter(c => c.where === 'right').map(c => c.size)")
+    check(f"takehome-drag ({name}): a MeeMee in the going-home part takes that part's counting pattern at the part's size", big == [80], str(big))
+
+    # steps 2 and 3: the gap
+    for step, q, target in (("left", {"whole": 7, "take": 4}, "left"), ("numbers", {"whole": 7, "take": 4, "missing": "right"}, "right"),
+                            ("numbers", {"whole": 7, "take": 4, "missing": "whole"}, "whole"), ("numbers", {"whole": 9, "take": 6, "missing": "left"}, "left")):
+        await page.evaluate("(a) => MW.takehome.ask(a[0], a[1])", [q, step])
+        await asyncio.sleep(0.4)
+        qq = th_q(step, q)
+        ans = th_answer(qq)
+        g = await th_gap(page)
+        await t.drag(*tile_xy(ans), *g)
+        s = await th_state(page)
+        tile = await page.evaluate("(n => { const t = MW.takehome.track().tile(n); return [t.x, t.y]; })(%d)" % ans)
+        label = f"{step}, {th_text(qq, target)}"
+        check(f"takehome-drag ({name}): {label}: a tile dropped on the gap lands in the empty circle and fills the gap",
+              s["placed"] == ans and tile == list(CENTRES[target]) and s["sentence"] == th_text(qq), json.dumps([s, tile, g]))
+        await t.drag(*CENTRES[target], 900, 330)
+        s = await th_state(page)
+        check(f"takehome-drag ({name}): {label}: taken out, it floats back to the track and the sentence has its gap again",
+              s["placed"] is None and s["out"] == [] and s["sentence"] == th_text(qq, target), json.dumps(s))
+    # a second tile replaces the first; a placed tile picked up and put down on the number it filled stays
+    wrong = 2
+    await t.drag(*tile_xy(wrong), *(await th_gap(page)))
+    await t.drag(*tile_xy(3), 210, 470)
+    s = await th_state(page)
+    check(f"takehome-drag ({name}): another tile replaces the first, which floats back; the sentence shows the new one", s["placed"] == 3 and s["out"] == [3]
+          and s["sentence"] == "9 − 6 = 3", json.dumps(s))
+    num = await page.evaluate("(() => { const e = MW.takehome.equation().el, r = e.children[4].getBoundingClientRect(); const c = MW.stage.toStage(r.left + r.width / 2, r.top + r.height / 2); return [c.x, c.y]; })()")
+    await t.drag(210, 470, *num)
+    s = await th_state(page)
+    check(f"takehome-drag ({name}): the tile picked back up and put down on the number it filled stays in the circle", s["placed"] == 3 and s["sentence"] == "9 − 6 = 3", json.dumps([s, num]))
+    eq = (await page.evaluate(TH_EQ))[-4:]
+    check(f"takehome-drag ({name}): the sentence's events: the gap back (minus 9-6=?), filled again (fill 3)", eq[-2:] == ["minus 9-6=?", "fill 3"], json.dumps(eq))
+    # the new lines that join others once recorded (stubbed here: they are pending): the first two questions' instructions, and the praise
+    lines = await page.evaluate("""(() => { const R = MW.takehome, out = {};
+        const was = MW.audio.recorded;
+        out.pending = [R.ask({ whole: 7, take: 4 }, 'take') && R.st.prompt.slice(-2), R.ask({ whole: 7, take: 4 }, 'left') && R.st.prompt.slice(-2), R.praiseLines()];
+        MW.audio.recorded = id => ['takehome-move-them', 'takehome-find-number', 'takehome-home-they-go'].indexOf(id) >= 0 || was(id);
+        out.recorded = [R.ask({ whole: 7, take: 4 }, 'take') && R.st.prompt.slice(-2), R.ask({ whole: 7, take: 4 }, 'left') && R.st.prompt.slice(-2), R.praiseLines()];
+        MW.audio.recorded = was; MW.world.home(); return out; })()""")
+    praise = ["praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done"]
+    check(f"takehome-drag ({name}): while pending, 'Move them into the dotted circle.', 'Find the number.' and 'Home they go!' are left out (so nothing falls silent)",
+          lines["pending"] == [[["num-mid-4", "takehome-are-going"], ["tap-scruffles"]], [["takehome-how-many-left"], ["tap-scruffles"]], praise], json.dumps(lines["pending"]))
+    check(f"takehome-drag ({name}): once recorded, they join: step 1's first questions end 'Move them into the dotted circle. Tap Scruffles…', steps 2 and 3's "
+          f"'Find the number. Tap Scruffles…', and 'Home they go!' is one of the praise",
+          lines["recorded"] == [[["takehome-move-them"], ["tap-scruffles"]], [["takehome-find-number"], ["tap-scruffles"]], praise + ["takehome-home-they-go"]],
+          json.dumps(lines["recorded"]))
+    check(f"takehome-drag ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_takehome_questions(p):
+    """Every question each step can ask is put on the screen and answered (a wrong tile refused first in steps 2 and 3);
+    rounds bring up every fact, and in step 3 every gap place; the zero facts only in step 3, once that whole's other
+    facts are secure there. Writes notes/all-questions-takehome.md."""
+    print("\n== Take MeeMee Home: every question ==")
+    browser = await p.chromium.launch()
+    ctx, page, problems = await seeded(browser, [])
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    counts = {}
+    for step in TH_STEPS:
+        qs = await E("(a) => MW.takehomeFacts.allQuestions(a[0], [2,3,4,5,6,7,8,9,10], a[1])", [step, step == "numbers"])
+        counts[step] = len(qs)
+        out = await E("""(a) => { const R = MW.takehome, out = [], step = a[0];
+            a[1].forEach(q => { R.ask(q, step); const s = R.st, d = R.diagram(), tr = R.track(), e = R.equation();
+              const o = { q: q, prompt: s.prompt, carried: ['whole', 'left', 'right'].map(k => d.carried(k)), waiting: d.circles[q.missing].classList.contains('is-waiting'),
+                          sentence: Array.from(e.el.children).map(c => c.classList.contains('mw-equation-gap') ? '_' : c.textContent).join(' '), counters: s.counters.length + s.fixed.length };
+              const c = MW.LAYOUT[q.missing], ans = s.answer;
+              if (step === 'take') {
+                s.counters.filter(m => m.where === 'whole').slice(0, q.take).forEach(m => R.drop(m, 550, 470, false));
+              } else {
+                R.drop(tr.tile((ans + 1) % 11), c.x + 20, c.y - 20, false); R.podTap();
+                o.wrong = [s.tries, s.placed, tr.tile((ans + 1) % 11).out()];
+                R.drop(tr.tile(ans), c.x - 30, c.y + 20, false);
+              }
+              R.podTap();
+              const rec = R.answers(step).slice(-1)[0];
+              o.right = [MW.world.st.phase, d.circles[q.missing].classList.contains('is-success'), step === 'take' ? null : d.carried(q.missing), ans];
+              o.rec = [rec.whole, rec.take, rec.missing];
+              out.push(o); });
+            MW.world.home(); return out; }""", [step, qs])
+        bad = []
+        for o in out:
+            q = o["q"]
+            w, t_, r = q["whole"], q["take"], q["left"]
+            ans = th_answer(q)
+            want = dict(right=["takehome-celebrate", True, None if step == "take" else ans, ans], rec=[w, t_, q["missing"]],
+                        prompt=None)
+            sentence_ok = (o["sentence"] == "" if step == "take" else o["sentence"] == th_text(q, q["missing"]))
+            shown = (o["counters"] == w if step == "take" else (o["counters"] == w + t_ if step == "left" else o["counters"] == 0))
+            wrong_ok = step == "take" or o["wrong"] == [1, None, False]
+            p_ok = " ".join(" ".join(x) for x in o["prompt"]) == th_prompt(step, q, 0)
+            if not (o["right"] == want["right"] and o["rec"] == want["rec"] and sentence_ok and shown and wrong_ok and p_ok and o["waiting"]):
+                bad.append(o)
+        label = {"take": "step 1 (take away): 45", "left": "step 2 (how many are left): 45", "numbers": "step 3 (numbers): 45 in each of the 3 gap places, and the 18 zero facts' 54"}[step]
+        check(f"takehome-questions: every question of {label} on the screen as its step shows it, asked in its words, answered (a wrong tile refused first)",
+              len(out) == {"take": 45, "left": 45, "numbers": 189}[step] and not bad, json.dumps(bad[:2]))
+
+    # rounds: every fact comes up (and every gap place in step 3); zero facts only in step 3, once that whole's others are secure there
+    rounds = """(a) => { const out = []; for (let i = 0; i < a.n; i++) out.push(MW.takehomeFacts.pickRound({ step: a.step, wholes: a.wholes || [2,3,4,5,6,7,8,9,10],
+        answers: a.answers || [], size: 5, turn: i * 5 })); return out; }"""
+    seen = {}
+    for step in TH_STEPS:
+        rs = await E(rounds, {"step": step, "n": 3000})
+        qs = [q for r in rs for q in r]
+        seen[step] = qs
+        keys = {(q["whole"], q["take"], q["missing"]) for q in qs}
+        want = 135 if step == "numbers" else 45
+        check(f"takehome-questions: {step} rounds bring up every question ({want}), none a zero fact while nothing is secure",
+              len(keys) == want and not any(q["take"] in (0, q["whole"]) for q in qs), str(len(keys)))
+        check(f"takehome-questions: {step}: every round has five, at most two from one whole, never the same whole twice in a row",
+              all(len(r) == 5 and max(sum(1 for q in r if q["whole"] == w) for w in range(2, 11)) <= 2 and all(r[i]["whole"] != r[i - 1]["whole"] for i in range(1, 5)) for r in rs))
+    spread = [sorted(sum(1 for q in r if q["missing"] == m) for m in ("whole", "right", "left")) for r in [seen["numbers"][i:i + 5] for i in range(0, len(seen["numbers"]), 5)]]
+    share = {m: sum(1 for q in seen["numbers"] if q["missing"] == m) / len(seen["numbers"]) for m in ("whole", "right", "left")}
+    check("takehome-questions: step 3 spreads the gap's place: 2, 2 and 1 in every round, and about a third each across rounds",
+          all(x == [1, 2, 2] for x in spread) and all(abs(v - 1 / 3) < 0.01 for v in share.values()), json.dumps(share))
+    five = [{"t": T0 + d * DAY + i * 1000, "whole": 5, "take": tk, "missing": "left", "tries": 0, "misses": 0, "hint": False} for d in range(3) for i, tk in enumerate((1, 2, 3, 4))]
+    z = {}
+    for step in TH_STEPS:
+        rs = await E(rounds, {"step": step, "n": 600, "answers": five})
+        z[step] = sorted({(q["whole"], q["take"], q["missing"]) for r in rs for q in r if q["take"] in (0, q["whole"])})
+    check("takehome-questions: whole 5's facts secure in a step: in step 3 its zero facts (5 − 0, 5 − 5) join, with the gap in every place; never in steps 1 and 2",
+          z["take"] == [] and z["left"] == [] and {(w, t_) for w, t_, m in z["numbers"]} == {(5, 0), (5, 5)} and len(z["numbers"]) == 6, json.dumps(z))
+    four = [a for a in five if a["take"] != 4]
+    rs = await E(rounds, {"step": "numbers", "n": 600, "answers": four})
+    check("takehome-questions: ... not while one of its other facts (5 − 4) isn't secure", not any(q["take"] in (0, q["whole"]) for r in rs for q in r))
+    small = await E("() => MW.takehomeFacts.pickRound({ step: 'take', wholes: [2], answers: [], size: 5 })")
+    check("takehome-questions: only 2 in play still makes a round (2 − 1 five times)", len(small) == 5 and all(q["whole"] == 2 and q["take"] == 1 for q in small), json.dumps(small))
+
+    # notes/all-questions-takehome.md
+    allq = {step: await E("(a) => MW.takehomeFacts.allQuestions(a[0], [2,3,4,5,6,7,8,9,10], a[1])", [step, step == "numbers"]) for step in TH_STEPS}
+    def words(step, q):
+        w, t_, r = q["whole"], q["take"], q["left"]
+        whole = f"{TH_N[w].capitalize()}… MeeMee."
+        going = f"{TH_N[t_].capitalize()}… {'is' if t_ == 1 else 'are'} going home."
+        staying = f"{TH_N[r].capitalize()}… {'is' if r == 1 else 'are'} staying."
+        if step == "take":
+            return f"{whole} {going}"
+        if q["missing"] == "left":
+            return f"{whole} {going} How many are left?"
+        if q["missing"] == "right":
+            return f"{whole} {staying} How many are going home?"
+        return f"{going} {staying} How many MeeMee altogether?"
+    lines = ["# Every question Take MeeMee Home can ask", "",
+             "Made by tools/tests/test_game.py from the game's own list (MW.takehomeFacts.allQuestions); don't edit it by hand.",
+             "Step 1 (take away): the child moves the MeeMee going home into their part; the sentence shows after a right answer.",
+             "Step 2 (how many are left) and step 3 (numbers): the child drags a number tile into the empty circle or the sentence's gap.",
+             "Zero facts (marked *) come up in step 3 only, once the other facts of that number are secure in step 3. The first two",
+             "questions of a round also say \"Move them into the dotted circle.\" (step 1) or \"Find the number.\" (steps 2 and 3), and",
+             "\"Tap Scruffles when you're ready.\" Every right answer is said as a sentence: \"Seven take away four is three.\"", ""]
+    for step, title in (("take", "Step 1: Take away"), ("left", "Step 2: How many are left"), ("numbers", "Step 3: Numbers")):
+        lines += [f"## {title} ({len(allq[step])} questions)", ""]
+        if step == "take":
+            # step 1 asks for no number: the child moves the MeeMee going home, and the sentence shows once that is right
+            lines += ["| Whole | MeeMee to move | Number sentence, once right | What Scruffles says |", "|---|---|---|---|"]
+            lines += [f"| {q['whole']} | {q['take']} | {th_text(q)} | {words(step, q)} |" for q in allq[step]]
+        else:
+            lines += ["| Whole | Number sentence | Answer | What Scruffles says |", "|---|---|---|---|"]
+            for q in allq[step]:
+                zero = q["take"] in (0, q["whole"])
+                lines.append(f"| {q['whole']} | {th_text(q, q['missing']).replace('_', '?')}{' *' if zero else ''} | {th_answer(q)} | {words(step, q)} |")
+        lines.append("")
+    (ROOT / "notes" / "all-questions-takehome.md").write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    print(f"   wrote notes/all-questions-takehome.md ({', '.join(f'{s}: {len(allq[s])}' for s in TH_STEPS)})")
+    check("takehome-questions: the list has 45, 45 and 189 questions (step 3: 135 and the zero facts' 54)", [len(allq[s]) for s in TH_STEPS] == [45, 45, 189])
+    check("takehome-questions: no console errors", not problems, "; ".join(problems[:3]))
+    await ctx.close()
+    await browser.close()
+
+
+TH_ANSWER = """(a) => { const R = MW.takehome; R.ask(a.q, a.step); const s = R.st, tr = R.track(), c = MW.LAYOUT[s.target];
+    if (a.step === 'take') {
+      if (a.wrong) R.podTap();                                // nothing moved: a wrong check
+      s.counters.filter(m => m.where === 'whole').slice(0, a.q.take).forEach(m => R.drop(m, 550, 470, false));
+    } else {
+      if (a.wrong) { R.drop(tr.tile((s.answer + 1) % 11), c.x, c.y, false); R.podTap(); }
+      R.drop(tr.tile(s.answer), c.x, c.y, false);
+    }
+    R.podTap(); const out = MW.world.st.phase; MW.world.home(); return out; }"""
+TH_STATUS = "(a) => { const m = MW.takehomeFacts.statuses(MW.takehome.answers(a[0])); const s = m[a[1]]; return s ? s.status : 'notyet'; }"
+
+
+async def test_takehome_progress(p):
+    """Secure: right first time on three different days (the date faked in the page); a wrong answer moves a fact back to
+    practising. Each step keeps its own records; in step 3 a fact counts whichever place its gap was in. MeeMee Rescue's
+    progress is untouched by this game, and this game's by MeeMee Rescue."""
+    print("\n== Take MeeMee Home: progress ==")
+    browser = await p.chromium.launch()
+    rescue = secure_answers([(7, 3)]) + [ans(T0 + DAY, 5, 1, first=False)]
+    ctx, page, problems = await seeded(browser, rescue)
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    await E("window.__now = %d; Date.now = () => window.__now" % T0)
+    got = []
+    for d in range(3):
+        await E("window.__now = %d" % (T0 + d * DAY + 3600_000))
+        got.append(await E(TH_ANSWER, {"q": {"whole": 7, "take": 4}, "step": "take"}))
+        got.append(await E(TH_STATUS, ["take", "7:4"]))
+    check("takehome-progress: 7 − 4 right first time on three different days (step 1): practising, practising, then secure",
+          got == ["takehome-celebrate", "practising", "takehome-celebrate", "practising", "takehome-celebrate", "secure"], json.dumps(got))
+    same = []
+    for i in range(3):
+        await E("window.__now = %d" % (T0 + i * 60_000))
+        same.append(await E(TH_ANSWER, {"q": {"whole": 8, "take": 2}, "step": "take"}))
+    check("takehome-progress: three times right on one day is still practising", await E(TH_STATUS, ["take", "8:2"]) == "practising")
+    await E("window.__now = %d" % (T0 + 3 * DAY))
+    await E(TH_ANSWER, {"q": {"whole": 7, "take": 4}, "step": "take", "wrong": True})
+    check("takehome-progress: a wrong answer moves 7 − 4 back to practising", await E(TH_STATUS, ["take", "7:4"]) == "practising")
+    check("takehome-progress: 7 − 3 is a fact of its own (not yet), not 7 − 4", await E(TH_STATUS, ["take", "7:3"]) == "notyet")
+    sep = await E("[MW.takehome.answers('left').length, MW.takehome.answers('numbers').length, MW.takehome.answers('take').length]")
+    check("takehome-progress: each step keeps its own records: step 1's answers are in step 1's only", sep == [0, 0, 7], str(sep))
+    for d, gap in enumerate(("right", "whole", "left")):
+        await E("window.__now = %d" % (T0 + (5 + d) * DAY))
+        await E(TH_ANSWER, {"q": {"whole": 7, "take": 4, "missing": gap}, "step": "numbers"})
+    check("takehome-progress: in step 3, 7 − 4 right first time on three days with its gap in a different place each day is secure",
+          await E(TH_STATUS, ["numbers", "7:4"]) == "secure" and await E(TH_STATUS, ["take", "7:4"]) == "practising" and await E(TH_STATUS, ["left", "7:4"]) == "notyet")
+    saved = await E("JSON.parse(localStorage.getItem('mimi-world'))")
+    th = saved["games"]["takehome"]
+    check("takehome-progress: saved on the tablet in this game's own record, one list per step; MeeMee Rescue's answers untouched",
+          sorted(th["answers"]) == ["numbers", "take"] and saved["answers"] == rescue, json.dumps(sorted(th)))
+    # MeeMee Rescue's play leaves this game's progress as it is
+    before = json.dumps(th, sort_keys=True)
+    await E("""(() => { MW.store.setting('answerMode', 'numbers'); MW.store.setting('check', 'auto'); MW.rescue.ask({ whole: 5, left: 2, right: 3, missing: 'right' });
+        MW.rescue.drop(MW.rescue.track().tile(3), 550, 470, false); MW.world.home(); })()""")
+    saved = await E("JSON.parse(localStorage.getItem('mimi-world'))")
+    check("takehome-progress: a MeeMee Rescue answer is saved with MeeMee Rescue's, and this game's progress is as it was",
+          len(saved["answers"]) == len(rescue) + 1 and json.dumps(saved["games"]["takehome"], sort_keys=True) == before, str(len(saved["answers"])))
+    # a tablet that has never played this game keeps nothing for it (reading its tab doesn't create it)
+    ctx2, page2, problems2 = await seeded(browser, rescue)
+    await page2.evaluate("MW.grownups.openPanel(); MW.grownups.show('takehome-subtraction')")
+    await asyncio.sleep(0.3)
+    kept = await page2.evaluate("(() => { MW.store.save(); return JSON.parse(localStorage.getItem('mimi-world')).games; })()")
+    check("takehome-progress: opening the Subtraction tab on a tablet that has never played keeps nothing for the game", "takehome" not in kept, json.dumps(kept))
+    check("takehome-progress: no console errors", not (problems or problems2), "; ".join((problems + problems2)[:3]))
+    await ctx2.close()
+    await ctx.close()
+    await browser.close()
+
+
+TH_TAB = """(() => { const b = document.querySelector('.gu-body'), g = {};
+    b.querySelectorAll('.gu-grid .mw-cell').forEach(c => { g[c.textContent.trim()] = c.className.split(' ').find(x => x.startsWith('is-')); });
+    return { tabs: Array.from(document.querySelectorAll('.gu-tab')).map(x => x.textContent), on: (document.querySelector('.gu-tab.is-on') || {}).textContent,
+             h3: Array.from(b.querySelectorAll('.gu-h3')).map(h => h.textContent),
+             steps: Array.from(b.querySelectorAll('[data-step]')).map(x => [x.textContent, x.classList.contains('is-on')]),
+             views: Array.from(b.querySelectorAll('[data-view]')).map(x => [x.textContent, x.classList.contains('is-on')]),
+             wholes: Array.from(b.querySelectorAll('.takehome-whole')).map(x => [x.textContent, x.classList.contains('is-on')]),
+             paras: Array.from(b.querySelectorAll('.gu-p')).map(x => x.textContent), lead: (b.querySelector('.gu-lead') || {}).textContent,
+             cells: Object.keys(g).length, rows: Array.from(b.querySelectorAll('.gu-grid-row')).map(r => r.querySelectorAll('.mw-cell').length), g: g,
+             legend: Array.from(b.querySelectorAll('.gu-legend .mw-cell')).map(c => c.textContent.trim()),
+             clear: Array.from(b.querySelectorAll('.gu-btn')).filter(x => /clear/i.test(x.textContent)).map(x => x.textContent) }; })()"""
+TH_EXAMPLE = [(2, 1), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3), (5, 1), (5, 2), (5, 4)]                    # board grid-final's secure facts
+TH_PRACTISING = [(5, 3), (6, 1), (6, 2), (6, 3), (7, 1), (7, 4)]
+
+
+async def test_takehome_grownups(p, name, vw, vh, dpr):
+    """The game's grown-ups tab, Subtraction (boards grownups and grid-final): which step (a change starts with the next
+    round), wholes in play (they limit the questions), the grid for the step picked, and clearing this game's progress only."""
+    print(f"\n== Take MeeMee Home: the Subtraction tab ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-gu-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    take = [{"t": T0 + d * DAY + i * 1000, "whole": w, "take": a, "missing": "right", "tries": 0, "misses": 0, "hint": False}
+            for d in range(3) for i, (w, a) in enumerate(TH_EXAMPLE)]
+    take += [{"t": T0 + 4 * DAY + i * 1000, "whole": w, "take": a, "missing": "right", "tries": 1, "misses": 0, "hint": False} for i, (w, a) in enumerate(TH_PRACTISING)]
+    await page.evaluate("""(a) => { const g = MW.store.game('takehome'); g.answers = { take: a }; MW.store.save();
+        MW.store.get('answers').push({ t: 1, whole: 7, left: 3, right: 4, missing: 'right', tries: 0, misses: 0, hint: false, check: 'tap' });
+        MW.store.game('words').answers = [{ t: 1, w: 'one', step: 'tiles', mode: 'find', tapped: 0, drops: 0, hint: false }]; MW.store.save(); }""", take)
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('takehome-subtraction')")
+    await asyncio.sleep(0.4)
+    tab = await page.evaluate(TH_TAB)
+    check(f"takehome-gu ({name}): the tab 'Subtraction' sits after MeeMee Rockets' Words, before Checks and Sound",
+          tab["tabs"] == ["Progress", "Settings", "Words", "Subtraction", "Checks", "Sound"] and tab["on"] == "Subtraction", json.dumps(tab["tabs"]))
+    check(f"takehome-gu ({name}): in order: Which step (Take away on), Wholes in play (2 to 10, all on), Showing progress for (Take away)",
+          tab["h3"] == ["Which step", "Wholes in play", "Showing progress for"] and tab["steps"] == [["Take away", True], ["How many are left", False], ["Numbers", False]]
+          and tab["wholes"] == [[str(w), True] for w in range(2, 11)] and tab["views"] == [["Take away", True], ["How many are left", False], ["Numbers", False]],
+          json.dumps([tab["h3"], tab["steps"], tab["views"]]))
+    want = ["Take away (the first step): the MeeMee sit in the whole. Your child drags the ones going home into their part, then taps Scruffles. The rest slide into the other part, and the number sentence shows.",
+            "How many are left: the whole and the part going home show their MeeMee, and the number sentence waits for its answer. Your child drags a number tile into the empty circle, and it fills the gap in the sentence. Two wrong tries: the MeeMee going home fade, and the ones left are counted together.",
+            "Numbers: each circle shows a MeeMee holding its number, and the gap can be anywhere in the sentence: 7 − 4 = ?, 7 − ? = 3 or ? − 4 = 3.",
+            "A change starts with the next round. Each step keeps its own progress, separate from MeeMee Rescue's."]
+    check(f"takehome-gu ({name}): the three explanations and the note, as round 11's board words them (British English, no exclamation marks)",
+          tab["paras"][:4] == want and not any("!" in x for x in tab["paras"]), json.dumps(tab["paras"][:4]))
+    check(f"takehome-gu ({name}): the summary: 'Secure: 9 of 45 facts. Practising: 6. Questions answered this step on this tablet: 33.'",
+          tab["lead"] == "Secure: 9 of 45 facts. Practising: 6. Questions answered this step on this tablet: 33.", tab["lead"])
+    check(f"takehome-gu ({name}): the grid: a row per whole (2 to 10), a cell per fact written with the minus sign, 45 in all; 7 − 4 practising, 5 − 4 secure, 8 − 1 not yet",
+          tab["rows"] == list(range(1, 10)) and tab["cells"] == 45 and tab["g"].get("7 − 4") == "is-practising" and tab["g"].get("5 − 4") == "is-secure"
+          and tab["g"].get("8 − 1") == "is-notyet" and tab["legend"] == ["Secure", "Practising", "Not yet"]
+          and tab["paras"][-2].startswith("Secure means right first time") and tab["paras"][-1].startswith("Zero facts (such as 7 − 0 and 7 − 7)"), json.dumps(tab["rows"]))
+    await page.screenshot(path=str(SHOTS / f"takehome-{name}-grownups.png"))
+    await page.evaluate("(() => { const h = Array.from(document.querySelectorAll('.gu-body .gu-h3')).find(x => x.textContent === 'Showing progress for'); const b = document.querySelector('.gu-body');"
+                        " b.scrollTop += (h.getBoundingClientRect().top - b.getBoundingClientRect().top) / MW.stage.scale - 18; })()")
+    await asyncio.sleep(0.3)
+    await page.screenshot(path=str(SHOTS / f"takehome-{name}-grid-final.png"))
+    await page.click(".gu-body [data-view=numbers]")
+    await asyncio.sleep(0.3)
+    tab = await page.evaluate(TH_TAB)
+    wide = await page.evaluate("(() => { const g = document.querySelector('.gu-grid'); const b = g.closest('.gu-body'); return [g.scrollWidth, b.clientWidth]; })()")
+    check(f"takehome-gu ({name}): 'Numbers' shows step 3's grid, with each whole's zero facts (7 − 0 to 7 − 7): 63 cells, nothing answered yet",
+          tab["views"] == [["Take away", False], ["How many are left", False], ["Numbers", True]] and tab["cells"] == 63 and tab["rows"] == list(range(3, 12))
+          and "7 − 0" in tab["g"] and "7 − 7" in tab["g"] and tab["lead"] == "No questions answered this step on this tablet yet." and tab["steps"][0][1], json.dumps(tab["rows"]))
+    check(f"takehome-gu ({name}): the widest row (10 − 0 to 10 − 10) fits without sideways scrolling", wide[0] <= wide[1], str(wide))
+    await page.screenshot(path=str(SHOTS / f"takehome-{name}-grid-numbers.png"))
+    await page.evaluate("MW.grownups.close()")
+
+    # a change of step starts with the next round
+    s = await th_open(t, page, "take", [{"whole": 7, "take": 4}] * 5)
+    await t.tap(46, 754, 3.3)                                # the grown-ups lock
+    await page.evaluate("MW.grownups.show('takehome-subtraction')")
+    await asyncio.sleep(0.3)
+    await page.click(".gu-body [data-step=left]")
+    await asyncio.sleep(0.2)
+    tab = await page.evaluate(TH_TAB)
+    saved = await page.evaluate("MW.store.peek('takehome').step")
+    check(f"takehome-gu ({name}): 'How many are left' picked: saved, on, and the progress below shows its grid",
+          saved == "left" and tab["steps"][1][1] and tab["views"][1][1] and tab["cells"] == 45, json.dumps([saved, tab["steps"], tab["views"]]))
+    await page.click(".gu-close")
+    await asyncio.sleep(0.6)
+    s = await th_state(page)
+    check(f"takehome-gu ({name}): ... but the round being played carries on taking away", s["step"] == "take" and s["look"] == "counting" and not s["track"]
+          and s["whole"] == 7, json.dumps(s))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    s = await th_open(t, page, None, [{"whole": 7, "take": 4}] * 5)
+    check(f"takehome-gu ({name}): the next round is How many are left", s["step"] == "left" and s["track"] and s["sentence"] == "7 − 4 = _", json.dumps(s))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    # wholes in play limit the questions
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('takehome-subtraction')")
+    await asyncio.sleep(0.3)
+    for w in (2, 4, 6, 7, 8, 9, 10):
+        await page.click(f".gu-body .takehome-whole:nth-child({w - 1})")
+        await asyncio.sleep(0.05)
+    tab = await page.evaluate(TH_TAB)
+    on = [int(x[0]) for x in tab["wholes"] if x[1]]
+    rounds = await page.evaluate("(() => { const out = new Set(); for (let i = 0; i < 300; i++) MW.takehome.makeRound().forEach(q => out.add(q.whole)); return Array.from(out).sort(); })()")
+    check(f"takehome-gu ({name}): with only 3 and 5 in play, rounds use only 3 and 5", on == [3, 5] and await page.evaluate("MW.store.peek('takehome').wholes") == [3, 5]
+          and rounds == [3, 5], json.dumps([on, rounds]))
+    await page.click(".gu-body .takehome-whole:nth-child(2)")
+    await page.click(".gu-body .takehome-whole:nth-child(4)")
+    await asyncio.sleep(0.1)
+    check(f"takehome-gu ({name}): the last whole in play can't be turned off", await page.evaluate("MW.store.peek('takehome').wholes") == [5])
+    # clearing clears this game's progress only (its step and wholes stay; MeeMee Rescue's and MeeMee Rockets' answers stay)
+    await page.click(".gu-body .takehome-clear")
+    await asyncio.sleep(0.1)
+    first = await page.evaluate("[document.querySelector('.gu-body .takehome-clear').textContent, MW.takehome.answers('take').length]")
+    await page.click(".gu-body .takehome-clear")
+    await asyncio.sleep(0.2)
+    after = await page.evaluate("""(() => { const s = JSON.parse(localStorage.getItem('mimi-world')); return [s.games.takehome, s.answers.length, s.games.words.answers.length,
+        document.querySelector('.gu-body .gu-lead').textContent]; })()""")
+    check(f"takehome-gu ({name}): 'Clear this tablet's progress' asks first ('Tap again to clear'), then clears this game's answers only",
+          first == ["Tap again to clear", 33] and after[0] == {"step": "left", "wholes": [5]} and after[1] == 1 and after[2] == 1
+          and after[3] == "No questions answered this step on this tablet yet.", json.dumps([first, after]))
+    await page.evaluate("MW.grownups.close()")
+    check(f"takehome-gu ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+STUB_TH_NAME = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
+    MW.audio.recorded = id => id === 'takehome-name' || window.__recorded(id); })()"""
+
+
+async def test_takehome_map(p, name, vw, vh, dpr):
+    """Place 2 is the game's: lit with its badge; it and its badge open the game (its name pending: no banner yet); with the
+    name recorded (stubbed), its title banner. The rocks and the station stay locked and still say their line."""
+    print(f"\n== Take MeeMee Home on the map ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-map-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(1.0)
+    await screenshot(page, f"takehome-{name}-map.png")
+    info = await page.evaluate(PLACES_INFO)
+    badge = await page.evaluate("(() => { const L = MW.LAYOUT.map.planets[2].badge; const b = Array.from(document.querySelectorAll('#screen-map .mw-planet-badge')).find(e => e.offsetLeft === L.x && e.offsetTop === L.y);"
+                                " return b ? [!!b.querySelector('clipPath[id^=\"takehome-badge-c\"]'), b.getAttribute('aria-label')] : null; })()")
+    check(f"takehome-map ({name}): place 2 (the small peach planet) is Take MeeMee Home's: lit, a mint halo and its badge (the house in its night window)",
+          place_ok(info[2], "Take MeeMee Home") and badge and badge[0], json.dumps([info[2], badge]))
+    check(f"takehome-map ({name}): MeeMee Rescue and MeeMee Rockets keep places 0 and 1; the rocks and the station (3, 4) stay locked",
+          place_ok(info[0], "MeeMee Rescue") and place_ok(info[1], "MeeMee Rockets") and place_ok(info[3], None) and place_ok(info[4], None), json.dumps(info))
+    for i in (3, 4):
+        pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % i)
+        said, screen = await tap_said(t, pl["x"], pl["y"])
+        check(f"takehome-map ({name}): {WHAT[i]} still say 'That planet isn't ready yet.' (while 'That place…' is pending) and stay on the map",
+              said == ["map-not-ready"] and screen == "screen-map", json.dumps([said, screen]))
+        await asyncio.sleep(1.2)
+    await page.evaluate("MW.takehome.nextRound = %s" % json.dumps([{"whole": 7, "take": 4}] * 5))
+    pl = await page.evaluate(TH_PLACE)
+    await t.tap(pl["x"], pl["y"])
+    ok = await t.wait_screen("screen-takehome-play", 3)
+    check(f"takehome-map ({name}): tapping place 2 opens the game (its name isn't recorded yet, so straight away, no banner)",
+          ok and await page.evaluate("MW.events.some(e => e.type === 'banner' && e.detail === 'none for Take MeeMee Home (takehome-name not recorded yet)')"))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await asyncio.sleep(0.5)
+    b = await page.evaluate("MW.LAYOUT.map.planets[2].badge")
+    await t.tap(b["x"] + b["d"] / 2, b["y"] + b["d"] / 2)
+    check(f"takehome-map ({name}): its badge opens it too", await t.wait_screen("screen-takehome-play", 3))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await asyncio.sleep(0.5)
+    # once "Take MeeMee Home!" is recorded (stubbed here): its title banner, its name and badge, and the game after it
+    await page.evaluate(STUB_TH_NAME)
+    await t.tap(pl["x"], pl["y"])
+    await asyncio.sleep(0.4)
+    bi = await page.evaluate(BANNER_INFO)
+    size = await page.evaluate("(() => { const a = document.querySelector('#banner [data-art] svg'); return a ? [a.getAttribute('width'), a.getAttribute('height')] : null; })()")
+    await screenshot(page, f"takehome-{name}-banner.png")
+    check(f"takehome-map ({name}): once its name is recorded, tapping place 2 shows its title banner: 'Take MeeMee Home' and its badge at 112",
+          bi == {"up": True, "name": "Take MeeMee Home", "art": ["takehome-badge"], "phase": "opening", "screen": "screen-map"} and size == ["112", "112"], json.dumps([bi, size]))
+    await page.evaluate("MW.takehome.nextRound = %s" % json.dumps([{"whole": 7, "take": 4}] * 5))
+    check(f"takehome-map ({name}): ... and the game starts once the banner has gone", await t.wait_screen("screen-takehome-play", 6))
+    await page.evaluate("(() => { if (window.__recorded) { MW.audio.recorded = window.__recorded; delete window.__recorded; } })()")
+    check(f"takehome-map ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_takehome_pause(p):
+    """Hear-again; the screen going off mid-question; Home while a MeeMee or a tile is held, mid-celebration and from the end
+    screen; the grown-ups area opened mid-hint and mid-celebration; Again on the end screen."""
+    print("\n== Take MeeMee Home: Hear-again, pausing and Home ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "takehome-pause", 1046, 653, 1.22, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rnd = [{"whole": 7, "take": 4}, {"whole": 5, "take": 2}, {"whole": 6, "take": 3}, {"whole": 8, "take": 2}, {"whole": 4, "take": 1}]
+    await th_open(t, page, "take", rnd)
+    await n_quiet(t)
+    n0 = len(await t.said())
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.4)
+    check("takehome-pause: Hear-again says the question again", (await t.said())[n0:] == [th_prompt("take", rnd[0], 0)], json.dumps((await t.said())[n0:]))
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.6)
+    paused = await page.evaluate("MW.world.st.paused")
+    n0 = len(await t.said())
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.5)
+    check("takehome-pause: the screen going off pauses; coming back asks the question again", paused and (await t.said())[n0:][:1] == [th_prompt("take", rnd[0], 0)],
+          json.dumps((await t.said())[n0:]))
+    # a MeeMee held as the screen goes off goes back to its place
+    await th_move(t, 1)
+    await n_hold(t, 380, 205, 700, 300, touch_id=70)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.4)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.5)
+    s = await th_state(page)
+    home = await page.evaluate("MW.takehome.st.counters.filter(c => c.where === 'whole').every(c => Math.abs(c.x - c.home.x) < 0.5 && Math.abs(c.y - c.home.y) < 0.5)")
+    check("takehome-pause: a MeeMee held as the screen goes off goes back to its place (the one already moved stays)", s["going"] == 1 and s["whole"] == 6 and home, json.dumps(s))
+    # Home while a MeeMee is held: nothing said after, the map
+    await n_quiet(t)
+    await n_hold(t, 380, 205, 700, 300, touch_id=71)
+    await page.evaluate("MW.takehome.home()")               # Home (the other hand)
+    n0 = len(await t.said())
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.8)
+    s = await th_state(page)
+    check("takehome-pause: Home while a MeeMee is held: the map, nothing said after, the game put away", s["screen"] == "screen-map" and (await t.said())[n0:] == []
+          and s["whole"] == 0 and s["going"] == 0, json.dumps(s))
+    # step 2: the grown-ups area opened mid-hint takes the hint away; closed, the question again; the next wrong number brings it back
+    rnd2 = [{"whole": 7, "take": 4}, {"whole": 6, "take": 1}, {"whole": 9, "take": 3}, {"whole": 5, "take": 3}, {"whole": 8, "take": 4}]
+    await th_open(t, page, "left", rnd2)
+    await n_quiet(t)
+    for n in (5, 6):
+        await t.drag(*tile_xy(n), 210, 470)
+        await n_check(t)
+        await asyncio.sleep(0.1)
+        if n == 5:
+            await n_quiet(t)
+    await asyncio.sleep(0.5)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")
+    await asyncio.sleep(0.5)
+    s = await th_state(page)
+    check("takehome-pause: the grown-ups area opened mid-hint: the hint stops and is taken away (nothing faded, no ghosts)",
+          not s["hinted"] and s["dim"] == 0 and s["ghosts"] == 0 and not await page.evaluate("MW.audio.speaking()"), json.dumps(s))
+    n0 = len(await t.said())
+    await page.click(".gu-close")
+    await asyncio.sleep(0.5)
+    check("takehome-pause: ... closed, the question is asked again", (await t.said())[n0:][:1] == [th_prompt("left", rnd2[0], 0)], json.dumps((await t.said())[n0:]))
+    await n_quiet(t)
+    await t.drag(*tile_xy(8), 210, 470)
+    await n_check(t)
+    s = await th_state(page)
+    check("takehome-pause: ... and the next wrong number gives the hint again", s["hinted"] and s["dim"] == 4 and s["ghosts"] == 3, json.dumps(s))
+    await n_quiet(t)
+    # the grown-ups area opened mid-celebration: everything waits, then carries on
+    await t.drag(*tile_xy(3), 210, 470)
+    await n_check(t)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")
+    n0 = len(await t.said())
+    await asyncio.sleep(2.5)
+    s = await th_state(page)
+    check("takehome-pause: the grown-ups area opened mid-celebration: nothing is said while it's open, the answer stays",
+          s["phase"] == "takehome-celebrate" and (await t.said())[n0:] == [] and s["carried"] == [None, 3, None], json.dumps(s))
+    await page.click(".gu-close")
+    s = await th_wait(page, ["takehome-open"], 20)
+    check("takehome-pause: ... closed, the celebration carries on (the sentence said, the MeeMee home), then question 2",
+          s["qi"] == 1 and th_said_sentence(th_q("left", rnd2[0])) in await t.said(), json.dumps(s))
+    # Home mid-celebration: nothing more said
+    await n_quiet(t)
+    await t.drag(*tile_xy(5), 210, 470)
+    await n_check(t)
+    await t.tap(*HOME)
+    n0 = len(await t.said())
+    await asyncio.sleep(3)
+    s = await th_state(page)
+    check("takehome-pause: Home mid-celebration: back on the map, nothing more said, the tiles all back", s["screen"] == "screen-map" and (await t.said())[n0:] == []
+          and s["out"] == [] and s["placed"] is None and s["hoppers"] == 0, json.dumps([(await t.said())[n0:], s]))
+    # the end screen: Again starts a new round; Home goes back to the map
+    await th_set(page, "take", [{"whole": 2, "take": 1}] * 5)
+    pl = await page.evaluate(TH_PLACE)
+    await t.tap(pl["x"], pl["y"])
+    for _ in range(5):
+        await th_wait(page, ["takehome-open"], 25)
+        await th_move(t, 1)
+        await n_check(t)
+    await th_wait(page, ["takehome-done"], 25)
+    await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 15)
+    await page.evaluate("MW.takehome.nextRound = %s" % json.dumps(rnd))
+    await t.tap(1160, 480)                                   # Again (1080, 400, 160 across)
+    s = await th_wait(page, ["takehome-open"], 20)
+    check("takehome-pause: Again on the end screen starts a new round", s["screen"] == "screen-takehome-play" and s["qi"] == 0 and s["whole"] == 7, json.dumps(s))
+    await t.tap(*HOME)
+    check("takehome-pause: Home goes back to the map", await t.wait_screen("screen-map", 5))
+    check("takehome-pause: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+TH_PLAY_ROUNDS = """(n) => { const R = MW.takehome, out = { turns: [], rounds: [], lens: [] };
+    for (let r = 0; r < n; r++) {
+      out.turns.push(R.gapTurn());
+      const round = R.makeRound();
+      out.rounds.push(round.map(q => q.missing));
+      round.forEach(q => { R.ask(q, 'numbers'); const s = R.st, tr = R.track(), c = MW.LAYOUT[s.target];
+        R.drop(tr.tile(s.answer), c.x, c.y, false); R.podTap(); });
+      out.lens.push(R.answers('numbers').length);
+    }
+    MW.world.home(); return out; }"""
+
+
+async def test_takehome_storage(p):
+    """What the tablet keeps: each step its last 1000 answers (3000 for the game in all, as MeeMee Rescue keeps), so the
+    one storage entry stays small; secure, practising and not yet still come out right with a full list; step 3's gap
+    places keep turning once the list is full (a counter saved with the progress, not the list's length); MeeMee Rescue's
+    Clear leaves this game's progress alone."""
+    print("\n== Take MeeMee Home: what the tablet keeps ==")
+    browser = await p.chromium.launch()
+    rescue = secure_answers([(7, 3)])
+    ctx, page, problems = await seeded(browser, rescue)
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    await E("window.__now = %d; Date.now = () => window.__now" % T0)
+    # step 1 full: 997 answers to 9 − 1 a minute apart, long ago, then 8 − 2 right first time on the last three days
+    take = [{"t": T0 - 40 * DAY + i * 60_000, "whole": 9, "take": 1, "missing": "right", "tries": 0, "misses": 0, "hint": False} for i in range(997)]
+    take += [{"t": T0 - d * DAY, "whole": 8, "take": 2, "missing": "right", "tries": 0, "misses": 0, "hint": False} for d in (3, 2, 1)]
+    full = lambda s: [dict(a, missing=("left" if s == "left" else a["missing"])) for a in take]
+    await E("""(a) => { const g = MW.store.game('takehome'); g.answers = { take: a.take, left: a.left, numbers: a.numbers }; g.step = 'numbers'; MW.store.save(); }""",
+            {"take": take, "left": full("left"), "numbers": full("numbers")})
+    size0 = await E("MW.store.bytes()")
+    st0 = await E("(() => { const m = MW.takehomeFacts.statuses(MW.takehome.answers('take')); return [m['8:2'].status, m['9:1'].status, (m['7:4'] || {}).status || 'notyet']; })()")
+    check("takehome-store: with every step's list full (1000 each, 3000 in all) the tablet's one entry stays small (under 300 KB)",
+          size0 < 300_000 and await E("['take', 'left', 'numbers'].map(s => MW.takehome.answers(s).length)") == [1000] * 3, f"{size0} bytes")
+    got = []
+    for d in range(3):
+        await E("window.__now = %d" % (T0 + d * DAY + 3600_000))
+        await E(TH_ANSWER, {"q": {"whole": 7, "take": 4}, "step": "take"})
+        got.append(await E("(() => { const a = MW.takehome.answers('take'); const m = MW.takehomeFacts.statuses(a); return [a.length, m['7:4'].status, m['8:2'].status, a[0].t]; })()"))
+    check("takehome-store: a full list stays at 1000, the oldest answer making room; 7 − 4 right first time on three days becomes secure, 8 − 2 stays secure",
+          st0 == ["secure", "practising", "notyet"] and [g[0] for g in got] == [1000] * 3 and [g[1] for g in got] == ["practising", "practising", "secure"]
+          and all(g[2] == "secure" for g in got) and got[0][3] < got[1][3] < got[2][3], json.dumps([st0, got]))
+    await E("window.__now = %d" % (T0 + 3 * DAY + 3600_000))
+    await E(TH_ANSWER, {"q": {"whole": 7, "take": 4}, "step": "take", "wrong": True})
+    st1 = await E("(() => { const a = MW.takehome.answers('take'); const m = MW.takehomeFacts.statuses(a); return [a.length, m['7:4'].status, m['8:2'].status]; })()")
+    check("takehome-store: ... and a wrong answer at the cap moves 7 − 4 back to practising", st1 == [1000, "practising", "secure"], json.dumps(st1))
+    # step 3: the list is full, so its length no longer changes; the gap's places keep turning (2, 2 and 1 a round, the
+    # short one moving on each round), from the list's length the first time (1000: place 1) and then from the counter
+    rot = await E(TH_PLAY_ROUNDS, 3)
+    places = ["whole", "right", "left"]
+    counts = [{m: r.count(m) for m in places} for r in rot["rounds"]]
+    short = [min(c, key=c.get) for c in counts]
+    total = {m: sum(c[m] for c in counts) for m in places}
+    saved = await E("MW.store.peek('takehome').gapTurn")
+    check("takehome-store: with step 3's list full (1000), the gap's places keep turning: rounds start at places 1, 0, 2 (the counter moves on 5 a round), "
+          "2, 2 and 1 in each, the short one a different place each round, 5 of each in all",
+          rot["lens"] == [1000] * 3 and rot["turns"] == [1, 0, 2] and all(sorted(c.values()) == [1, 2, 2] for c in counts) and len(set(short)) == 3
+          and total == {"whole": 5, "right": 5, "left": 5} and saved == 1, json.dumps([rot, saved]))
+    # MeeMee Rescue's Clear (its Progress tab) clears its own answers and leaves this game's progress as it was
+    before = json.dumps(await E("MW.store.peek('takehome')"), sort_keys=True)
+    await E("MW.grownups.openPanel(); MW.grownups.show('progress')")
+    await asyncio.sleep(0.3)
+    await page.click("text=Clear this tablet's progress")
+    await page.click("text=Tap again to clear")
+    await asyncio.sleep(0.3)
+    after = await E("[MW.store.get('answers').length, MW.store.peek('takehome')]")
+    await E("MW.grownups.close()")
+    check("takehome-store: MeeMee Rescue's 'Clear this tablet's progress' clears its answers only; this game's progress stays as it was",
+          after[0] == 0 and json.dumps(after[1], sort_keys=True) == before, str(after[0]))
+    check("takehome-store: no console errors", not problems, "; ".join(problems[:3]))
+    await ctx.close()
+    await browser.close()
+
+
+async def test_takehome_hop_pause(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """During the hop home: Hear-again says nothing and the hop carries on; the screen going off holds the round, and it
+    carries on when the screen comes back; Home takes the hopping MeeMee away at once, and the next round starts clean."""
+    print(f"\n== Take MeeMee Home: Home, pausing and Hear-again during the hop home ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-hop-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rnd = [{"whole": 7, "take": 4}, {"whole": 6, "take": 3}, {"whole": 8, "take": 5}, {"whole": 5, "take": 2}, {"whole": 9, "take": 4}]
+    await th_open(t, page, "take", rnd)
+    hopping = "MW.events.some(e => e.type === 'home' && e.t > window.__thq)"
+
+    async def answer_and_hop(q):
+        await n_quiet(t)
+        await th_move(t, q["take"])
+        await page.evaluate("window.__thq = performance.now()")
+        await n_check(t)
+        return await th_until(page, hopping, 20)
+
+    # Hear-again while they hop: nothing said, the hop carries on, then question 2
+    ok = await answer_and_hop(rnd[0])
+    await asyncio.sleep(0.2)
+    n0 = len(await t.said())
+    s0 = await th_state(page)
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.3)
+    s1 = await th_state(page)
+    check(f"takehome-hop ({name}): Hear-again while the MeeMee hop home says nothing, and the hop carries on",
+          ok and s0["hoppers"] == 4 and s1["phase"] == "takehome-celebrate" and s1["hoppers"] == 4 and (await t.said())[n0:] == [], json.dumps([s0["hoppers"], s1]))
+    s = await th_wait(page, ["takehome-open"], 15)
+    check(f"takehome-hop ({name}): ... then question 2, the hoppers gone", s["qi"] == 1 and s["hoppers"] == 0 and s["whole"] == 6, json.dumps(s))
+    # the screen going off mid-hop: the round waits (nothing said, no next question) until it comes back
+    ok = await answer_and_hop(rnd[1])
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    n0 = len(await t.said())
+    q0 = await page.evaluate("MW.events.filter(e => e.type === 'question').length")
+    await asyncio.sleep(2.5)
+    s = await th_state(page)
+    held = s["phase"] == "takehome-celebrate" and s["qi"] == 1 and (await t.said())[n0:] == [] and await page.evaluate("MW.events.filter(e => e.type === 'question').length") == q0
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    s2 = await th_wait(page, ["takehome-open"], 15)
+    check(f"takehome-hop ({name}): the screen going off while they hop holds the round (nothing said, no next question); back on, it carries on to question 3",
+          ok and held and s2["qi"] == 2 and s2["hoppers"] == 0, json.dumps([s, s2]))
+    # Home mid-hop: the map at once, the hopping MeeMee taken away, nothing said after; the next round starts clean
+    ok = await answer_and_hop(rnd[2])
+    await asyncio.sleep(0.15)
+    await t.tap(*HOME)
+    n0 = len(await t.said())
+    await asyncio.sleep(0.3)
+    s = await th_state(page)
+    left = await page.evaluate("document.querySelectorAll('#screen-takehome-play .mw-counters .mw-mimi').length")
+    await asyncio.sleep(2)
+    check(f"takehome-hop ({name}): Home while they hop: the map, every hopping MeeMee taken away, nothing said after",
+          ok and s["screen"] == "screen-map" and s["hoppers"] == 0 and left == 0 and (await t.said())[n0:] == [], json.dumps([s, left, (await t.said())[n0:]]))
+    s = await th_open(t, page, "take", rnd)
+    check(f"takehome-hop ({name}): ... and the next round starts clean (question 1, its 7 MeeMee, nobody hopping)",
+          s["qi"] == 0 and s["whole"] == 7 and s["going"] == 0 and s["hoppers"] == 0, json.dumps(s))
+    await t.tap(*HOME)
+    check(f"takehome-hop ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_takehome_motion(p):
+    """The MeeMee going home hop to their houses (about a second in all); with reduce motion they fade instead, and the
+    track, the numbered MeeMee and the sentence fade rather than move."""
+    print("\n== Take MeeMee Home: motion and reduce motion ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    # each hopper's animations: [moves?, duration, how many hops (keyframes at the top of an arc), its turn (delay, ms)]
+    hops = """(() => { const R = MW.takehome; return R.st.hoppers.map(c => c.el.getAnimations().map(a => {
+        const k = a.effect.getKeyframes(), tm = a.effect.getTiming(); return [k.some(f => f.transform && f.transform !== 'none'), tm.duration,
+        k.filter(f => f.easing === 'ease-in').length, tm.delay]; })); })()"""
+    for reduce in (False, True):
+        label = "reduce motion" if reduce else "motion"
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, reduced_motion="reduce" if reduce else "no-preference")
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+        # step 1, 9 − 6: six going home
+        await page.evaluate("""(() => { const R = MW.takehome; R.ask({ whole: 9, take: 6 }, 'take'); R.st.counters.filter(m => m.where === 'whole').slice(0, 6).forEach(m => R.drop(m, 550, 470, false)); R.podTap(); })()""")
+        await th_until(page, "MW.events.some(e => e.type === 'home')", 15)
+        await asyncio.sleep(0.55)                               # the sixth sets off 420 ms after the first
+        got = await page.evaluate(hops)
+        gone = await page.evaluate("MW.takehome.st.counters.filter(c => c.where === 'right').map(c => [c.el.classList.contains('takehome-gone'), getComputedStyle(c.el).transitionProperty])")
+        if reduce:
+            doors = got[1::2]                                   # hoppers: each MeeMee, then the one that fades in by its house
+            turns = [h[0][3] for h in doors if h]
+            check(f"takehome ({label}): the six going home fade from their circle, and fade in and out by their houses, one after another: nothing hops (no movement)",
+                  len(got) == 12 and all(not a[0] for h in got for a in h) and all(g[0] for g in gone) and len(gone) == 6
+                  and len(turns) == 6 and turns[0] == 0 and turns == sorted(turns) and 300 <= turns[-1] <= 600, json.dumps([got, gone]))
+        else:
+            spans = [a[1] for h in got for a in h]
+            turns = [h[0][3] for h in got if h]
+            check(f"takehome ({label}): the six going home hop off to their houses, one journey of two hops each (340 ms a hop, 0.68 s), one after another "
+                  f"(each its turn, the last setting off within about half a second: about a second in all)",
+                  len(got) == 6 and all(len(h) == 1 and h[0][0] and h[0][2] == 2 and h[0][1] / h[0][2] >= 1000 / 3 for h in got) and max(spans) <= 800
+                  and len(turns) == 6 and turns[0] == 0 and all(b - a >= 80 for a, b in zip(turns, turns[1:])) and 300 <= turns[-1] <= 600
+                  and await page.evaluate("MW.events.filter(e => e.type === 'hop').length") == 6, json.dumps(got))
+        # step 2: the track, the numbered MeeMee and the sentence
+        res = await page.evaluate("""(() => { const R = MW.takehome; R.ask({ whole: 7, take: 4 }, 'left'); const tr = R.track(), c = MW.LAYOUT.left;
+            R.drop(tr.tile(3), c.x, c.y, false); R.podTap(); const e = R.equation().el;
+            const pop = Array.from(document.querySelectorAll('#screen-takehome-play .mw-numbered.is-popping')).map(x => getComputedStyle(x).animationName);
+            const ts = getComputedStyle(tr.el);
+            return { pop: pop, track: [ts.transform, ts.transitionProperty], sentence: e.getAnimations().map(a => a.transitionProperty || a.animationName) }; })()""")
+        if reduce:
+            check(f"takehome ({label}): a right answer in step 2: the numbered MeeMee fades in, the track fades away and the sentence fades in under the diagram",
+                  res["pop"] == ["mw-arrive"] and res["track"][0] == "none" and res["sentence"] == ["mw-arrive"], json.dumps(res))
+        else:
+            check(f"takehome ({label}): a right answer in step 2: the numbered MeeMee pops up, the track slides away and the sentence slides under the diagram",
+                  res["pop"] == ["mw-carry"] and res["track"][0] != "none" and "transform" in res["sentence"], json.dumps(res))
+        await page.evaluate("MW.world.home()")
+        check(f"takehome ({label}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
+
+
+async def test_takehome_moments(p, name, vw, vh, dpr):
+    """The crew's moments at MeeMee Rescue's points: the lookout as a round starts (step 1 behind the home planet's curve;
+    steps 2 and 3 behind the track, gone before the sentence comes up), the engineer on a right answer, the navigator as
+    a star turns peach, the cook on the end screen; never over the diagram or the sentence; none without a job."""
+    print(f"\n== Take MeeMee Home: the crew's moments ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-moments-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'engineer'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await th_set(page, "take", [{"whole": 7, "take": 4}, {"whole": 5, "take": 2}, {"whole": 6, "take": 3}, {"whole": 8, "take": 2}, {"whole": 4, "take": 1}])
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    pl = await page.evaluate(TH_PLACE)
+    await t.tap(pl["x"], pl["y"])
+    await asyncio.sleep(0.9)
+    look = await page.evaluate("""(() => { const b = document.querySelector('#screen-takehome-play [data-moment=lookout].is-shown'); if (!b) return null;
+        const lay = b.closest('.mw-moments'), home = MW.takehome.homePlanet();
+        return { window: [b.offsetLeft, b.offsetTop, b.offsetWidth, b.offsetHeight], behind: !!(lay.compareDocumentPosition(home) & Node.DOCUMENT_POSITION_FOLLOWING),
+                 flip: b.classList.contains('takehome-peek-flip') }; })()""")
+    lb = await moment_box(page, "#screen-takehome-play [data-moment=lookout]")
+    await screenshot(page, f"takehome-{name}-lookout-home.png")
+    pills = [(505, 612, 90, 70), (165, 612, 90, 70)]
+    check(f"takehome-moments ({name}): step 1: the lookout rises from behind the home planet's curve as the round starts (its window 690, 548, to the stage's foot)",
+          look is not None and look["window"] == [690, 548, 250, 252] and look["behind"] and not look["flip"], json.dumps(look))
+    check(f"takehome-moments ({name}): ... clear of the diagram and its pills", lb and not any(overlaps_circle(lb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)])
+          and not any(overlap(lb, q) for q in pills), json.dumps(lb))
+    await th_wait(page, ["takehome-open"], 15)
+    await asyncio.sleep(2.4)
+    check(f"takehome-moments ({name}): ... and ducks down once it has spotted the planet", not await page.evaluate("!!document.querySelector('#screen-takehome-play [data-moment=lookout]')"))
+    await th_move(t, 4)
+    await n_check(t)
+    await asyncio.sleep(0.5)
+    eb = await moment_box(page, "#screen-takehome-play [data-moment=engineer]")
+    check(f"takehome-moments ({name}): the engineer taps the ship on a right answer, clear of the diagram and of the sentence's place under it",
+          eb is not None and not any(overlaps_circle(eb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and not overlap(eb, (180, 700, 400, 80)) and eb[1] + eb[3] < 530,
+          json.dumps(eb))
+    await screenshot(page, f"takehome-{name}-engineer.png")
+    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'cook'})")
+    await th_wait(page, ["takehome-open"], 20)
+    await asyncio.sleep(2.5)                                 # question 1's moments are over
+    n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
+    await th_move(t, 2)
+    await n_check(t)
+    await th_until(page, "MW.events.filter(e => e.type === 'moment').length > %d" % n0, 15)
+    await asyncio.sleep(0.5)
+    nb = await moment_box(page, "#screen-takehome-play [data-moment=navigator]")
+    route = await page.evaluate("(() => { const r = document.querySelector('#screen-takehome-play .mw-route path'); return r ? r.getAttribute('d') : null; })()")
+    check(f"takehome-moments ({name}): the navigator holds up the star map as the star turns peach, with a dotted route to the next star, clear of the diagram",
+          nb is not None and route is not None and "NaN" not in route and not any(overlaps_circle(nb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and nb[1] > 95,
+          json.dumps([nb, route]))
+    for q in range(2, 5):
+        s = await th_wait(page, ["takehome-open"], 20)
+        await th_move(t, s["answer"])
+        await n_check(t)
+    await th_wait(page, ["takehome-done"], 20)
+    ok = await th_until(page, "!!document.querySelector('#screen-takehome-end [data-moment=cook].is-shown')", 10)
+    badges = await page.evaluate("Array.from(document.querySelectorAll('#screen-takehome-end .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
+    await asyncio.sleep(0.8)
+    await screenshot(page, f"takehome-{name}-cook.png")
+    check(f"takehome-moments ({name}): the cook brings fish on the end screen; the end screen's cats wear their badges",
+          ok and badges == ["moggles:navigator", "snuffles:cook"], json.dumps(badges))
+    await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 10)
+    said = await t.said()
+    check(f"takehome-moments ({name}): no words in the moments", not any("job-" in x or "name-" in x for x in said), json.dumps(said[-3:]))
+    await t.tap(*HOME)
+    await asyncio.sleep(0.4)
+    check(f"takehome-moments ({name}): Home clears them", await page.evaluate("document.querySelectorAll('#screen-takehome-play [data-moment], #screen-takehome-end [data-moment]').length") == 0)
+
+    # steps 2 and 3: the lookout peeks over the track, mirrored, and is gone before the sentence comes up under Scruffles
+    await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'engineer'})")
+    await th_set(page, "numbers", [{"whole": 7, "take": 4, "missing": "right"}] * 5)
+    await page.evaluate("""(() => { window.__both = 0; window.__seen = 0; const loop = () => { const b = document.querySelector('#screen-takehome-play [data-moment=lookout].is-shown');
+        const e = MW.takehome.equation().el; if (b) window.__seen++; if (b && e.classList.contains('is-shown')) window.__both++; window.__loop = requestAnimationFrame(loop); }; loop(); })()""")
+    await t.tap(pl["x"], pl["y"])
+    await asyncio.sleep(0.9)
+    look = await page.evaluate(LOOKOUT_LOOK.replace("#screen-game", "#screen-takehome-play").replace("rescue-peek-flip", "takehome-peek-flip"))
+    await screenshot(page, f"takehome-{name}-lookout-track.png")
+    check(f"takehome-moments ({name}): step 3: the lookout peeks up from behind the track's right-hand end, mirrored towards the diagram (906, 519, 250 x 175)",
+          look is not None and look["window"] == [906, 519, 250, 175] and look["flip"] and look["scale"] == "-1 1" and look["scopeLeft"], json.dumps(look))
+    s = await th_state(page)
+    check(f"takehome-moments ({name}): ... and Scruffles starts the new round thinking, not still grinning from the last round's last answer, his lights off",
+          s["face"] == "thinking" and not s["lights"] and s["phase"] == "takehome-starting", json.dumps(s))
+    s = await th_wait(page, ["takehome-open"], 15)
+    await asyncio.sleep(0.5)
+    both = await page.evaluate("[window.__seen, window.__both, !!document.querySelector('#screen-takehome-play [data-moment=lookout]')]")
+    await page.evaluate("cancelAnimationFrame(window.__loop)")
+    check(f"takehome-moments ({name}): ... and has ducked down before the sentence comes up under Scruffles (never both at once)",
+          both[0] > 10 and both[1] == 0 and not both[2] and s["sentence"] == "7 − _ = 3", json.dumps(both))
+    await t.drag(*tile_xy(4), 550, 470)
+    await n_check(t)
+    await asyncio.sleep(0.5)
+    eb = await moment_box(page, "#screen-takehome-play [data-moment=engineer]")
+    check(f"takehome-moments ({name}): step 3: the engineer on a right answer, clear of the diagram and the sentence's place under Scruffles",
+          eb is not None and not any(overlaps_circle(eb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and not overlap(eb, (790, 528, 440, 100)), json.dumps(eb))
+    # nobody has a job: no moments
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await page.evaluate("MW.crew.save({moggles: null, snuffles: null})")
+    n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
+    await th_set(page, "take", [{"whole": 3, "take": 1}] * 5)
+    await t.tap(pl["x"], pl["y"])
+    await th_wait(page, ["takehome-open"], 15)
+    await th_move(t, 1)
+    await n_check(t)
+    await asyncio.sleep(3)
+    check(f"takehome-moments ({name}): no jobs, no moments", await page.evaluate("MW.events.filter(e => e.type === 'moment').length") == n0)
+    check(f"takehome-moments ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
 async def main():
     srv = serve()
     async with async_playwright() as p:
@@ -5196,6 +6590,32 @@ async def main():
         await test_equation(p, "fire", 1046, 653, 1.22)
         await test_equation(p, "doogee", 1280, 800, 2)
         await test_equation_motion(p)
+        await test_takehome_round(p, "take", "fire", 1046, 653, 1.22)
+        await test_takehome_round(p, "take", "doogee", 1280, 800, 2)
+        await test_takehome_round(p, "left", "fire", 1046, 653, 1.22)
+        await test_takehome_round(p, "left", "doogee", 1280, 800, 2)
+        await test_takehome_round(p, "numbers", "fire", 1046, 653, 1.22)
+        await test_takehome_round(p, "numbers", "doogee", 1280, 800, 2)
+        await test_takehome_wrong_take(p)
+        await test_takehome_wrong_take(p, "doogee", 1280, 800, 2)
+        await test_takehome_wrong_left(p, "fire", 1046, 653, 1.22)
+        await test_takehome_wrong_left(p, "doogee", 1280, 800, 2)
+        await test_takehome_wrong_numbers(p)
+        await test_takehome_wrong_numbers(p, "doogee", 1280, 800, 2)
+        await test_takehome_drag(p)
+        await test_takehome_questions(p)
+        await test_takehome_progress(p)
+        await test_takehome_grownups(p, "fire", 1046, 653, 1.22)
+        await test_takehome_grownups(p, "doogee", 1280, 800, 2)
+        await test_takehome_map(p, "fire", 1046, 653, 1.22)
+        await test_takehome_map(p, "doogee", 1280, 800, 2)
+        await test_takehome_pause(p)
+        await test_takehome_hop_pause(p)
+        await test_takehome_hop_pause(p, "doogee", 1280, 800, 2)
+        await test_takehome_storage(p)
+        await test_takehome_motion(p)
+        await test_takehome_moments(p, "fire", 1046, 653, 1.22)
+        await test_takehome_moments(p, "doogee", 1280, 800, 2)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)} of {len(RESULTS)} checks passed")

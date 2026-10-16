@@ -1599,6 +1599,142 @@
       "group": "Tile sounds",
       "words": "z",
       "how": "A pure sound, held for a moment, with no \"uh\" after it. Used by: s (these)."
+    },
+    {
+      "id": "takehome-name",
+      "game": "Take MeeMee Home",
+      "group": "Map",
+      "words": "Take MeeMee Home!",
+      "how": "Announcing the game's name.",
+      "pending": true
+    },
+    {
+      "id": "takehome-round-ready",
+      "game": "Take MeeMee Home",
+      "group": "Rounds",
+      "words": "Let's take the MeeMee home!",
+      "how": "Excited, inviting.",
+      "pending": true
+    },
+    {
+      "id": "takehome-round-done",
+      "game": "Take MeeMee Home",
+      "group": "Rounds",
+      "words": "All the MeeMee are home!",
+      "how": "Big finish: proud and happy.",
+      "pending": true
+    },
+    {
+      "id": "takehome-round-another",
+      "game": "Take MeeMee Home",
+      "group": "Rounds",
+      "words": "Another trip?",
+      "how": "Inviting.",
+      "pending": true
+    },
+    {
+      "id": "takehome-meemee",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "MeeMee.",
+      "how": "Fall at the end: it follows a number (\"Seven… MeeMee.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-are-going",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "are going home.",
+      "how": "Fall at the end: it follows a number (\"Four… are going home.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-is-going",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "is going home.",
+      "how": "As above, after \"One…\".",
+      "pending": true
+    },
+    {
+      "id": "takehome-are-staying",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "are staying.",
+      "how": "Fall at the end: it follows a number (\"Three… are staying.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-is-staying",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "is staying.",
+      "how": "As above, after \"One…\".",
+      "pending": true
+    },
+    {
+      "id": "takehome-how-many-left",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "How many are left?",
+      "how": "A real question, curious and warm.",
+      "pending": true
+    },
+    {
+      "id": "takehome-how-many-going",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "How many are going home?",
+      "how": "A real question, curious and warm.",
+      "pending": true
+    },
+    {
+      "id": "takehome-how-many-altogether",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "How many MeeMee altogether?",
+      "how": "A real question, curious and warm.",
+      "pending": true
+    },
+    {
+      "id": "takehome-move-them",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "Move them into the dotted circle.",
+      "how": "Friendly and clear, like showing someone a new game.",
+      "pending": true
+    },
+    {
+      "id": "takehome-find-number",
+      "game": "Take MeeMee Home",
+      "group": "Questions",
+      "words": "Find the number.",
+      "how": "Friendly and clear, as MeeMee Rescue's.",
+      "pending": true
+    },
+    {
+      "id": "takehome-take-away",
+      "game": "Take MeeMee Home",
+      "group": "Number sentence",
+      "words": "take away",
+      "how": "Short, voice up: a number follows (\"seven take away four…\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-is",
+      "game": "Take MeeMee Home",
+      "group": "Number sentence",
+      "words": "is",
+      "how": "Short and light, voice up: the answer follows (\"…is three.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-home-they-go",
+      "game": "Take MeeMee Home",
+      "group": "Praise",
+      "words": "Home they go!",
+      "how": "Pleased and warm.",
+      "pending": true
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "id": "takehome",
+  "name": "Take MeeMee Home",
+  "planet": 2,
+  "badge": "takehome-badge",
+  "say": "takehome-name",
+  "scripts": ["facts.js", "moments.js", "game.js"],
+  "about": "Subtraction within 10 on the part-whole diagram: Scruffles takes the rescued MeeMee home. planet: 2 is the small peach planet; badge: a MeeMee house on its planet (art.py); say: the line said when its place is tapped; scripts: facts.js is the subtraction facts, how secure each is and how rounds are chosen, moments.js the crew's job moments, game.js the game (its three steps and its grown-ups tab, Subtraction)."
+}

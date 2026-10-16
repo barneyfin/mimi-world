@@ -1,0 +1,124 @@
+{
+  "about": "Every new line Take MeeMee Home says, in recording order (the 0.8.0 PRD's Lines tab). Ids start with the game's id (takehome-). It also says MeeMee Rescue's numbers (num-mid-0 to num-end-10), four of its praise lines, its try-again lines, tap-scruffles and too-many, shared with Barney's agreement (0.8.0 PRD, question 3): those stay in games/rescue/lines.json. \"pending\": true puts a line on the recording page but keeps it out of the game until it's recorded. The class's words for subtraction are still to check (open question 2): they decide the words of takehome-take-away, takehome-is and the word \"left\", not their ids.",
+  "lines": [
+    {
+      "id": "takehome-name",
+      "group": "Map",
+      "words": "Take MeeMee Home!",
+      "how": "Announcing the game's name.",
+      "pending": true
+    },
+    {
+      "id": "takehome-round-ready",
+      "group": "Rounds",
+      "words": "Let's take the MeeMee home!",
+      "how": "Excited, inviting.",
+      "pending": true
+    },
+    {
+      "id": "takehome-round-done",
+      "group": "Rounds",
+      "words": "All the MeeMee are home!",
+      "how": "Big finish: proud and happy.",
+      "pending": true
+    },
+    {
+      "id": "takehome-round-another",
+      "group": "Rounds",
+      "words": "Another trip?",
+      "how": "Inviting.",
+      "pending": true
+    },
+    {
+      "id": "takehome-meemee",
+      "group": "Questions",
+      "words": "MeeMee.",
+      "how": "Fall at the end: it follows a number (\"Seven… MeeMee.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-are-going",
+      "group": "Questions",
+      "words": "are going home.",
+      "how": "Fall at the end: it follows a number (\"Four… are going home.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-is-going",
+      "group": "Questions",
+      "words": "is going home.",
+      "how": "As above, after \"One…\".",
+      "pending": true
+    },
+    {
+      "id": "takehome-are-staying",
+      "group": "Questions",
+      "words": "are staying.",
+      "how": "Fall at the end: it follows a number (\"Three… are staying.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-is-staying",
+      "group": "Questions",
+      "words": "is staying.",
+      "how": "As above, after \"One…\".",
+      "pending": true
+    },
+    {
+      "id": "takehome-how-many-left",
+      "group": "Questions",
+      "words": "How many are left?",
+      "how": "A real question, curious and warm.",
+      "pending": true
+    },
+    {
+      "id": "takehome-how-many-going",
+      "group": "Questions",
+      "words": "How many are going home?",
+      "how": "A real question, curious and warm.",
+      "pending": true
+    },
+    {
+      "id": "takehome-how-many-altogether",
+      "group": "Questions",
+      "words": "How many MeeMee altogether?",
+      "how": "A real question, curious and warm.",
+      "pending": true
+    },
+    {
+      "id": "takehome-move-them",
+      "group": "Questions",
+      "words": "Move them into the dotted circle.",
+      "how": "Friendly and clear, like showing someone a new game.",
+      "pending": true
+    },
+    {
+      "id": "takehome-find-number",
+      "group": "Questions",
+      "words": "Find the number.",
+      "how": "Friendly and clear, as MeeMee Rescue's.",
+      "pending": true
+    },
+    {
+      "id": "takehome-take-away",
+      "group": "Number sentence",
+      "words": "take away",
+      "how": "Short, voice up: a number follows (\"seven take away four…\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-is",
+      "group": "Number sentence",
+      "words": "is",
+      "how": "Short and light, voice up: the answer follows (\"…is three.\").",
+      "pending": true
+    },
+    {
+      "id": "takehome-home-they-go",
+      "group": "Praise",
+      "words": "Home they go!",
+      "how": "Pleased and warm.",
+      "pending": true
+    }
+  ]
+}
