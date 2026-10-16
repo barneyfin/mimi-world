@@ -5,120 +5,103 @@
       "id": "takehome-name",
       "group": "Map",
       "words": "Take MeeMee Home!",
-      "how": "Announcing the game's name.",
-      "pending": true
+      "how": "Announcing the game's name."
     },
     {
       "id": "takehome-round-ready",
       "group": "Rounds",
       "words": "Let's take the MeeMee home!",
-      "how": "Excited, inviting.",
-      "pending": true
+      "how": "Excited, inviting."
     },
     {
       "id": "takehome-round-done",
       "group": "Rounds",
       "words": "All the MeeMee are home!",
-      "how": "Big finish: proud and happy.",
-      "pending": true
+      "how": "Big finish: proud and happy."
     },
     {
       "id": "takehome-round-another",
       "group": "Rounds",
       "words": "Another trip?",
-      "how": "Inviting.",
-      "pending": true
+      "how": "Inviting."
     },
     {
       "id": "takehome-meemee",
       "group": "Questions",
       "words": "MeeMee.",
-      "how": "Fall at the end: it follows a number (\"Seven… MeeMee.\").",
-      "pending": true
+      "how": "Fall at the end: it follows a number (\"Seven… MeeMee.\")."
     },
     {
       "id": "takehome-are-going",
       "group": "Questions",
       "words": "are going home.",
-      "how": "Fall at the end: it follows a number (\"Four… are going home.\").",
-      "pending": true
+      "how": "Fall at the end: it follows a number (\"Four… are going home.\")."
     },
     {
       "id": "takehome-is-going",
       "group": "Questions",
       "words": "is going home.",
-      "how": "As above, after \"One…\".",
-      "pending": true
+      "how": "As above, after \"One…\"."
     },
     {
       "id": "takehome-are-staying",
       "group": "Questions",
       "words": "are staying.",
-      "how": "Fall at the end: it follows a number (\"Three… are staying.\").",
-      "pending": true
+      "how": "Fall at the end: it follows a number (\"Three… are staying.\")."
     },
     {
       "id": "takehome-is-staying",
       "group": "Questions",
       "words": "is staying.",
-      "how": "As above, after \"One…\".",
-      "pending": true
+      "how": "As above, after \"One…\"."
     },
     {
       "id": "takehome-how-many-left",
       "group": "Questions",
       "words": "How many are left?",
-      "how": "A real question, curious and warm.",
-      "pending": true
+      "how": "A real question, curious and warm."
     },
     {
       "id": "takehome-how-many-going",
       "group": "Questions",
       "words": "How many are going home?",
-      "how": "A real question, curious and warm.",
-      "pending": true
+      "how": "A real question, curious and warm."
     },
     {
       "id": "takehome-how-many-altogether",
       "group": "Questions",
       "words": "How many MeeMee altogether?",
-      "how": "A real question, curious and warm.",
-      "pending": true
+      "how": "A real question, curious and warm."
     },
     {
       "id": "takehome-move-them",
       "group": "Questions",
       "words": "Move them into the dotted circle.",
-      "how": "Friendly and clear, like showing someone a new game.",
-      "pending": true
+      "how": "Friendly and clear, like showing someone a new game."
     },
     {
       "id": "takehome-find-number",
       "group": "Questions",
       "words": "Find the number.",
-      "how": "Friendly and clear, as MeeMee Rescue's.",
-      "pending": true
+      "how": "Friendly and clear, as MeeMee Rescue's."
     },
     {
       "id": "takehome-take-away",
       "group": "Number sentence",
       "words": "take away",
-      "how": "Short, voice up: a number follows (\"seven take away four…\").",
-      "pending": true
+      "how": "Short, voice up: a number follows (\"seven take away four…\")."
     },
     {
       "id": "takehome-is",
       "group": "Number sentence",
       "words": "is",
-      "how": "Short and light, voice up: the answer follows (\"…is three.\").",
-      "pending": true
+      "how": "Short and light, voice up: the answer follows (\"…is three.\")."
     },
     {
       "id": "takehome-home-they-go",
       "group": "Praise",
       "words": "Home they go!",
-      "how": "Pleased and warm.",
-      "pending": true
+      "how": "Pleased and warm."
     }
   ]
 }

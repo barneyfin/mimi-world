@@ -5132,7 +5132,7 @@ async def test_equation_motion(p):
 # ---------------------------------------------------------------- 0.8.0: Take MeeMee Home (games/takehome), subtraction
 TH_PLACE = "MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === 'takehome').planet]"
 TH_STEPS = ("take", "left", "numbers")
-TH_PRAISE = {"praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done"}
+TH_PRAISE = {"praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done", "takehome-home-they-go"}   # MeeMee Rescue's four and its own
 TH_UNDER, TH_SHIP = [180, 700], [790, 528]              # the sentence's two places (its box's top-left corner)
 # What the game screen shows (stage px): the round's step and question, the diagram, the MeeMee, the tiles, the sentence
 TH_STATE = """(() => { const R = MW.takehome, s = R.st, d = R.diagram(), tr = R.track(), e = R.equation(), g = document.getElementById('screen-takehome-play');
@@ -5169,9 +5169,11 @@ def th_answer(q):
     return q["whole"] if q["missing"] == "whole" else (q["take"] if q["missing"] == "right" else q["left"])
 
 
-def th_prompt(step, q, qi):
-    """What Scruffles says for a question (lines.md, How they join up), as the say log has it. While "Move them into the
-    dotted circle." and "Find the number." are pending they are left out (as MeeMee Rescue's "Find the number.")."""
+def th_prompt(step, q, qi, pending=False):
+    """What Scruffles says for a question (lines.md, How they join up), as the say log has it. The first two questions of a
+    round add "Move them into the dotted circle." (step 1) or "Find the number." (steps 2 and 3), then "Tap Scruffles when
+    you're ready."; pending: as while those two lines were still pending, when they are left out (as MeeMee Rescue's
+    "Find the number.")."""
     q = th_q(step, q)
     w, t, r = q["whole"], q["take"], q["left"]
     whole = f"num-mid-{w} takehome-meemee"
@@ -5185,7 +5187,9 @@ def th_prompt(step, q, qi):
         p = [whole, staying, "takehome-how-many-going"]
     else:
         p = [going, staying, "takehome-how-many-altogether"]
-    return " ".join(p + (["tap-scruffles"] if qi < 2 else []))
+    if qi < 2:
+        p += ([] if pending else ["takehome-move-them" if step == "take" else "takehome-find-number"]) + ["tap-scruffles"]
+    return " ".join(p)
 
 
 def th_said_sentence(q):
@@ -5235,7 +5239,7 @@ async def th_open(t, page, step, round_):
         await t.wait_screen("screen-map")
     pl = await page.evaluate(TH_PLACE)
     await t.tap(pl["x"], pl["y"])
-    return await th_wait(page, ["takehome-open"], 25)
+    return await th_wait(page, ["takehome-open"], 30)          # its title banner, "Let's take the MeeMee home!", the question
 
 
 async def th_move(t, n, to=(560, 478)):
@@ -5733,20 +5737,24 @@ async def test_takehome_drag(p, name="fire", vw=1046, vh=653, dpr=1.22):
     check(f"takehome-drag ({name}): the tile picked back up and put down on the number it filled stays in the circle", s["placed"] == 3 and s["sentence"] == "9 − 6 = 3", json.dumps([s, num]))
     eq = (await page.evaluate(TH_EQ))[-4:]
     check(f"takehome-drag ({name}): the sentence's events: the gap back (minus 9-6=?), filled again (fill 3)", eq[-2:] == ["minus 9-6=?", "fill 3"], json.dumps(eq))
-    # the new lines that join others once recorded (stubbed here: they are pending): the first two questions' instructions, and the praise
-    lines = await page.evaluate("""(() => { const R = MW.takehome, out = {};
+    # "Move them into the dotted circle.", "Find the number." and "Home they go!" join the first two questions and the
+    # praise now they are recorded; while they were pending they were left out, so nothing fell silent. Both ways: as the
+    # page has them (recorded), and with MW.audio.recorded stubbed to say they aren't recorded yet.
+    lines = await page.evaluate("""(() => { const R = MW.takehome, out = {}, three = ['takehome-move-them', 'takehome-find-number', 'takehome-home-they-go'];
         const was = MW.audio.recorded;
-        out.pending = [R.ask({ whole: 7, take: 4 }, 'take') && R.st.prompt.slice(-2), R.ask({ whole: 7, take: 4 }, 'left') && R.st.prompt.slice(-2), R.praiseLines()];
-        MW.audio.recorded = id => ['takehome-move-them', 'takehome-find-number', 'takehome-home-they-go'].indexOf(id) >= 0 || was(id);
-        out.recorded = [R.ask({ whole: 7, take: 4 }, 'take') && R.st.prompt.slice(-2), R.ask({ whole: 7, take: 4 }, 'left') && R.st.prompt.slice(-2), R.praiseLines()];
-        MW.audio.recorded = was; MW.world.home(); return out; })()""")
+        const look = () => [R.ask({ whole: 7, take: 4 }, 'take') && R.st.prompt.slice(-2), R.ask({ whole: 7, take: 4 }, 'left') && R.st.prompt.slice(-2), R.praiseLines()];
+        out.onPage = three.map(id => was(id));
+        out.recorded = look();
+        MW.audio.recorded = id => three.indexOf(id) < 0 && was(id);
+        try { out.pending = look(); } finally { MW.audio.recorded = was; }
+        MW.world.home(); return out; })()""")
     praise = ["praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done"]
-    check(f"takehome-drag ({name}): while pending, 'Move them into the dotted circle.', 'Find the number.' and 'Home they go!' are left out (so nothing falls silent)",
-          lines["pending"] == [[["num-mid-4", "takehome-are-going"], ["tap-scruffles"]], [["takehome-how-many-left"], ["tap-scruffles"]], praise], json.dumps(lines["pending"]))
-    check(f"takehome-drag ({name}): once recorded, they join: step 1's first questions end 'Move them into the dotted circle. Tap Scruffles…', steps 2 and 3's "
+    check(f"takehome-drag ({name}): recorded, they join: step 1's first questions end 'Move them into the dotted circle. Tap Scruffles…', steps 2 and 3's "
           f"'Find the number. Tap Scruffles…', and 'Home they go!' is one of the praise",
-          lines["recorded"] == [[["takehome-move-them"], ["tap-scruffles"]], [["takehome-find-number"], ["tap-scruffles"]], praise + ["takehome-home-they-go"]],
-          json.dumps(lines["recorded"]))
+          lines["onPage"] == [True] * 3 and lines["recorded"] == [[["takehome-move-them"], ["tap-scruffles"]], [["takehome-find-number"], ["tap-scruffles"]], praise + ["takehome-home-they-go"]],
+          json.dumps([lines["onPage"], lines["recorded"]]))
+    check(f"takehome-drag ({name}): while pending (stubbed), 'Move them into the dotted circle.', 'Find the number.' and 'Home they go!' are left out (so nothing falls silent)",
+          lines["pending"] == [[["num-mid-4", "takehome-are-going"], ["tap-scruffles"]], [["takehome-how-many-left"], ["tap-scruffles"]], praise], json.dumps(lines["pending"]))
     check(f"takehome-drag ({name}): no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
@@ -6055,13 +6063,15 @@ async def test_takehome_grownups(p, name, vw, vh, dpr):
     await browser.close()
 
 
-STUB_TH_NAME = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
-    MW.audio.recorded = id => id === 'takehome-name' || window.__recorded(id); })()"""
+# as while "Take MeeMee Home!" was still pending: MW.audio.recorded stubbed to say it isn't recorded (UNSTUB_PLACE_LINE undoes it)
+STUB_TH_NAME_PENDING = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
+    MW.audio.recorded = id => id !== 'takehome-name' && window.__recorded(id); })()"""
 
 
 async def test_takehome_map(p, name, vw, vh, dpr):
-    """Place 2 is the game's: lit with its badge; it and its badge open the game (its name pending: no banner yet); with the
-    name recorded (stubbed), its title banner. The rocks and the station stay locked and still say their line."""
+    """Place 2 is the game's: lit with its badge; it and its badge open the game after its title banner (its name is
+    recorded); with the name stubbed as not recorded, straight away with no banner. The rocks and the station stay locked
+    and still say their line."""
     print(f"\n== Take MeeMee Home on the map ({name}) ==")
     browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-map-{name}", vw, vh, dpr, mode=None)
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
@@ -6082,33 +6092,45 @@ async def test_takehome_map(p, name, vw, vh, dpr):
         check(f"takehome-map ({name}): {WHAT[i]} still say 'That planet isn't ready yet.' (while 'That place…' is pending) and stay on the map",
               said == ["map-not-ready"] and screen == "screen-map", json.dumps([said, screen]))
         await asyncio.sleep(1.2)
+    # its name is recorded: tapping place 2 shows its title banner while "Take MeeMee Home!" is said, then the game starts
     await page.evaluate("MW.takehome.nextRound = %s" % json.dumps([{"whole": 7, "take": 4}] * 5))
     pl = await page.evaluate(TH_PLACE)
+    n0 = len(await t.said())
     await t.tap(pl["x"], pl["y"])
-    ok = await t.wait_screen("screen-takehome-play", 3)
-    check(f"takehome-map ({name}): tapping place 2 opens the game (its name isn't recorded yet, so straight away, no banner)",
-          ok and await page.evaluate("MW.events.some(e => e.type === 'banner' && e.detail === 'none for Take MeeMee Home (takehome-name not recorded yet)')"))
+    up = await th_until(page, "MW.world.banner.up() && document.getElementById('banner').classList.contains('is-in')", 5)
+    await asyncio.sleep(0.4)                                 # its fade-in (260 ms)
+    bi = await page.evaluate(BANNER_INFO)
+    size = await page.evaluate("(() => { const a = document.querySelector('#banner [data-art] svg'); return a ? [a.getAttribute('width'), a.getAttribute('height')] : null; })()")
+    await screenshot(page, f"takehome-{name}-banner.png")
+    check(f"takehome-map ({name}): tapping place 2 shows its title banner, 'Take MeeMee Home' and its badge at 112, while 'Take MeeMee Home!' is said",
+          up and bi == {"up": True, "name": "Take MeeMee Home", "art": ["takehome-badge"], "phase": "opening", "screen": "screen-map"} and size == ["112", "112"]
+          and (await t.said())[n0:][:1] == ["takehome-name"], json.dumps([bi, size, (await t.said())[n0:]]))
+    ok = await t.wait_screen("screen-takehome-play", 10)
+    gone = await page.evaluate("(() => { const g = MW.events.filter(e => e.type === 'banner' && e.detail === 'gone Take MeeMee Home').pop(), "
+                               "r = MW.events.filter(e => e.type === 'round').pop(); return !!(g && r && g.t <= r.t); })()")
+    check(f"takehome-map ({name}): ... and the game starts once the banner has gone", ok and gone)
     await t.tap(*HOME)
     await t.wait_screen("screen-map", 5)
     await asyncio.sleep(0.5)
     b = await page.evaluate("MW.LAYOUT.map.planets[2].badge")
     await t.tap(b["x"] + b["d"] / 2, b["y"] + b["d"] / 2)
-    check(f"takehome-map ({name}): its badge opens it too", await t.wait_screen("screen-takehome-play", 3))
+    check(f"takehome-map ({name}): its badge opens it too (with its banner)",
+          await th_until(page, "MW.world.banner.up()", 5) and await t.wait_screen("screen-takehome-play", 10))
     await t.tap(*HOME)
     await t.wait_screen("screen-map", 5)
     await asyncio.sleep(0.5)
-    # once "Take MeeMee Home!" is recorded (stubbed here): its title banner, its name and badge, and the game after it
-    await page.evaluate(STUB_TH_NAME)
-    await t.tap(pl["x"], pl["y"])
-    await asyncio.sleep(0.4)
-    bi = await page.evaluate(BANNER_INFO)
-    size = await page.evaluate("(() => { const a = document.querySelector('#banner [data-art] svg'); return a ? [a.getAttribute('width'), a.getAttribute('height')] : null; })()")
-    await screenshot(page, f"takehome-{name}-banner.png")
-    check(f"takehome-map ({name}): once its name is recorded, tapping place 2 shows its title banner: 'Take MeeMee Home' and its badge at 112",
-          bi == {"up": True, "name": "Take MeeMee Home", "art": ["takehome-badge"], "phase": "opening", "screen": "screen-map"} and size == ["112", "112"], json.dumps([bi, size]))
-    await page.evaluate("MW.takehome.nextRound = %s" % json.dumps([{"whole": 7, "take": 4}] * 5))
-    check(f"takehome-map ({name}): ... and the game starts once the banner has gone", await t.wait_screen("screen-takehome-play", 6))
-    await page.evaluate("(() => { if (window.__recorded) { MW.audio.recorded = window.__recorded; delete window.__recorded; } })()")
+    # as while its name was still pending (stubbed): no banner, the game starts straight away
+    await page.evaluate(STUB_TH_NAME_PENDING)
+    try:
+        await t.tap(pl["x"], pl["y"])
+        ok = await t.wait_screen("screen-takehome-play", 3)
+        check(f"takehome-map ({name}): with its name not recorded (stubbed), tapping place 2 opens the game straight away, no banner",
+              ok and not await page.evaluate("MW.world.banner.up()")
+              and await page.evaluate("MW.events.some(e => e.type === 'banner' && e.detail === 'none for Take MeeMee Home (takehome-name not recorded yet)')"))
+    finally:
+        await page.evaluate(UNSTUB_PLACE_LINE)
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
     check(f"takehome-map ({name}): no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
@@ -6191,7 +6213,7 @@ async def test_takehome_pause(p):
     check("takehome-pause: the grown-ups area opened mid-celebration: nothing is said while it's open, the answer stays",
           s["phase"] == "takehome-celebrate" and (await t.said())[n0:] == [] and s["carried"] == [None, 3, None], json.dumps(s))
     await page.click(".gu-close")
-    s = await th_wait(page, ["takehome-open"], 20)
+    s = await th_wait(page, ["takehome-open"], 30)
     check("takehome-pause: ... closed, the celebration carries on (the sentence said, the MeeMee home), then question 2",
           s["qi"] == 1 and th_said_sentence(th_q("left", rnd2[0])) in await t.said(), json.dumps(s))
     # Home mid-celebration: nothing more said
@@ -6216,7 +6238,7 @@ async def test_takehome_pause(p):
     await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 15)
     await page.evaluate("MW.takehome.nextRound = %s" % json.dumps(rnd))
     await t.tap(1160, 480)                                   # Again (1080, 400, 160 across)
-    s = await th_wait(page, ["takehome-open"], 20)
+    s = await th_wait(page, ["takehome-open"], 30)
     check("takehome-pause: Again on the end screen starts a new round", s["screen"] == "screen-takehome-play" and s["qi"] == 0 and s["whole"] == 7, json.dumps(s))
     await t.tap(*HOME)
     check("takehome-pause: Home goes back to the map", await t.wait_screen("screen-map", 5))
@@ -6324,7 +6346,7 @@ async def test_takehome_hop_pause(p, name="fire", vw=1046, vh=653, dpr=1.22):
     s1 = await th_state(page)
     check(f"takehome-hop ({name}): Hear-again while the MeeMee hop home says nothing, and the hop carries on",
           ok and s0["hoppers"] == 4 and s1["phase"] == "takehome-celebrate" and s1["hoppers"] == 4 and (await t.said())[n0:] == [], json.dumps([s0["hoppers"], s1]))
-    s = await th_wait(page, ["takehome-open"], 15)
+    s = await th_wait(page, ["takehome-open"], 30)
     check(f"takehome-hop ({name}): ... then question 2, the hoppers gone", s["qi"] == 1 and s["hoppers"] == 0 and s["whole"] == 6, json.dumps(s))
     # the screen going off mid-hop: the round waits (nothing said, no next question) until it comes back
     ok = await answer_and_hop(rnd[1])
@@ -6335,7 +6357,7 @@ async def test_takehome_hop_pause(p, name="fire", vw=1046, vh=653, dpr=1.22):
     s = await th_state(page)
     held = s["phase"] == "takehome-celebrate" and s["qi"] == 1 and (await t.said())[n0:] == [] and await page.evaluate("MW.events.filter(e => e.type === 'question').length") == q0
     await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
-    s2 = await th_wait(page, ["takehome-open"], 15)
+    s2 = await th_wait(page, ["takehome-open"], 30)
     check(f"takehome-hop ({name}): the screen going off while they hop holds the round (nothing said, no next question); back on, it carries on to question 3",
           ok and held and s2["qi"] == 2 and s2["hoppers"] == 0, json.dumps([s, s2]))
     # Home mid-hop: the map at once, the hopping MeeMee taken away, nothing said after; the next round starts clean
@@ -6378,7 +6400,7 @@ async def test_takehome_motion(p):
         await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
         # step 1, 9 − 6: six going home
         await page.evaluate("""(() => { const R = MW.takehome; R.ask({ whole: 9, take: 6 }, 'take'); R.st.counters.filter(m => m.where === 'whole').slice(0, 6).forEach(m => R.drop(m, 550, 470, false)); R.podTap(); })()""")
-        await th_until(page, "MW.events.some(e => e.type === 'home')", 15)
+        await th_until(page, "MW.events.some(e => e.type === 'home')", 25)
         await asyncio.sleep(0.55)                               # the sixth sets off 420 ms after the first
         got = await page.evaluate(hops)
         gone = await page.evaluate("MW.takehome.st.counters.filter(c => c.where === 'right').map(c => [c.el.classList.contains('takehome-gone'), getComputedStyle(c.el).transitionProperty])")
@@ -6427,7 +6449,8 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
     await t.wait_screen("screen-map")
     pl = await page.evaluate(TH_PLACE)
     await t.tap(pl["x"], pl["y"])
-    await asyncio.sleep(0.9)
+    await th_until(page, "MW.events.some(e => e.type === 'moment' && e.detail === 'lookout home') && !!document.querySelector('#screen-takehome-play [data-moment=lookout].is-shown')", 15)          # once the title banner has gone and the round starts
+    await asyncio.sleep(0.6)                                 # its rise (450 ms)
     look = await page.evaluate("""(() => { const b = document.querySelector('#screen-takehome-play [data-moment=lookout].is-shown'); if (!b) return null;
         const lay = b.closest('.mw-moments'), home = MW.takehome.homePlanet();
         return { window: [b.offsetLeft, b.offsetTop, b.offsetWidth, b.offsetHeight], behind: !!(lay.compareDocumentPosition(home) & Node.DOCUMENT_POSITION_FOLLOWING),
@@ -6439,9 +6462,10 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
           look is not None and look["window"] == [690, 548, 250, 252] and look["behind"] and not look["flip"], json.dumps(look))
     check(f"takehome-moments ({name}): ... clear of the diagram and its pills", lb and not any(overlaps_circle(lb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)])
           and not any(overlap(lb, q) for q in pills), json.dumps(lb))
-    await th_wait(page, ["takehome-open"], 15)
-    await asyncio.sleep(2.4)
-    check(f"takehome-moments ({name}): ... and ducks down once it has spotted the planet", not await page.evaluate("!!document.querySelector('#screen-takehome-play [data-moment=lookout]')"))
+    await th_wait(page, ["takehome-asking", "takehome-open"], 20)
+    down = await th_until(page, "!document.querySelector('#screen-takehome-play [data-moment=lookout]')", 10)
+    check(f"takehome-moments ({name}): ... and ducks down once it has spotted the planet (1.8 s into the first question)", down)
+    await th_wait(page, ["takehome-open"], 20)
     await th_move(t, 4)
     await n_check(t)
     await asyncio.sleep(0.5)
@@ -6451,8 +6475,8 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
           json.dumps(eb))
     await screenshot(page, f"takehome-{name}-engineer.png")
     await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'cook'})")
-    await th_wait(page, ["takehome-open"], 20)
-    await asyncio.sleep(2.5)                                 # question 1's moments are over
+    await th_wait(page, ["takehome-open"], 30)
+    await th_until(page, "!document.querySelector('#screen-takehome-play [data-moment].is-shown')", 10)   # question 1's moments are over
     n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
     await th_move(t, 2)
     await n_check(t)
@@ -6464,17 +6488,17 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
           nb is not None and route is not None and "NaN" not in route and not any(overlaps_circle(nb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and nb[1] > 95,
           json.dumps([nb, route]))
     for q in range(2, 5):
-        s = await th_wait(page, ["takehome-open"], 20)
+        s = await th_wait(page, ["takehome-open"], 30)
         await th_move(t, s["answer"])
         await n_check(t)
-    await th_wait(page, ["takehome-done"], 20)
-    ok = await th_until(page, "!!document.querySelector('#screen-takehome-end [data-moment=cook].is-shown')", 10)
+    await th_wait(page, ["takehome-done"], 30)
+    ok = await th_until(page, "!!document.querySelector('#screen-takehome-end [data-moment=cook].is-shown')", 15)
     badges = await page.evaluate("Array.from(document.querySelectorAll('#screen-takehome-end .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
     await asyncio.sleep(0.8)
     await screenshot(page, f"takehome-{name}-cook.png")
     check(f"takehome-moments ({name}): the cook brings fish on the end screen; the end screen's cats wear their badges",
           ok and badges == ["moggles:navigator", "snuffles:cook"], json.dumps(badges))
-    await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 10)
+    await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 15)
     said = await t.said()
     check(f"takehome-moments ({name}): no words in the moments", not any("job-" in x or "name-" in x for x in said), json.dumps(said[-3:]))
     await t.tap(*HOME)
@@ -6487,7 +6511,8 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
     await page.evaluate("""(() => { window.__both = 0; window.__seen = 0; const loop = () => { const b = document.querySelector('#screen-takehome-play [data-moment=lookout].is-shown');
         const e = MW.takehome.equation().el; if (b) window.__seen++; if (b && e.classList.contains('is-shown')) window.__both++; window.__loop = requestAnimationFrame(loop); }; loop(); })()""")
     await t.tap(pl["x"], pl["y"])
-    await asyncio.sleep(0.9)
+    await th_until(page, "MW.events.some(e => e.type === 'moment' && e.detail === 'lookout track') && !!document.querySelector('#screen-takehome-play [data-moment=lookout].is-shown')", 15)          # once the title banner has gone and the round starts
+    await asyncio.sleep(0.6)                                 # its rise (450 ms)
     look = await page.evaluate(LOOKOUT_LOOK.replace("#screen-game", "#screen-takehome-play").replace("rescue-peek-flip", "takehome-peek-flip"))
     await screenshot(page, f"takehome-{name}-lookout-track.png")
     check(f"takehome-moments ({name}): step 3: the lookout peeks up from behind the track's right-hand end, mirrored towards the diagram (906, 519, 250 x 175)",
@@ -6495,7 +6520,7 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
     s = await th_state(page)
     check(f"takehome-moments ({name}): ... and Scruffles starts the new round thinking, not still grinning from the last round's last answer, his lights off",
           s["face"] == "thinking" and not s["lights"] and s["phase"] == "takehome-starting", json.dumps(s))
-    s = await th_wait(page, ["takehome-open"], 15)
+    s = await th_wait(page, ["takehome-open"], 30)
     await asyncio.sleep(0.5)
     both = await page.evaluate("[window.__seen, window.__both, !!document.querySelector('#screen-takehome-play [data-moment=lookout]')]")
     await page.evaluate("cancelAnimationFrame(window.__loop)")
@@ -6514,11 +6539,12 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
     n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
     await th_set(page, "take", [{"whole": 3, "take": 1}] * 5)
     await t.tap(pl["x"], pl["y"])
-    await th_wait(page, ["takehome-open"], 15)
+    await th_wait(page, ["takehome-open"], 30)
     await th_move(t, 1)
+    await page.evaluate("window.__thq = performance.now()")
     await n_check(t)
-    await asyncio.sleep(3)
-    check(f"takehome-moments ({name}): no jobs, no moments", await page.evaluate("MW.events.filter(e => e.type === 'moment').length") == n0)
+    hopped = await th_until(page, "MW.events.some(e => e.type === 'home' && e.t > window.__thq)", 20)   # past the engineer's and the navigator's points
+    check(f"takehome-moments ({name}): no jobs, no moments", hopped and await page.evaluate("MW.events.filter(e => e.type === 'moment').length") == n0)
     check(f"takehome-moments ({name}): no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
