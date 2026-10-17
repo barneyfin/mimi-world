@@ -19,7 +19,7 @@
       { x: 1010, y: 560, tap: 130, badge: { x: 1040, y: 446, d: 84, pic: 56 }, lock: { x: 1056, y: 470, d: 60, icon: 30 } },  // 1 indigo planet
       { x: 1150, y: 250, tap: 120, badge: { x: 1172, y: 158, d: 72, pic: 48 }, lock: { x: 1186, y: 196, d: 50, icon: 24 } },  // 2 small peach planet
       { x: 690, y: 628, tap: 240, badge: { x: 760, y: 500, d: 84, pic: 56 }, lock: { x: 780, y: 532, d: 56, icon: 28 } },     // 3 the rocks
-      { x: 860, y: 182, tap: 240, badge: { x: 940, y: 70, d: 84, pic: 56 }, lock: { x: 966, y: 104, d: 56, icon: 28 } }       // 4 the station
+      { x: 860, y: 182, tap: 240, badge: { x: 944, y: 56, d: 84, pic: 56 }, lock: { x: 966, y: 96, d: 56, icon: 28 } }       // 4 the station
     ],
     ship: { x: 155, y: 400, w: 190 },
     crew: [{ who: 'moggles', x: 44, y: 456, w: 112 }, { who: 'snuffles', x: 344, y: 456, w: 112 }],

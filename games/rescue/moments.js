@@ -5,7 +5,8 @@
                 ship, answer 24 of the 0.6.0 PRD, mirrored so it looks towards the diagram);
      engineer   on a right answer, gives the ship a tap with the spanner while the lights flash;
      navigator  as a star turns peach, holds up the star map and points to the next one;
-     cook       on the end screen, brings fish for the rescued MeeMee.
+     commander  on the end screen, the radio grows in and calls (three arcs from its aerial) beside the rescued
+                MeeMee (0.9.0, in the cook's place: the cook brought fish).
    A job no cat has has no moment. With reduce motion the cats fade in and out instead of moving. */
 (function () {
   'use strict';
@@ -18,7 +19,8 @@
     lookoutTrack: { x: 906, y: 519, w: 220, show: 175, box: 250, scope: { x: 89, y: 2, size: 150 }, flip: true },
     engineer: { x: 700, y: 318, w: 140, spanner: { x: 100, y: 84, size: 88 } },                     // by the ship's left fin
     navigator: { x: 686, y: 124, w: 120, map: { x: 64, y: 50, size: 80 } },                         // under the stars
-    cook: { size: 104, moggles: { x: 254, y: 494, flip: true }, snuffles: { x: 770, y: 494, flip: false } }   // end screen
+    // end screen: the radio's box (where the cook's pan was), its call rising above it; never flipped (boards Moment14)
+    commander: { size: 104, moggles: { x: 254, y: 494 }, snuffles: { x: 770, y: 494 } }
   };
   function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
   function size(svg, s) { svg.setAttribute('width', s); svg.setAttribute('height', s); return svg; }
@@ -128,18 +130,22 @@
       return true;
     };
 
-    // ---------------------------------------------------------------- cook (end screen)
-    m.cook = function () {
-      const who = MW.crew.who('cook');
+    // ---------------------------------------------------------------- commander (end screen)
+    // 0.9.0, in the cook's place: the radio grows in where the pan did (its 104 box at the commander's place), with its
+    // call, three arcs from the aerial, rising above it: the drawing is 104 wide and 1.42 times as tall
+    m.commander = function () {
+      const who = MW.crew.who('commander');
       if (!who) return false;
-      const k = L.cook, at = k[who];
-      const pan = place(MW.make('div', 'mw-moment mw-cook-pan' + (at.flip ? ' is-flipped' : ''), { 'data-moment': 'cook' }), at.x, at.y);
-      pan.appendChild(size(MW.art('job-cook'), k.size));
-      endLayer.appendChild(pan);
-      show(pan);
+      const k = L.commander, at = k[who], h = Math.round(k.size * 1.42);
+      const call = place(MW.make('div', 'mw-moment mw-commander-call', { 'data-moment': 'commander' }), at.x, at.y - (h - k.size));
+      call.style.width = k.size + 'px'; call.style.height = h + 'px';
+      const art = MW.art('commander-call'); art.setAttribute('width', k.size); art.setAttribute('height', h);
+      call.appendChild(art);
+      endLayer.appendChild(call);
+      show(call);
       if (opts.endCats && opts.endCats[who]) opts.endCats[who].hop(0);
       MW.sparkles(endLayer, at.x + k.size / 2, at.y + k.size / 2, 70);
-      MW.log('moment', 'cook');
+      MW.log('moment', 'commander');
       return true;
     };
 

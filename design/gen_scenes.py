@@ -4,8 +4,8 @@ Each function returns an SVG string. Colours are classes (f-*, s-*) bound to tok
 design system share one palette."""
 import math
 
-from gen_art import (ICONS, JOBS, cross_star, galaxy, held_telescope, icon, job_badge, job_picture, mimi, moggles, nebula, number_tile,
-                     number_track, numbered_mimi, planet, scruffles_pod, sky_art, snuffles, spark, starfield, tok, tray)
+from gen_art import (ICONS, JOBS, commander_call, cross_star, galaxy, held_telescope, icon, job_badge, job_picture, mimi, moggles, nebula,
+                     number_tile, number_track, numbered_mimi, planet, scruffles_pod, sky_art, snuffles, spark, starfield, tok, tray)
 
 
 def sky(uid="sky"):
@@ -119,29 +119,51 @@ def asteroid_cluster(cx, cy):
                + spark(cx - 30 * k, cy - 36 * k, 0.6))
 
 
-def station(x, y, k=1.35):
-    """A small space station: a round hub with windows, two solar wings and an antenna light."""
-    return f'<g transform="translate({x} {y}) scale({k})">' + _station(0, 0) + '</g>'
+def station(x, y, k=1.11):
+    """A small space station on the map (place 4), drawn 6 px below the place's middle (0.9.0, mock-up round 14). At 1.11
+    (Barney, 17 October 2026) every point of it, outlines included, is within 111.5 px of the place's middle, inside its
+    240 tap circle, so a tap anywhere on it is heard."""
+    return f'<g transform="translate({x} {y + 6}) scale({k})">' + _station(0, 0) + '</g>'
 
 
 def _station(cx, cy):
-    wing = lambda x0: (f'<rect x="{x0}" y="{cy - 15}" width="40" height="30" rx="3" fill="@planet-indigo" stroke="@ink" stroke-width="3.5"/>'
-                       + "".join(f'<path d="M{x0 + k * 10} {cy - 13} V{cy + 13}" stroke="@planet-indigo-light" stroke-width="2" opacity="0.8"/>' for k in (1, 2, 3))
-                       + f'<path d="M{x0 + 2} {cy} H{x0 + 38}" stroke="@planet-indigo-light" stroke-width="2" opacity="0.8"/>')
-    return tok(
-        f'<path d="M{cx - 66} {cy} H{cx + 66}" stroke="@ink" stroke-width="9" stroke-linecap="round"/>'
-        f'<path d="M{cx - 66} {cy} H{cx + 66}" stroke="@asteroid-light" stroke-width="4" stroke-linecap="round"/>'
-        + wing(cx - 86) + wing(cx + 46)
-        + f'<path d="M{cx} {cy - 24} V{cy - 42}" stroke="@ink" stroke-width="3.5" stroke-linecap="round"/>'
-        f'<circle cx="{cx}" cy="{cy - 45}" r="4.5" fill="@spark" stroke="@ink" stroke-width="2.5"/>'
-        f'<ellipse cx="{cx}" cy="{cy + 6}" rx="34" ry="10" fill="@night-button" stroke="@ink" stroke-width="3.5"/>'
-        f'<circle cx="{cx}" cy="{cy}" r="24" fill="@moon" stroke="@ink" stroke-width="4"/>'
-        f'<path d="M{cx - 24} {cy + 2} A24 24 0 0 0 {cx + 24} {cy + 2} A24 10 0 0 1 {cx - 24} {cy + 2} Z" fill="@white-shade"/>'
-        + f'<rect x="{cx - 22}" y="{cy - 5}" width="44" height="9" fill="@night-raised"/>'
-        + "".join(f'<path d="M{cx + dx} {cy - 5} V{cy + 4}" stroke="@moon" stroke-width="2.5"/>' for dx in (-14, -5, 4, 13))
-        + f'<path d="M{cx - 24} {cy - 5} H{cx + 24} M{cx - 24} {cy + 4} H{cx + 24}" stroke="@ink" stroke-width="2"/>'
-        + f'<path d="M{cx - 17} {cy - 14} A20 20 0 0 1 {cx - 4} {cy - 20}" fill="none" stroke="@highlight" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>'
-    )
+    """MeeMee Station as the game draws it (0.9.0, mock-up round 14; SolarMap and MeeMeeStation cards), small: a
+    mint-deep truss with a mint-light zigzag, an indigo solar wing at each end on a steel mast, ten moon modules in 2 rows
+    of 5 joined by mint collars (three windows lit spark), a command tower with its round screen, an antenna and a dish."""
+    def X(v):
+        return f"{cx + v:.1f}"
+
+    def Y(v):
+        return f"{cy + v:.1f}"
+    g = ''
+    # the truss, between the two rows and out to the wings
+    g += (f'<rect x="{X(-84)}" y="{Y(-3.5)}" width="168" height="7" rx="2.3" fill="@mint-deep" stroke="@ink" stroke-width="2.5"/>'
+          f'<path d="M{X(-80)} {Y(-1.5)}' + "".join(f' L{X(-80 + 7 * k)} {Y(1.5 if k % 2 else -1.5)}' for k in range(1, 23)) + '" fill="none" stroke="@mint-light" stroke-width="1.4" stroke-linejoin="round"/>')
+    # solar wings at both ends, on a mast
+    for wx in (-82, 82):
+        g += f'<rect x="{X(wx - 2.2)}" y="{Y(-30.5)}" width="4.4" height="61" rx="2" fill="@steel" stroke="@ink" stroke-width="2"/>'
+        for top in (-28.5, 6.5):
+            g += (f'<rect x="{X(wx - 12)}" y="{Y(top)}" width="24" height="22" rx="2.5" fill="@planet-indigo" stroke="@ink" stroke-width="2.5"/>'
+                  f'<path d="M{X(wx)} {Y(top + 1.5)} V{Y(top + 20.5)} M{X(wx - 10.5)} {Y(top + 7.3)} H{X(wx + 10.5)} M{X(wx - 10.5)} {Y(top + 14.7)} H{X(wx + 10.5)}" stroke="@planet-indigo-light" stroke-width="1.3"/>')
+        g += f'<circle cx="{X(wx)}" cy="{Y(0)}" r="4.5" fill="@steel" stroke="@ink" stroke-width="2"/>'
+    # the command tower above the middle, with its round screen, and an antenna
+    g += (f'<path d="M{X(6)} {Y(-34)} V{Y(-45)}" stroke="@ink" stroke-width="2.6" stroke-linecap="round"/>'
+          f'<circle cx="{X(6)}" cy="{Y(-48)}" r="3.4" fill="@spark" stroke="@ink" stroke-width="1.8"/>'
+          f'<rect x="{X(-12)}" y="{Y(-35)}" width="24" height="22" rx="5" fill="@moon" stroke="@ink" stroke-width="2.5"/>'
+          f'<circle cx="{X(0)}" cy="{Y(-24.5)}" r="6.2" fill="@moon" stroke="@mint" stroke-width="2.4"/>')
+    # a dish on the top right module
+    g += (f'<path d="M{X(40)} {Y(-17)} V{Y(-21)}" stroke="@ink" stroke-width="2.4"/>'
+          f'<path d="M{X(33.5)} {Y(-24)} A6.5 4 0 0 0 {X(46.5)} {Y(-24)} Z" fill="@moon-dim" stroke="@ink" stroke-width="2" transform="rotate(-25 {X(40)} {Y(-23)})"/>')
+    # the ten modules, joined by mint collars, with their windows
+    lit = {(0, 1), (3, 0), (4, 1)}
+    for r, my in enumerate((-9, 9)):
+        for c in range(4):
+            g += f'<rect x="{X(-36 + 18 * c - 2.5)}" y="{Y(my - 3)}" width="5" height="6" rx="1" fill="@mint" stroke="@ink" stroke-width="1.4"/>'
+        for c in range(5):
+            mx = -36 + 18 * c
+            g += (f'<rect x="{X(mx - 8)}" y="{Y(my - 8)}" width="16" height="16" rx="3.4" fill="@moon" stroke="@ink" stroke-width="2.2"/>'
+                  f'<circle cx="{X(mx)}" cy="{Y(my)}" r="4.6" fill="@{"spark" if (c, r) in lit else "night-raised"}" stroke="@steel" stroke-width="1.6"/>')
+    return tok(g)
 
 
 # The crew screen (phase 4, 0.4.1): where the cats wait before they have jobs. kit/crew.js puts the job stations,
@@ -192,6 +214,8 @@ def art_dict(taken=(0,), extra=None):
         "map": map_art(taken=taken),
         "crew": crew_art(),
         "held-telescope": held_telescope(100),
+        # the commander's moment on every game's end screen (0.9.0): the radio and its call (viewBox 0 -42 100 142)
+        "commander-call": commander_call(100),
         # MeeMee Rescue's numbers mode (0.6.0): the kit's diagram and number track use these (kit/scene.js)
         "numbered-mimi": numbered_mimi(),
         "number-tile": number_tile(),

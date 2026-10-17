@@ -515,7 +515,7 @@
     });
     await MW.wait(500);
     if (!(await ok(token))) return;
-    if (moments.cook()) {                                    // the cook brings fish; the MeeMee hop again
+    if (moments.commander()) {                               // the commander's radio calls; the MeeMee hop again
       await MW.wait(450);
       Array.prototype.forEach.call(endMimi.children, function (m, i) {
         setTimeout(function () { m.classList.remove('is-hop'); void m.getBoundingClientRect(); m.classList.add('is-hop'); }, i * 120);

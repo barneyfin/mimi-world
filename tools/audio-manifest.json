@@ -56,11 +56,6 @@
    "lufs_before": -23.7,
    "gain_db": 3.7
   },
-  "job-cook": {
-   "dur": 0.94,
-   "lufs_before": -20.8,
-   "gain_db": 0.8
-  },
   "num-mid-0": {
    "dur": 1.04,
    "lufs_before": -19.5,

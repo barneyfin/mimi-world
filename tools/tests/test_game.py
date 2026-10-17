@@ -1,7 +1,8 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
 game; 0.7.0: autumn 2, the half-term switch, capitals), the kit (0.6.0: the title banners, the store, stars, pick-up boxes,
-numbers mode's pieces; 0.8.0: the map's five places and the minus sentence), MeeMee Rescue's numbers mode (0.6.0) and Take
-MeeMee Home (0.8.0: subtraction, its three steps, its progress and its grown-ups tab), on Fire and Doogee screen sizes.
+numbers mode's pieces; 0.8.0: the map's five places and the minus sentence; 0.9.0: the commander and its moment, the crew's
+got-it face, the redrawn station and the grown-ups tab row), MeeMee Rescue's numbers mode (0.6.0) and Take MeeMee Home
+(0.8.0: subtraction, its three steps, its progress and its grown-ups tab), on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -838,7 +839,17 @@ async def test_grid(p):
 # ---------------------------------------------------------------- 0.4.1: the crew screen and the job moments
 CREW_BTN = (250, 510)                 # the crew corner on the map
 DECK = {"moggles": (220, 279), "snuffles": (380, 279)}                     # a waiting cat's middle
-STATION = {"lookout": (175, 640), "engineer": (485, 640), "navigator": (795, 640), "cook": (1105, 640)}
+STATION = {"lookout": (175, 640), "engineer": (485, 640), "navigator": (795, 640), "commander": (1105, 640)}   # 0.9.0: the commander in the cook's place
+SHOTS9 = SHOTS / "0.9.0"                    # 0.9.0's screenshots: the commander, the got-it face, the station, the tab row
+SHOTS9.mkdir(exist_ok=True)
+# "commander." (job-commander) is pending until Barney records it. These make the page treat it as pending (false) or
+# recorded (true), whichever it really is, as the place line's stubs do (0.8.0)
+COMMANDER_LINE = """(on => { if (!window.__recordedJob) window.__recordedJob = MW.audio.recorded;
+    MW.audio.recorded = id => id === 'job-commander' ? on : window.__recordedJob(id); })"""
+UNSTUB_COMMANDER_LINE = "(() => { if (window.__recordedJob) { MW.audio.recorded = window.__recordedJob; delete window.__recordedJob; } })()"
+# each job station on the crew screen: its job, its left edge, and whether its picture is the kit's drawing for that job
+STATIONS_INFO = """Array.from(document.querySelectorAll('#screen-crew .mw-station')).map(e => [e.dataset.job, e.offsetLeft,
+    e.querySelector('.mw-station-disc svg').innerHTML === document.getElementById('art-job-' + e.dataset.job).content.firstElementChild.innerHTML])"""
 
 
 async def crew_state(page):
@@ -864,8 +875,12 @@ async def test_crew(p, name="crew", vw=1280, vh=800, dpr=1):
     check(f"{name}: tapping the crew on the map opens the crew screen", await t.wait_screen("screen-crew"))
     await asyncio.sleep(0.3)
     check(f"{name}: it says 'Let's give the crew their jobs!'", (await t.said())[-1:] == ["crew-jobs"], str((await t.said())[-2:]))
+    stations = await page.evaluate(STATIONS_INFO)
+    check(f"{name}: four job stations: lookout, engineer, navigator and commander (0.9.0: the radio, where the cook's frying pan was), each with its job's picture",
+          stations == [["lookout", 40, True], ["engineer", 350, True], ["navigator", 660, True], ["commander", 970, True]], json.dumps(stations))
     if name == "crew":
         await page.screenshot(path=str(SHOTS / "crew-1-no-jobs.png"))
+    await page.evaluate(COMMANDER_LINE + "(false)")             # as while "commander." is pending
     await asyncio.sleep(1.5)
     x, y = await cat_at(page, "moggles")
     await t.drag(x, y, *STATION["lookout"])
@@ -877,11 +892,14 @@ async def test_crew(p, name="crew", vw=1280, vh=800, dpr=1):
     check(f"{name}: no 'crew are ready' with one job left", not st["pulse"])
     await asyncio.sleep(2)
     x, y = await cat_at(page, "snuffles")
-    await t.drag(x, y, *STATION["cook"])
+    n = len(await t.said())
+    await t.drag(x, y, *STATION["commander"])
     await asyncio.sleep(0.5)
     st = await crew_state(page)
-    check(f"{name}: Snuffles onto the frying pan is the cook", st["jobs"] == {"moggles": "lookout", "snuffles": "cook"}, json.dumps(st))
-    check(f"{name}: 'Snuffles is the cook. The crew are ready!'", (await t.said())[-1:] == ["name-snuffles is-the job-cook crew-ready"], str((await t.said())[-1:]))
+    check(f"{name}: Snuffles onto the radio is the commander", st["jobs"] == {"moggles": "lookout", "snuffles": "commander"}
+          and st["taken"] == ["lookout", "commander"] and "snuffles:commander" in st["badges"], json.dumps(st))
+    check(f"{name}: while 'commander.' is pending, 'Snuffles is the commander.' isn't said at all (never half a sentence); 'The crew are ready!' still is",
+          (await t.said())[n:] == ["crew-ready"], str((await t.said())[n:]))
     check(f"{name}: with both jobs given, Home pulses (back to the map)", st["pulse"])
     if name == "crew":
         await asyncio.sleep(0.5)
@@ -889,32 +907,66 @@ async def test_crew(p, name="crew", vw=1280, vh=800, dpr=1):
     await asyncio.sleep(2.5)
     # Moggles onto Snuffles's job: they swap
     x, y = await cat_at(page, "moggles")
-    await t.drag(x, y, *STATION["cook"])
+    await t.drag(x, y, *STATION["commander"])
     await asyncio.sleep(0.5)
     st = await crew_state(page)
-    check(f"{name}: one job per cat: onto the other cat's job, they swap", st["jobs"] == {"moggles": "cook", "snuffles": "lookout"}, json.dumps(st))
-    check(f"{name}: both new jobs are said", (await t.said())[-1:] == ["name-moggles is-the job-cook name-snuffles is-the job-lookout crew-ready"], str((await t.said())[-1:]))
+    check(f"{name}: one job per cat: onto the other cat's job, they swap", st["jobs"] == {"moggles": "commander", "snuffles": "lookout"}, json.dumps(st))
+    check(f"{name}: both new jobs are said (the commander's sentence left out while its line is pending)",
+          (await t.said())[-1:] == ["name-snuffles is-the job-lookout crew-ready"], str((await t.said())[-1:]))
+    await asyncio.sleep(0.6)
+    await screenshot(page, f"0.9.0/{'doogee' if name == 'crew' else 'fire'}-crew-commander.png")   # as board Crew12
     await asyncio.sleep(3.5)
     # a drop between the stations' rows (off the bottom half) takes the job off
     x, y = await cat_at(page, "snuffles")
     await t.drag(x, y, 640, 300)
     await asyncio.sleep(0.5)
     st = await crew_state(page)
-    check(f"{name}: a cat put back on the deck has no job", st["jobs"] == {"moggles": "cook", "snuffles": None} and not st["pulse"], json.dumps(st))
+    check(f"{name}: a cat put back on the deck has no job", st["jobs"] == {"moggles": "commander", "snuffles": None} and not st["pulse"], json.dumps(st))
     back = await cat_at(page, "snuffles")
     check(f"{name}: ... and goes back to its place on the deck", abs(back[0] - DECK["snuffles"][0]) < 3 and abs(back[1] - DECK["snuffles"][1]) < 6, str(back))
     x, y = await cat_at(page, "snuffles")
     await t.drag(x, y, *STATION["engineer"])
     await asyncio.sleep(2.5)
     n = len(await t.said())
+    x, y = await cat_at(page, "snuffles")
+    await t.tap(x, y)
+    await asyncio.sleep(0.5)
+    check(f"{name}: tapping a cat says its job", (await t.said())[n:] == ["name-snuffles is-the job-engineer"], str((await t.said())[n:]))
+    await asyncio.sleep(0.3)
+    n = len(await t.said())
     x, y = await cat_at(page, "moggles")
     await t.tap(x, y)
     await asyncio.sleep(0.5)
-    check(f"{name}: tapping a cat says its job", (await t.said())[n:] == ["name-moggles is-the job-cook"], str((await t.said())[n:]))
+    check(f"{name}: tapping the commander says nothing while 'commander.' is pending, and doesn't cut off what was being said",
+          (await t.said())[n:] == [] and await page.evaluate("MW.audio.speaking()"), str((await t.said())[n:]))
     await asyncio.sleep(2)
     await t.tap(1208, 68)                                    # Hear it again
     await asyncio.sleep(0.4)
-    check(f"{name}: Hear-again says each cat's job", (await t.said())[-1:] == ["name-moggles is-the job-cook name-snuffles is-the job-engineer"], str((await t.said())[-1:]))
+    check(f"{name}: Hear-again says each cat's job (the commander's left out while its line is pending)",
+          (await t.said())[-1:] == ["name-snuffles is-the job-engineer"], str((await t.said())[-1:]))
+    # once "commander." is recorded (stubbed), the commander's sentence is said like every job's
+    await page.evaluate(COMMANDER_LINE + "(true)")
+    await asyncio.sleep(1.6)
+    n = len(await t.said())
+    x, y = await cat_at(page, "moggles")
+    await t.tap(x, y)
+    await asyncio.sleep(0.5)
+    tapped = (await t.said())[n:]
+    await t.tap(1208, 68)
+    await asyncio.sleep(0.4)
+    heard = (await t.said())[-1:]
+    x, y = await cat_at(page, "moggles")
+    await t.drag(x, y, 640, 300)                             # off the job, and back onto the radio
+    await asyncio.sleep(0.6)
+    x, y = await cat_at(page, "moggles")
+    n2 = len(await t.said())
+    await t.drag(x, y, *STATION["commander"])
+    await asyncio.sleep(0.5)
+    given = (await t.said())[n2:]
+    check(f"{name}: once 'commander.' is recorded, tapping the commander, Hear-again and giving a cat the radio say 'Moggles… is the… commander.'",
+          tapped == ["name-moggles is-the job-commander"] and heard == ["name-moggles is-the job-commander name-snuffles is-the job-engineer"]
+          and given == ["name-moggles is-the job-commander crew-ready"], json.dumps([tapped, heard, given]))
+    await asyncio.sleep(2.5)
     # the screen going off mid-drag: the cat goes back to its place, and the next drag still works
     x, y = await cat_at(page, "snuffles")
     sx, sy = await t.screen(x, y)
@@ -929,19 +981,20 @@ async def test_crew(p, name="crew", vw=1280, vh=800, dpr=1):
     await touch(t, "touchEnd", [])
     await asyncio.sleep(0.6)
     st = await crew_state(page)
-    check(f"{name}: a pause lets go of a held cat, and its job stays", not held and st["jobs"] == {"moggles": "cook", "snuffles": "engineer"}, json.dumps([held, st["jobs"]]))
-    check(f"{name}: coming back says the crew's jobs again", (await t.said())[-1:] == ["name-moggles is-the job-cook name-snuffles is-the job-engineer"], str((await t.said())[-1:]))
+    check(f"{name}: a pause lets go of a held cat, and its job stays", not held and st["jobs"] == {"moggles": "commander", "snuffles": "engineer"}, json.dumps([held, st["jobs"]]))
+    check(f"{name}: coming back says the crew's jobs again", (await t.said())[-1:] == ["name-moggles is-the job-commander name-snuffles is-the job-engineer"], str((await t.said())[-1:]))
+    await page.evaluate(UNSTUB_COMMANDER_LINE)
     await t.tap(66, 62)                                      # Home
     check(f"{name}: Home goes back to the map", await t.wait_screen("screen-map"))
     jobs = await page.evaluate("Array.from(document.querySelectorAll('#screen-map .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
-    check(f"{name}: the cats wear their job badges on the map", jobs == ["moggles:cook", "snuffles:engineer"]
+    check(f"{name}: the cats wear their job badges on the map", jobs == ["moggles:commander", "snuffles:engineer"]
           and await page.evaluate("document.querySelectorAll('#screen-map .mw-badge').length") == 2, str(jobs))
     if name == "crew":
         await asyncio.sleep(0.4)
         await page.screenshot(path=str(SHOTS / "crew-3-map-badges.png"))
     await page.reload()
     await page.wait_for_load_state("load")
-    check(f"{name}: the jobs are remembered after closing the game", await page.evaluate("JSON.stringify(MW.crew.jobs())") == json.dumps({"moggles": "cook", "snuffles": "engineer"}, separators=(",", ":")))
+    check(f"{name}: the jobs are remembered after closing the game", await page.evaluate("JSON.stringify(MW.crew.jobs())") == json.dumps({"moggles": "commander", "snuffles": "engineer"}, separators=(",", ":")))
     check(f"{name}: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
@@ -959,6 +1012,52 @@ async def moment_box(page, sel):
         let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
         el.querySelectorAll('svg').forEach(g => { const r = g.getBoundingClientRect(); x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); });
         return [(x0 - ox) / s, (y0 - oy) / s, (x1 - x0) / s, (y1 - y0) / s]; })(%s)""" % json.dumps(sel))
+
+
+# 0.9.0: the commander's moment on an end screen (the cook's before): its box in stage px, whether it is flipped, whether
+# it holds the kit's commander-call drawing (the same as the page's template) at its size, its sparkles (count and
+# middle), its motion (how it changes, its scale and opacity), anything repeating, and any cook moment left on the page
+CALL_INFO = """(sel => { const el = document.querySelector(sel); if (!el) return null;
+    const svg = el.querySelector('svg'), tpl = document.getElementById('art-commander-call').content.firstElementChild, cs = getComputedStyle(el);
+    const sp = Array.from(el.parentNode.querySelectorAll('.mw-spark')).map(e => [parseFloat(e.style.left) + parseFloat(e.getAttribute('width')) / 2,
+        parseFloat(e.style.top) + parseFloat(e.getAttribute('height')) / 2]);
+    const mid = i => sp.length ? Math.round(sp.reduce((a, q) => a + q[i], 0) / sp.length * 10) / 10 : null;
+    return { box: [el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight], shown: el.classList.contains('is-shown'), flipped: el.classList.contains('is-flipped'),
+             drawing: !!svg && svg.innerHTML === tpl.innerHTML, viewBox: svg && svg.getAttribute('viewBox'), size: svg ? [+svg.getAttribute('width'), +svg.getAttribute('height')] : null,
+             sparks: [sp.length, mid(0), mid(1)], transition: cs.transitionProperty, scale: cs.scale, opacity: +cs.opacity,
+             repeats: el.getAnimations({ subtree: true }).some(a => a.effect && a.effect.getTiming().iterations === Infinity),
+             cook: document.querySelectorAll('[data-moment^="cook"], .mw-cook-pan').length }; })"""
+MOMENTS_LOGGED = "MW.events.filter(e => e.type === 'moment').map(e => e.detail)"
+
+
+async def wait_call(page, screen, timeout=20):
+    """Wait for the commander's moment on an end screen; what it is as it shows (with its sparkles), and its scale and
+    opacity half a second later, once it has grown (or faded) in."""
+    sel = screen + " [data-moment=commander]"
+    for _ in range(int(timeout / 0.05)):
+        if await page.evaluate("!!document.querySelector(%s)" % json.dumps(sel + ".is-shown")):
+            break
+        await asyncio.sleep(0.05)
+    info = await page.evaluate(CALL_INFO, sel)
+    if info:
+        await asyncio.sleep(0.5)
+        later = await page.evaluate(CALL_INFO, sel)
+        info["after"] = [later["scale"], later["opacity"], later["repeats"]]
+    return info
+
+
+def call_ok(c, box, flipped, reduce=False):
+    """The commander's moment: shown, its box (the radio's box where the cook's pan was, the call rising above it: the
+    drawing is as wide as the radio's box and 1.42 times as tall), flipped or not (never, as on the boards), the commander-call drawing,
+    five sparkles round the radio's box, nothing repeating, no cook moment, and grown in (or, with reduce motion, faded in)."""
+    if not c:
+        return False
+    radio = (box[0] + box[2] / 2, box[1] + box[3] - box[2] / 2)
+    grown = c["after"][0] == "1" and c["after"][1] == 1 and not c["after"][2]
+    motion = (c["transition"] == "opacity" and c["scale"] == "1") if reduce else ("scale" in c["transition"])
+    return (c["shown"] and c["box"] == box and c["flipped"] == flipped and c["drawing"] and c["viewBox"] == "0 -42 100 142"
+            and c["size"] == [box[2], box[3]] and c["sparks"][0] == 5 and abs(c["sparks"][1] - radio[0]) < 1 and abs(c["sparks"][2] - radio[1]) < 1
+            and not c["repeats"] and c["cook"] == 0 and grown and motion)
 
 
 async def test_moments(p):
@@ -998,8 +1097,8 @@ async def test_moments(p):
     await page.screenshot(path=str(SHOTS / "moments-2-engineer.png"))
     await asyncio.sleep(3.8)
     check("moments: the engineer goes as the lights stop", not await page.evaluate("!!document.querySelector('[data-moment=engineer].is-shown')"))
-    # the navigator and the cook
-    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'cook'})")
+    # the navigator and the commander
+    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'commander'})")
     s = await t.wait_phase(["open"], 15)
     n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
     await t.fill(5, "whole")
@@ -1019,16 +1118,14 @@ async def test_moments(p):
         s = await t.wait_phase(["open"], 15)
         await t.fill(s["answer"], s["target"])
     await t.wait_phase(["done"], 20)
-    for _ in range(80):
-        if await page.evaluate("!!document.querySelector('#screen-end [data-moment=cook].is-shown')"):
-            break
-        await asyncio.sleep(0.1)
-    check("moments: the cook brings fish on the end screen", await page.evaluate("!!document.querySelector('#screen-end [data-moment=cook].is-shown')"))
+    call = await wait_call(page, "#screen-end")
+    check("moments: the commander's radio calls on the end screen (0.9.0, the cook's moment before), at Snuffles's place, logged, and no cook",
+          call_ok(call, [770, 450, 104, 148], False) and (await page.evaluate(MOMENTS_LOGGED)).count("commander") == 1, json.dumps(call))
     badges = await page.evaluate("Array.from(document.querySelectorAll('#screen-end .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
-    check("moments: the end screen's cats wear their badges", badges == ["moggles:navigator", "snuffles:cook"], str(badges))
+    check("moments: the end screen's cats wear their badges", badges == ["moggles:navigator", "snuffles:commander"], str(badges))
     await asyncio.sleep(1)
-    await page.screenshot(path=str(SHOTS / "moments-4-cook.png"))
-    for _ in range(80):                                      # the cook's moment comes before "Another rescue?"
+    await page.screenshot(path=str(SHOTS / "moments-4-commander.png"))
+    for _ in range(80):                                      # the commander's moment comes before "Another rescue?"
         if "round-another" in await t.said():
             break
         await asyncio.sleep(0.1)
@@ -1080,12 +1177,12 @@ async def test_carryover(p):
         jobs: MW.crew.jobs(), answers: MW.store.get('answers').length,
         secure: Object.values(MW.bonds.statuses(MW.store.get('answers'))).filter(s => s.status === 'secure').length })""")
     check("carry-over: music off, answer check and wholes in play kept", got["music"] is False and got["check"] == "auto" and got["wholes"] == [2, 3, 4, 5, 6, 7], json.dumps(got))
-    check("carry-over: the crew's jobs kept", got["jobs"] == {"moggles": "cook", "snuffles": "engineer"}, json.dumps(got["jobs"]))
+    check("carry-over: the crew's jobs kept (0.9.0: the cook saved then is the commander)", got["jobs"] == {"moggles": "commander", "snuffles": "engineer"}, json.dumps(got["jobs"]))
     check("carry-over: every answer kept, and the bonds secure before are secure now", got["answers"] == len(answers) and got["secure"] == 2, json.dumps(got))
     await page.evaluate("const g = MW.store.game('starter'); g.rounds = 3; MW.store.save()")
     after = await page.evaluate("JSON.parse(localStorage.getItem('mimi-world'))")
     check("carry-over: a newer game's saved data sits beside the old, without disturbing it",
-          after["games"] == {"starter": {"rounds": 3}} and len(after["answers"]) == len(answers) and after["settings"]["crew"]["moggles"] == "cook", json.dumps(after["games"]))
+          after["games"] == {"starter": {"rounds": 3}} and len(after["answers"]) == len(answers) and after["settings"]["crew"]["moggles"] == "commander", json.dumps(after["games"]))
     check("carry-over: no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
@@ -1094,7 +1191,8 @@ TPL_PORT = 8793
 
 
 # The shapes that draw place i on the map (0.8.0): a planet by its clip circle; the rocks by the rock groups (each with
-# its shaded underside) and the sparkle within place 3's tap area; the station by its group at place 4's middle.
+# its shaded underside) and the sparkle within place 3's tap area; the station by its group, drawn 6 px below place 4's
+# middle (0.9.0, the redrawn station).
 SHAPES_JS = """const L = MW.LAYOUT.map.planets, svg = document.querySelector('#screen-map > svg.mw-layer'), k = MW.stage.scale;
     const mid = e => { const r = e.getBoundingClientRect(); return [(r.left + r.width / 2 - MW.stage.offX) / k, (r.top + r.height / 2 - MW.stage.offY) / k]; };
     const near = (e, p) => { const m = mid(e); return Math.hypot(m[0] - p.x, m[1] - p.y) < p.tap / 2; };
@@ -1102,7 +1200,7 @@ SHAPES_JS = """const L = MW.LAYOUT.map.planets, svg = document.querySelector('#s
     const shapes = i => { const p = L[i];
         if (i === 3) return Array.from(svg.querySelectorAll('g[transform*=" rotate("]')).filter(g => g.querySelector('.f-asteroid-crater') && near(g, p))
             .reduce((a, g) => a.concat(Array.from(g.querySelectorAll(GEO))), []).concat(Array.from(svg.querySelectorAll('path.f-spark')).filter(e => near(e, p)));
-        if (i === 4) { const g = svg.querySelector('g[transform^="translate(' + p.x + ' ' + p.y + ')"]'); return g ? Array.from(g.querySelectorAll(GEO)) : []; }
+        if (i === 4) { const g = svg.querySelector('g[transform^="translate(' + p.x + ' ' + (p.y + 6) + ')"]'); return g ? Array.from(g.querySelectorAll(GEO)) : []; }
         return Array.from(svg.querySelectorAll('clipPath circle')).filter(c => +c.getAttribute('cx') === p.x && +c.getAttribute('cy') === p.y); };"""
 # Each place on the map as drawn and as buttons (0.8.0): whose game it has, its tap area, whether it is lit with a mint
 # halo and its badge, or dimmed with its lock badge.
@@ -1900,7 +1998,7 @@ async def test_words_grownups(p):
     rescue = secure_answers([(7, 3)])
     for name, vw, vh in (("fire", 1046, 653), ("doogee", 1280, 800)):
         ctx = await browser.new_context(viewport={"width": vw, "height": vh}, has_touch=True, is_mobile=True)
-        saved = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True, "crew": {"moggles": "cook", "snuffles": "lookout"}},
+        saved = {"v": 1, "music": True, "settings": {"check": "tap", "checkPicked": True, "crew": {"moggles": "commander", "snuffles": "lookout"}},
                  "answers": rescue, "games": {"words": {"half": "autumn-1", "week": 5, "answers": words}}}
         await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
                                   % json.dumps(json.dumps(saved)))
@@ -1959,7 +2057,7 @@ async def test_words_grownups(p):
         check(f"words-grownups ({name}): one tap on Clear does nothing yet", first == len(words), str(first))
         check(f"words-grownups ({name}): the second tap clears this game's progress (every word not yet)", after[0] == 0 and after[4] == cells2 == 52, str([after, cells2]))
         check(f"words-grownups ({name}): ... and nothing else: MeeMee Rescue's answers, the crew and the week in play stay",
-              after[1] == len(rescue) and after[2] == json.dumps({"moggles": "cook", "snuffles": "lookout"}, separators=(",", ":")) and after[3] == 2, str(after))
+              after[1] == len(rescue) and after[2] == json.dumps({"moggles": "commander", "snuffles": "lookout"}, separators=(",", ":")) and after[3] == 2, str(after))
         await page.evaluate("MW.grownups.close()")
         await page.reload()
         await page.wait_for_load_state("load")
@@ -2628,8 +2726,8 @@ async def test_words_moments(p, name, vw, vh, dpr):
           and sp[1] < 693 < sp[1] + sp[3] + 20 and rk["x"] < sp[0] + sp[2] / 2 < rk["x"] + 140, str([sp, tapping]))
     check(f"words-moments ({name}): ... never over a word", not any(overlap(b, pnl) for b in (eb, sp) for pnl in panels), str([eb, sp]))
     await screenshot(page, f"{name}-words-moment-engineer.png")
-    # the navigator and the cook
-    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'cook'})")
+    # the navigator and the commander
+    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'commander'})")
     await w_wait(page, ["words-build"])
     await w_build(t)
     for _ in range(80):
@@ -2659,19 +2757,16 @@ async def test_words_moments(p, name, vw, vh, dpr):
     await w_wait(page, ["words-build"])
     await w_build(t)
     await w_wait(page, ["words-done"], 20)
-    for _ in range(80):
-        if await page.evaluate("!!document.querySelector('#screen-words-end [data-moment=cook-pan].is-shown')"):
-            break
-        await asyncio.sleep(0.1)
+    call = await wait_call(page, "#screen-words-end")
     await asyncio.sleep(0.6)
-    cb = await moment_box(page, "#screen-words-end [data-moment=cook]")
-    pb = await moment_box(page, "#screen-words-end [data-moment=cook-pan]")
+    cb = await moment_box(page, "#screen-words-end [data-moment=commander-cat]")
+    pb = await moment_box(page, "#screen-words-end [data-moment=commander]")
     again = (await stage_rect(page, "#words-again"))[0]
-    who = await page.evaluate("document.querySelector('#screen-words-end [data-moment=cook] .mw-cat').dataset.job")
-    check(f"words-moments ({name}): on the end screen the cook brings a pan of fish for the MeeMee in the little rockets",
-          cb and pb and who == "cook" and pb[0] < cb[0] and 600 < pb[1] < 700, str([cb, pb, who]))
-    check(f"words-moments ({name}): ... clear of the Play button", not overlap(cb, again) and not overlap(pb, again), str([cb, again]))
-    await screenshot(page, f"{name}-words-moment-cook.png")
+    who = await page.evaluate("document.querySelector('#screen-words-end [data-moment=commander-cat] .mw-cat').dataset.job")
+    check(f"words-moments ({name}): on the end screen the commander pops up beside the little rockets and holds up the radio, which calls (0.9.0, the cook's moment before)",
+          call_ok(call, [800, 580, 120, 170], False) and cb and pb and who == "commander" and pb[0] < cb[0] and 570 < pb[1] < 700, json.dumps([call, cb, pb, who]))
+    check(f"words-moments ({name}): ... clear of the Play button", not overlap(cb, again) and not overlap(pb, again), str([cb, pb, again]))
+    await screenshot(page, f"{name}-words-moment-commander.png")
     await w_wait_said(t, "words-round-another", 15)
     said = await t.said()
     check(f"words-moments ({name}): the moments have no words", not any("job-" in x or "name-" in x for x in said), str(said[-4:]))
@@ -4968,6 +5063,12 @@ async def places_lit(p, name, vw, vh, dpr, spots):
         info = await page.evaluate(PLACES_INFO)
         check(f"{label}: {' and '.join(WHAT[i] for i in spots)} are lit, each with its badge and a mint halo",
               all(place_ok(info[i], made[i][1]) for i in spots), json.dumps([info[i] for i in spots]))
+        if 4 in spots:                                       # 0.9.0: the redrawn station, lit, as part B will have it (board Map14)
+            await page.screenshot(path=str(SHOTS9 / f"{name}-map-station-lit.png"))
+            lit = await page.evaluate("""(() => { const b = document.querySelectorAll('#screen-map .mw-planet-badge'), L = MW.LAYOUT.map.planets[4].badge;
+                const e = Array.from(b).find(e => e.offsetLeft === L.x && e.offsetTop === L.y); return e ? [e.offsetLeft, e.offsetTop, e.offsetWidth] : null; })()""")
+            check(f"{label}: with a game on the station (0.9.0), its badge is at 944, 56 (84 across) and it has its halo, at full colour",
+                  lit == [944, 56, 84] and info[4]["halo"] == 1 and info[4]["lit"], json.dumps([lit, info[4]]))
         reach = await page.evaluate(REACH_JS, spots)
         check(f"{label}: a tap anywhere on their drawings lands on that place or its badge (every outline, its outer edge, and the drawing's far ends)",
               all(reach_ok(x) for x in reach), json.dumps(reach))
@@ -6560,7 +6661,8 @@ async def test_takehome_motion(p):
 async def test_takehome_moments(p, name, vw, vh, dpr):
     """The crew's moments at MeeMee Rescue's points: the lookout as a round starts (step 1 behind the home planet's curve;
     steps 2 and 3 behind the track, gone before the sentence comes up), the engineer on a right answer, the navigator as
-    a star turns peach, the cook on the end screen; never over the diagram or the sentence; none without a job."""
+    a star turns peach, the commander on the end screen (the cook's place before 0.9.0); never over the diagram or the
+    sentence; none without a job."""
     print(f"\n== Take MeeMee Home: the crew's moments ({name}) ==")
     browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-moments-{name}", vw, vh, dpr, mode=None)
     await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'engineer'})")
@@ -6595,7 +6697,7 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
           eb is not None and not any(overlaps_circle(eb, c) for c in [(380, 205, 115), (210, 470, 125), (550, 470, 125)]) and not overlap(eb, (180, 700, 400, 80)) and eb[1] + eb[3] < 530,
           json.dumps(eb))
     await screenshot(page, f"takehome-{name}-engineer.png")
-    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'cook'})")
+    await page.evaluate("MW.crew.save({moggles: 'navigator', snuffles: 'commander'})")
     await th_wait(page, ["takehome-open"], 30)
     await th_until(page, "!document.querySelector('#screen-takehome-play [data-moment].is-shown')", 10)   # question 1's moments are over
     n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
@@ -6613,12 +6715,12 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
         await th_move(t, s["answer"])
         await n_check(t)
     await th_wait(page, ["takehome-done"], 30)
-    ok = await th_until(page, "!!document.querySelector('#screen-takehome-end [data-moment=cook].is-shown')", 15)
+    call = await wait_call(page, "#screen-takehome-end")
     badges = await page.evaluate("Array.from(document.querySelectorAll('#screen-takehome-end .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
     await asyncio.sleep(0.8)
-    await screenshot(page, f"takehome-{name}-cook.png")
-    check(f"takehome-moments ({name}): the cook brings fish on the end screen; the end screen's cats wear their badges",
-          ok and badges == ["moggles:navigator", "snuffles:cook"], json.dumps(badges))
+    await screenshot(page, f"takehome-{name}-commander.png")
+    check(f"takehome-moments ({name}): the commander's radio calls on the end screen (0.9.0, the cook's moment before); the end screen's cats wear their badges",
+          call_ok(call, [770, 450, 104, 148], False) and badges == ["moggles:navigator", "snuffles:commander"], json.dumps([call, badges]))
     await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'takehome-round-another')", 15)
     said = await t.said()
     check(f"takehome-moments ({name}): no words in the moments", not any("job-" in x or "name-" in x for x in said), json.dumps(said[-3:]))
@@ -6668,6 +6770,383 @@ async def test_takehome_moments(p, name, vw, vh, dpr):
     check(f"takehome-moments ({name}): no jobs, no moments", hopped and await page.evaluate("MW.events.filter(e => e.type === 'moment').length") == n0)
     check(f"takehome-moments ({name}): no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
+
+
+# ---------------------------------------------------------------- 0.9.0: the commander, the got-it face, the station, the tab row
+async def open_motion(p, vw, vh, dpr, reduce, mode="auto"):
+    """open_tablet with reduce motion on or off."""
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True,
+                                    reduced_motion="reduce" if reduce else "no-preference")
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(ORIGIN + "/")
+    await page.wait_for_load_state("load")
+    if mode:
+        await page.evaluate("MW.store.setting('check', %s); MW.store.setting('checkPicked', true)" % json.dumps(mode))
+    return browser, ctx, page, Tablet(page, await ctx.new_cdp_session(page)), problems
+
+
+async def rescue_quick_round(t, page):
+    """MeeMee Rescue from the map (or the start screen): ROUND, each answer dropped in at once (answers checked as they
+    are made), to the end screen."""
+    await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+    if await page.evaluate("MW.shell.screen") == "screen-start":
+        await t.tap(*PLAY)
+        await t.wait_screen("screen-map")
+    await t.tap(*RESCUE)
+    for q in range(len(ROUND)):
+        for _ in range(250):
+            s = await t.state()
+            if s["phase"] == "open" and s["qi"] == q:
+                break
+            await asyncio.sleep(0.1)
+        cx, cy = CENTRES[s["target"]]
+        await page.evaluate("""(a) => { for (let i = 0; i < a.n; i++) { const c = MW.rescue.st.counters.filter(c => c.where === 'tray').pop();
+            MW.rescue.drop(c, a.x, a.y, false); } }""", {"n": s["answer"], "x": cx, "y": cy})
+    return await t.wait_phase(["done"], 25)
+
+
+async def words_quick_round(t, page):
+    """MeeMee Rockets from the map: one word found and built, to the end screen."""
+    await w_open(t, page, [{"word": "toy", "step": "tiles"}])
+    await t.tap([r for r in await w_rockets(page) if r["word"] == "toy"][0]["x"], 450)
+    await w_wait(page, ["words-build"])
+    await w_build(t)
+    return await w_wait(page, ["words-done"], 20)
+
+
+async def takehome_quick_round(t, page):
+    """Take MeeMee Home from the map: one question in step 1 (3 take away 1), to the end screen."""
+    await th_open(t, page, "take", [{"whole": 3, "take": 1}])
+    await th_move(t, 1)
+    await n_check(t)
+    return await th_wait(page, ["takehome-done"], 30)
+
+
+async def test_commander_moments(p, name, vw, vh, dpr, reduce=False):
+    """0.9.0: the commander's moment on each game's end screen, in the cook's place (boards Moment14): the radio grows in
+    where the pan did (MeeMee Rescue and Take MeeMee Home: Moggles's place, 254, 494, not flipped, as on the boards; MeeMee
+    Rockets: the commander pops up beside the little rockets, 880, 560, and holds the radio up at 800, 630), its call
+    rising above it, with sparkles; once, nothing repeating; logged as 'moment commander' where the cook's was logged;
+    no cook moment. With reduce motion it fades in. Moggles is the commander and Snuffles the lookout, as on the boards."""
+    label = f"commander-moments ({name}{', reduce motion' if reduce else ''})"
+    print(f"\n== 0.9.0: the commander's moment on each end screen ({name}{', reduce motion' if reduce else ''}) ==")
+    browser, ctx, page, t, problems = await open_motion(p, vw, vh, dpr, reduce)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rounds = [("MeeMee Rescue", "#screen-end", rescue_quick_round, [254, 450, 104, 148], False, "round-rescued-all", "round-another", "rescue"),
+              ("MeeMee Rockets", "#screen-words-end", words_quick_round, [800, 580, 120, 170], False, "words-round-done", "words-round-another", "rockets"),
+              ("Take MeeMee Home", "#screen-takehome-end", takehome_quick_round, [254, 450, 104, 148], False, "takehome-round-done", "takehome-round-another", "takehome")]
+    for game, screen, play, box, flipped, done_line, another, short in rounds:
+        t0 = await page.evaluate("performance.now()")
+        await play(t, page)
+        call = await wait_call(page, screen)
+        await asyncio.sleep(0.1)
+        if not reduce:
+            await screenshot(page, f"0.9.0/{name}-end-{short}-commander.png")          # as board Moment14 (sparkles still there)
+        logged = await page.evaluate("(t0 => MW.events.filter(e => e.type === 'moment' && e.t >= t0).map(e => e.detail))", t0)
+        check(f"{label}: {game}'s end screen: the commander's radio and its call {'fade' if reduce else 'grow'} in at the cook's place ({box[0]}, {box[1] + box[3] - box[2]}, "
+              f"{box[2]} across, the call rising {box[3] - box[2]} above it, not flipped, as on the boards), with sparkles, once; no cook moment",
+              call_ok(call, box, flipped, reduce), json.dumps(call))
+        extra = True
+        if short == "rockets":
+            cat = await page.evaluate("""(() => { const b = document.querySelector('#screen-words-end [data-moment=commander-cat]'); if (!b) return null;
+                const c = b.querySelector('.mw-cat'); return [b.offsetLeft, b.offsetTop, b.offsetWidth, b.classList.contains('is-shown'), c.dataset.who, c.dataset.job]; })()""")
+            extra = cat == [880, 560, 170, True, "moggles", "commander"]
+            check(f"{label}: ... Moggles, wearing the commander's badge, pops up beside the little rockets (880, 560, 170 wide) to hold it", extra, json.dumps(cat))
+        else:
+            badges = await page.evaluate("Array.from(document.querySelectorAll('%s .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)" % screen)
+            extra = badges == ["moggles:commander", "snuffles:lookout"]
+            check(f"{label}: ... beside Moggles, who wears the commander's badge", extra, json.dumps(badges))
+        for _ in range(100):
+            if another in await t.said():
+                break
+            await asyncio.sleep(0.1)
+        said = await page.evaluate("(t0 => MW.events.filter(e => (e.type === 'say' || e.type === 'moment') && e.t >= t0).map(e => e.type + ' ' + e.detail))", t0)
+        at = [said.index(x) if x in said else -1 for x in ("say " + done_line, "moment commander", "say " + another)]
+        check(f"{label}: ... logged 'moment commander' (once, where the cook's was: after the round's last line, before 'another go'), and no words in it",
+              logged.count("commander") == 1 and "cook" not in logged and -1 < at[0] < at[1] < at[2]
+              and not any(x.startswith("say ") and ("job-" in x or "name-" in x) for x in said), json.dumps([logged, at]))
+        await t.tap(*HOME)
+        await t.wait_screen("screen-map", 5)
+        check(f"{label}: ... and Home clears it", await page.evaluate("document.querySelectorAll('[data-moment]').length") == 0)
+    check(f"{label}: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+# Moggles and Snuffles, each with its usual face and its got-it face (board Faces15): four cats in a row on a test
+# screen, each wearing its badge (Moggles the commander, Snuffles the lookout)
+FACES_SCREEN = """(() => { let s = document.getElementById('screen-kittest');
+    if (!s) { s = MW.make('section', 'mw-screen', {id: 'screen-kittest'}); MW.$('stage').appendChild(s); }
+    MW.shell.show('screen-kittest'); s.innerHTML = ''; window.__cats = [];
+    [['moggles', 'commander', 'usual', 140], ['moggles', 'commander', 'got-it', 420], ['snuffles', 'lookout', 'usual', 720], ['snuffles', 'lookout', 'got-it', 1000]].forEach(c => {
+        const box = MW.crew.cat(c[0], 200); box.setJob(c[1]); const w = MW.make('div', 'mw-abs', { style: 'left:' + (c[3] - 100) + 'px;top:210px' });
+        w.appendChild(box); s.appendChild(w); window.__cats.push([box, c[2]]); });
+    return true; })()"""
+# what a cat box shows: box.face(), its data-face, and which face groups are drawn (computed display), the nose shared
+FACE_INFO = """(i => { const box = window.__cats[i][0], svg = box.querySelector('svg');
+    const g = n => getComputedStyle(svg.querySelector('[data-face="' + n + '"]')).display !== 'none';
+    const happy = svg.querySelector('[data-face="got-it"]'), eye = box.dataset.who === 'moggles' ? 'moggles-eye' : 'snuffles-eye';
+    return { face: box.face(), attr: box.dataset.face, usual: g('usual'), gotIt: g('got-it'),
+             groups: svg.querySelectorAll('[data-face]').length, nose: /f-nose/.test(happy.nextElementSibling.getAttribute('class')),
+             drawn: [happy.querySelectorAll('path.s-' + eye).length, happy.querySelectorAll('ellipse.f-nose-pink[opacity="0.5"]').length,
+                     happy.querySelectorAll('.f-mouth').length, happy.querySelectorAll('.f-tongue').length],
+             badge: box.dataset.job }; })"""
+
+
+async def test_crew_faces(p, name, vw, vh, dpr):
+    """0.9.0: the crew's got-it face (Crew card; board Faces15). MW.crew.cat's box.face('got-it') shows the got-it face
+    (happy closed eyes in the cat's own eye colour, a nose-pink blush at 50%, an open smile with a tongue) and hides the
+    usual one; box.face('usual') the reverse; box.face() says which shows; a new box shows the usual face. Both cats.
+    Nothing in 0.9.0's part A uses it (MeeMee Station will)."""
+    print(f"\n== 0.9.0: the crew's got-it face ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"faces-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await page.evaluate(FACES_SCREEN)
+    for i, who in ((0, "Moggles"), (2, "Snuffles")):
+        new = await page.evaluate(FACE_INFO, i)
+        check(f"faces ({name}): a new {who} shows its usual face (two face groups, the nose shared, after them)",
+              new["face"] == "usual" and new["attr"] == "usual" and new["usual"] and not new["gotIt"] and new["groups"] == 2 and new["nose"], json.dumps(new))
+        got = await page.evaluate("(i => window.__cats[i][0].face('got-it'))", i)
+        on = await page.evaluate(FACE_INFO, i)
+        check(f"faces ({name}): {who}'s box.face('got-it') shows the got-it face and hides the usual one; box.face() says 'got-it'",
+              got == "got-it" and on["face"] == "got-it" and on["attr"] == "got-it" and on["gotIt"] and not on["usual"], json.dumps(on))
+        check(f"faces ({name}): ... drawn as the Crew card says: two closed eyes in {who}'s eye colour, a nose-pink blush at 50% on each cheek, an open mouth with a tongue",
+              on["drawn"] == [2, 2, 1, 1], json.dumps(on["drawn"]))
+        back = await page.evaluate("(i => window.__cats[i][0].face('usual'))", i)
+        off = await page.evaluate(FACE_INFO, i)
+        check(f"faces ({name}): {who}'s box.face('usual') shows the usual face again and hides the got-it one; the badge stays",
+              back == "usual" and off["face"] == "usual" and off["attr"] == "usual" and off["usual"] and not off["gotIt"] and off["badge"] == new["badge"], json.dumps(off))
+    await page.evaluate("window.__cats.forEach(c => c[0].face(c[1]))")   # usual, got it, usual, got it: as the board
+    faces = await page.evaluate("window.__cats.map(c => c[0].face() + ':' + c[0].dataset.face)")
+    check(f"faces ({name}): Moggles and Snuffles, usual and got it, side by side", faces == ["usual:usual", "got-it:got-it", "usual:usual", "got-it:got-it"], str(faces))
+    await asyncio.sleep(0.2)
+    await screenshot(page, f"0.9.0/{name}-faces-got-it.png")
+    check(f"faces ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_saved_cook(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """0.9.0: a tablet with a cook saved (settings.crew holding 'cook') has that cat as the commander from the first load:
+    the change is saved the first time the jobs are read, so the map's badge, the crew screen and the end screen show the
+    commander; nothing else in the saved data changes."""
+    print(f"\n== 0.9.0: a tablet with a cook saved ({name}) ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True)
+    saved = {"v": 1, "music": True, "settings": {"check": "tap", "wholes": [2, 3, 4, 5, 6, 7, 8, 9, 10], "checkPicked": True, "answerMode": "counting",
+                                                 "crew": {"moggles": "cook", "snuffles": "lookout"}},
+             "answers": secure_answers([(7, 3)]), "games": {"words": {"half": "autumn-2", "week": 3}, "takehome": {"step": "take"}}}
+    await ctx.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mimi-world', %s); sessionStorage.setItem('seeded', '1'); }"
+                              % json.dumps(json.dumps(saved)))
+    page = await ctx.new_page()
+    problems = []
+    page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    await page.goto(ORIGIN + "/")
+    await page.wait_for_load_state("load")
+    t = Tablet(page, await ctx.new_cdp_session(page))
+    want = json.loads(json.dumps(saved))
+    want["settings"]["crew"] = {"moggles": "commander", "snuffles": "lookout"}
+    stored = await page.evaluate("JSON.parse(localStorage.getItem('mimi-world'))")
+    check(f"saved cook ({name}): as the page opens, Moggles (saved as the cook) is saved as the commander, and nothing else in the saved data changes",
+          stored == want, json.dumps(stored["settings"]))
+    got = await page.evaluate("""[MW.crew.jobs(), MW.crew.who('commander'), MW.crew.who('cook'), MW.crew.ready(),
+        MW.events.filter(e => e.type === 'crew' && e.detail === 'the cook is now the commander').length]""")
+    check(f"saved cook ({name}): MW.crew.jobs() has Moggles as the commander (no cook), changed once only",
+          got == [{"moggles": "commander", "snuffles": "lookout"}, "moggles", None, True, 1], json.dumps(got))
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    badge = await page.evaluate("""(() => { const c = document.querySelector('#screen-map .mw-cat[data-who=moggles]'), b = c.querySelector('.mw-badge');
+        return [c.dataset.job, !!b && b.innerHTML === document.getElementById('art-badge-commander').content.firstElementChild.innerHTML]; })()""")
+    check(f"saved cook ({name}): on the map Moggles wears the commander's badge (the radio)", badge == ["commander", True], json.dumps(badge))
+    await asyncio.sleep(1.4)
+    await t.tap(*CREW_BTN)
+    await t.wait_screen("screen-crew")
+    await asyncio.sleep(0.6)
+    st = await crew_state(page)
+    at = await cat_at(page, "moggles")
+    check(f"saved cook ({name}): on the crew screen Moggles stands at the commander's station (the radio), wearing its badge",
+          st["jobs"] == {"moggles": "commander", "snuffles": "lookout"} and st["taken"] == ["lookout", "commander"] and "moggles:commander" in st["badges"]
+          and abs(at[0] - STATION["commander"][0]) < 3, json.dumps([st, at]))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await takehome_quick_round(t, page)
+    call = await wait_call(page, "#screen-takehome-end")
+    badges = await page.evaluate("Array.from(document.querySelectorAll('#screen-takehome-end .mw-cat')).map(e => e.dataset.who + ':' + e.dataset.job)")
+    check(f"saved cook ({name}): on an end screen (Take MeeMee Home's) Moggles is the commander: its badge, and the commander's moment at its place",
+          badges == ["moggles:commander", "snuffles:lookout"] and call_ok(call, [254, 450, 104, 148], False), json.dumps([badges, call]))
+    await screenshot(page, f"0.9.0/{name}-saved-cook-end.png")
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await page.reload()
+    await page.wait_for_load_state("load")
+    again = await page.evaluate("""[JSON.parse(localStorage.getItem('mimi-world')).settings.crew, MW.crew.jobs(),
+        MW.events.filter(e => e.type === 'crew' && e.detail === 'the cook is now the commander').length]""")
+    check(f"saved cook ({name}): opened again, it stays the commander (nothing left to change)",
+          again == [{"moggles": "commander", "snuffles": "lookout"}, {"moggles": "commander", "snuffles": "lookout"}, 0], json.dumps(again))
+    check(f"saved cook ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+# the station on the map (0.9.0, redrawn): its group, what it is made of, and whether it is dimmed to 62%
+STATION_DRAWN = """(() => { const svg = document.querySelector('#screen-map > svg.mw-layer'), p = MW.LAYOUT.map.planets[4];
+    const g = svg.querySelector('g[transform^="translate(' + p.x + ' ' + (p.y + 6) + ')"]'); if (!g) return null;
+    return { transform: g.getAttribute('transform'), dimmed: !!g.closest('g[opacity="0.62"]'),
+             modules: g.querySelectorAll('rect.f-moon[width="16"]').length, lit: g.querySelectorAll('circle.f-spark[r="4.6"]').length,
+             dark: g.querySelectorAll('circle.f-night-raised[r="4.6"]').length, wings: g.querySelectorAll('rect.f-planet-indigo').length,
+             collars: g.querySelectorAll('rect.f-mint[width="5"]').length, truss: g.querySelectorAll('rect.f-mint-deep').length,
+             tower: g.querySelectorAll('circle.s-mint').length, dish: g.querySelectorAll('path.f-moon-dim').length }; })()"""
+
+
+async def test_station_map(p, name, vw, vh, dpr):
+    """0.9.0: the map's redrawn station (SolarMap card; board Map14): five places, places 3 and 4 locked; the station
+    drawn as MeeMee Station (the truss, a wing at each end, ten modules with three windows lit, the tower and its screen,
+    the dish) at 1.11 and 6 px lower, dimmed to 62%; place 4's lock at 966, 96 and (once a game takes it) its badge at
+    944, 56; tap area 240, which the whole drawing is inside; tapping the station or its lock says the locked line; the
+    three games open as before."""
+    print(f"\n== 0.9.0: the map's redrawn station ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-{name}", vw, vh, dpr, mode="tap")
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(1.0)
+    await screenshot(page, f"0.9.0/{name}-map.png")
+    lay = await page.evaluate("MW.LAYOUT.map.planets[4]")
+    check(f"station ({name}): place 4 stays at 860, 182 with its 240 tap area; its badge's place is 944, 56 and its lock 966, 96",
+          lay == {"x": 860, "y": 182, "tap": 240, "badge": {"x": 944, "y": 56, "d": 84, "pic": 56}, "lock": {"x": 966, "y": 96, "d": 56, "icon": 28}}, json.dumps(lay))
+    info = await page.evaluate(PLACES_INFO)
+    games = await page.evaluate("MW.world.games.map(g => g.planet)")
+    check(f"station ({name}): five places: the three games' planets lit, the rocks and the station locked", len(info) == 5 and sorted(games) == [0, 1, 2]
+          and all(info[i]["game"] for i in (0, 1, 2)) and place_ok(info[3], None) and place_ok(info[4], None), json.dumps([info[3], info[4]]))
+    lock = await page.evaluate("(() => { const L = MW.LAYOUT.map.planets[4].lock; const e = Array.from(document.querySelectorAll('#screen-map .mw-planet-lock')).find(e => e.offsetLeft === L.x && e.offsetTop === L.y); return e ? [e.offsetLeft, e.offsetTop, e.offsetWidth] : null; })()")
+    check(f"station ({name}): the station's lock badge sits at 966, 96 (56 across), clear of its right wing", lock == [966, 96, 56], json.dumps(lock))
+    drawn = await page.evaluate(STATION_DRAWN)
+    check(f"station ({name}): the station is drawn as MeeMee Station, small (1.11), 6 px lower than before, dimmed to 62%: the truss, a wing at each end (two panels each), "
+          f"ten modules joined by mint collars, three windows lit, the tower with its round screen, and the dish",
+          drawn == {"transform": "translate(860 188) scale(1.11)", "dimmed": True, "modules": 10, "lit": 3, "dark": 7, "wings": 4, "collars": 8, "truss": 1, "tower": 1, "dish": 1},
+          json.dumps(drawn))
+    said = []
+    for what, (x, y) in (("the station", (860, 182)), ("its lock", (994, 124))):
+        n = len(await t.said())
+        await t.tap(x, y)
+        await asyncio.sleep(0.5)
+        said.append([what, (await t.said())[n:], await page.evaluate("MW.shell.screen")])
+        await asyncio.sleep(1.5)
+    line = await page.evaluate(MAP_LOCKED_LINE)
+    check(f"station ({name}): tapping the station, or its lock, says the locked line ('That place isn't ready yet.') and stays on the map",
+          all(s[1] == [line] and s[2] == "screen-map" for s in said), json.dumps(said))
+    opened = []
+    for gid, screen, words in (("rescue", "screen-game", "map-mimi-rescue"), ("words", "screen-words-find", "words-name"), ("takehome", "screen-takehome-play", "takehome-name")):
+        pl = await page.evaluate("MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === '%s').planet]" % gid)
+        if gid == "rescue":
+            await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+        await t.tap(pl["x"], pl["y"])
+        ok = await t.wait_screen(screen, 8)
+        opened.append([gid, ok, words in await t.said()])
+        await t.tap(*HOME_BTN)
+        await t.wait_screen("screen-map", 5)
+        await asyncio.sleep(0.5)
+    check(f"station ({name}): MeeMee Rescue, MeeMee Rockets and Take MeeMee Home open as before (each its name and banner, then its screen)",
+          all(o[1] and o[2] for o in opened), json.dumps(opened))
+    check(f"station ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+# the grown-ups header (0.9.0, BondGrid's tab row): the title's lines, the title and Close on one line with Close at its
+# right, and every tab under them inside the panel (stage px)
+TAB_ROW = """(() => { const k = MW.stage.scale, sb = r => [(r.left - MW.stage.offX) / k, (r.top - MW.stage.offY) / k, (r.right - MW.stage.offX) / k, (r.bottom - MW.stage.offY) / k];
+    const panel = sb(document.querySelector('.gu-panel').getBoundingClientRect()), title = document.querySelector('.gu-title');
+    const rg = document.createRange(); rg.selectNodeContents(title);
+    const tr = sb(rg.getBoundingClientRect()), cr = sb(document.querySelector('.gu-close').getBoundingClientRect());
+    const tabs = Array.from(document.querySelectorAll('.gu-tab')).map(b => [b.textContent, sb(b.getBoundingClientRect())]);
+    const r = v => Math.round(v);
+    return { title: title.textContent, lines: rg.getClientRects().length, titleBox: tr.map(r), closeBox: cr.map(r), panel: panel.map(r),
+             tabs: tabs.map(x => x[0]), rows: new Set(tabs.map(x => r(x[1][1]))).size,
+             sameLine: cr[1] < (tr[1] + tr[3]) / 2 && (tr[1] + tr[3]) / 2 < cr[3], closeRight: cr[0] > tr[2] && cr[2] <= panel[2] - 24,
+             under: tabs.every(x => x[1][1] >= Math.max(tr[3], cr[3])),
+             inside: tabs.every(x => x[1][0] >= panel[0] && x[1][2] <= panel[2] && x[1][3] <= panel[3]),
+             tabsBox: tabs.length ? [r(Math.min(...tabs.map(x => x[1][0]))), r(Math.min(...tabs.map(x => x[1][1]))), r(Math.max(...tabs.map(x => x[1][2]))), r(Math.max(...tabs.map(x => x[1][3])))] : null }; })()"""
+# an eighth tab, as MeeMee Station's will be (0.9.0 part B): a copy of a tab, before the world's Checks and Sound
+ADD_TAB = """(() => { const tabs = document.querySelector('.gu-tabs'), checks = tabs.querySelector('[data-tab=checks]');
+    const b = checks.cloneNode(true); b.textContent = 'Station'; b.setAttribute('data-tab', 'test-station'); b.classList.remove('is-on');
+    tabs.insertBefore(b, checks); return tabs.children.length; })()"""
+
+
+def tab_row_ok(r, n):
+    return (r["title"] == "Grown-ups" and r["lines"] == 1 and r["sameLine"] and r["closeRight"] and len(r["tabs"]) == n and r["under"] and r["inside"])
+
+
+async def tab_row_check(page, label, n, shot):
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show(MW.grownups.sections[0].id)")
+    await asyncio.sleep(0.3)
+    r = await page.evaluate(TAB_ROW)
+    if len(r["tabs"]) < n:
+        await page.evaluate(ADD_TAB)
+        await asyncio.sleep(0.2)
+        r = await page.evaluate(TAB_ROW)
+    check(f"{label}: 'Grown-ups' on one line with Close at its right, and all {n} tabs ({', '.join(r['tabs'])}) on {'their own row' if r['rows'] == 1 else str(r['rows']) + ' rows'} under it, inside the panel",
+          tab_row_ok(r, n), json.dumps(r))
+    await screenshot(page, shot)
+    await page.evaluate("MW.grownups.close()")
+    return r
+
+
+async def test_tab_row(p):
+    """0.9.0: the grown-ups tab row (BondGrid card; board Grownups14): "Grown-ups" alone on the title line with Close at
+    its right, the tabs on their own row under it (wrapping if they must), at both sizes: with today's tabs (Progress,
+    Settings, Words, Subtraction, Checks, Sound), with the starter game's added (a test copy), and with one more (eight,
+    as there will be once MeeMee Station adds its tab)."""
+    import shutil
+    import subprocess
+    print("\n== 0.9.0: the grown-ups tab row ==")
+    sizes = (("fire", 1046, 653, 1.22), ("doogee", 1280, 800, 2))
+    for name, vw, vh, dpr in sizes:
+        browser, ctx, page, t, problems, _ = await open_tablet(p, f"tabs-{name}", vw, vh, dpr, mode=None)
+        r = await tab_row_check(page, f"tab row ({name}, today's page)", 6, f"0.9.0/{name}-grownups-tabs-6.png")
+        check(f"tab row ({name}, today's page): the tabs are Progress, Settings, Words, Subtraction, Checks and Sound",
+              r["tabs"] == ["Progress", "Settings", "Words", "Subtraction", "Checks", "Sound"], json.dumps(r["tabs"]))
+        check(f"tab row ({name}): no console errors", not problems, "; ".join(problems[:3]))
+        await browser.close()
+    here = pathlib.Path(__file__).resolve().parent
+    out, src = here / "serve-template", here / "serve-template-src" / "starter"
+    if src.parent.exists():
+        shutil.rmtree(src.parent)
+    shutil.copytree(ROOT / "games" / "_template", src, ignore=shutil.ignore_patterns("__pycache__"))
+    sys.path.insert(0, str(ROOT / "tools"))
+    import games as G
+    free = [i for i in range(G.PLANETS) if i not in {g.get("planet") for g in G.load()}]
+    if not free:
+        check("tab row: with the starter game's tab", True, "skipped: every place has a game")
+        return
+    gj = json.loads((src / "game.json").read_text(encoding="utf-8"))
+    gj["planet"] = free[0]
+    (src / "game.json").write_text(json.dumps(gj), encoding="utf-8")
+    res = subprocess.run([sys.executable, str(ROOT / "tools" / "build.py"), "--no-audio", "--out", str(out), "--extra-game", str(src)], capture_output=True, text=True)
+    check("tab row: a test copy with the starter game builds", res.returncode == 0, (res.stdout + res.stderr)[-300:])
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", TPL_PORT), functools.partial(Quiet, directory=str(out)))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        for name, vw, vh, dpr in sizes:
+            browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+            ctx = await browser.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=dpr, has_touch=True, is_mobile=True)
+            page = await ctx.new_page()
+            problems = []
+            page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+            page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+            await page.goto(f"http://127.0.0.1:{TPL_PORT}/")
+            await page.wait_for_load_state("load")
+            await tab_row_check(page, f"tab row ({name}, with the starter game)", 7, f"0.9.0/{name}-grownups-tabs-7.png")
+            await tab_row_check(page, f"tab row ({name}, with an eighth tab)", 8, f"0.9.0/{name}-grownups-tabs-8.png")
+            check(f"tab row ({name}, test copy): no console errors", not problems, "; ".join(problems[:3]))
+            await browser.close()
+    finally:
+        srv.shutdown()
+        srv.server_close()
 
 
 async def main():
@@ -6764,6 +7243,15 @@ async def main():
         await test_takehome_motion(p)
         await test_takehome_moments(p, "fire", 1046, 653, 1.22)
         await test_takehome_moments(p, "doogee", 1280, 800, 2)
+        await test_commander_moments(p, "fire", 1046, 653, 1.22)
+        await test_commander_moments(p, "doogee", 1280, 800, 2)
+        await test_commander_moments(p, "fire", 1046, 653, 1.22, reduce=True)
+        await test_crew_faces(p, "fire", 1046, 653, 1.22)
+        await test_crew_faces(p, "doogee", 1280, 800, 2)
+        await test_saved_cook(p)
+        await test_station_map(p, "fire", 1046, 653, 1.22)
+        await test_station_map(p, "doogee", 1280, 800, 2)
+        await test_tab_row(p)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)} of {len(RESULTS)} checks passed")

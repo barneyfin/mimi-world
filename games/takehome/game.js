@@ -813,7 +813,7 @@
     hopEnd(160);                                             // the MeeMee home by their houses hop once each, left to right
     await MW.wait(500);
     if (!(await W.ok(token))) return;
-    if (moments.cook()) {                                    // the cook brings fish; the MeeMee hop again
+    if (moments.commander()) {                               // the commander's radio calls; the MeeMee hop again
       await MW.wait(450);
       hopEnd(120);
       await MW.wait(900);

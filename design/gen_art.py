@@ -699,15 +699,28 @@ def cat(kind="moggles", w=260, uid=None):
                  '<path d="M92 192 C 112 204, 148 204, 168 192" fill="none" stroke="@mint-deep" stroke-width="2.4"/>'
                  '<circle cx="130" cy="214" r="10" fill="@peach" stroke="@ink" stroke-width="3"/>'
                  '<path d="M130 208 L132 212 L136 212.5 L133 215 L134 219 L130 217 L126 219 L127 215 L124 212.5 L128 212 Z" fill="@spark"/>')
-    # face
+    # face: the usual one, and (0.9.0, mock-up round 15) a got-it face for a right answer: happy closed eyes in the cat's
+    # own eye colour, a blush and an open smile, as Scruffles's got-it face. The kit shows one at a time (data-face, as it
+    # does Scruffles's; MW.crew.cat's box.face). The nose is shared.
     if kind == "moggles":
-        s.append(_cat_eye(104, 118, "moggles-eye", "moggles-rim") + _cat_eye(156, 118, "moggles-eye", "moggles-rim"))
-        s.append('<path d="M123 141 L137 141 L130 149 Z" fill="@nose-dark" stroke="@moggles-rim" stroke-width="2" stroke-linejoin="round"/>')
-        s.append('<path d="M120 156 C 124 162, 130 160, 130 151 C 130 160, 136 162, 140 156" fill="none" stroke="@moggles-rim" stroke-width="3" stroke-linecap="round"/>')
+        eyes, iris, line, rim = ((104, 118), (156, 118)), "moggles-eye", "moggles-rim", "moggles-rim"
+        nose = '<path d="M123 141 L137 141 L130 149 Z" fill="@nose-dark" stroke="@moggles-rim" stroke-width="2" stroke-linejoin="round"/>'
+        mouth = '<path d="M120 156 C 124 162, 130 160, 130 151 C 130 160, 136 162, 140 156" fill="none" stroke="@moggles-rim" stroke-width="3" stroke-linecap="round"/>'
+        my = 151
     else:
-        s.append(_cat_eye(106, 114, "snuffles-eye", "moggles-rim") + _cat_eye(154, 114, "snuffles-eye", "moggles-rim"))
-        s.append('<path d="M123 139 L137 139 L130 147 Z" fill="@nose-pink" stroke="@ink" stroke-width="2" stroke-linejoin="round"/>')
-        s.append('<path d="M120 154 C 124 160, 130 158, 130 149 C 130 158, 136 160, 140 154" fill="none" stroke="@ink" stroke-width="3" stroke-linecap="round"/>')
+        eyes, iris, line, rim = ((106, 114), (154, 114)), "snuffles-eye", "moggles-rim", "ink"
+        nose = '<path d="M123 139 L137 139 L130 147 Z" fill="@nose-pink" stroke="@ink" stroke-width="2" stroke-linejoin="round"/>'
+        mouth = '<path d="M120 154 C 124 160, 130 158, 130 149 C 130 158, 136 160, 140 154" fill="none" stroke="@ink" stroke-width="3" stroke-linecap="round"/>'
+        my = 149
+    usual = "".join(_cat_eye(x, y, iris, line) for x, y in eyes) + mouth
+    happy = ""
+    for x, y in eyes:
+        out = -1 if x < 130 else 1
+        happy += (f'<path d="M{x - 14} {y + 5} C {x - 9} {y - 10}, {x + 9} {y - 10}, {x + 14} {y + 5}" fill="none" stroke="@{iris}" stroke-width="6" stroke-linecap="round"/>'
+                  f'<ellipse cx="{x + 6 * out}" cy="{y + 22}" rx="11" ry="6" fill="@nose-pink" opacity="0.5"/>')
+    happy += (f'<path d="M117 {my + 2} C 119 {my + 22}, 141 {my + 22}, 143 {my + 2} C 136 {my + 6}, 124 {my + 6}, 117 {my + 2} Z" fill="@mouth" stroke="@{rim}" stroke-width="3" stroke-linejoin="round"/>'
+              f'<path d="M123 {my + 13} C 126 {my + 8}, 134 {my + 8}, 137 {my + 13} C 134 {my + 18}, 126 {my + 18}, 123 {my + 13} Z" fill="@tongue"/>')
+    s.append(f'<g data-face="usual">{usual}</g><g data-face="got-it" style="display:none">{happy}</g>' + nose)
     s.append('<path d="M110 146 C 90 140, 72 138, 50 140 M110 152 C 90 152, 72 156, 52 164 M110 158 C 92 162, 78 170, 62 180 '
              'M150 146 C 170 140, 188 138, 210 140 M150 152 C 170 152, 188 156, 208 164 M150 158 C 168 162, 182 170, 198 180" '
              'fill="none" stroke="@text-3" stroke-width="2.2" stroke-linecap="round"/>')
@@ -724,8 +737,9 @@ def snuffles(w=260, uid="snuffles"):
 
 
 # ---------------------------------------------------------------- crew jobs (phase 4, round 4 of the design canvas)
-# Four pictures in a 100 x 100 box centred on (50, 50): lookout, engineer, navigator, cook. A cat wears its job as a
-# badge (the picture in a moon disc with a mint rim) on its chest.
+# Four pictures in a 100 x 100 box centred on (50, 50): lookout, engineer, navigator, commander (0.9.0, in the cook's
+# place: the cook and its frying pan are retired). A cat wears its job as a badge (the picture in a moon disc with a
+# mint rim) on its chest.
 
 def job_telescope(tripod=True):
     """A brass-and-mint telescope on a little tripod, pointing up to the right."""
@@ -770,22 +784,26 @@ def job_star_map():
     )
 
 
-def job_frying_pan():
-    """A frying pan with a fish in it (the crew are cats)."""
+def job_radio():
+    """The commander's radio (0.9.0, mock-up round 12; the commander runs MeeMee Station): a peach handset, tilted, with
+    a peach-dark band and grille, a little mint screen, a side button and a steel aerial with a spark light on top."""
     return (
-        '<path d="M62 62 L92 86" stroke="@ink" stroke-width="12" stroke-linecap="round"/>'
-        '<path d="M62 62 L92 86" stroke="@peach-dark" stroke-width="6" stroke-linecap="round"/>'
-        '<ellipse cx="42" cy="46" rx="34" ry="32" fill="@night-button" stroke="@ink" stroke-width="4"/>'
-        '<ellipse cx="42" cy="46" rx="26" ry="24" fill="@asteroid-crater"/>'
-        '<path d="M22 46 C 30 34, 46 34, 54 46 C 46 58, 30 58, 22 46 Z" fill="@peach" stroke="@ink" stroke-width="3" stroke-linejoin="round"/>'
-        '<path d="M54 46 L64 38 L64 54 Z" fill="@peach" stroke="@ink" stroke-width="3" stroke-linejoin="round"/>'
-        '<circle cx="30" cy="44" r="2.4" fill="@ink"/>'
-        '<path d="M38 40 C 40 44, 40 48, 38 52 M44 40 C 46 44, 46 48, 44 52" fill="none" stroke="@peach-dark" stroke-width="2" stroke-linecap="round"/>'
-        '<path d="M26 22 C 30 18, 36 16, 42 16" fill="none" stroke="@mint-light" stroke-width="3" stroke-linecap="round" opacity="0.5"/>'
+        '<g transform="rotate(-10 50 54)">'
+        '<path d="M62 30 L62 8" stroke="@ink" stroke-width="7" stroke-linecap="round"/>'
+        '<path d="M62 30 L62 8" stroke="@steel" stroke-width="3" stroke-linecap="round"/>'
+        '<circle cx="62" cy="7" r="6" fill="@spark" stroke="@ink" stroke-width="3"/>'
+        '<rect x="28" y="26" width="44" height="66" rx="10" fill="@peach" stroke="@ink" stroke-width="4"/>'
+        '<rect x="32" y="74" width="36" height="14" rx="6" fill="@peach-dark"/>'
+        '<rect x="35" y="33" width="30" height="16" rx="4" fill="@mint" stroke="@ink" stroke-width="3"/>'
+        '<path d="M40 41 h9 M53 41 h6" stroke="@mint-deep" stroke-width="3" stroke-linecap="round"/>'
+        '<path d="M37 57 h26 M37 64 h26 M37 71 h26" stroke="@peach-dark" stroke-width="3.5" stroke-linecap="round"/>'
+        '<rect x="20" y="40" width="9" height="20" rx="3" fill="@peach-dark" stroke="@ink" stroke-width="3"/>'
+        '<path d="M33 30 C 36 28, 44 28, 48 28" fill="none" stroke="@spark" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>'
+        '</g>'
     )
 
 
-JOB_ART = {"lookout": job_telescope, "engineer": job_spanner, "navigator": job_star_map, "cook": job_frying_pan}
+JOB_ART = {"lookout": job_telescope, "engineer": job_spanner, "navigator": job_star_map, "commander": job_radio}
 JOBS = list(JOB_ART)
 
 
@@ -805,6 +823,27 @@ def job_badge(job, size=56):
 def held_telescope(size=100):
     """The telescope without its tripod, for a cat holding it to its eye."""
     return f'<svg width="{size}" height="{size}" viewBox="0 0 100 100" aria-hidden="true">' + tok(job_telescope(False)) + '</svg>'
+
+
+# the aerial's light in the radio's 100 x 100 box (job_radio's light at 62, 7, turned -10 degrees about 50, 54)
+CALL = {"x": 53.6, "y": 5.6, "radii": (16, 28, 40), "from": -150, "to": -30, "top": 42}
+
+
+def commander_call(size=100):
+    """The commander's moment on the end screen (0.9.0, mock-up round 14): the radio with its call, three arcs from the
+    aerial's light (radii 16, 28 and 40, from -150 to -30 degrees: above the aerial), each a 10 px ink stroke under a
+    5 px spark stroke, round caps. The radio keeps its 100 x 100 box at the bottom; the call rises 42 above it, so the
+    viewBox is 0 -42 100 142, drawn size wide and round(size x 1.42) tall."""
+    c = CALL
+    a0, a1 = math.radians(c["from"]), math.radians(c["to"])
+    arcs = ""
+    for r in c["radii"]:
+        d = (f'M{f(c["x"] + r * math.cos(a0))} {f(c["y"] + r * math.sin(a0))} '
+             f'A{r} {r} 0 0 1 {f(c["x"] + r * math.cos(a1))} {f(c["y"] + r * math.sin(a1))}')
+        arcs += (f'<path d="{d}" fill="none" stroke="@ink" stroke-width="10" stroke-linecap="round"/>'
+                 f'<path d="{d}" fill="none" stroke="@spark" stroke-width="5" stroke-linecap="round"/>')
+    return (f'<svg width="{size}" height="{round(size * (100 + c["top"]) / 100)}" viewBox="0 -{c["top"]} 100 {100 + c["top"]}" aria-hidden="true">'
+            + tok(job_radio() + arcs) + '</svg>')
 
 # ---------------------------------------------------------------- icons (48 viewBox, stroke currentColor)
 

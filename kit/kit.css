@@ -160,9 +160,12 @@ button { font-family: var(--font-andika); }
 .mw-grownups { position: absolute; inset: 0; z-index: 100; display: none; background: rgba(15, 18, 54, 0.92); }
 .mw-grownups.is-open { display: block; }
 .gu-panel { position: absolute; left: 24px; top: 24px; width: 1232px; height: 752px; display: flex; flex-direction: column; padding: 24px 32px 0; }
-.gu-head { display: flex; align-items: center; gap: 24px; margin-bottom: 10px; }
-.gu-title { margin: 0; }
-.gu-tabs { display: flex; gap: 8px; flex: 1; }
+.gu-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-bottom: 10px; }
+.gu-title { margin: 0; flex: 1; }
+.gu-close { order: 2; }
+/* 0.9.0 (BondGrid, the tab row): "Grown-ups" alone on the title line with Close at its right; the tabs on their own row
+   under it, wrapping if they ever have to */
+.gu-tabs { order: 3; display: flex; flex-wrap: wrap; gap: 8px; flex-basis: 100%; }
 .gu-tab { height: 52px; padding: 0 22px; border-radius: 26px; border: 3px solid var(--night-button); background: transparent; color: var(--text-2); cursor: pointer; }
 .gu-tab.is-on { background: var(--night-button); color: var(--moon); border-color: var(--mint); }
 .gu-btn { min-height: 52px; padding: 0 22px; border-radius: 26px; border: 3px solid var(--mint); background: var(--night-button); color: var(--moon); cursor: pointer; }
@@ -236,9 +239,9 @@ button { font-family: var(--font-andika); }
 .mw-spanner.is-tapping { animation: mw-spanner-tap 800ms ease-in-out 2; }
 @keyframes mw-spanner-tap { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(12deg); } }
 .mw-star-map { position: absolute; transform: rotate(-8deg); }
-.mw-cook-pan { scale: 0; transition: scale 380ms cubic-bezier(.3,1.5,.5,1); }
-.mw-cook-pan.is-flipped svg { transform: scaleX(-1); }
-.mw-cook-pan.is-shown { scale: 1; }
+/* the commander's radio and its call (0.9.0, in the cook's place): it grows in once, as the cook's pan did */
+.mw-commander-call { scale: 0; transition: scale 380ms cubic-bezier(.3,1.5,.5,1); }
+.mw-commander-call.is-shown { scale: 1; }
 
 /* ---------------------------------------------------------------- title banners (0.6.0, TitleBanner)
    The set's or a game's name on a moon plaque, while it is spoken. Above the screens and below the grown-ups lock:
@@ -279,8 +282,8 @@ button { font-family: var(--font-andika); }
   .mw-peek.is-shown .mw-peek-inner { transform: none; opacity: 1; }
   .mw-moment-pop { transform: none; }
   .mw-spanner.is-tapping { animation: none; }
-  .mw-cook-pan { scale: 1; opacity: 0; transition: opacity 300ms ease-out; }
-  .mw-cook-pan.is-shown { opacity: 1; }
+  .mw-commander-call { scale: 1; opacity: 0; transition: opacity 300ms ease-out; }
+  .mw-commander-call.is-shown { opacity: 1; }
   .mw-banner-card, .mw-banner.is-in .mw-banner-card, .mw-banner.is-going .mw-banner-card { transform: none; transition: opacity 260ms ease-out; }
   .mw-numbered.is-popping { animation: mw-arrive 300ms ease-out both; }
   .mw-track { transition: opacity 260ms ease-out; }

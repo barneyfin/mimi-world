@@ -608,7 +608,7 @@
     if (!(await W.ok(token))) return;
     await MW.wait(500);
     if (!(await W.ok(token))) return;
-    if (moments.cook()) {                                      // the cook brings a pan of fish for the MeeMee
+    if (moments.commander()) {                                 // the commander holds up the radio, and it calls
       await MW.wait(1300);
       if (!(await W.ok(token))) return;
     }

@@ -34,7 +34,7 @@ import gen_scenes  # noqa: E402
 import games as G  # noqa: E402
 import make_voice_script  # noqa: E402
 
-VERSION = "0.8.1"
+VERSION = "0.9.0"
 # the kit's scripts, in loading order: world.js last, so it starts once every game has joined
 KIT_JS = ["core.js", "audio.js", "drag.js", "scene.js", "map.js", "crew.js", "shell.js", "grownups.js", "world.js"]
 

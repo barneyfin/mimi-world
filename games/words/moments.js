@@ -4,7 +4,8 @@
      engineer   on a right tap in Find, pops up under the launch pad below that rocket and taps its clamp with the spanner;
      navigator  as the star lights after the launch, holds up the star map on the cargo tray and points the way to the next
                 star (the dotted route goes behind the rocket, so it never crosses the word);
-     cook       on the end screen, brings a pan of fish for the MeeMee in the little rockets.
+     commander  on the end screen, pops up beside the little rockets and holds up the radio, which calls (three arcs
+                from its aerial) (0.9.0, in the cook's place: the cook brought a pan of fish).
    A job no cat has has no moment (MW.crew.who). With reduce motion the cats fade in and out instead of moving (the kit's
    moment styles), and the spanner doesn't swing.
    Positions are stage px from the board (each of its panels is a 1280 x 800 stage drawn at half size). MeeMee Rescue's
@@ -20,8 +21,9 @@
     engineer: { dx: -83, y: 676, w: 160, spanner: { dx: 29, y: 620, size: 84, turn: -40 } },
     // standing on the cargo tray, the star map held up; the route starts at the top of the map
     navigator: { x: 600, y: 470, w: 140, map: { x: 650, y: 440, size: 96 }, from: { dx: 50, dy: 12 }, below: 24 },
-    // beside the little rockets, facing them, the pan held out to the last one
-    cook: { x: 880, y: 560, w: 170, pan: { x: 800, y: 630, size: 120 } }
+    // beside the little rockets, facing them, the radio held up by the last one (where the cook's pan was), its call
+    // rising above it
+    commander: { x: 880, y: 560, w: 170, radio: { x: 800, y: 630, size: 120 } }
   };
   function place(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; return el; }
   function size(svg, s) { svg.setAttribute('width', s); svg.setAttribute('height', s); return svg; }
@@ -35,7 +37,7 @@
   // opts: { find: Find's screen, findBefore: the layer the lookout and engineer go under (in front of the rockets and
   //         the pad), build: Build's screen, routeBefore: the rocket's layer (the route goes behind it), buildBefore: the
   //         layer the navigator goes under (in front of the tray and its tiles), stars: Build's MW.stars,
-  //         end: the end screen, endBefore: what the cook goes under (the Play button) }
+  //         end: the end screen, endBefore: what the commander goes under (the Play button) }
   MW.wordsMoments = function (opts) {
     const m = {};
     let timers = [];
@@ -155,22 +157,28 @@
       return true;
     };
 
-    // ---------------------------------------------------------------- cook (the end screen)
-    m.cook = function () {
-      const k = L.cook, cat = catFor('cook', k.w);
+    // ---------------------------------------------------------------- commander (the end screen)
+    // 0.9.0, in the cook's place: the cat pops up as the cook did; the radio grows in where the pan did (its 120 box),
+    // with its call rising above it (the drawing is 120 wide and 1.42 times as tall). The radio and its call are the
+    // moment (data-moment commander, as in the other games); the cat holding it is commander-cat.
+    m.commander = function () {
+      const k = L.commander, cat = catFor('commander', k.w);
       if (!cat) return false;
-      const box = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'cook' }), k.x, k.y);
+      const box = place(MW.make('div', 'mw-moment mw-moment-pop', { 'data-moment': 'commander-cat' }), k.x, k.y);
       box.style.width = k.w + 'px'; box.style.height = cat.h + 'px';
       const flip = flipBox(0, 0, k.w, cat.h);
       flip.appendChild(cat);
       box.appendChild(flip);
-      const pan = place(MW.make('div', 'mw-moment mw-cook-pan', { 'data-moment': 'cook-pan' }), k.pan.x, k.pan.y);
-      pan.appendChild(size(MW.art('job-cook'), k.pan.size));
+      const r = k.radio, h = Math.round(r.size * 1.42);
+      const call = place(MW.make('div', 'mw-moment mw-commander-call', { 'data-moment': 'commander' }), r.x, r.y - (h - r.size));
+      call.style.width = r.size + 'px'; call.style.height = h + 'px';
+      const art = MW.art('commander-call'); art.setAttribute('width', r.size); art.setAttribute('height', h);
+      call.appendChild(art);
       endLayer.appendChild(box);
-      endLayer.appendChild(pan);
+      endLayer.appendChild(call);
       show(box);
-      later(function () { show(pan); MW.sparkles(endLayer, k.pan.x + k.pan.size / 2, k.pan.y + k.pan.size / 2, 70); }, 250);
-      MW.log('moment', 'cook');
+      later(function () { show(call); MW.sparkles(endLayer, r.x + r.size / 2, r.y + r.size / 2, 70); }, 250);
+      MW.log('moment', 'commander');
       return true;
     };
 

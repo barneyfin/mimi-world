@@ -1,18 +1,27 @@
-/* MeeMee World kit: the crew (phase 4, 0.4.1).
-   Moggles and Snuffles each get a job (lookout, engineer, navigator or cook) on the crew screen, by dragging the cat
-   onto the job's picture: one job per cat, never the same job for both. Each tablet remembers the jobs. A cat wears its
-   job as a badge on its chest on the map, the crew screen and the end screen; the game gives each job a moment.
-   Layout from the design canvas's round 4 (Crew4). */
+/* MeeMee World kit: the crew (phase 4, 0.4.1; the commander and the got-it face from 0.9.0).
+   Moggles and Snuffles each get a job (lookout, engineer, navigator or commander) on the crew screen, by dragging the
+   cat onto the job's picture: one job per cat, never the same job for both. Each tablet remembers the jobs. A cat wears
+   its job as a badge on its chest on the map, the crew screen and the end screen; the game gives each job a moment.
+   The commander took the cook's place in 0.9.0 (the cook and its frying pan are retired): a tablet with a cat saved as
+   the cook has that cat as the commander. Layout from the design canvas's round 4 (Crew4); the radio from round 12. */
 (function () {
   'use strict';
   const MW = window.MW;
   const CATS = ['moggles', 'snuffles'];
-  const JOBS = ['lookout', 'engineer', 'navigator', 'cook'];
+  const JOBS = ['lookout', 'engineer', 'navigator', 'commander'];
   const C = MW.crew = { CATS: CATS, JOBS: JOBS };
 
   // ---------------------------------------------------------------- the jobs, saved on this tablet
   C.jobs = function () {
-    const saved = MW.store.setting('crew') || {};
+    let saved = MW.store.setting('crew') || {};
+    // 0.9.0: a cat saved as the cook is the commander, and is saved as the commander the first time the jobs are read
+    // (the world reads them as the page opens), so the badge, the crew screen and every game see the commander
+    if (CATS.some(function (c) { return saved[c] === 'cook'; })) {
+      saved = Object.assign({}, saved);
+      CATS.forEach(function (c) { if (saved[c] === 'cook') saved[c] = 'commander'; });
+      MW.store.setting('crew', saved);
+      MW.log('crew', 'the cook is now the commander');
+    }
     const out = {};
     CATS.forEach(function (c) { out[c] = JOBS.indexOf(saved[c]) >= 0 ? saved[c] : null; });
     if (out.moggles && out.moggles === out.snuffles) out.snuffles = null;    // never the same job twice
@@ -23,9 +32,14 @@
   C.ready = function () { const j = C.jobs(); return CATS.every(function (c) { return !!j[c]; }); };
   // "Moggles… is the… lookout."
   C.line = function (cat, job) { return ['name-' + cat, 'is-the', 'job-' + job]; };
+  // Can that sentence be said? Not while its job's line is still pending (job-commander, new in 0.9.0): then it is left
+  // out altogether, so the crew screen never says half a sentence ("Moggles… is the…"), and checked before the call, so
+  // leaving it out stops nothing else being said (reference.md, MW.audio.recorded).
+  C.sayable = function (job) { return !!job && MW.audio.recorded('job-' + job); };
 
   // ---------------------------------------------------------------- a cat with a place for its badge
-  // MW.crew.cat('moggles', 112) -> a box w wide; box.setJob('cook') puts the badge on its chest (null takes it off).
+  // MW.crew.cat('moggles', 112) -> a box w wide; box.setJob('commander') puts the badge on its chest (null takes it off);
+  // box.face('got-it') shows its got-it face and box.face('usual') its usual one (0.9.0; box.face() says which shows).
   C.cat = function (who, w) {
     const h = Math.round(w * 340 / 260);
     const box = MW.make('div', 'mw-cat', { 'data-who': who });
@@ -51,6 +65,18 @@
     box.hop = function (delay) {
       setTimeout(function () { body.classList.remove('is-hop'); void body.getBoundingClientRect(); body.classList.add('is-hop'); }, delay || 0);
     };
+    // its face (0.9.0, Crew: the got-it face): the drawing has both, in data-face groups, and shows one at a time, as
+    // Scruffles's ship does. A new cat shows its usual face; the box's data-face says which is showing.
+    let face = 'usual';
+    box.face = function (name) {
+      if (name === 'usual' || name === 'got-it') {
+        face = name;
+        Array.prototype.forEach.call(pic.querySelectorAll('[data-face]'), function (g) { g.style.display = g.getAttribute('data-face') === name ? '' : 'none'; });
+        box.setAttribute('data-face', name);
+      }
+      return face;
+    };
+    box.setAttribute('data-face', face);
     return box;
   };
 
@@ -58,7 +84,7 @@
   const L = MW.LAYOUT.crew = {
     ship: { x: 530, y: 40, w: 220 },
     deck: { moggles: { x: 220, y: 368 }, snuffles: { x: 380, y: 368 } },     // where each cat's feet go before it has a job
-    stations: [{ job: 'lookout', x: 40 }, { job: 'engineer', x: 350 }, { job: 'navigator', x: 660 }, { job: 'cook', x: 970 }],
+    stations: [{ job: 'lookout', x: 40 }, { job: 'engineer', x: 350 }, { job: 'navigator', x: 660 }, { job: 'commander', x: 970 }],
     top: 420, w: 270, h: 340, disc: 124, pic: 98, spotY: 726,
     cat: 136, foot: 173,          // a cat's width, and how far below the top of its picture its feet are
     dropY: 430,                   // a cat let go with its middle below this line takes the nearest job
@@ -152,10 +178,11 @@
       if (!job) { if (was) MW.audio.sfx('whoosh'); return; }
       MW.audio.sfx('pop');
       c.el.hop(260);
-      const lines = [C.line(c.who, job)];
-      if (swapped && jobs[other]) lines.push(C.line(other, jobs[other]));
+      const lines = [];
+      if (C.sayable(job)) lines.push(C.line(c.who, job));                       // not while its job's line is pending
+      if (swapped && C.sayable(jobs[other])) lines.push(C.line(other, jobs[other]));
       if (C.ready() && (job !== was || swapped)) lines.push(['crew-ready']);   // not again for a tap on a cat
-      if (opts.speak) opts.speak(lines);
+      if (lines.length && opts.speak) opts.speak(lines);
     }
     scr.dragger = MW.dragger(parent, {
       counters: function () { return CATS.map(function (w) { return cats[w]; }); },
@@ -164,10 +191,13 @@
       grab: L.grab
     });
 
-    // what the screen says when it opens, and again on Hear-again
+    // what the screen says when it opens, and again on Hear-again (a cat whose job's line is pending is left out)
     scr.intro = function () {
       const jobs = C.jobs();
-      if (C.ready()) return opts.speak(CATS.map(function (w) { return C.line(w, jobs[w]); }));
+      if (C.ready()) {
+        const lines = CATS.filter(function (w) { return C.sayable(jobs[w]); }).map(function (w) { return C.line(w, jobs[w]); });
+        return lines.length ? opts.speak(lines) : Promise.resolve(false);
+      }
       return opts.speak([['crew-jobs']]);
     };
     scr.enter = function () { layout(false); scr.intro(); };
