@@ -61,7 +61,7 @@ Andika for everything (built into the page): single-storey *a* and *g*; *I*, *l*
 ## Words: what Scruffles says
 
 - Every line is short (under eight words), warm, present tense, using "we" and "you": "Let's make seven.", "How many more?", "Tap Scruffles when you're ready."
-- Use the class's words (for MeeMee Rescue: whole, part, make; for Take MeeMee Home: take away, is, left, still to check against the class's homework, which may change the words but not the line ids). Match the homework.
+- Use the class's words (for MeeMee Rescue: whole, part, make; for Take MeeMee Home, every subtraction word the class uses, taking turns: take away, subtract and minus, is and equals, and "left"). Match the homework.
 - Praise the effort and the maths: "You found it!", "Super counting!", "Three and four make seven." Never "Wrong", "Oops" or "No".
 - A wrong try gets "Let's try again." or "Let's look again." in the same warm voice; the second wrong try gets a hint that does it together ("Let's count on from three. Four, five…").
 - Build sentences from pieces when the same shape repeats with different words (numbers, names, jobs). Pieces in the middle of a sentence are recorded with the voice lifting; the last piece with the voice falling. Say so in the line's `how`.

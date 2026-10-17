@@ -22,8 +22,7 @@
       "game": "MeeMee World",
       "group": "Map",
       "words": "That place isn't ready yet.",
-      "how": "Gentle, a little sorry; the end of the sentence.",
-      "pending": true
+      "how": "Gentle, a little sorry; the end of the sentence."
     },
     {
       "id": "crew-jobs",
@@ -1711,6 +1710,27 @@
       "group": "Number sentence",
       "words": "is",
       "how": "Short and light, voice up: the answer follows (\"…is three.\")."
+    },
+    {
+      "id": "takehome-subtract",
+      "game": "Take MeeMee Home",
+      "group": "Number sentence",
+      "words": "subtract",
+      "how": "Short, voice up: a number follows (\"seven subtract four…\"). Takes turns with \"take away\" and \"minus\"."
+    },
+    {
+      "id": "takehome-minus",
+      "game": "Take MeeMee Home",
+      "group": "Number sentence",
+      "words": "minus",
+      "how": "Short, voice up: a number follows (\"seven minus four…\"). Takes turns with \"take away\" and \"subtract\"."
+    },
+    {
+      "id": "takehome-equals",
+      "game": "Take MeeMee Home",
+      "group": "Number sentence",
+      "words": "equals",
+      "how": "Short and light, voice up: the answer follows (\"…equals three.\"). Takes turns with \"is\"."
     },
     {
       "id": "takehome-home-they-go",

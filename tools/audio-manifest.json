@@ -11,6 +11,11 @@
    "lufs_before": -23.1,
    "gain_db": 3.1
   },
+  "map-place-not-ready": {
+   "dur": 2.47,
+   "lufs_before": -21.4,
+   "gain_db": 1.4
+  },
   "crew-jobs": {
    "dur": 3.06,
    "lufs_before": -20.3,
@@ -1215,6 +1220,21 @@
    "dur": 0.87,
    "lufs_before": -21.0,
    "gain_db": 1.0
+  },
+  "takehome-subtract": {
+   "dur": 1.5,
+   "lufs_before": -22.1,
+   "gain_db": 2.1
+  },
+  "takehome-minus": {
+   "dur": 1.04,
+   "lufs_before": -19.4,
+   "gain_db": -0.6
+  },
+  "takehome-equals": {
+   "dur": 0.99,
+   "lufs_before": -24.8,
+   "gain_db": 4.8
   },
   "takehome-home-they-go": {
    "dur": 1.3,

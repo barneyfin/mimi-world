@@ -364,9 +364,16 @@ async def test_tap_mode(p):
         const l = getComputedStyle(pod.querySelector('.mw-ship-light'));
         return [pod.classList.contains('is-ready'), l.opacity, l.animationName]; })()""")
     check("tap: with MeeMee in the circle the lights glow steadily", cue == [True, "1", "none"], str(cue))
-    await t.tap(1030, 300)                                   # tap Scruffles with 2 (too few)
+    n0 = len(await t.said())
+    await t.tap(1030, 300)                                   # tap Scruffles with 2 (too few), twice in quick succession
+    await asyncio.sleep(0.12)
+    await t.tap(1030, 300)
     await asyncio.sleep(0.6)
-    check("tap: too few says 'Let's look again.'", "again-look-again" in await t.said())
+    s = await t.state()
+    waited = await page.evaluate("MW.events.some(e => e.type === 'check' && e.detail === 'still answering')")
+    check("tap: too few says 'Let's look again.'; a double tap is one try, the second tap does nothing while he is answering (0.8.1)",
+          (await t.said())[n0:] == ["again-look-again"] and waited and await page.evaluate("MW.rescue.st.tries") == 1, json.dumps(s))
+    await n_quiet(t)
     await t.fill(4, "right")                                 # 6 > 4
     s = await t.state()
     check("tap: six MeeMee can go in (no auto-complete)", s["placed"] == 6 and s["phase"] == "open", json.dumps(s))
@@ -376,10 +383,12 @@ async def test_tap_mode(p):
     placed = await page.evaluate("MW.rescue.st.counters.filter(c => c.where === 'right').map(c => [c.x, c.y])")
     for x, y in placed[:3]:
         await t.drag(x, y, 1000, 640)
+    await n_quiet(t)                                         # a tap while he is still answering does nothing (0.8.1)
     await t.tap(1030, 300)
     await asyncio.sleep(0.8)
     check("tap: third wrong check plays the counting-on hint", any(x.startswith("q-count-on-from num-end-3") for x in await t.said()))
     await t.fill(1, "right")
+    await n_quiet(t)                                         # the hint is still being said: a tap waits for it (0.8.1)
     await t.tap(1030, 300)
     s = await t.wait_phase(["celebrate"], 3)
     check("tap: four MeeMee and a tap on Scruffles completes it", s["phase"] == "celebrate", json.dumps(s))
@@ -589,18 +598,19 @@ async def test_map(p):
     check("map: every planet is a big target (at least 120 stage px)", sizes and min(sizes) >= 120, str(sizes))
     await asyncio.sleep(1.5)
     empty = await page.evaluate(EMPTY_PLANETS)
+    locked = await page.evaluate(MAP_LOCKED_LINE)            # "That place isn't ready yet." once recorded (0.8.1), the old line before
     if empty:
         await t.tap(empty[0]["x"], empty[0]["y"])
         await asyncio.sleep(0.3)
         said = await t.said()
-        check("map: a locked planet says 'That planet isn't ready yet.'", said[-1:] == ["map-not-ready"] and await page.evaluate("MW.shell.screen") == "screen-map", str(said[-2:]))
+        check(f"map: a locked planet says its locked line ({locked})", said[-1:] == [locked] and await page.evaluate("MW.shell.screen") == "screen-map", str(said[-2:]))
         await asyncio.sleep(1.5)
     else:
-        check("map: a locked planet says 'That planet isn't ready yet.'", True, "skipped: every planet has a game")
+        check("map: a locked planet says its locked line", True, "skipped: every planet has a game")
     if len(empty) > 1:
         await t.tap(empty[1]["x"], empty[1]["y"])
         await asyncio.sleep(0.3)
-        check("map: so does the other one", (await t.said())[-1:] == ["map-not-ready"])
+        check("map: so does the other one", (await t.said())[-1:] == [locked])
         await asyncio.sleep(1.5)
     else:
         check("map: so does the other one", True, "skipped: fewer than two planets still to come")
@@ -660,6 +670,7 @@ async def test_zero(p):
     await t.drag(placed[0][0], placed[0][1], 1000, 640)
     ready = await page.evaluate("document.querySelector('#screen-game .mw-pod').classList.contains('is-ready')")
     check("zero: the ship's lights don't glow with the circle empty (no give-away)", not ready)
+    await n_quiet(t)                                         # a tap while he is still answering does nothing (0.8.1)
     await t.tap(1030, 300)
     s = await t.wait_phase(["celebrate"], 3)
     check("zero: tapping Scruffles with the circle empty answers 0", s["phase"] == "celebrate", json.dumps(s))
@@ -4445,6 +4456,7 @@ async def test_numbers_pause(p):
     await t.drag(*tile_xy(4), 380, 205); await n_check(t)
     st = await n_state(page)
     check("numbers: the next wrong number gives the hint again", st["hinted"] and st["fixed"] == 6, json.dumps(st))
+    await n_quiet(t)                                         # a tap during the hint does nothing (0.8.1)
     await t.drag(*tile_xy(6), 380, 205); await n_check(t)
     st = await n_state(page)
     check("numbers: 0 + 6 = ? answered with 6", st["phase"] == "celebrate" and st["carried"] == [6, 0, 6], json.dumps(st))
@@ -4613,7 +4625,8 @@ async def test_numbers_taps(p):
     check("numbers: ... closed, the celebration carries on (the number sentence), then question 2 with the track back",
           ok and s["qi"] == 1 and st["carried"] == [None, 2, 3] and not st["away"], json.dumps(st))
 
-    # counting mode, as before: a tap during the hint leaves it in place
+    # counting mode (0.8.1, B2): a double tap with too few is one wrong check, not two; the second tap does nothing while
+    # Scruffles is answering. A second wrong check, once he is quiet, brings the hint; taps during the hint leave it in place.
     await page.evaluate("MW.store.setting('answerMode', 'counting')")
     await t.tap(*HOME)
     await t.wait_screen("screen-map", 5)
@@ -4623,7 +4636,14 @@ async def test_numbers_taps(p):
     await n_quiet(t)
     await t.fill(2, "right")
     n0 = len(await t.said())
-    await w_double_tap(t, *POD)                              # two wrong checks (too few): the second brings the hint
+    await w_double_tap(t, *POD)                              # too few, twice in quick succession: one wrong check
+    await asyncio.sleep(0.6)
+    says = await n_says_after(t, n0)
+    check("counting: a double tap with too few is one wrong check ('Let's look again.' once, no hint): the second tap does nothing while he is answering (0.8.1)",
+          says == ["again-look-again"] and await page.evaluate("MW.rescue.st.tries") == 1 and not await page.evaluate("MW.rescue.st.hinted"),
+          json.dumps(says))
+    await n_quiet(t)
+    await t.tap(*POD)                                        # a second wrong check, once he is quiet: the hint
     await asyncio.sleep(0.6)
     await w_double_tap(t, *POD)                              # and more taps during the hint
     await asyncio.sleep(0.4)
@@ -4632,9 +4652,9 @@ async def test_numbers_taps(p):
     says = await n_says_after(t, n0)
     st = await t.state()
     hint = await page.evaluate("[MW.rescue.st.hinted, document.querySelectorAll('#screen-game .mw-ghost').length, document.querySelectorAll('#screen-game .mw-ghost.is-lit').length]")
-    check("counting: a double tap with too few is two wrong checks (the hint), and taps during the hint leave it in place, as before",
-          says[-1:] == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"] and len(says) <= 2 and hint == [True, 2, 2]
-          and st["placed"] == 2 and await page.evaluate("MW.rescue.st.tries") >= 2, json.dumps([says, hint, st]))
+    check("counting: the second wrong check brings the hint, and taps during the hint leave it in place (nothing more is said, still two tries)",
+          says[-1:] == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"] and len(says) == 2 and hint == [True, 2, 2]
+          and st["placed"] == 2 and await page.evaluate("MW.rescue.st.tries") == 2, json.dumps([says, hint, st]))
     check("numbers (taps): no console errors", not problems, "; ".join(problems[:3]))
     await browser.close()
 
@@ -4728,6 +4748,10 @@ async def test_numbers_decided(p, name, vw, vh, dpr):
 STUB_PLACE_LINE = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
     MW.audio.recorded = id => id === 'map-place-not-ready' || window.__recorded(id); })()"""
 UNSTUB_PLACE_LINE = "(() => { if (window.__recorded) { MW.audio.recorded = window.__recorded; delete window.__recorded; } })()"
+# as while "That place isn't ready yet." was still pending (it was recorded on 16 October 2026, 0.8.1)
+PENDING_PLACE_LINE = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
+    MW.audio.recorded = id => id === 'map-place-not-ready' ? false : window.__recorded(id); })()"""
+MAP_LOCKED_LINE = "MW.audio.recorded('map-place-not-ready') ? 'map-place-not-ready' : 'map-not-ready'"
 
 
 async def tap_said(t, sx, sy):
@@ -4835,7 +4859,9 @@ async def test_places(p, name, vw, vh, dpr):
           all(o["things"] >= 9 and not o["inside"] and not o["covered"] for o in over), json.dumps(over))
 
     if free:
-        # while "That place isn't ready yet." is pending: "That planet isn't ready yet.", never silence
+        # while "That place isn't ready yet." is pending (stubbed: it was recorded on 16 October 2026): "That planet isn't
+        # ready yet.", never silence
+        await page.evaluate(PENDING_PLACE_LINE)
         rec = await page.evaluate("[MW.audio.recorded('map-place-not-ready'), MW.audio.recorded('map-not-ready')]")
         got = []
         for i in free:
@@ -4852,7 +4878,8 @@ async def test_places(p, name, vw, vh, dpr):
         check(f"places ({name}): taps at the far ends of {' and '.join(WHAT[r['i']] for r in ends) or 'the rocks and the station'} (the review's points, and each drawing's left, right, top and bottom) are heard too",
               all(g[3] == ["map-not-ready"] and g[4] == "screen-map" for g in got), json.dumps(got) if ends else "skipped: both have a game")
 
-        # once it is recorded (stubbed here: the recording isn't made yet), "That place isn't ready yet."
+        # once it is recorded (stubbed, in case it isn't on this page), "That place isn't ready yet."
+        await page.evaluate(UNSTUB_PLACE_LINE)
         await page.evaluate(STUB_PLACE_LINE)
         got = []
         for i in free:
@@ -5192,8 +5219,20 @@ def th_prompt(step, q, qi, pending=False):
     return " ".join(p)
 
 
-def th_said_sentence(q):
-    return f"num-mid-{q['whole']} takehome-take-away num-mid-{q['take']} takehome-is num-end-{q['whole'] - q['take']}"
+TH_TAKE_WORDS = ["takehome-take-away", "takehome-subtract", "takehome-minus"]
+TH_IS_WORDS = ["takehome-is", "takehome-equals"]
+TH_SENTENCE_RE = "/takehome-(take-away|subtract|minus) num-mid-\\d+ takehome-(is|equals) num-end-/"
+
+
+def th_said_sentence(q, take="takehome-take-away", is_="takehome-is"):
+    """The number sentence as said (0.8.1: its words take turns; take, is_: this answer's turn, from the 'words' event)."""
+    return f"num-mid-{q['whole']} {take} num-mid-{q['take']} {is_} num-end-{q['whole'] - q['take']}"
+
+
+async def th_words(page):
+    """The words the last right answer's sentence used (its 'words' event since window.__thq), as (take, is)."""
+    w = await page.evaluate("(MW.events.filter(e => e.type === 'words' && e.t > (window.__thq || 0)).pop() || {}).detail || ''")
+    return tuple(w.split()) if w else ("takehome-take-away", "takehome-is")
 
 
 def th_text(q, gap=None):
@@ -5264,7 +5303,7 @@ async def th_end_question(t, page, step, q, qi, name, shot=None):
     """After a right check: wait for the MeeMee going home to set off, then check the ending (the same for every step)."""
     q = th_q(step, q)
     ok = await th_until(page, "MW.events.some(e => e.type === 'home' && e.t > (window.__thq || 0))" if q["take"] else
-                        "MW.events.some(e => e.type === 'say' && e.detail.indexOf('takehome-take-away') >= 0 && e.t > (window.__thq || 0))", 20)
+                        "MW.events.some(e => e.type === 'say' && %s.test(e.detail) && e.t > (window.__thq || 0))" % TH_SENTENCE_RE, 20)
     await asyncio.sleep(0.45)
     s = await th_state(page)
     if shot:
@@ -5373,9 +5412,17 @@ async def th_round(t, page, step, round_, name, shots, before=None):
                   f"the whole shows {q['whole']}",
                   s["staying"] == q["left"] and s["whole"] == 0 and s["pills"] == [str(q["left"]), str(q["take"])] and s["wholeNum"] == str(q["whole"]), json.dumps(s))
         said = await t.said()
-        i = len(said) - 1 - said[::-1].index(th_said_sentence(q)) if th_said_sentence(q) in said else -1
-        check(f"takehome-{step} ({name}): question {qi + 1}: praise, then the sentence said: '{th_said_sentence(q)}'",
-              i > 0 and said[i - 1] in TH_PRAISE, json.dumps(said[-3:]))
+        words = await th_words(page)
+        sent = th_said_sentence(q, *words)
+        i = len(said) - 1 - said[::-1].index(sent) if sent in said else -1
+        if step == "take":
+            # 0.8.1: the MeeMee staying are counted aloud as they slide over, between the praise and the sentence
+            count = " ".join([f"num-mid-{k}" for k in range(1, q["left"])] + [f"num-end-{q['left']}"])
+            check(f"takehome-take ({name}): question {qi + 1}: praise, the staying MeeMee counted aloud ('{count}'), then the sentence said: '{sent}'",
+                  i > 1 and said[i - 1] == count and said[i - 2] in TH_PRAISE and words[0] in TH_TAKE_WORDS and words[1] in TH_IS_WORDS, json.dumps(said[-4:]))
+        else:
+            check(f"takehome-{step} ({name}): question {qi + 1}: praise, then the sentence said: '{sent}'",
+                  i > 0 and said[i - 1] in TH_PRAISE and words[0] in TH_TAKE_WORDS and words[1] in TH_IS_WORDS, json.dumps(said[-3:]))
         eq = (await page.evaluate(TH_EQ))[eq0:]
         want = (["at under"] if step == "take" else ["at ship", f"minus {th_text(q, q['missing']).replace(' ', '').replace('_', '?').replace('−', '-')}", f"fill {ans}"])
         want_end = [f"minus {th_text(q).replace(' ', '').replace('−', '-')}"] if step == "take" else ["at under"]
@@ -5440,10 +5487,15 @@ async def test_takehome_wrong_take(p, name="fire", vw=1046, vh=653, dpr=1.22):
     s = await th_open(t, page, "take", [{"whole": 7, "take": 4}, {"whole": 5, "take": 2}, {"whole": 6, "take": 3}, {"whole": 8, "take": 2}, {"whole": 4, "take": 1}])
     await n_quiet(t)
     n0 = len(await t.said())
-    await n_check(t)                                         # nothing moved yet: too few
+    await t.tap(*POD)                                        # nothing moved yet: too few, tapped twice in quick succession
+    await asyncio.sleep(0.12)
+    await t.tap(*POD)
+    await asyncio.sleep(0.4)
     s = await th_state(page)
-    check(f"takehome-wrong-take ({name}): Scruffles tapped with none moved: 'Let's look again.', the try-again face, one try, no hint",
-          (await t.said())[n0:] == ["again-look-again"] and s["face"] == "try-again" and s["tries"] == 1 and not s["hinted"] and s["phase"] == "takehome-open", json.dumps(s))
+    waited = await page.evaluate("MW.events.some(e => e.type === 'check' && e.detail === 'still answering')")
+    check(f"takehome-wrong-take ({name}): Scruffles double-tapped with none moved: 'Let's look again.' once, the try-again face, one try (the second tap does "
+          f"nothing while he is answering, 0.8.1), no hint",
+          (await t.said())[n0:] == ["again-look-again"] and waited and s["face"] == "try-again" and s["tries"] == 1 and not s["hinted"] and s["phase"] == "takehome-open", json.dumps(s))
     await asyncio.sleep(1.8)
     s = await th_state(page)
     check(f"takehome-wrong-take ({name}): ... and Scruffles is soon thinking again (no red, nothing taken away)", s["face"] == "thinking" and s["whole"] == 7, json.dumps(s))
@@ -5635,6 +5687,7 @@ async def test_takehome_wrong_numbers(p, name="fire", vw=1046, vh=653, dpr=1.22)
     s = await th_state(page)
     check(f"takehome-wrong-numbers ({name}): 7 − 0 = ?, two wrong numbers: the hint (7 MeeMee in the whole, the going-home part's 0 as no MeeMee, nothing fades, 7 ghosts)",
           s["hinted"] and s["fixed"] == 7 and s["dim"] == 0 and s["ghosts"] == 7, json.dumps(s))
+    await n_quiet(t)                                         # a tap during the hint does nothing (0.8.1)
     await t.drag(*tile_xy(7), 210, 470)
     await n_check(t)
     await th_wait(page, ["takehome-celebrate"], 5)
@@ -5649,7 +5702,7 @@ async def test_takehome_wrong_numbers(p, name="fire", vw=1046, vh=653, dpr=1.22)
     await page.evaluate("window.__thq = performance.now()")
     await t.drag(*tile_xy(0), 550, 470)
     await n_check(t)
-    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-6 takehome-take-away num-mid-0 takehome-is num-end-6')", 15)
+    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && /^num-mid-6 takehome-(take-away|subtract|minus) num-mid-0 takehome-(is|equals) num-end-6$/.test(e.detail))", 15)
     await asyncio.sleep(1.5)
     hops = await page.evaluate("MW.events.filter(e => (e.type === 'hop' || e.type === 'home') && e.t > window.__thq).length")
     check(f"takehome-wrong-numbers ({name}): 6 − 0 = 6: 'Six take away zero is six.', and nobody hops home", ok and hops == 0, str(hops))
@@ -5781,6 +5834,7 @@ async def test_takehome_questions(p):
               } else {
                 R.drop(tr.tile((ans + 1) % 11), c.x + 20, c.y - 20, false); R.podTap();
                 o.wrong = [s.tries, s.placed, tr.tile((ans + 1) % 11).out()];
+                s.talking = false;                           // as once Scruffles is quiet: a tap while he answers does nothing (0.8.1)
                 R.drop(tr.tile(ans), c.x - 30, c.y + 20, false);
               }
               R.podTap();
@@ -5886,6 +5940,7 @@ TH_ANSWER = """(a) => { const R = MW.takehome; R.ask(a.q, a.step); const s = R.s
       if (a.wrong) { R.drop(tr.tile((s.answer + 1) % 11), c.x, c.y, false); R.podTap(); }
       R.drop(tr.tile(s.answer), c.x, c.y, false);
     }
+    s.talking = false;                                       // as once Scruffles is quiet: a tap while he answers does nothing (0.8.1)
     R.podTap(); const out = MW.world.st.phase; MW.world.home(); return out; }"""
 TH_STATUS = "(a) => { const m = MW.takehomeFacts.statuses(MW.takehome.answers(a[0])); const s = m[a[1]]; return s ? s.status : 'notyet'; }"
 
@@ -5988,6 +6043,8 @@ async def test_takehome_grownups(p, name, vw, vh, dpr):
             "A change starts with the next round. Each step keeps its own progress, separate from MeeMee Rescue's."]
     check(f"takehome-gu ({name}): the three explanations and the note, as round 11's board words them (British English, no exclamation marks)",
           tab["paras"][:4] == want and not any("!" in x for x in tab["paras"]), json.dumps(tab["paras"][:4]))
+    check(f"takehome-gu ({name}): under Wholes in play, MeeMee Rescue's note (0.8.1)",
+          "Questions use only the wholes switched on. Changes start with the next round." in tab["paras"], json.dumps(tab["paras"]))
     check(f"takehome-gu ({name}): the summary: 'Secure: 9 of 45 facts. Practising: 6. Questions answered this step on this tablet: 33.'",
           tab["lead"] == "Secure: 9 of 45 facts. Practising: 6. Questions answered this step on this tablet: 33.", tab["lead"])
     check(f"takehome-gu ({name}): the grid: a row per whole (2 to 10), a cell per fact written with the minus sign, 45 in all; 7 − 4 practising, 5 − 4 secure, 8 − 1 not yet",
@@ -6007,6 +6064,19 @@ async def test_takehome_grownups(p, name, vw, vh, dpr):
           tab["views"] == [["Take away", False], ["How many are left", False], ["Numbers", True]] and tab["cells"] == 63 and tab["rows"] == list(range(3, 12))
           and "7 − 0" in tab["g"] and "7 − 7" in tab["g"] and tab["lead"] == "No questions answered this step on this tablet yet." and tab["steps"][0][1], json.dumps(tab["rows"]))
     check(f"takehome-gu ({name}): the widest row (10 − 0 to 10 − 10) fits without sideways scrolling", wide[0] <= wide[1], str(wide))
+    # 0.8.1: the summary counts the 45 facts in Numbers too, and the zero facts have a line of their own
+    nums = [{"t": T0 + d * DAY + i * 1000, "whole": w, "take": a, "missing": "left", "tries": 0, "misses": 0, "hint": False}
+            for d in range(3) for i, (w, a) in enumerate([(5, 4), (5, 5)])]
+    nums.append({"t": T0 + 5 * DAY, "whole": 6, "take": 0, "missing": "left", "tries": 1, "misses": 0, "hint": False})
+    await page.evaluate("(a) => { const g = MW.store.game('takehome'); g.answers.numbers = a; MW.store.save(); }", nums)
+    await page.click(".gu-body [data-view=numbers]")
+    await asyncio.sleep(0.3)
+    zl = await page.evaluate("Array.from(document.querySelectorAll('.gu-body .gu-lead')).map(x => x.textContent)")
+    check(f"takehome-gu ({name}): Numbers' summary counts the 45 facts, and the zero facts have their own line (0.8.1)",
+          zl == ["Secure: 1 of 45 facts. Practising: 0. Questions answered this step on this tablet: 7.", "Zero facts: 1 of 18 secure. Practising: 1."], json.dumps(zl))
+    await page.evaluate("(() => { const g = MW.store.game('takehome'); delete g.answers.numbers; MW.store.save(); })()")
+    await page.click(".gu-body [data-view=numbers]")
+    await asyncio.sleep(0.3)
     await page.screenshot(path=str(SHOTS / f"takehome-{name}-grid-numbers.png"))
     await page.evaluate("MW.grownups.close()")
 
@@ -6086,11 +6156,12 @@ async def test_takehome_map(p, name, vw, vh, dpr):
           place_ok(info[2], "Take MeeMee Home") and badge and badge[0], json.dumps([info[2], badge]))
     check(f"takehome-map ({name}): MeeMee Rescue and MeeMee Rockets keep places 0 and 1; the rocks and the station (3, 4) stay locked",
           place_ok(info[0], "MeeMee Rescue") and place_ok(info[1], "MeeMee Rockets") and place_ok(info[3], None) and place_ok(info[4], None), json.dumps(info))
+    locked = await page.evaluate(MAP_LOCKED_LINE)
     for i in (3, 4):
         pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % i)
         said, screen = await tap_said(t, pl["x"], pl["y"])
-        check(f"takehome-map ({name}): {WHAT[i]} still say 'That planet isn't ready yet.' (while 'That place…' is pending) and stay on the map",
-              said == ["map-not-ready"] and screen == "screen-map", json.dumps([said, screen]))
+        check(f"takehome-map ({name}): {WHAT[i]} still say the locked line ({locked}) and stay on the map",
+              said == [locked] and screen == "screen-map", json.dumps([said, screen]))
         await asyncio.sleep(1.2)
     # its name is recorded: tapping place 2 shows its title banner while "Take MeeMee Home!" is said, then the game starts
     await page.evaluate("MW.takehome.nextRound = %s" % json.dumps([{"whole": 7, "take": 4}] * 5))
@@ -6256,6 +6327,56 @@ TH_PLAY_ROUNDS = """(n) => { const R = MW.takehome, out = { turns: [], rounds: [
       out.lens.push(R.answers('numbers').length);
     }
     MW.world.home(); return out; }"""
+
+
+async def test_takehome_words(p):
+    """0.8.1: the number sentence's words take turns (the class uses every subtraction word): the next of take away,
+    subtract and minus, and the next of is and equals, every answer in any step, carrying on across rounds. A word not
+    recorded yet sits out its turn, so the sentence is never missing a word."""
+    print("\n== Take MeeMee Home: the sentence's words take turns ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "takehome-words", 1046, 653, 1.22, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    say = "(n => { const w = MW.takehome.sentenceWords(n); return w.take.replace('takehome-', '') + '/' + w.is.replace('takehome-', ''); })"
+    rec = await page.evaluate("['takehome-subtract', 'takehome-minus', 'takehome-equals'].map(id => MW.audio.recorded(id))")
+    now = await page.evaluate(f"[0, 1, 2, 3, 4, 5].map({say})")
+    want_now = [f"{['take-away', 'subtract', 'minus'][n % 3] if rec[0] and rec[1] else 'take-away'}/{['is', 'equals'][n % 2] if rec[2] else 'is'}" for n in range(6)]
+    if not any(rec) or all(rec):
+        check(f"takehome-words: with subtract, minus and equals {'recorded' if all(rec) else 'still waiting for their recordings'}, six turns say: {', '.join(want_now)}",
+              now == want_now, json.dumps(now))
+    turns = await page.evaluate(f"""(() => {{ const real = MW.audio.recorded, say = {say};
+        MW.audio.recorded = id => ['takehome-subtract', 'takehome-minus', 'takehome-equals'].indexOf(id) >= 0 || real(id);
+        const all = [0, 1, 2, 3, 4, 5].map(say);
+        MW.audio.recorded = id => id === 'takehome-minus' || (id !== 'takehome-subtract' && id !== 'takehome-equals' && real(id));
+        const one = [0, 1, 2, 3].map(say);
+        MW.audio.recorded = real;
+        return [all, one]; }})()""")
+    check("takehome-words: all recorded, six turns say every pairing once: take away/is, subtract/equals, minus/is, take away/equals, subtract/is, minus/equals",
+          turns[0] == ["take-away/is", "subtract/equals", "minus/is", "take-away/equals", "subtract/is", "minus/equals"], json.dumps(turns[0]))
+    check("takehome-words: only minus recorded: take away and minus take turns, and is (equals sits out)",
+          turns[1] == ["take-away/is", "minus/is", "take-away/is", "minus/is"], json.dumps(turns[1]))
+    # the turn moves on with every answer and carries on into the next round
+    await page.evaluate("(() => { const g = MW.store.game('takehome'); g.wordTurn = 4; MW.store.save(); })()")
+    expect4 = await page.evaluate("(w => w.take + ' ' + w.is)(MW.takehome.sentenceWords(4))")
+    await th_open(t, page, "take", [{"whole": 3, "take": 1}] * 5)
+    await page.evaluate("window.__thq = performance.now()")
+    await th_move(t, 1)
+    await n_check(t)
+    await th_until(page, "MW.events.some(e => e.type === 'words' && e.t > window.__thq)", 15)
+    words = await page.evaluate("MW.events.filter(e => e.type === 'words').pop().detail")
+    turn = await page.evaluate("MW.takehome.wordTurn()")
+    check("takehome-words: a right answer at turn 4 uses turn 4's words and moves the turn on to 5", words == expect4 and turn == 5, json.dumps([words, expect4, turn]))
+    await th_wait(page, ["takehome-open"], 30)
+    await th_move(t, 1)
+    await n_check(t)
+    await th_wait(page, ["takehome-celebrate"], 5)
+    turn = await page.evaluate("MW.takehome.wordTurn()")
+    check("takehome-words: the next answer moves it on again, round past 5 to 0", turn == 0, str(turn))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    await th_open(t, page, "take", [{"whole": 3, "take": 1}] * 5)
+    check("takehome-words: a new round carries on from where the last one stopped", await page.evaluate("MW.takehome.wordTurn()") == 0)
+    check("takehome-words: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
 
 
 async def test_takehome_storage(p):
@@ -6639,6 +6760,7 @@ async def main():
         await test_takehome_hop_pause(p)
         await test_takehome_hop_pause(p, "doogee", 1280, 800, 2)
         await test_takehome_storage(p)
+        await test_takehome_words(p)
         await test_takehome_motion(p)
         await test_takehome_moments(p, "fire", 1046, 653, 1.22)
         await test_takehome_moments(p, "doogee", 1280, 800, 2)

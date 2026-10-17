@@ -1,7 +1,7 @@
 // MeeMee World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
 // VERSION changes with every build that changes a file, so tablets pick up the new copy. A tablet saves the new
 // copy in the background the next time MeeMee World opens, then switches to it at the start screen (never mid-round).
-const VERSION = 'mimi-world-v0.8.0-2a3f6a45';
+const VERSION = 'mimi-world-v0.8.1-2cc52c4f';
 const FILES = [
   "./",
   "./index.html",
@@ -28,6 +28,7 @@ const FILES = [
   "./audio/voice/make.mp3",
   "./audio/voice/map-mimi-rescue.mp3",
   "./audio/voice/map-not-ready.mp3",
+  "./audio/voice/map-place-not-ready.mp3",
   "./audio/voice/map-welcome.mp3",
   "./audio/voice/name-moggles.mp3",
   "./audio/voice/name-snuffles.mp3",
@@ -69,6 +70,7 @@ const FILES = [
   "./audio/voice/round-rescued-all.mp3",
   "./audio/voice/takehome-are-going.mp3",
   "./audio/voice/takehome-are-staying.mp3",
+  "./audio/voice/takehome-equals.mp3",
   "./audio/voice/takehome-find-number.mp3",
   "./audio/voice/takehome-home-they-go.mp3",
   "./audio/voice/takehome-how-many-altogether.mp3",
@@ -78,11 +80,13 @@ const FILES = [
   "./audio/voice/takehome-is-staying.mp3",
   "./audio/voice/takehome-is.mp3",
   "./audio/voice/takehome-meemee.mp3",
+  "./audio/voice/takehome-minus.mp3",
   "./audio/voice/takehome-move-them.mp3",
   "./audio/voice/takehome-name.mp3",
   "./audio/voice/takehome-round-another.mp3",
   "./audio/voice/takehome-round-done.mp3",
   "./audio/voice/takehome-round-ready.mp3",
+  "./audio/voice/takehome-subtract.mp3",
   "./audio/voice/takehome-take-away.mp3",
   "./audio/voice/tap-scruffles.mp3",
   "./audio/voice/too-many.mp3",

@@ -6,8 +6,8 @@
    whole − going home = left: 7 − 4 = 3. A round is five questions in one of three steps, which a grown-up picks in the
    game's grown-ups tab, Subtraction (a change starts with the next round):
      take     Take away. The whole holds its MeeMee; the pill under the going-home part says how many go. The child drags
-              that many into the going-home part, then taps Scruffles. The rest slide into the other part, and the
-              sentence shows under the diagram.
+              that many into the going-home part, then taps Scruffles. The rest slide into the other part as they are
+              counted aloud (0.8.1), and the sentence shows under the diagram.
      left     How many are left. The whole and the going-home part show their MeeMee; the staying part waits, and so
               does the sentence's gap, under Scruffles. The child drags a number tile from the track into the empty
               circle or the gap, then taps Scruffles.
@@ -15,7 +15,9 @@
               sentence's three places.
    Two wrong checks bring the hint (not for an answer of zero). Every right answer ends the same way: the answer is
    carried, the track slides away, the sentence ends up complete under the diagram and is said, the home planet shows,
-   and the MeeMee going home hop off to their houses (with reduce motion they fade).
+   and the MeeMee going home hop off to their houses (with reduce motion they fade). The sentence's words take turns
+   (0.8.1): take away, subtract and minus, and is and equals ("Seven subtract four equals three."). A tap on Scruffles
+   while he is still answering a check does nothing (0.8.1), so a double tap is one try.
    facts.js chooses the questions and keeps each step's progress (apart from MeeMee Rescue's); moments.js has the crew's
    job moments. Everything this game owns starts with its id, takehome. */
 (function () {
@@ -34,6 +36,11 @@
   const PRAISE = ['praise-found-it', 'praise-thats-right', 'praise-super-counting', 'praise-well-done'];   // MeeMee Rescue's
   const HOME_THEY_GO = 'takehome-home-they-go';            // mixed in with the praise once it is recorded
   const MOVE = 'takehome-move-them', FIND = 'takehome-find-number';
+  // The number sentence's words take turns, question by question (0.8.1; the class uses every subtraction word): the
+  // next of take away, subtract and minus, and the next of is and equals, so six questions say every pairing. A word not
+  // recorded yet sits out its turn, so the sentence is never missing one (take away and is are always recorded).
+  const TAKE_WORDS = ['takehome-take-away', 'takehome-subtract', 'takehome-minus'];
+  const IS_WORDS = ['takehome-is', 'takehome-equals'];
   const N = function (n) { return 'num-mid-' + n; };
   const E = function (n) { return 'num-end-' + n; };
   // The home planet (takehome-home), bottom right; the end screen's ground (takehome-home-wide) across the bottom.
@@ -89,6 +96,8 @@
   // time is far inside 1000 answers, and a fact a round keeps asking (secure ones come up in every round) keeps its
   // recent answers. gapTurn is where step 3's next round starts taking the gap's three places in turn (0, 1 or 2); it
   // moves on with every step 3 answer, so the places stay spread for ever, however long the list has been full.
+  // wordTurn (0 to 5) is which words the next number sentence uses (TAKE_WORDS, IS_WORDS); it moves on with every
+  // answer in any step and carries on across rounds. Clear leaves both turns alone.
   const KEEP = 1000;
   function saved() { return MW.store.peek(ID); }
   function savedStep() { return F.step(saved().step); }
@@ -102,9 +111,23 @@
     const t = saved().gapTurn;
     return t === 0 || t === 1 || t === 2 ? t : answers('numbers').length % 3;   // (none saved yet: from the list, as before)
   }
+  function wordTurn() {
+    const t = saved().wordTurn;
+    return Number.isInteger(t) && t >= 0 ? t % 6 : 0;
+  }
+  // The sentence's words for a turn: the turn-th of those recorded, of each kind.
+  function sentenceWords(turn) {
+    const pick = function (list) {
+      const ok = list.filter(function (id) { return MW.audio.recorded(id); });
+      const from = ok.length ? ok : list.slice(0, 1);
+      return from[turn % from.length];
+    };
+    return { take: pick(TAKE_WORDS), is: pick(IS_WORDS) };
+  }
   function recordAnswer(q, s) {
-    const turn = gapTurn();
+    const turn = gapTurn(), words = wordTurn();
     const g = MW.store.game(ID);
+    g.wordTurn = (words + 1) % 6;
     if (!g.answers || typeof g.answers !== 'object' || Array.isArray(g.answers)) g.answers = {};
     const list = Array.isArray(g.answers[s]) ? g.answers[s] : (g.answers[s] = []);
     list.push({ t: Date.now(), whole: q.whole, take: q.take, missing: q.missing, tries: st.tries, misses: st.misses, hint: st.hinted });
@@ -453,6 +476,9 @@
   function onPodTap() {
     if (W.st.paused || !answering()) return;
     if (dragger && dragger.dragging()) return;              // one hand holding something, the other tapping
+    // While Scruffles is still answering a check (a try-again line, too many, the hint), a tap does nothing, so a double
+    // tap is one try, not two (0.8.1, B2; MeeMee Rescue does the same)
+    if (st.talking) { MW.log('check', 'still answering'); return; }
     if (step() === 'take') {
       const n = inGoing().length;
       MW.log('check', n + ' of ' + st.answer);
@@ -609,6 +635,7 @@
     W.st.phase = P.celebrate;
     clearHint();
     moments.lookoutDown();                                   // a quick first answer: the lookout makes way for the engineer
+    const words = sentenceWords(wordTurn());                 // this answer's turn of the sentence's words
     recordAnswer(q, s);
     if (st.ghosts) { st.ghosts.clear(); st.ghosts = null; }
     undim();
@@ -640,7 +667,8 @@
       if (!(await slideRest(token))) return;
       equation.minus(q.whole, q.take, q.left, null);         // under the diagram, where MeeMee Rescue's shows
     }
-    await W.speak([[N(q.whole), 'takehome-take-away', N(q.take), 'takehome-is', E(q.left)]]);
+    MW.log('words', words.take + ' ' + words.is);
+    await W.speak([[N(q.whole), words.take, N(q.take), words.is, E(q.left)]]);
     if (!(await W.ok(token))) return;
     stars.set(st.qi + 1);
     MW.audio.sfx('twinkle');
@@ -661,13 +689,21 @@
     return st.praise.pop();
   }
 
-  // Step 1, right: the MeeMee still in the whole slide into the staying part's pattern one by one, its pill counting
-  // them; then the whole shows its number. Resolves false if the player left meanwhile.
+  // Step 1, right: the MeeMee still in the whole slide into the staying part's pattern one by one, each as its number is
+  // said ("One, two, three.", MeeMee Rescue's number recordings; 0.8.1, B1), its pill counting them; then the whole shows
+  // its number. If the counting is cut short or can't be heard, the rest slide over one by one as before. Resolves false
+  // if the player left meanwhile.
   async function slideRest(token) {
     const rest = st.counters.filter(function (c) { return c.where === 'whole'; }).sort(function (a, b) { return a.idx - b.idx; });
     const slots = diagram.slots(STAYING, rest.length);
+    const qi = st.qi;
     pill(STAYING, '?', false);
-    for (let i = 0; i < rest.length; i++) {
+    let moved = 0;
+    // up to and including the i-th, in order and once each, and only while this question is still on
+    const slide = function (i) {
+      while (moved <= i && moved < rest.length && token === W.st.token && qi === st.qi) slideOne(moved);
+    };
+    const slideOne = function (i) {
       const c = rest[i];
       c.where = STAYING; c.draggable = false;
       c.moveTo(slots[i].x, slots[i].y, slots[i].size, true);
@@ -675,6 +711,18 @@
       diagram.count(STAYING, i + 1);
       if (i === rest.length - 1) diagram.count('whole', 0); // the whole is empty: its number shows
       MW.log('slide', String(i + 1));
+      moved++;
+    };
+    // one sentence, so the count runs at a counting pace (the hint's count, one sentence a number, is slower, to count along)
+    const count = rest.map(function (c, i) { return i === rest.length - 1 ? E(i + 1) : N(i + 1); });
+    await W.speak([count], {
+      onStart: function (timeline) {
+        timeline.forEach(function (clip, i) { later(token, clip.at * 1000, function () { slide(i); }); });
+      }
+    });
+    if (!(await W.ok(token))) return false;
+    while (moved < rest.length) {                            // any not slid over yet
+      slide(moved);
       await MW.wait(SLIDE);
       if (!(await W.ok(token))) return false;
     }
@@ -848,6 +896,7 @@
       }, 'mw-chip gu-chip takehome-whole');
     }
     paintW();
+    G.p(el, 'Questions use only the wholes switched on. Changes start with the next round.', 'gu-note');   // as MeeMee Rescue's (0.8.1, B5)
 
     const prog = MW.make('div', 'takehome-progress');
     el.appendChild(prog);
@@ -882,22 +931,27 @@
     });
     const list = answers(shown);
     const map = F.statuses(list);
-    let nSecure = 0, nPractising = 0, total = 0;
+    // the summary counts the 45 facts in every step; in Numbers the zero facts have a line of their own (0.8.1, B4)
+    const n = { secure: 0, practising: 0, total: 0 }, zero = { secure: 0, practising: 0, total: 0 };
     const grid = MW.make('div', 'gu-grid');
     for (let w = 2; w <= 10; w++) {
       const rowEl = MW.make('div', 'gu-grid-row');
       rowEl.appendChild(MW.make('span', 'gu-grid-whole', null, String(w)));
       F.facts(w, shown === 'numbers').forEach(function (t) {
         const status = F.status(map, w, t);
-        total++;
-        if (status === 'secure') nSecure++; else if (status === 'practising') nPractising++;
+        const tally = t === 0 || t === w ? zero : n;
+        tally.total++;
+        if (status === 'secure') tally.secure++; else if (status === 'practising') tally.practising++;
         rowEl.appendChild(cell(status, w + ' − ' + t));
       });
       grid.appendChild(rowEl);
     }
     G.p(box, list.length
-      ? 'Secure: ' + nSecure + ' of ' + total + ' facts. Practising: ' + nPractising + '. Questions answered this step on this tablet: ' + list.length + '.'
+      ? 'Secure: ' + n.secure + ' of ' + n.total + ' facts. Practising: ' + n.practising + '. Questions answered this step on this tablet: ' + list.length + '.'
       : 'No questions answered this step on this tablet yet.', 'gu-lead');
+    if (list.length && zero.total) {
+      G.p(box, 'Zero facts: ' + zero.secure + ' of ' + zero.total + ' secure. Practising: ' + zero.practising + '.', 'gu-lead takehome-zero-lead');
+    }
     box.appendChild(grid);
     const legend = MW.make('div', 'gu-legend');
     legend.appendChild(cell('secure', 'Secure'));
@@ -912,6 +966,7 @@
   R.drop = drop; R.podTap = onPodTap; R.start = startRound; R.home = W.home; R.makeRound = makeRound; R.step = step;
   R.diagram = function () { return diagram; }; R.track = function () { return track; }; R.equation = function () { return equation; };
   R.homePlanet = function () { return home; }; R.answers = answers; R.gapTurn = gapTurn; R.praiseLines = praiseLines;
+  R.wordTurn = wordTurn; R.sentenceWords = sentenceWords;
   // Ask one question straight away, as a round of its own in step s (or the step set in the grown-ups tab), with nothing
   // said (the tests use it to put every question on the screen without playing whole rounds).
   R.ask = function (q, s) {

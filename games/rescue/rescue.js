@@ -307,6 +307,9 @@
     if (st.paused || !(st.phase === 'open' || st.phase === 'asking')) return;
     if (dragger && dragger.dragging()) return;              // one hand holding a MeeMee, the other tapping
     if (check() !== 'tap') { hearAgain(); return; }
+    // While Scruffles is still answering a check (a try-again line, too many, the hint), a tap does nothing, so a double
+    // tap is one try, not two (decided by Barney, 16 October 2026, 0.8.1; Take MeeMee Home does the same)
+    if (st.talking) { MW.log('check', 'still answering'); return; }
     if (numbers()) {
       if (!st.placed) {
         // nothing to check: the question again, not a try, but only once Scruffles is quiet. While he's saying "Let's try
