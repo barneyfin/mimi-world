@@ -1,0 +1,54 @@
+{
+  "about": "MeeMee Station's own lines. Everything else it says is MeeMee Rescue's (shared by their own ids): the numbers (num-mid-*, num-end-*), and, make, q-lets-make, q-weve-got, q-how-many-more, q-how-many-altogether, q-count-on-from, praise-found-it, praise-thats-right, praise-super-counting, praise-well-done, again-try-again, again-count-with-me, too-many and tap-scruffles. A new line is \"pending\" until Barney has recorded it: it shows on the recording page, and the game leaves it out until then.",
+  "lines": [
+    {
+      "id": "station-name",
+      "group": "Map",
+      "words": "MeeMee Station!",
+      "how": "Announcing the game's name.",
+      "pending": true
+    },
+    {
+      "id": "station-round-ready",
+      "group": "Rounds",
+      "words": "Let's bring the MeeMee aboard!",
+      "how": "Excited, inviting.",
+      "pending": true
+    },
+    {
+      "id": "station-bring-aboard",
+      "group": "Questions",
+      "words": "Bring more MeeMee aboard.",
+      "how": "Friendly and clear, like showing someone a new game.",
+      "pending": true
+    },
+    {
+      "id": "station-find-number",
+      "group": "Questions",
+      "words": "Find the number.",
+      "how": "Friendly and clear, as MeeMee Rescue's.",
+      "pending": true
+    },
+    {
+      "id": "station-all-aboard",
+      "group": "Praise",
+      "words": "All aboard!",
+      "how": "Pleased and warm.",
+      "pending": true
+    },
+    {
+      "id": "station-round-done",
+      "group": "Rounds",
+      "words": "All the MeeMee are aboard!",
+      "how": "Big finish: proud and happy.",
+      "pending": true
+    },
+    {
+      "id": "station-round-another",
+      "group": "Rounds",
+      "words": "Another visit?",
+      "how": "Inviting.",
+      "pending": true
+    }
+  ]
+}

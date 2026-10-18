@@ -1,0 +1,54 @@
+/* MeeMee Station's own styles (colour tokens only). The station, its windows and its hull modules are the mock-up's
+   approved drawing (rounds 12 to 15; the design system's MeeMeeStation card). */
+.station-svg { position: absolute; overflow: visible; pointer-events: none; }
+.station-scene { pointer-events: none; }
+
+/* a module's window: a steel rim, dark glass, a glint */
+.station-pod { position: absolute; box-sizing: border-box; border-radius: var(--radius-round); background: var(--night-raised);
+  border: 7px solid var(--steel); box-shadow: 0 0 0 3px var(--ink); }
+.station-pod::after { content: ''; position: absolute; left: 14%; top: 12%; width: 34%; height: 34%; border-radius: var(--radius-round);
+  border-top: 4px solid var(--highlight); opacity: 0.35; transform: rotate(-30deg); }
+.station-pod.is-arrived { box-shadow: 0 0 0 3px var(--ink), var(--ring-success); border-color: var(--peach); }
+.station-pod.is-closed { border-color: var(--asteroid-light); }
+.station-pod.is-closed::after { display: none; }
+.station-pod .station-shutter { position: absolute; inset: -3px; line-height: 0; }
+.station-pod.is-hinting { box-shadow: 0 0 0 3px var(--ink), var(--halo-mint); border-color: var(--mint); }
+/* the success ring comes in as the diagram's does (450 ms) */
+.station-pod { transition: box-shadow 450ms cubic-bezier(.2,.8,.2,1), border-color 260ms; }
+
+/* the whole, on the tower's screen (step 1) */
+.station-whole { position: absolute; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+  background: var(--moon); border: var(--rim) solid var(--mint); border-radius: var(--radius-round); box-shadow: var(--halo-mint), 0 0 0 4px var(--ink) inset; color: var(--numeral); }
+
+/* the bar model: the station's hull modules (the svg inside draws the hull) */
+.station-bar { position: absolute; box-sizing: border-box; }
+.station-bar-n { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--numeral); }
+.station-bar.is-waiting { background: var(--moon-dim); border: 5px dashed var(--mint); }
+.station-bar.is-success { box-shadow: var(--ring-success); }
+.station-bar.is-hinting { box-shadow: var(--halo-mint); border-color: var(--mint-light); }
+.station-bar { transition: box-shadow 450ms cubic-bezier(.2,.8,.2,1); }
+
+/* the commander, standing by (nothing to tap) */
+.station-commander { line-height: 0; pointer-events: none; }
+
+/* step 2: the rest of the MeeMee pop into their windows on a right answer (the snap's timing; a fade with reduce motion).
+   The scale property leaves the counter's own size (its transform) alone. */
+.mw-mimi.station-pop .mw-mimi-art { animation: station-pop 260ms cubic-bezier(.2,.8,.2,1) both; }
+@keyframes station-pop { from { opacity: 0; scale: 0.4; } to { opacity: 1; scale: 1; } }
+
+/* step 3: the hint's small station fades away once its job is done (a right answer); a fade with reduce motion too */
+.station-hint { transition: opacity 300ms ease-out; }
+.station-hint.is-gone { opacity: 0; }
+
+/* the end screen's MeeMee, one in each window */
+.station-end-mimi { line-height: 0; pointer-events: none; }
+
+/* the crew's moments (moments.js): the lookout mirrored to face the station; the window keeps its place, the cat and
+   what it holds are mirrored about its middle. The scale property leaves the kit's rise (or fade) on transform
+   untouched. */
+.station-peek-flip .mw-peek-inner { width: 250px; scale: -1 1; transform-origin: 125px 50%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .station-pod, .station-bar { transition: none; }
+  .mw-mimi.station-pop .mw-mimi-art { animation: mw-arrive 260ms ease-out both; }
+}

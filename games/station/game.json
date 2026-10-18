@@ -1,0 +1,9 @@
+{
+  "id": "station",
+  "name": "MeeMee Station",
+  "planet": 4,
+  "badge": "station-badge",
+  "say": "station-name",
+  "scripts": ["facts.js", "draw.js", "moments.js", "game.js"],
+  "about": "Number bonds within 10 on the class's ten frame and bar model: the MeeMee come aboard a space station. planet: 4 is the space station; badge: the station in a round night window (art.py); say: the line said when its place is tapped; scripts: facts.js is the facts, how secure each is and how rounds are chosen, draw.js the station and its hull modules (the mock-up's approved drawing), moments.js the crew's job moments, game.js the game (its three steps and its grown-ups tab, Station)."
+}

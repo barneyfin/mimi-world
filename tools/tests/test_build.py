@@ -118,15 +118,17 @@ def main():
             else:
                 check(f"build: {label} stops the build", any(expect in x for x in p), "; ".join(p[:2]) or "no problem found")
 
-    # 0.8.0: a game can take the rocks (3) or the station (4), while they are free; two games can't share a place
-    for place, what in ((3, "the rocks"), (4, "the station")):
-        if place not in FREE:
-            check(f"build: a game on place {place} ({what}) builds", True, f"skipped: place {place} has a game")
-            continue
-        with tempfile.TemporaryDirectory() as tmp:
-            d = copy_template(tmp, edit=lambda d: edit_json(d / "game.json", planet=place))
-            p = problems_for(real + [G.load_folder(d)])
-            check(f"build: a game on place {place} ({what}) builds", not p, "; ".join(p[:3]))
+    # 0.8.0: a game can take a free place; 0.9.0: the station (4) is MeeMee Station's, so the rocks (3) are the only free
+    # place, and a new game on the station stops the build; two games can't share a place
+    with tempfile.TemporaryDirectory() as tmp:
+        d = copy_template(tmp, edit=lambda d: edit_json(d / "game.json", planet=3))
+        p = problems_for(real + [G.load_folder(d)])
+        check("build: a game on place 3 (the rocks, the one free place) builds", FREE == [3] and not p, f"free: {FREE}; " + "; ".join(p[:3]))
+    with tempfile.TemporaryDirectory() as tmp:
+        d = copy_template(tmp, edit=lambda d: edit_json(d / "game.json", planet=4))
+        p = problems_for(real + [G.load_folder(d)])
+        check("build: a game on place 4 (the station, MeeMee Station's) stops the build", any("planet 4 is already station's" in x for x in p),
+              "; ".join(p[:2]) or "no problem found")
     with tempfile.TemporaryDirectory() as tmp:
         place = FREE[-1]
         one = copy_template(tmp, "probe", lambda d: edit_json(d / "game.json", planet=place))

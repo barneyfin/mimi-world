@@ -1739,6 +1739,62 @@
       "group": "Praise",
       "words": "Home they go!",
       "how": "Pleased and warm."
+    },
+    {
+      "id": "station-name",
+      "game": "MeeMee Station",
+      "group": "Map",
+      "words": "MeeMee Station!",
+      "how": "Announcing the game's name.",
+      "pending": true
+    },
+    {
+      "id": "station-round-ready",
+      "game": "MeeMee Station",
+      "group": "Rounds",
+      "words": "Let's bring the MeeMee aboard!",
+      "how": "Excited, inviting.",
+      "pending": true
+    },
+    {
+      "id": "station-bring-aboard",
+      "game": "MeeMee Station",
+      "group": "Questions",
+      "words": "Bring more MeeMee aboard.",
+      "how": "Friendly and clear, like showing someone a new game.",
+      "pending": true
+    },
+    {
+      "id": "station-find-number",
+      "game": "MeeMee Station",
+      "group": "Questions",
+      "words": "Find the number.",
+      "how": "Friendly and clear, as MeeMee Rescue's.",
+      "pending": true
+    },
+    {
+      "id": "station-all-aboard",
+      "game": "MeeMee Station",
+      "group": "Praise",
+      "words": "All aboard!",
+      "how": "Pleased and warm.",
+      "pending": true
+    },
+    {
+      "id": "station-round-done",
+      "game": "MeeMee Station",
+      "group": "Rounds",
+      "words": "All the MeeMee are aboard!",
+      "how": "Big finish: proud and happy.",
+      "pending": true
+    },
+    {
+      "id": "station-round-another",
+      "game": "MeeMee Station",
+      "group": "Rounds",
+      "words": "Another visit?",
+      "how": "Inviting.",
+      "pending": true
     }
   ]
 }

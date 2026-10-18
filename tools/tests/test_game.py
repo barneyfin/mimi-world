@@ -1,8 +1,9 @@
 """Headless checks for MeeMee World: the map, the crew, MeeMee Rescue (a round, the bonds), MeeMee Rockets (the tricky-words
 game; 0.7.0: autumn 2, the half-term switch, capitals), the kit (0.6.0: the title banners, the store, stars, pick-up boxes,
 numbers mode's pieces; 0.8.0: the map's five places and the minus sentence; 0.9.0: the commander and its moment, the crew's
-got-it face, the redrawn station and the grown-ups tab row), MeeMee Rescue's numbers mode (0.6.0) and Take MeeMee Home
-(0.8.0: subtraction, its three steps, its progress and its grown-ups tab), on Fire and Doogee screen sizes.
+got-it face, the redrawn station and the grown-ups tab row), MeeMee Rescue's numbers mode (0.6.0), Take MeeMee Home
+(0.8.0: subtraction, its three steps, its progress and its grown-ups tab) and MeeMee Station (0.9.0: the ten frame and the
+bar model, its three steps, the commander's smile, its progress and its grown-ups tab), on Fire and Doogee screen sizes.
 
     python tools/tests/test_game.py            run everything, screenshots into tools/tests/shots/
 
@@ -6132,8 +6133,8 @@ async def test_takehome_grownups(p, name, vw, vh, dpr):
     await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('takehome-subtraction')")
     await asyncio.sleep(0.4)
     tab = await page.evaluate(TH_TAB)
-    check(f"takehome-gu ({name}): the tab 'Subtraction' sits after MeeMee Rockets' Words, before Checks and Sound",
-          tab["tabs"] == ["Progress", "Settings", "Words", "Subtraction", "Checks", "Sound"] and tab["on"] == "Subtraction", json.dumps(tab["tabs"]))
+    check(f"takehome-gu ({name}): the tab 'Subtraction' sits after MeeMee Rockets' Words, before MeeMee Station's Station, Checks and Sound",
+          tab["tabs"] == ALL_TABS and tab["on"] == "Subtraction", json.dumps(tab["tabs"]))
     check(f"takehome-gu ({name}): in order: Which step (Take away on), Wholes in play (2 to 10, all on), Showing progress for (Take away)",
           tab["h3"] == ["Which step", "Wholes in play", "Showing progress for"] and tab["steps"] == [["Take away", True], ["How many are left", False], ["Numbers", False]]
           and tab["wholes"] == [[str(w), True] for w in range(2, 11)] and tab["views"] == [["Take away", True], ["How many are left", False], ["Numbers", False]],
@@ -6241,8 +6242,8 @@ STUB_TH_NAME_PENDING = """(() => { if (!window.__recorded) window.__recorded = M
 
 async def test_takehome_map(p, name, vw, vh, dpr):
     """Place 2 is the game's: lit with its badge; it and its badge open the game after its title banner (its name is
-    recorded); with the name stubbed as not recorded, straight away with no banner. The rocks and the station stay locked
-    and still say their line."""
+    recorded); with the name stubbed as not recorded, straight away with no banner. The rocks stay locked and still say
+    their line (the station is MeeMee Station's from 0.9.0)."""
     print(f"\n== Take MeeMee Home on the map ({name}) ==")
     browser, ctx, page, t, problems, _ = await open_tablet(p, f"takehome-map-{name}", vw, vh, dpr, mode=None)
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
@@ -6255,10 +6256,10 @@ async def test_takehome_map(p, name, vw, vh, dpr):
                                 " return b ? [!!b.querySelector('clipPath[id^=\"takehome-badge-c\"]'), b.getAttribute('aria-label')] : null; })()")
     check(f"takehome-map ({name}): place 2 (the small peach planet) is Take MeeMee Home's: lit, a mint halo and its badge (the house in its night window)",
           place_ok(info[2], "Take MeeMee Home") and badge and badge[0], json.dumps([info[2], badge]))
-    check(f"takehome-map ({name}): MeeMee Rescue and MeeMee Rockets keep places 0 and 1; the rocks and the station (3, 4) stay locked",
-          place_ok(info[0], "MeeMee Rescue") and place_ok(info[1], "MeeMee Rockets") and place_ok(info[3], None) and place_ok(info[4], None), json.dumps(info))
+    check(f"takehome-map ({name}): MeeMee Rescue and MeeMee Rockets keep places 0 and 1, MeeMee Station has the station (4); the rocks (3) stay locked",
+          place_ok(info[0], "MeeMee Rescue") and place_ok(info[1], "MeeMee Rockets") and place_ok(info[3], None) and place_ok(info[4], "MeeMee Station"), json.dumps(info))
     locked = await page.evaluate(MAP_LOCKED_LINE)
-    for i in (3, 4):
+    for i in (3,):
         pl = await page.evaluate("MW.LAYOUT.map.planets[%d]" % i)
         said, screen = await tap_said(t, pl["x"], pl["y"])
         check(f"takehome-map ({name}): {WHAT[i]} still say the locked line ({locked}) and stay on the map",
@@ -6831,7 +6832,8 @@ async def test_commander_moments(p, name, vw, vh, dpr, reduce=False):
     where the pan did (MeeMee Rescue and Take MeeMee Home: Moggles's place, 254, 494, not flipped, as on the boards; MeeMee
     Rockets: the commander pops up beside the little rockets, 880, 560, and holds the radio up at 800, 630), its call
     rising above it, with sparkles; once, nothing repeating; logged as 'moment commander' where the cook's was logged;
-    no cook moment. With reduce motion it fades in. Moggles is the commander and Snuffles the lookout, as on the boards."""
+    no cook moment. With reduce motion it fades in. Moggles is the commander and Snuffles the lookout, as on the boards.
+    MeeMee Station's end screen (0.9.0 part B) has it at Take MeeMee Home's place (board round14-end)."""
     label = f"commander-moments ({name}{', reduce motion' if reduce else ''})"
     print(f"\n== 0.9.0: the commander's moment on each end screen ({name}{', reduce motion' if reduce else ''}) ==")
     browser, ctx, page, t, problems = await open_motion(p, vw, vh, dpr, reduce)
@@ -6839,7 +6841,8 @@ async def test_commander_moments(p, name, vw, vh, dpr, reduce=False):
     await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
     rounds = [("MeeMee Rescue", "#screen-end", rescue_quick_round, [254, 450, 104, 148], False, "round-rescued-all", "round-another", "rescue"),
               ("MeeMee Rockets", "#screen-words-end", words_quick_round, [800, 580, 120, 170], False, "words-round-done", "words-round-another", "rockets"),
-              ("Take MeeMee Home", "#screen-takehome-end", takehome_quick_round, [254, 450, 104, 148], False, "takehome-round-done", "takehome-round-another", "takehome")]
+              ("Take MeeMee Home", "#screen-takehome-end", takehome_quick_round, [254, 450, 104, 148], False, "takehome-round-done", "takehome-round-another", "takehome"),
+              ("MeeMee Station", "#screen-station-end", station_quick_round, [254, 450, 104, 148], False, "station-round-done", "station-round-another", "station")]
     for game, screen, play, box, flipped, done_line, another, short in rounds:
         t0 = await page.evaluate("performance.now()")
         await play(t, page)
@@ -7002,61 +7005,6 @@ STATION_DRAWN = """(() => { const svg = document.querySelector('#screen-map > sv
              tower: g.querySelectorAll('circle.s-mint').length, dish: g.querySelectorAll('path.f-moon-dim').length }; })()"""
 
 
-async def test_station_map(p, name, vw, vh, dpr):
-    """0.9.0: the map's redrawn station (SolarMap card; board Map14): five places, places 3 and 4 locked; the station
-    drawn as MeeMee Station (the truss, a wing at each end, ten modules with three windows lit, the tower and its screen,
-    the dish) at 1.11 and 6 px lower, dimmed to 62%; place 4's lock at 966, 96 and (once a game takes it) its badge at
-    944, 56; tap area 240, which the whole drawing is inside; tapping the station or its lock says the locked line; the
-    three games open as before."""
-    print(f"\n== 0.9.0: the map's redrawn station ({name}) ==")
-    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-{name}", vw, vh, dpr, mode="tap")
-    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
-    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
-    await t.tap(*PLAY)
-    await t.wait_screen("screen-map")
-    await asyncio.sleep(1.0)
-    await screenshot(page, f"0.9.0/{name}-map.png")
-    lay = await page.evaluate("MW.LAYOUT.map.planets[4]")
-    check(f"station ({name}): place 4 stays at 860, 182 with its 240 tap area; its badge's place is 944, 56 and its lock 966, 96",
-          lay == {"x": 860, "y": 182, "tap": 240, "badge": {"x": 944, "y": 56, "d": 84, "pic": 56}, "lock": {"x": 966, "y": 96, "d": 56, "icon": 28}}, json.dumps(lay))
-    info = await page.evaluate(PLACES_INFO)
-    games = await page.evaluate("MW.world.games.map(g => g.planet)")
-    check(f"station ({name}): five places: the three games' planets lit, the rocks and the station locked", len(info) == 5 and sorted(games) == [0, 1, 2]
-          and all(info[i]["game"] for i in (0, 1, 2)) and place_ok(info[3], None) and place_ok(info[4], None), json.dumps([info[3], info[4]]))
-    lock = await page.evaluate("(() => { const L = MW.LAYOUT.map.planets[4].lock; const e = Array.from(document.querySelectorAll('#screen-map .mw-planet-lock')).find(e => e.offsetLeft === L.x && e.offsetTop === L.y); return e ? [e.offsetLeft, e.offsetTop, e.offsetWidth] : null; })()")
-    check(f"station ({name}): the station's lock badge sits at 966, 96 (56 across), clear of its right wing", lock == [966, 96, 56], json.dumps(lock))
-    drawn = await page.evaluate(STATION_DRAWN)
-    check(f"station ({name}): the station is drawn as MeeMee Station, small (1.11), 6 px lower than before, dimmed to 62%: the truss, a wing at each end (two panels each), "
-          f"ten modules joined by mint collars, three windows lit, the tower with its round screen, and the dish",
-          drawn == {"transform": "translate(860 188) scale(1.11)", "dimmed": True, "modules": 10, "lit": 3, "dark": 7, "wings": 4, "collars": 8, "truss": 1, "tower": 1, "dish": 1},
-          json.dumps(drawn))
-    said = []
-    for what, (x, y) in (("the station", (860, 182)), ("its lock", (994, 124))):
-        n = len(await t.said())
-        await t.tap(x, y)
-        await asyncio.sleep(0.5)
-        said.append([what, (await t.said())[n:], await page.evaluate("MW.shell.screen")])
-        await asyncio.sleep(1.5)
-    line = await page.evaluate(MAP_LOCKED_LINE)
-    check(f"station ({name}): tapping the station, or its lock, says the locked line ('That place isn't ready yet.') and stays on the map",
-          all(s[1] == [line] and s[2] == "screen-map" for s in said), json.dumps(said))
-    opened = []
-    for gid, screen, words in (("rescue", "screen-game", "map-mimi-rescue"), ("words", "screen-words-find", "words-name"), ("takehome", "screen-takehome-play", "takehome-name")):
-        pl = await page.evaluate("MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === '%s').planet]" % gid)
-        if gid == "rescue":
-            await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
-        await t.tap(pl["x"], pl["y"])
-        ok = await t.wait_screen(screen, 8)
-        opened.append([gid, ok, words in await t.said()])
-        await t.tap(*HOME_BTN)
-        await t.wait_screen("screen-map", 5)
-        await asyncio.sleep(0.5)
-    check(f"station ({name}): MeeMee Rescue, MeeMee Rockets and Take MeeMee Home open as before (each its name and banner, then its screen)",
-          all(o[1] and o[2] for o in opened), json.dumps(opened))
-    check(f"station ({name}): no console errors", not problems, "; ".join(problems[:3]))
-    await browser.close()
-
-
 # the grown-ups header (0.9.0, BondGrid's tab row): the title's lines, the title and Close on one line with Close at its
 # right, and every tab under them inside the panel (stage px)
 TAB_ROW = """(() => { const k = MW.stage.scale, sb = r => [(r.left - MW.stage.offX) / k, (r.top - MW.stage.offY) / k, (r.right - MW.stage.offX) / k, (r.bottom - MW.stage.offY) / k];
@@ -7071,9 +7019,9 @@ TAB_ROW = """(() => { const k = MW.stage.scale, sb = r => [(r.left - MW.stage.of
              under: tabs.every(x => x[1][1] >= Math.max(tr[3], cr[3])),
              inside: tabs.every(x => x[1][0] >= panel[0] && x[1][2] <= panel[2] && x[1][3] <= panel[3]),
              tabsBox: tabs.length ? [r(Math.min(...tabs.map(x => x[1][0]))), r(Math.min(...tabs.map(x => x[1][1]))), r(Math.max(...tabs.map(x => x[1][2]))), r(Math.max(...tabs.map(x => x[1][3])))] : null }; })()"""
-# an eighth tab, as MeeMee Station's will be (0.9.0 part B): a copy of a tab, before the world's Checks and Sound
+# one tab more than the page has (a ninth with the starter game's): a copy of a tab, before the world's Checks and Sound
 ADD_TAB = """(() => { const tabs = document.querySelector('.gu-tabs'), checks = tabs.querySelector('[data-tab=checks]');
-    const b = checks.cloneNode(true); b.textContent = 'Station'; b.setAttribute('data-tab', 'test-station'); b.classList.remove('is-on');
+    const b = checks.cloneNode(true); b.textContent = 'Extra'; b.setAttribute('data-tab', 'test-extra'); b.classList.remove('is-on');
     tabs.insertBefore(b, checks); return tabs.children.length; })()"""
 
 
@@ -7099,17 +7047,17 @@ async def tab_row_check(page, label, n, shot):
 async def test_tab_row(p):
     """0.9.0: the grown-ups tab row (BondGrid card; board Grownups14): "Grown-ups" alone on the title line with Close at
     its right, the tabs on their own row under it (wrapping if they must), at both sizes: with today's tabs (Progress,
-    Settings, Words, Subtraction, Checks, Sound), with the starter game's added (a test copy), and with one more (eight,
-    as there will be once MeeMee Station adds its tab)."""
+    Settings, Words, Subtraction, Station, Checks, Sound: seven since MeeMee Station, 0.9.0 part B), with the starter
+    game's added (a test copy: eight), and with one more (nine, wrapping if it must)."""
     import shutil
     import subprocess
     print("\n== 0.9.0: the grown-ups tab row ==")
     sizes = (("fire", 1046, 653, 1.22), ("doogee", 1280, 800, 2))
     for name, vw, vh, dpr in sizes:
         browser, ctx, page, t, problems, _ = await open_tablet(p, f"tabs-{name}", vw, vh, dpr, mode=None)
-        r = await tab_row_check(page, f"tab row ({name}, today's page)", 6, f"0.9.0/{name}-grownups-tabs-6.png")
-        check(f"tab row ({name}, today's page): the tabs are Progress, Settings, Words, Subtraction, Checks and Sound",
-              r["tabs"] == ["Progress", "Settings", "Words", "Subtraction", "Checks", "Sound"], json.dumps(r["tabs"]))
+        r = await tab_row_check(page, f"tab row ({name}, today's page)", 7, f"0.9.0/{name}-grownups-tabs-7.png")
+        check(f"tab row ({name}, today's page): the tabs are Progress, Settings, Words, Subtraction, Station, Checks and Sound",
+              r["tabs"] == ALL_TABS, json.dumps(r["tabs"]))
         check(f"tab row ({name}): no console errors", not problems, "; ".join(problems[:3]))
         await browser.close()
     here = pathlib.Path(__file__).resolve().parent
@@ -7140,13 +7088,1505 @@ async def test_tab_row(p):
             page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
             await page.goto(f"http://127.0.0.1:{TPL_PORT}/")
             await page.wait_for_load_state("load")
-            await tab_row_check(page, f"tab row ({name}, with the starter game)", 7, f"0.9.0/{name}-grownups-tabs-7.png")
-            await tab_row_check(page, f"tab row ({name}, with an eighth tab)", 8, f"0.9.0/{name}-grownups-tabs-8.png")
+            await tab_row_check(page, f"tab row ({name}, with the starter game)", 8, f"0.9.0/{name}-grownups-tabs-8.png")
+            await tab_row_check(page, f"tab row ({name}, with a ninth tab)", 9, f"0.9.0/{name}-grownups-tabs-9.png")
             check(f"tab row ({name}, test copy): no console errors", not problems, "; ".join(problems[:3]))
             await browser.close()
     finally:
         srv.shutdown()
         srv.server_close()
+
+
+# ---------------------------------------------------------------- 0.9.0 part B: MeeMee Station (games/station), the ten frame and bar model
+ST_SHOTS = SHOTS9 / "station"                     # MeeMee Station's screenshots, named after the boards they match
+ST_SHOTS.mkdir(exist_ok=True)
+ST_PLACE = "MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === 'station').planet]"
+ST_STEPS = ("aboard", "more", "numbers")
+ST_PRAISE = {"praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done", "station-all-aboard"}   # MeeMee Rescue's four and its own
+ST_UNDER = [180, 700]                              # the sentence's usual place (its box's top-left corner)
+ST_ON_STATION = (430, 300)                         # step 1: a point on the station (the drop box is 40, 100 to 820, 500)
+ST_ON_DECK = (930, 690)                            # step 1: a point on the deck (a touch there picks up the nearest MeeMee)
+# What the game screen shows (stage px): the round's step and question, the windows (each one's state), the MeeMee, the
+# tower's whole, the hull modules (value, waiting, success, hinting, number shown), the tiles, the sentence, the commander
+ST_STATE = """(() => { const R = MW.station, s = R.st, tr = R.track(), e = R.equation(), g = document.getElementById('screen-station-play');
+    const shown = el => !!el && getComputedStyle(el).display !== 'none' && !el.closest('.mw-off');
+    const cat = g.querySelector('.station-commander .mw-cat'), box = g.querySelector('.station-commander');
+    const bar = m => m ? [m.value, m.el.classList.contains('is-waiting'), m.el.classList.contains('is-success'), m.el.classList.contains('is-hinting'),
+                          (m.el.querySelector('.station-bar-n') || {}).textContent || null] : null;
+    const b = R.bars(), wh = g.querySelector('.station-whole');
+    return { phase: MW.world.st.phase, qi: s.qi, step: R.step(), target: s.target, answer: s.answer, tries: s.tries, misses: s.misses,
+             hinted: s.hinted, placed: s.placed ? s.placed.n : null, screen: MW.shell.screen,
+             windows: R.windows().map(w => w.state), aboard: s.counters.filter(c => c.where === 'aboard').map(c => c.win),
+             deck: s.counters.filter(c => c.where === 'deck').length, fixed: s.fixed.length, hintMimi: s.hintMimi.length,
+             whole: wh ? wh.textContent : null, bars: b ? ['whole', 'left', 'right'].map(k => bar(b[k])) : null,
+             track: shown(tr.el) && !tr.away(), away: tr.away(), out: tr.tiles.filter(t => t.out()).map(t => t.n),
+             ghosts: g.querySelectorAll('.mw-ghost').length, lit: g.querySelectorAll('.mw-ghost.is-lit').length,
+             face: g.querySelector('.mw-pod').dataset.face, ready: g.querySelector('.mw-pod').classList.contains('is-ready'),
+             lights: g.querySelector('.mw-pod').classList.contains('is-celebrating'),
+             sentence: e.el.classList.contains('is-shown') ? Array.from(e.el.children).map(c => c.textContent).join(' ') : '',
+             at: [e.el.offsetLeft, e.el.offsetTop],
+             commander: cat ? [cat.dataset.who, cat.dataset.face, cat.dataset.job, box.offsetLeft, box.offsetTop, cat.offsetWidth] : null,
+             hintStation: !!g.querySelector('.station-hint'), sparks: g.querySelectorAll('.mw-spark').length,
+             stars: Array.from(g.querySelectorAll('.mw-stars svg')).map(x => x.dataset.state).join(',') }; })()"""
+ST_FACES = "MW.events.filter(e => e.type === 'commander' && e.t > (window.__stq || 0)).map(e => e.detail)"
+# A line the game asked for on its own (its last 'say'): whether it is recorded, and whether the kit skipped it (the next
+# say or audio-fail after it is the kit's "not recorded yet" for it). The say log has a line whether or not it is heard,
+# so this tells a skipped line from a played one; the test passes whichever it really is (skipped exactly while pending).
+ST_HEARD = """(id => { const ev = MW.events, i = ev.map(e => e.type + ' ' + e.detail).lastIndexOf('say ' + id); if (i < 0) return null;
+    const next = ev.slice(i + 1).find(e => e.type === 'say' || e.type === 'audio-fail');
+    return { recorded: MW.audio.recorded(id), skipped: !!next && next.type === 'audio-fail' && next.detail === 'not recorded yet: ' + id }; })"""
+
+
+def st_q(step, q):
+    """A question as the game has it: whole, a (already aboard), b (the rest), missing (where the answer goes)."""
+    return {"whole": q["whole"], "a": q["a"], "b": q["whole"] - q["a"], "missing": q.get("missing") or "right"}
+
+
+def st_answer(q):
+    return q["whole"] if q["missing"] == "whole" else (q["a"] if q["missing"] == "left" else q["b"])
+
+
+def st_prompt(step, q, qi, recorded=()):
+    """What Scruffles says for a question, as the say log has it: MeeMee Rescue's "Let's make… seven. We've got… three."
+    (and "How many more?" in steps 2 and 3), or for a missing whole "We've got… five… and four. How many altogether?". The
+    first two questions of a round add "Bring more MeeMee aboard." (step 1) or "Find the number." (steps 2 and 3) once
+    recorded (recorded: the lines stubbed as recorded), then "Tap Scruffles when you're ready."."""
+    q = st_q(step, q)
+    if step == "numbers" and q["missing"] == "whole":
+        p = [f"q-weve-got num-mid-{q['a']} and num-end-{q['b']}", "q-how-many-altogether"]
+    else:
+        given = q["b"] if step == "numbers" and q["missing"] == "left" else q["a"]
+        p = [f"q-lets-make num-end-{q['whole']}", f"q-weve-got num-end-{given}"] + (["q-how-many-more"] if step != "aboard" else [])
+    if qi < 2:
+        extra = "station-bring-aboard" if step == "aboard" else "station-find-number"
+        p += ([extra] if extra in recorded else []) + ["tap-scruffles"]
+    return " ".join(p)
+
+
+def st_text(q):
+    """The sentence as ST_STATE shows it: MeeMee Rescue's '3 + 4 = 7'."""
+    return f"{q['a']} + {q['b']} = {q['whole']}"
+
+
+def st_said_sentence(q):
+    return f"num-mid-{q['a']} and num-mid-{q['b']} make num-end-{q['whole']}"
+
+
+async def st_state(page):
+    return await page.evaluate(ST_STATE)
+
+
+async def st_wait(page, phases, timeout=25):
+    for _ in range(int(timeout / 0.1)):
+        s = await st_state(page)
+        if s["phase"] in phases:
+            return s
+        await asyncio.sleep(0.1)
+    return await st_state(page)
+
+
+async def st_set(page, step=None, round_=None, wholes=None):
+    """This game's own saved choices (its step, its wholes in play) and the next round, as a grown-up and the tests set them."""
+    await page.evaluate("""(a) => { const g = MW.store.game('station'); if (a.step) g.step = a.step; if (a.wholes) g.wholes = a.wholes; MW.store.save();
+        if (a.round) MW.station.nextRound = a.round; }""", {"step": step, "round": round_, "wholes": wholes})
+
+
+async def st_open(t, page, step, round_):
+    """Play (if on the start screen), then place 4 on the map: the round, in this step."""
+    await st_set(page, step, round_)
+    if await page.evaluate("MW.shell.screen") == "screen-start":
+        await t.tap(*PLAY)
+        await t.wait_screen("screen-map")
+    pl = await page.evaluate(ST_PLACE)
+    await t.tap(pl["x"], pl["y"])
+    return await st_wait(page, ["station-open"], 30)
+
+
+async def st_bring(t, n, to=ST_ON_STATION, frm=ST_ON_DECK):
+    """Step 1: n MeeMee dragged from the deck (a touch on it picks up the nearest) onto the station."""
+    for _ in range(n):
+        await t.drag(*frm, *to)
+
+
+async def st_berth(page):
+    """The empty berth's middle (stage px)."""
+    return await page.evaluate("(() => { const m = MW.station.st.berth; return [m.x + m.w / 2, m.y + m.h / 2]; })()")
+
+
+async def st_shot(page, name, board):
+    """A screenshot named after the board it matches, in tools/tests/shots/0.9.0/station/."""
+    await page.screenshot(path=str(ST_SHOTS / f"{name}-{board}.png"))
+
+
+def st_windows(a, w, kind=None):
+    """The ten windows' states: '' up to a, then kind ('hinting', 'arrived' or '') up to w, 'closed' after (or all open)."""
+    if kind is None:
+        return [""] * 10
+    return [""] * a + [kind] * (w - a) + ["closed"] * (10 - w)
+
+
+async def st_round(t, page, step, round_, name, shots):
+    """Play a whole round right first time, checking each question's look and words, the right answer, the commander's
+    smile, the sentence and the stars. shots: take the boards' screenshots (question 1, and the first missing whole)."""
+    for qi, q0 in enumerate(round_):
+        q = st_q(step, q0)
+        s = await st_wait(page, ["station-open"], 25)
+        await n_quiet(t)
+        said = await t.said()
+        check(f"station-{step} ({name}): question {qi + 1} ({st_text(q)}, the answer in {q['missing']}) asked: '{st_prompt(step, q, qi)}'",
+              s["qi"] == qi and said[-1:] == [st_prompt(step, q, qi)] and s["stars"] == ",".join(["done"] * qi + ["current"] + ["todo"] * (4 - qi)),
+              json.dumps([said[-1:], s["stars"]]))
+        ans = st_answer(q)
+        if step == "aboard":
+            check(f"station-aboard ({name}): question {qi + 1}: the whole ({q['whole']}) on the tower's screen, a MeeMee in each of the first {q['a']} windows, "
+                  f"{10 - q['a']} waiting on the deck (enough to fill every window), all ten windows open; no track, no hull modules, no sentence",
+                  s["whole"] == str(q["whole"]) and s["fixed"] == q["a"] and s["deck"] == 10 - q["a"] and s["windows"] == st_windows(q["a"], q["whole"])
+                  and not s["track"] and s["bars"] is None and s["sentence"] == "", json.dumps(s))
+            if shots and qi == 0:
+                await st_bring(t, 2)
+                await n_hold(t, *ST_ON_DECK, 790, 560, touch_id=80)        # a third on its way in (board s1ask)
+                await asyncio.sleep(0.2)
+                await st_shot(page, name, "s1ask")
+                x2, y2 = await t.screen(*ST_ON_STATION)
+                await touch(t, "touchMove", [(80, (x2, y2))])
+                await asyncio.sleep(0.05)
+                await touch(t, "touchEnd", [])
+                await asyncio.sleep(0.4)
+                await st_bring(t, q["b"] - 3)
+            else:
+                await st_bring(t, q["b"])
+            s = await st_state(page)
+            check(f"station-aboard ({name}): question {qi + 1}: {q['b']} brought aboard fill the next windows in ten-frame order ({q['a']} to {q['whole'] - 1}), "
+                  f"the ship's lights glow",
+                  sorted(s["aboard"]) == list(range(q["a"], q["whole"])) and s["deck"] == 10 - q["whole"] and s["ready"] and s["phase"] == "station-open", json.dumps(s))
+        else:
+            want = [[q["whole"], False, False, False, str(q["whole"])], [q["a"], False, False, False, str(q["a"])], [q["b"], False, False, False, str(q["b"])]]
+            want[{"whole": 0, "left": 1, "right": 2}[q["missing"]]] = [None, True, False, False, None]
+            if step == "more":
+                check(f"station-more ({name}): question {qi + 1}: the station with a MeeMee in each of the first {q['a']} windows, all open; the hull modules: "
+                      f"the whole {q['whole']}, the part {q['a']} and an empty berth; the track; no sentence",
+                      s["fixed"] == q["a"] and s["windows"] == st_windows(q["a"], q["whole"]) and s["bars"] == want and s["track"] and s["sentence"] == ""
+                      and s["deck"] == 0, json.dumps(s))
+            else:
+                check(f"station-numbers ({name}): question {qi + 1}: the hull modules alone (no station, no windows), the berth in its place ({q['missing']}); the track",
+                      s["windows"] == [] and s["fixed"] == 0 and s["bars"] == want and s["track"] and s["sentence"] == "", json.dumps(s))
+                if shots and q["missing"] != "whole" and qi == 0:
+                    await asyncio.sleep(0.3)
+                    await st_shot(page, name, "s3ten")
+                if shots and q["missing"] == "whole" and qi == 1:
+                    await asyncio.sleep(0.3)
+                    await st_shot(page, name, "s3whole")
+            berth = await st_berth(page)
+            if shots and step == "more" and qi == 0:
+                await n_hold(t, *tile_xy(ans), 580, 584, touch_id=81)          # board s2ask: tile 4 on its way to the berth
+                await st_shot(page, name, "s2ask")
+                x2, y2 = await t.screen(*berth)
+                await touch(t, "touchMove", [(81, (x2, y2))])
+                await asyncio.sleep(0.05)
+                await touch(t, "touchEnd", [])
+                await asyncio.sleep(0.4)
+            else:
+                await t.drag(*tile_xy(ans), berth[0] + 25, berth[1] - 15)
+            s = await st_state(page)
+            tile = await page.evaluate("(n => { const t = MW.station.track().tile(n); return [t.x, t.y]; })(%d)" % ans)
+            check(f"station-{step} ({name}): question {qi + 1}: tile {ans} let go on the berth docks in its middle, the ship's lights glow",
+                  s["placed"] == ans and abs(tile[0] - berth[0]) < 0.6 and abs(tile[1] - berth[1]) < 0.6 and s["ready"], json.dumps([s, tile, berth]))
+        await page.evaluate("window.__stq = performance.now()")
+        await n_check(t)
+        s = await st_state(page)
+        if shots and qi == 0 and step != "numbers":
+            await st_shot(page, name, "s1right" if step == "aboard" else "s2right")
+        if step == "aboard":
+            look = s["windows"] == st_windows(q["a"], q["whole"], "arrived") and s["sparks"] == 5 * q["b"]
+        else:
+            filled = [[q["whole"], False, False, False, str(q["whole"])], [q["a"], False, False, False, str(q["a"])], [q["b"], False, False, False, str(q["b"])]]
+            k = {"whole": 0, "left": 1, "right": 2}[q["missing"]]
+            filled[k] = [ans, False, True, False, str(ans)]
+            look = s["bars"] == filled and not s["track"] and s["placed"] is None
+            if step == "more":
+                look = look and s["windows"] == st_windows(q["a"], q["whole"], "arrived") and s["fixed"] == q["whole"] and s["sparks"] == 5 * q["b"]
+            else:
+                look = look and s["windows"] == [] and s["sparks"] == 5
+        what = {"aboard": "the newcomers' windows glow peach (arrived), the spare windows shut, sparkles at each",
+                "more": f"the berth becomes a hull module showing {ans} with the success ring, {q['b']} MeeMee pop into the empty windows (arrived), "
+                        "the spare windows shut, sparkles, the track slides away",
+                "numbers": f"the berth becomes a hull module showing {ans} with the success ring, sparkles, the track slides away"}[step]
+        blinked = await th_until(page, "MW.events.filter(e => e.type === 'commander' && e.t > window.__stq).length >= 3", 5)
+        faces = await page.evaluate(ST_FACES)
+        check(f"station-{step} ({name}): question {qi + 1}: a tap on Scruffles checks it: right; {what}; the got-it face and the ship's lights; the commander "
+              f"blinks, then smiles (its faces so far: got it, usual, got it)",
+              s["phase"] == "station-celebrate" and s["face"] == "got-it" and s["lights"] and look and blinked and faces == ["got-it", "usual", "got-it"],
+              json.dumps([s, faces]))
+        ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === %s && e.t > window.__stq)" % json.dumps(st_said_sentence(q)), 20)
+        await asyncio.sleep(0.3)
+        s = await st_state(page)
+        if shots and qi == 0 and step != "numbers":
+            await st_shot(page, name, "step1-smile" if step == "aboard" else "step2-smile")
+        said = await t.said()
+        sent = st_said_sentence(q)
+        i = len(said) - 1 - said[::-1].index(sent) if sent in said else -1
+        check(f"station-{step} ({name}): question {qi + 1}: praise, then the sentence shows under the picture ({st_text(q)}, 180, 700) and is said "
+              f"('{sent}'), the commander smiling while it is said",
+              ok and i > 0 and said[i - 1] in ST_PRAISE and s["sentence"] == st_text(q) and s["at"] == ST_UNDER and s["commander"][1] == "got-it", json.dumps([said[-3:], s]))
+        await th_until(page, "MW.events.some(e => e.type === 'commander' && e.detail === 'usual' && e.t > window.__stq) && "
+                             "MW.station.st.commander && MW.station.st.commander.face() === 'usual' && MW.world.st.phase === 'station-celebrate'", 10)
+        faces = await page.evaluate(ST_FACES)
+        check(f"station-{step} ({name}): question {qi + 1}: the commander blinked, then smiled until the sentence was said, then looks as before "
+              f"(got it, usual, got it, usual)", faces == ["got-it", "usual", "got-it", "usual"], json.dumps(faces))
+    s = await st_wait(page, ["station-done"], 25)
+    if shots and step == "aboard":
+        await wait_call(page, "#screen-station-end")
+        await asyncio.sleep(0.1)
+        await st_shot(page, name, "end")                    # board round14-end (the commander's radio, its sparkles still there)
+    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'station-round-another')", 15)
+    said = await page.evaluate("MW.events.filter(e => e.type === 'say' || e.type === 'moment').map(e => e.type + ' ' + e.detail)")
+    at = [said.index(x) if x in said else -1 for x in ("say station-round-done", "moment commander", "say station-round-another")]
+    heard = [await page.evaluate(ST_HEARD + "(%s)" % json.dumps(x)) for x in ("station-round-done", "station-round-another")]
+    check(f"station-{step} ({name}): after five, the end screen: five stars; the game asks for 'All the MeeMee are aboard!', then the commander's moment, "
+          f"then 'Another visit?' (the kit skips each while it is pending, and plays it once recorded)",
+          ok and await page.evaluate("MW.shell.screen") == "screen-station-end" and -1 < at[0] < at[1] < at[2]
+          and all(h is not None and h["skipped"] != h["recorded"] for h in heard)
+          and await page.evaluate("Array.from(document.querySelectorAll('#screen-station-end .mw-stars svg')).map(x => x.dataset.state).join(',')") == ",".join(["done"] * 5),
+          json.dumps([at, said[-4:], heard]))
+
+
+async def test_station_round(p, step, name, vw, vh, dpr):
+    """A whole round of one step, right first time, played by touch, with the boards' screenshots (round 13's ask and
+    right, round 15's smile, round 14's end). Moggles is the commander and Snuffles the lookout, as on the boards."""
+    print(f"\n== MeeMee Station: a round of step {ST_STEPS.index(step) + 1} ({step}, {name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-{step}-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rounds = {"aboard": [{"whole": 7, "a": 3}, {"whole": 5, "a": 1}, {"whole": 9, "a": 4}, {"whole": 2, "a": 1}, {"whole": 10, "a": 6}],
+              "more": [{"whole": 7, "a": 3}, {"whole": 8, "a": 5}, {"whole": 6, "a": 1}, {"whole": 10, "a": 2}, {"whole": 4, "a": 3}],
+              "numbers": [{"whole": 10, "a": 6, "missing": "right"}, {"whole": 9, "a": 5, "missing": "whole"}, {"whole": 6, "a": 2, "missing": "left"},
+                          {"whole": 3, "a": 1, "missing": "right"}, {"whole": 8, "a": 7, "missing": "whole"}]}
+    s = await st_open(t, page, step, rounds[step])
+    said = await t.said()
+    heard = await page.evaluate(ST_HEARD + "('station-round-ready')")
+    check(f"station-{step} ({name}): place 4 opens MeeMee Station in this step: the game asks for 'Let's bring the MeeMee aboard!' (the kit skips it while "
+          f"it is pending, and plays it once recorded), then question 1",
+          s["screen"] == "screen-station-play" and s["step"] == step and s["qi"] == 0 and "station-round-ready" in said
+          and said.index("station-round-ready") < len(said) - 1 and heard is not None and heard["skipped"] != heard["recorded"], json.dumps([s, said[-3:], heard]))
+    check(f"station-{step} ({name}): the commander (Moggles, wearing the commander's badge) stands {'on the deck (1146, 598, 108 wide)' if step == 'aboard' else 'at the track’s right-hand end (1110, 498, 124 wide)'}",
+          s["commander"] == (["moggles", "usual", "commander", 1146, 598, 108] if step == "aboard" else ["moggles", "usual", "commander", 1110, 498, 124]), json.dumps(s["commander"]))
+    await st_round(t, page, step, rounds[step], name, True)
+    saved = await page.evaluate("JSON.parse(localStorage.getItem('mimi-world'))")
+    mine = saved["games"]["station"]["answers"]
+    check(f"station-{step} ({name}): five answers saved in this game's own record for this step, each right first time; MeeMee Rescue's answers untouched",
+          list(mine) == [step] and len(mine[step]) == 5 and all(a["tries"] == 0 and a["hint"] is False for a in mine[step])
+          and [(a["whole"], a["a"], a["missing"]) for a in mine[step]] == [(q["whole"], q["a"], st_q(step, q)["missing"]) for q in rounds[step]]
+          and saved["answers"] == [], json.dumps(saved["games"]["station"])[:300])
+    check(f"station-{step} ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def st_newcomer(page, win):
+    """Step 1: the middle of the newcomer in window win."""
+    return await page.evaluate("(w => { const c = MW.station.st.counters.find(c => c.where === 'aboard' && c.win === w); return c ? [c.x, c.y] : null; })(%d)" % win)
+
+
+async def st_in_order(page):
+    """Step 1: every newcomer at its own window's middle, the windows filled in ten-frame order after those aboard."""
+    return await page.evaluate("""(() => { const R = MW.station, s = R.st, w = R.windows(), list = s.counters.filter(c => c.where === 'aboard').sort((p, q) => p.win - q.win);
+        return list.every((c, i) => c.win === s.q.a + i && Math.abs(c.x - w[c.win].x) < 0.5 && Math.abs(c.y - w[c.win].y) < 0.5)
+            && s.counters.filter(c => c.where === 'deck').every(c => Math.abs(c.x - c.home.x) < 0.5 && Math.abs(c.y - c.home.y) < 0.5); })()""")
+
+
+async def test_station_wrong_aboard(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """Step 1's wrong checks: nothing punishes ("Let's try again." before the hint; after it, only Scruffles's face, as in
+    steps 2 and 3, MeeMee Rescue and Take MeeMee Home); too many has its own line; a MeeMee let go off the station floats
+    back; one taken back out leaves no gap; two wrong checks bring the hint (the newcomers go back to the deck, the
+    windows past the whole shut, and the windows from a + 1 to w light as they are counted on, board s1hint); the child
+    still brings them, and only as many as the whole; a hinted fact isn't right first time. The commander never smiles
+    at a wrong check or the hint."""
+    print(f"\n== MeeMee Station: step 1's wrong checks and the hint ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-wrong-aboard-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await st_open(t, page, "aboard", [{"whole": 7, "a": 3}, {"whole": 5, "a": 2}, {"whole": 6, "a": 4}, {"whole": 8, "a": 2}, {"whole": 4, "a": 1}])
+    await n_quiet(t)
+    await page.evaluate("window.__stq = performance.now()")
+    n0 = len(await t.said())
+    await t.tap(*POD)                                        # none brought yet: too few, tapped twice in quick succession
+    await asyncio.sleep(0.12)
+    await t.tap(*POD)
+    await asyncio.sleep(0.4)
+    s = await st_state(page)
+    waited = await page.evaluate("MW.events.some(e => e.type === 'check' && e.detail === 'still answering')")
+    check(f"station-wrong-aboard ({name}): Scruffles double-tapped with none brought: 'Let's try again.' once, the try-again face, one try (the second "
+          f"tap does nothing while he is answering), no hint",
+          (await t.said())[n0:] == ["again-try-again"] and waited and s["face"] == "try-again" and s["tries"] == 1 and not s["hinted"] and s["phase"] == "station-open",
+          json.dumps(s))
+    await asyncio.sleep(1.8)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): ... and Scruffles is soon thinking again (no red, nothing taken away)", s["face"] == "thinking" and s["fixed"] == 3 and s["deck"] == 7, json.dumps(s))
+    # a MeeMee let go off the station floats back to its place on the deck: not a try, a whoosh, nothing said
+    n0 = len(await t.said())
+    misses = "MW.events.filter(e => e.type === 'drop' && e.detail === 'miss').length"
+    m0 = await page.evaluate(misses)
+    for to in ((600, 590), (30, 300), (430, 560)):
+        await t.drag(*ST_ON_DECK, *to)
+        await asyncio.sleep(0.3)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): MeeMee let go off the station (the sky, left of it, under it) float back to their places on the deck "
+          f"(a miss each, not a try, nothing said)",
+          s["aboard"] == [] and s["deck"] == 7 and await st_in_order(page) and s["tries"] == 1 and (await t.said())[n0:] == [] and await page.evaluate(misses) - m0 == 3,
+          json.dumps(s))
+    # too many: its own line, a try, never the hint
+    await st_bring(t, 6)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): six brought for 7 with 3 aboard fill windows 4 to 9, in ten-frame order (all ten windows are open)",
+          sorted(s["aboard"]) == [3, 4, 5, 6, 7, 8] and await st_in_order(page) and s["windows"] == st_windows(3, 7), json.dumps(s))
+    await n_check(t)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): nine aboard for 7: 'That's too many. Take one back.' (a try, never the hint)",
+          (await t.said())[-1:] == ["too-many"] and s["tries"] == 2 and not s["hinted"] and len(s["aboard"]) == 6, json.dumps(s))
+    await n_quiet(t)
+    # one taken back out from the middle: back to the deck, and the ones after it close up
+    xy = await st_newcomer(page, 5)
+    await t.drag(*xy, 600, 590)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): the newcomer in window 6 taken back off the station goes back to the deck, and the ones after it close up "
+          f"(windows 4 to 8 full, in order, no gap)",
+          sorted(s["aboard"]) == [3, 4, 5, 6, 7] and s["deck"] == 2 and await st_in_order(page), json.dumps(s))
+    for w in (7, 6, 5, 4):
+        await t.drag(*(await st_newcomer(page, w)), 1000, 700)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): four more taken back (let go on the deck) leave one brought, in window 4", s["aboard"] == [3] and s["deck"] == 6, json.dumps(s))
+    # too few: the hint. The newcomer goes back to the deck; the windows past the whole shut; 4 to 7 counted on from 3
+    await n_check(t)
+    s = await st_state(page)
+    said = await t.said()
+    check(f"station-wrong-aboard ({name}): then too few: the hint: 'Let's count on from… three. Four, five, six, seven.'; the newcomer back on the deck, "
+          f"windows 8 to 10 shut, 4 to 7 lit for counting (a ghost in each)",
+          said[-1:] == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"] and s["hinted"] and s["tries"] == 3 and s["aboard"] == []
+          and s["deck"] == 7 and s["windows"] == st_windows(3, 7, "hinting") and s["ghosts"] == 4, json.dumps([said[-1:], s]))
+    await th_until(page, "document.querySelectorAll('#screen-station-play .mw-ghost.is-lit').length >= 2", 8)
+    await st_shot(page, name, "s1hint")
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): ... each window lights as its number is said, and they stay lit; the child still brings them",
+          s["lit"] == 4 and s["phase"] == "station-open" and s["aboard"] == [], json.dumps(s))
+    await st_bring(t, 2)
+    n0 = len(await t.said())
+    await n_check(t)
+    await asyncio.sleep(0.6)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): two brought and a check, too few again after the hint: only the try-again face, nothing said (as in steps 2 "
+          f"and 3, MeeMee Rescue and Take MeeMee Home); the hint stays",
+          (await t.said())[n0:] == [] and s["face"] == "try-again" and s["tries"] == 4 and s["hinted"] and s["lit"] == 4 and s["phase"] == "station-open",
+          json.dumps([(await t.said())[n0:], s]))
+    await asyncio.sleep(1.2)
+    check(f"station-wrong-aboard ({name}): ... and Scruffles is soon thinking again", (await st_state(page))["face"] == "thinking")
+    await st_bring(t, 2)
+    n0 = await page.evaluate("MW.events.filter(e => e.type === 'drop' && e.detail === 'no window').length")
+    await st_bring(t, 1)
+    s = await st_state(page)
+    check(f"station-wrong-aboard ({name}): with the windows past the whole shut, the station takes only the whole: a fifth brought floats back to the deck",
+          sorted(s["aboard"]) == [3, 4, 5, 6] and s["deck"] == 3 and await st_in_order(page)
+          and await page.evaluate("MW.events.filter(e => e.type === 'drop' && e.detail === 'no window').length") == n0 + 1, json.dumps(s))
+    await n_check(t)
+    s = await st_state(page)
+    rec = await page.evaluate("MW.station.answers('aboard').slice(-1)[0]")
+    faces = await page.evaluate(ST_FACES)
+    check(f"station-wrong-aboard ({name}): seven and a tap: right (the newcomers' windows arrived, the spare ones shut, the ghosts gone); saved with "
+          f"4 wrong checks and the hint; the commander smiled only now",
+          s["phase"] == "station-celebrate" and rec["tries"] == 4 and rec["hint"] is True and s["ghosts"] == 0
+          and s["windows"] == st_windows(3, 7, "arrived") and faces[:1] == ["got-it"] and faces.count("got-it") <= 2, json.dumps([s, rec, faces]))
+    # 5 with 2 aboard, right first time; the statuses: 7 with 3 not right first time (no day), 5 with 2 one day
+    await st_wait(page, ["station-open"], 25)
+    await st_bring(t, 3)
+    await n_check(t)
+    await st_wait(page, ["station-celebrate"], 5)
+    days = await page.evaluate("(() => { const m = MW.stationFacts.statuses(MW.station.answers('aboard')); return [m['7:3'].days.length, m['7:3'].status, m['5:2'].days.length]; })()")
+    check(f"station-wrong-aboard ({name}): a hinted fact isn't right first time (7 with 3 aboard: no day towards secure; 5 with 2: one)", days == [0, "practising", 1], json.dumps(days))
+    check(f"station-wrong-aboard ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_station_wrong_more(p, name, vw, vh, dpr):
+    """Step 2's wrong checks: a wrong number floats back and the berth is empty again; a tile let go elsewhere floats
+    back; two wrong checks bring the hint (the windows past the whole shut, the empty ones counted on with ghosts, the
+    berth's counting halo, board s2hint); the number still has to be dragged."""
+    print(f"\n== MeeMee Station: step 2's wrong checks and the hint ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-wrong-more-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await st_open(t, page, "more", [{"whole": 7, "a": 3}, {"whole": 6, "a": 2}, {"whole": 9, "a": 5}, {"whole": 5, "a": 1}, {"whole": 3, "a": 2}])
+    await n_quiet(t)
+    await page.evaluate("window.__stq = performance.now()")
+    berth = await st_berth(page)
+    await t.drag(*tile_xy(5), *berth)
+    s = await st_state(page)
+    check(f"station-wrong-more ({name}): tile 5 on the berth docks there", s["placed"] == 5 and s["ready"], json.dumps(s))
+    await n_check(t)
+    s = await st_state(page)
+    check(f"station-wrong-more ({name}): a wrong number: 'Let's try again.', the try-again face, the tile floats back and the berth is empty again",
+          (await t.said())[-1:] == ["again-try-again"] and s["face"] == "try-again" and s["placed"] is None and s["out"] == [] and s["bars"][2] == [None, True, False, False, None]
+          and s["tries"] == 1 and not s["hinted"] and not s["ready"], json.dumps(s))
+    await asyncio.sleep(1.2)
+    n0 = len(await t.said())
+    # the sky, a window with a MeeMee in it, the station's truss, Scruffles
+    for n, to in ((8, (900, 600)), (6, (260, 174)), (2, (170, 220)), (9, (1030, 300))):
+        await t.drag(*tile_xy(n), *to)
+    s = await st_state(page)
+    check(f"station-wrong-more ({name}): tiles let go in the sky, on a window with a MeeMee in it, on the truss or on Scruffles float back to the track "
+          f"(not a try, nothing said)",
+          s["out"] == [] and s["placed"] is None and s["tries"] == 1 and (await t.said())[n0:] == [], json.dumps(s))
+    got = []
+    mods = await page.evaluate("(() => { const b = MW.station.bars(); return ['whole', 'left'].map(k => [b[k].x + b[k].w / 2, b[k].y + b[k].h / 2]); })()")
+    win = await page.evaluate("(() => { const w = MW.station.windows()[7]; return [w.x, w.y]; })()")
+    for what, to in (("the whole's hull module", mods[0]), ("the part's hull module", mods[1]), ("an empty window", win)):
+        await t.drag(*tile_xy(4), *to)
+        a = await st_state(page)
+        tile = await page.evaluate("(() => { const t = MW.station.track().tile(4); return [t.x, t.y]; })()")
+        await t.drag(*tile, 900, 600)
+        b = await st_state(page)
+        got.append([what, a["placed"], abs(tile[0] - berth[0]) < 0.6 and abs(tile[1] - berth[1]) < 0.6, b["placed"], b["out"]])
+    check(f"station-wrong-more ({name}): a tile let go on the whole's or the part's hull module, or on an empty window, docks in the berth; taken back out, "
+          f"it floats back and the berth is empty again",
+          all(g[1] == 4 and g[2] and g[3] is None and g[4] == [] for g in got) and (await st_state(page))["tries"] == 1, json.dumps(got))
+    # the second wrong number: the hint
+    await t.drag(*tile_xy(2), *berth)
+    await n_check(t)
+    s = await st_state(page)
+    said = await t.said()
+    check(f"station-wrong-more ({name}): a second wrong number: 'Let's count on from… three. Four, five, six, seven.'; windows 8 to 10 shut, 4 to 7 lit "
+          f"for counting (a ghost in each), the berth's counting halo",
+          said[-1:] == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"] and s["hinted"] and s["tries"] == 2
+          and s["windows"] == st_windows(3, 7, "hinting") and s["ghosts"] == 4 and s["bars"][2] == [None, True, False, True, None], json.dumps([said[-1:], s]))
+    await th_until(page, "document.querySelectorAll('#screen-station-play .mw-ghost.is-lit').length >= 3", 8)
+    await st_shot(page, name, "s2hint")
+    await n_quiet(t)
+    await asyncio.sleep(0.3)
+    s = await st_state(page)
+    check(f"station-wrong-more ({name}): ... the windows light as they are counted on, and stay lit until the number is dragged",
+          s["lit"] == 4 and s["phase"] == "station-open" and s["placed"] is None and await page.evaluate(ST_FACES) == [], json.dumps(s))
+    await t.drag(*tile_xy(4), *berth)
+    await n_check(t)
+    s = await st_state(page)
+    rec = await page.evaluate("MW.station.answers('more').slice(-1)[0]")
+    check(f"station-wrong-more ({name}): tile 4: right; the ghosts gone, the berth a hull module showing 4 (no halo now); saved with 2 wrong checks and the hint",
+          s["phase"] == "station-celebrate" and s["ghosts"] == 0 and s["bars"][2] == [4, False, True, False, "4"] and rec["tries"] == 2 and rec["hint"] is True,
+          json.dumps([s, rec]))
+    check(f"station-wrong-more ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_station_wrong_numbers(p, name, vw, vh, dpr):
+    """Step 3's hints, by where the berth is (board s3hint): a small station hangs under the modules; a part missing,
+    the given part's MeeMee fill its first windows and the rest are counted on; the whole missing, both parts' MeeMee fill
+    them and every one is counted. Hear-again cuts a hint short; the next wrong number gives it again in full; a right
+    answer, and the small station fades away."""
+    print(f"\n== MeeMee Station: step 3's wrong checks and the hints ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-wrong-numbers-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rnd = [{"whole": 10, "a": 6, "missing": "right"}, {"whole": 9, "a": 5, "missing": "whole"}, {"whole": 7, "a": 4, "missing": "left"},
+           {"whole": 3, "a": 1, "missing": "right"}, {"whole": 4, "a": 2, "missing": "left"}]
+    await st_open(t, page, "numbers", rnd)
+
+    async def wrong(*tiles):
+        for n in tiles:
+            await n_quiet(t)
+            await t.drag(*tile_xy(n), *(await st_berth(page)))
+            await n_check(t)
+
+    # 10 = 6 + ?: the small station; 6 MeeMee in its first windows; 7 to 10 counted on
+    await wrong(2, 5)
+    s = await st_state(page)
+    check(f"station-wrong-numbers ({name}): 10 with 6 aboard, the rest missing, two wrong numbers: a small station under the modules, 6 MeeMee in its first "
+          f"windows, 7 to 10 lit for counting; 'Let's count on from… six. Seven, eight, nine, ten.'; the berth's counting halo",
+          s["hinted"] and s["hintStation"] and s["hintMimi"] == 6 and s["windows"] == st_windows(6, 10, "hinting") and s["ghosts"] == 4
+          and s["bars"][2][3] and (await t.said())[-1:] == ["q-count-on-from num-end-6 num-mid-7 num-mid-8 num-mid-9 num-end-10"], json.dumps(s))
+    await th_until(page, "document.querySelectorAll('#screen-station-play .mw-ghost.is-lit').length >= 2", 8)
+    await st_shot(page, name, "s3hint")
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.5)
+    s = await st_state(page)
+    check(f"station-wrong-numbers ({name}): Hear-again during the hint takes it away (the small station and its MeeMee gone, no ghosts, no halo); the question again",
+          not s["hinted"] and not s["hintStation"] and s["hintMimi"] == 0 and s["ghosts"] == 0 and not s["bars"][2][3]
+          and (await t.said())[-1:] == [st_prompt("numbers", rnd[0], 0)], json.dumps(s))
+    await wrong(3)
+    s = await st_state(page)
+    check(f"station-wrong-numbers ({name}): the next wrong number gives the hint again in full", s["hinted"] and s["hintMimi"] == 6 and s["ghosts"] == 4 and s["tries"] == 3, json.dumps(s))
+    await n_quiet(t)
+    await t.drag(*tile_xy(4), *(await st_berth(page)))
+    await n_check(t)
+    s = await st_state(page)
+    gone = await page.evaluate("[!!document.querySelector('#screen-station-play .station-hint.is-gone'), document.querySelectorAll('#screen-station-play .mw-counters .mw-mimi.is-rescued').length]")
+    check(f"station-wrong-numbers ({name}): tile 4: right; the berth shows 4 with the success ring; the hint's small station and its MeeMee fade away",
+          s["phase"] == "station-celebrate" and s["bars"][2] == [4, False, True, False, "4"] and gone == [True, 6], json.dumps([s, gone]))
+    # 9 = 5 + 4, the whole missing: both parts' MeeMee in the small station, all counted
+    await st_wait(page, ["station-open"], 25)
+    hops0 = await page.evaluate("MW.events.filter(e => e.type === 'hint').length")
+    await wrong(8, 7)
+    s = await st_state(page)
+    check(f"station-wrong-numbers ({name}): 5 and 4, the whole missing, two wrong numbers: both parts' MeeMee fill the small station's first 9 windows (the "
+          f"tenth shut); 'Count them with me. One… nine.'; the whole's berth with the counting halo",
+          s["hinted"] and s["hintMimi"] == 9 and s["windows"] == [""] * 9 + ["closed"] and s["ghosts"] == 0 and s["bars"][0][3]
+          and (await t.said())[-1:] == ["again-count-with-me " + " ".join(f"num-mid-{i}" for i in range(1, 9)) + " num-end-9"]
+          and await page.evaluate("MW.events.filter(e => e.type === 'hint').length") == hops0 + 1, json.dumps(s))
+    await n_quiet(t)
+    hopped = await page.evaluate("document.querySelectorAll('#screen-station-play .mw-counters .mw-mimi.is-hop').length")
+    check(f"station-wrong-numbers ({name}): ... every MeeMee hops as it is counted", hopped == 9, str(hopped))
+    await asyncio.sleep(0.3)
+    await st_shot(page, name, "s3hint-whole")
+    await t.drag(*tile_xy(9), *(await st_berth(page)))
+    await n_check(t)
+    check(f"station-wrong-numbers ({name}): tile 9 completes it", (await st_state(page))["phase"] == "station-celebrate")
+    # ? + 3 = 7, the part aboard missing: the rest's 3 MeeMee, counted on from 3
+    await st_wait(page, ["station-open"], 25)
+    await n_quiet(t)
+    check(f"station-wrong-numbers ({name}): 7 with the part aboard missing asked: 'Let's make… seven. We've got… three. How many more?'",
+          (await t.said())[-1:] == [st_prompt("numbers", rnd[2], 2)], json.dumps((await t.said())[-1:]))
+    await wrong(1, 2)
+    s = await st_state(page)
+    check(f"station-wrong-numbers ({name}): ... two wrong numbers: the rest's 3 MeeMee in the small station, 4 to 7 counted on from 3, the part's berth with its halo",
+          s["hinted"] and s["hintMimi"] == 3 and s["windows"] == st_windows(3, 7, "hinting") and s["bars"][1][3]
+          and (await t.said())[-1:] == ["q-count-on-from num-end-3 num-mid-4 num-mid-5 num-mid-6 num-end-7"], json.dumps(s))
+    await n_quiet(t)
+    await t.drag(*tile_xy(4), *(await st_berth(page)))
+    await n_check(t)
+    rec = await page.evaluate("MW.station.answers('numbers').slice(-1)[0]")
+    check(f"station-wrong-numbers ({name}): tile 4: right; saved as 7 with 4 aboard, the berth in the part aboard's place, 2 wrong checks and the hint",
+          (await st_state(page))["phase"] == "station-celebrate" and [rec["whole"], rec["a"], rec["missing"], rec["tries"], rec["hint"]] == [7, 4, "left", 2, True], json.dumps(rec))
+    check(f"station-wrong-numbers ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_station_drag(p, name="fire", vw=1046, vh=653, dpr=1.22):
+    """Step 1: a MeeMee let go anywhere on the station (its box, 40, 100 to 820, 500) goes into the next empty window, with
+    the snap and a pop; just off it, it floats back; a newcomer can be picked up again (let go on the station it stays,
+    off it, it goes back and the others close up); those already aboard can't be; a touch anywhere on the deck picks up
+    the nearest. Steps 2 and 3: a tile on the berth docks there, taken out the berth is empty again, another replaces it.
+    The new lines join once recorded and are left out while pending."""
+    print(f"\n== MeeMee Station: dragging and dropping ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-drag-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await page.evaluate("MW.station.ask({ whole: 6, a: 2 }, 'aboard')")
+    pops = "MW.events.filter(e => e.type === 'sfx' && e.detail === 'pop').length"
+    got = []
+    for i, pt in enumerate(((45, 105), (815, 105), (45, 495), (815, 495), (430, 150), (80, 300), (650, 430))):
+        p0 = await page.evaluate(pops)
+        await t.drag(*ST_ON_DECK, *pt)
+        s = await st_state(page)
+        got.append([pt, sorted(s["aboard"]) == list(range(2, 3 + i)), await page.evaluate(pops) - p0])
+    check(f"station-drag ({name}): MeeMee let go anywhere on the station (its box's four corners, the tower, a wing, between windows) each go into the "
+          f"next empty window in ten-frame order, with a pop",
+          all(g[1] and g[2] == 1 for g in got) and await st_in_order(page), json.dumps(got))
+    n0, said0 = await page.evaluate("MW.events.filter(e => e.type === 'drop' && e.detail === 'miss').length"), len(await t.said())
+    for pt in ((34, 300), (826, 300), (430, 94), (430, 506)):
+        await t.drag(*ST_ON_DECK, *pt)
+    s = await st_state(page)
+    check(f"station-drag ({name}): just off the station (6 px outside its box on each side) a MeeMee floats back to the deck (a miss, not a try, nothing said)",
+          sorted(s["aboard"]) == list(range(2, 9)) and s["deck"] == 1 and await st_in_order(page) and s["tries"] == 0 and len(await t.said()) == said0
+          and await page.evaluate("MW.events.filter(e => e.type === 'drop' && e.detail === 'miss').length") == n0 + 4, json.dumps(s))
+    await t.drag(*ST_ON_DECK, *ST_ON_STATION)
+    s = await st_state(page)
+    check(f"station-drag ({name}): all ten windows are open: the last MeeMee fills the tenth (the child can bring too many)", sorted(s["aboard"]) == list(range(2, 10)) and s["deck"] == 0, json.dumps(s))
+    await t.drag(*(await st_newcomer(page, 5)), 300, 200)
+    s = await st_state(page)
+    check(f"station-drag ({name}): a newcomer picked up from its window and let go on the station stays in its window", sorted(s["aboard"]) == list(range(2, 10)) and await st_in_order(page), json.dumps(s))
+    home = await page.evaluate("(() => { const c = MW.station.st.counters.find(c => c.where === 'aboard' && c.win === 4); window.__out = c; return [c.home.x, c.home.y]; })()")
+    await t.drag(*(await st_newcomer(page, 4)), 1000, 700)
+    s = await st_state(page)
+    back = await page.evaluate("[window.__out.where, Math.round(window.__out.x), Math.round(window.__out.y)]")
+    check(f"station-drag ({name}): taken from the middle (window 5) and let go off the station, it goes back to its own place on the deck, and the ones after it close up",
+          sorted(s["aboard"]) == list(range(2, 9)) and s["deck"] == 1 and back == ["deck", round(home[0]), round(home[1])] and await st_in_order(page), json.dumps([s, back]))
+    await t.drag(212, 324, 1000, 700)                       # a MeeMee already aboard (window 1): not one to drag
+    s = await st_state(page)
+    check(f"station-drag ({name}): the MeeMee already aboard can't be picked up", s["fixed"] == 2 and sorted(s["aboard"]) == list(range(2, 9)) and s["deck"] == 1, json.dumps(s))
+    # a touch anywhere on the deck (its empty right-hand end, by the commander) picks up the nearest waiting MeeMee
+    await t.drag(1110, 730, *ST_ON_STATION)
+    s = await st_state(page)
+    check(f"station-drag ({name}): a touch anywhere on the deck picks up the waiting MeeMee nearest the finger", sorted(s["aboard"]) == list(range(2, 10)) and s["deck"] == 0, json.dumps(s))
+    # taps on the deck (a child touching the MeeMee to count them) say nothing and log no miss
+    await page.evaluate("MW.station.ask({ whole: 6, a: 2 }, 'aboard')")
+    n0, said0 = await page.evaluate("MW.events.filter(e => e.type === 'drop' && e.detail === 'miss').length"), len(await t.said())
+    for pt in ((772, 652), (852, 652), (812, 722), (1000, 700)):
+        await t.tap(*pt)
+        await asyncio.sleep(0.3)
+    check(f"station-drag ({name}): taps on the deck say nothing, log no miss, and every MeeMee is back in its place",
+          await page.evaluate("MW.events.filter(e => e.type === 'drop' && e.detail === 'miss').length") == n0 and len(await t.said()) == said0 and await st_in_order(page)
+          and (await st_state(page))["deck"] == 8)
+
+    # steps 2 and 3: the berth
+    for step, q in (("more", {"whole": 7, "a": 3}), ("numbers", {"whole": 7, "a": 4, "missing": "left"}), ("numbers", {"whole": 9, "a": 5, "missing": "whole"}),
+                    ("numbers", {"whole": 10, "a": 6, "missing": "right"})):
+        await page.evaluate("(a) => MW.station.ask(a[0], a[1])", [q, step])
+        await asyncio.sleep(0.4)
+        qq = st_q(step, q)
+        ans = st_answer(qq)
+        berth = await st_berth(page)
+        label = f"{step}, {st_text(qq)} with the berth in {qq['missing']}"
+        await t.drag(*tile_xy(ans), *berth)
+        a = await st_state(page)
+        tile = await page.evaluate("(n => { const t = MW.station.track().tile(n); return [t.x, t.y]; })(%d)" % ans)
+        await t.drag(*tile, 900, 600)
+        b = await st_state(page)
+        wrong_n = (ans + 1) % 11
+        await t.drag(*tile_xy(wrong_n), *berth)
+        await t.drag(*tile_xy(ans), berth[0] - 30, berth[1] + 20)
+        c = await st_state(page)
+        check(f"station-drag ({name}): {label}: a tile on the berth docks in its middle; taken out, it floats back and the berth is empty again; another "
+              f"replaces the first, which floats back",
+              a["placed"] == ans and abs(tile[0] - berth[0]) < 0.6 and abs(tile[1] - berth[1]) < 0.6 and b["placed"] is None and b["out"] == []
+              and c["placed"] == ans and c["out"] == [ans], json.dumps([a["placed"], tile, berth, b["placed"], c["placed"], c["out"]]))
+    # "Bring more MeeMee aboard.", "Find the number." and "All aboard!" join the first two questions and the praise once
+    # they are recorded (stubbed); while they are pending they are left out, so nothing falls silent
+    lines = await page.evaluate("""(() => { const R = MW.station, out = {}, three = ['station-bring-aboard', 'station-find-number', 'station-all-aboard'];
+        const was = MW.audio.recorded;
+        const look = () => [R.ask({ whole: 7, a: 3 }, 'aboard') && R.st.prompt.slice(-2), R.ask({ whole: 7, a: 3 }, 'more') && R.st.prompt.slice(-2),
+                            R.ask({ whole: 7, a: 3, missing: 'whole' }, 'numbers') && R.st.prompt.slice(-2), R.praiseLines()];
+        out.onPage = three.map(id => was(id));
+        MW.audio.recorded = id => three.indexOf(id) < 0 && was(id);
+        try { out.pending = look(); } finally { MW.audio.recorded = was; }
+        MW.audio.recorded = id => three.indexOf(id) >= 0 || was(id);
+        try { out.recorded = look(); } finally { MW.audio.recorded = was; }
+        MW.world.home(); return out; })()""")
+    praise = ["praise-found-it", "praise-thats-right", "praise-super-counting", "praise-well-done"]
+    check(f"station-drag ({name}): while pending (as on this page: {lines['onPage']}; stubbed either way), 'Bring more MeeMee aboard.', 'Find the number.' "
+          f"and 'All aboard!' are left out (so nothing falls silent)",
+          lines["pending"] == [[["q-weve-got", "num-end-3"], ["tap-scruffles"]], [["q-how-many-more"], ["tap-scruffles"]], [["q-how-many-altogether"], ["tap-scruffles"]], praise],
+          json.dumps(lines["pending"]))
+    check(f"station-drag ({name}): once recorded (stubbed), they join: step 1's first questions end 'Bring more MeeMee aboard. Tap Scruffles…', steps 2 and 3's "
+          f"'Find the number. Tap Scruffles…', and 'All aboard!' is one of the praise",
+          lines["recorded"] == [[["station-bring-aboard"], ["tap-scruffles"]], [["station-find-number"], ["tap-scruffles"]], [["station-find-number"], ["tap-scruffles"]],
+                                praise + ["station-all-aboard"]], json.dumps(lines["recorded"]))
+    check(f"station-drag ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_station_questions(p):
+    """Every question each step can ask is put on the screen and answered (a wrong one refused first): 45, 45 and 135.
+    Rounds bring up every question; five each, one or two secure, at most two from one whole, never the same whole twice
+    in a row; in step 3 the berth's place spread 2, 2 and 1 a round and about a third each; the wholes in play come up
+    equally (no weighting). Writes notes/all-questions-station.md."""
+    print("\n== MeeMee Station: every question ==")
+    browser = await p.chromium.launch()
+    ctx, page, problems = await seeded(browser, [])
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    for step in ST_STEPS:
+        qs = await E("(s) => MW.stationFacts.allQuestions(s, [2,3,4,5,6,7,8,9,10])", step)
+        out = await E("""(a) => { const R = MW.station, out = [], step = a[0];
+            a[1].forEach(q => { R.ask(q, step); const s = R.st, tr = R.track(), b = R.bars(), wh = document.querySelector('#screen-station-play .station-whole');
+              const o = { q: q, prompt: s.prompt, fixed: s.fixed.length, deck: s.counters.filter(c => c.where === 'deck').length,
+                          whole: wh ? wh.textContent : null, windows: R.windows().length,
+                          bars: b ? ['whole', 'left', 'right'].map(k => b[k].value) : null, waiting: b ? ['whole', 'left', 'right'].filter(k => b[k].el.classList.contains('is-waiting')) : null };
+              if (step === 'aboard') {
+                R.podTap(); o.wrong = [s.tries, MW.world.st.phase];             // none brought: a wrong check
+                s.talking = false;                                               // as once Scruffles is quiet
+                s.counters.filter(m => m.where === 'deck').slice(0, q.whole - q.a).forEach(m => R.drop(m, 430, 300, false));
+              } else {
+                const m = s.berth, x = m.x + m.w / 2, y = m.y + m.h / 2;
+                R.drop(tr.tile((s.answer + 1) % 11), x, y, false); R.podTap();
+                o.wrong = [s.tries, s.placed, tr.tile((s.answer + 1) % 11).out()];
+                s.talking = false;
+                R.drop(tr.tile(s.answer), x, y, false);
+              }
+              R.podTap();
+              const rec = R.answers(step).slice(-1)[0];
+              o.right = [MW.world.st.phase, s.answer, step === 'aboard' ? s.counters.filter(c => c.where === 'aboard').length : s.berth.value,
+                         step === 'aboard' ? null : s.berth.el.classList.contains('is-success')];
+              o.rec = [rec.whole, rec.a, rec.missing];
+              out.push(o); });
+            MW.world.home(); return out; }""", [step, qs])
+        bad = []
+        for o in out:
+            q = o["q"]
+            ans = st_answer(q)
+            p_ok = " ".join(" ".join(x) for x in o["prompt"]) == st_prompt(step, q, 0)
+            if step == "aboard":
+                look = o["whole"] == str(q["whole"]) and o["fixed"] == q["a"] and o["deck"] == 10 - q["a"] and o["windows"] == 10 and o["bars"] is None
+                wrong = o["wrong"] == [1, "station-open"]
+                right = o["right"] == ["station-celebrate", q["b"], q["b"], None]
+            else:
+                vals = [q["whole"], q["a"], q["b"]]
+                vals[("whole", "left", "right").index(q["missing"])] = None
+                look = o["bars"] == vals and o["waiting"] == [q["missing"]] and o["fixed"] == (q["a"] if step == "more" else 0) and o["whole"] is None \
+                    and o["windows"] == (10 if step == "more" else 0)
+                wrong = o["wrong"] == [1, None, False]
+                right = o["right"] == ["station-celebrate", ans, ans, True]
+            if not (p_ok and look and wrong and right and o["rec"] == [q["whole"], q["a"], q["missing"]]):
+                bad.append(o)
+        label = {"aboard": "step 1 (bring them aboard): 45", "more": "step 2 (how many more): 45", "numbers": "step 3 (numbers): 45 with the berth in each of its 3 places, 135"}[step]
+        check(f"station-questions: every question of {label} on the screen as its step shows it, asked in its words, answered (a wrong check refused first)",
+              len(out) == {"aboard": 45, "more": 45, "numbers": 135}[step] and not bad, json.dumps(bad[:2]))
+
+    # rounds: every question comes up (every berth place in step 3)
+    rounds = """(a) => { const out = []; for (let i = 0; i < a.n; i++) out.push(MW.stationFacts.pickRound({ step: a.step, wholes: a.wholes || [2,3,4,5,6,7,8,9,10],
+        answers: a.answers || [], size: 5, turn: i * 5 })); return out; }"""
+    seen = {}
+    for step in ST_STEPS:
+        rs = await E(rounds, {"step": step, "n": 3000})
+        qs = [q for r in rs for q in r]
+        seen[step] = (rs, qs)
+        keys = {(q["whole"], q["a"], q["missing"]) for q in qs}
+        want = 135 if step == "numbers" else 45
+        check(f"station-questions: {step} rounds bring up every question ({want}), no zero facts",
+              len(keys) == want and all(1 <= q["a"] < q["whole"] and q["b"] == q["whole"] - q["a"] for q in qs), str(len(keys)))
+        check(f"station-questions: {step}: every round has five, at most two from one whole, never the same whole twice in a row",
+              all(len(r) == 5 and max(sum(1 for q in r if q["whole"] == w) for w in range(2, 11)) <= 2 and all(r[i]["whole"] != r[i - 1]["whole"] for i in range(1, 5)) for r in rs))
+    rs, qs = seen["numbers"]
+    spread = [sorted(sum(1 for q in r if q["missing"] == m) for m in ("whole", "left", "right")) for r in rs]
+    share = {m: sum(1 for q in qs if q["missing"] == m) / len(qs) for m in ("whole", "left", "right")}
+    check("station-questions: step 3 spreads the berth's place: 2, 2 and 1 in every round, and about a third each across rounds",
+          all(x == [1, 2, 2] for x in spread) and all(abs(v - 1 / 3) < 0.01 for v in share.values()), json.dumps(share))
+    rs, qs = seen["aboard"]
+    per = {w: sum(1 for q in qs if q["whole"] == w) / len(qs) for w in range(2, 11)}
+    check("station-questions: the wholes in play come up equally (no weighting): each of 2 to 10 in about a ninth of the questions (whole 2's one fact as "
+          "often as whole 10's nine together)", all(abs(v - 1 / 9) < 0.02 for v in per.values()), json.dumps({k: round(v, 3) for k, v in per.items()}))
+    # one or two secure facts a round once some are secure: 7's six facts secure in step 1
+    sec = [{"t": T0 + d * DAY + i * 1000, "whole": 7, "a": a, "missing": "right", "tries": 0, "misses": 0, "hint": False} for d in range(3) for i, a in enumerate(range(1, 7))]
+    rs = await E(rounds, {"step": "aboard", "n": 400, "answers": sec})
+    counts = sorted({sum(1 for q in r if q["status"] == "secure") for r in rs})
+    check("station-questions: with some facts secure, every round has one or two of them, the rest practising or not met", counts == [1, 2], str(counts))
+    few = await E(rounds, {"step": "aboard", "n": 200, "wholes": [3, 5]})
+    check("station-questions: only the wholes in play (3 and 5) come up", {q["whole"] for r in few for q in r} == {3, 5})
+    small = await E("() => MW.stationFacts.pickRound({ step: 'more', wholes: [2], answers: [], size: 5 })")
+    check("station-questions: only 2 in play still makes a round (1 + 1 five times)", len(small) == 5 and all(q["whole"] == 2 and q["a"] == 1 for q in small), json.dumps(small))
+
+    # notes/all-questions-station.md
+    allq = {step: await E("(s) => MW.stationFacts.allQuestions(s, [2,3,4,5,6,7,8,9,10])", step) for step in ST_STEPS}
+
+    def words(step, q):
+        if step == "numbers" and q["missing"] == "whole":
+            return f"We've got… {TH_N[q['a']]}… and {TH_N[q['b']]}. How many altogether?"
+        given = q["b"] if step == "numbers" and q["missing"] == "left" else q["a"]
+        return f"Let's make… {TH_N[q['whole']]}. We've got… {TH_N[given]}." + (" How many more?" if step != "aboard" else "")
+    lines = ["# Every question MeeMee Station can ask", "",
+             "Made by tools/tests/test_game.py from the game's own list (MW.stationFacts.allQuestions); don't edit it by hand.",
+             "Step 1 (bring them aboard): the whole is on the station's tower and the MeeMee already aboard are in the first windows; the",
+             "child brings the rest from the deck, then taps Scruffles. Step 2 (how many more): the child drags a number tile into the",
+             "empty berth of the bar model. Step 3 (numbers): the bar model alone, the empty berth in any of its three places. The first",
+             "two questions of a round also say \"Bring more MeeMee aboard.\" (step 1) or \"Find the number.\" (steps 2 and 3), and \"Tap",
+             "Scruffles when you're ready.\" Every right answer is said as MeeMee Rescue's sentence: \"Three and four make seven.\"", ""]
+    for step, title in (("aboard", "Step 1: Bring them aboard"), ("more", "Step 2: How many more"), ("numbers", "Step 3: Numbers")):
+        lines += [f"## {title} ({len(allq[step])} questions)", ""]
+        if step == "aboard":
+            lines += ["| Whole | Already aboard | MeeMee to bring | Number sentence, once right | What Scruffles says |", "|---|---|---|---|---|"]
+            lines += [f"| {q['whole']} | {q['a']} | {q['b']} | {st_text(q)} | {words(step, q)} |" for q in allq[step]]
+        else:
+            lines += ["| Whole | Bar model (? is the berth) | Answer | What Scruffles says |", "|---|---|---|---|"]
+            for q in allq[step]:
+                v = [str(q["whole"]), str(q["a"]), str(q["b"])]
+                v[("whole", "left", "right").index(q["missing"])] = "?"
+                lines.append(f"| {q['whole']} | {v[0]} = {v[1]} + {v[2]} | {st_answer(q)} | {words(step, q)} |")
+        lines.append("")
+    (ROOT / "notes" / "all-questions-station.md").write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    print(f"   wrote notes/all-questions-station.md ({', '.join(f'{s}: {len(allq[s])}' for s in ST_STEPS)})")
+    check("station-questions: the list has 45, 45 and 135 questions", [len(allq[s]) for s in ST_STEPS] == [45, 45, 135])
+    check("station-questions: no console errors", not problems, "; ".join(problems[:3]))
+    await ctx.close()
+    await browser.close()
+
+
+ST_ANSWER = """(a) => { const R = MW.station; R.ask(a.q, a.step); const s = R.st, tr = R.track();
+    if (a.step === 'aboard') {
+      if (a.wrong) R.podTap();                                // none brought: a wrong check
+      s.counters.filter(m => m.where === 'deck').slice(0, a.q.whole - a.q.a).forEach(m => R.drop(m, 430, 300, false));
+    } else {
+      const m = s.berth, x = m.x + m.w / 2, y = m.y + m.h / 2;
+      if (a.wrong) { R.drop(tr.tile((s.answer + 1) % 11), x, y, false); R.podTap(); }
+      R.drop(tr.tile(s.answer), x, y, false);
+    }
+    s.talking = false;                                       // as once Scruffles is quiet: a tap while he answers does nothing
+    R.podTap(); const out = MW.world.st.phase; MW.world.home(); return out; }"""
+ST_STATUS = "(a) => { const m = MW.stationFacts.statuses(MW.station.answers(a[0])); const s = m[a[1]]; return s ? s.status : 'notyet'; }"
+
+
+async def test_station_progress(p):
+    """Secure: right first time on three different days (the date faked in the page); a wrong answer moves a fact back to
+    practising. Each step keeps its own records; in step 3 a fact counts whichever place its berth was in. MeeMee
+    Rescue's progress is untouched by this game, and this game's by MeeMee Rescue."""
+    print("\n== MeeMee Station: progress ==")
+    browser = await p.chromium.launch()
+    rescue = secure_answers([(7, 3)]) + [ans(T0 + DAY, 5, 1, first=False)]
+    ctx, page, problems = await seeded(browser, rescue)
+    E = lambda js, arg=None: page.evaluate(js, arg)
+    await E("window.__now = %d; Date.now = () => window.__now" % T0)
+    got = []
+    for d in range(3):
+        await E("window.__now = %d" % (T0 + d * DAY + 3600_000))
+        got.append(await E(ST_ANSWER, {"q": {"whole": 7, "a": 3}, "step": "aboard"}))
+        got.append(await E(ST_STATUS, ["aboard", "7:3"]))
+    check("station-progress: 7 with 3 aboard right first time on three different days (step 1): practising, practising, then secure",
+          got == ["station-celebrate", "practising", "station-celebrate", "practising", "station-celebrate", "secure"], json.dumps(got))
+    for i in range(3):
+        await E("window.__now = %d" % (T0 + i * 60_000))
+        await E(ST_ANSWER, {"q": {"whole": 8, "a": 2}, "step": "aboard"})
+    check("station-progress: three times right on one day is still practising", await E(ST_STATUS, ["aboard", "8:2"]) == "practising")
+    await E("window.__now = %d" % (T0 + 3 * DAY))
+    await E(ST_ANSWER, {"q": {"whole": 7, "a": 3}, "step": "aboard", "wrong": True})
+    check("station-progress: a wrong answer moves 7 with 3 aboard back to practising", await E(ST_STATUS, ["aboard", "7:3"]) == "practising")
+    check("station-progress: 7 with 4 aboard (4 + 3) is a fact of its own (not yet), not 3 + 4", await E(ST_STATUS, ["aboard", "7:4"]) == "notyet")
+    sep = await E("[MW.station.answers('more').length, MW.station.answers('numbers').length, MW.station.answers('aboard').length]")
+    check("station-progress: each step keeps its own records: step 1's answers are in step 1's only", sep == [0, 0, 7], str(sep))
+    for d, gap in enumerate(("right", "whole", "left")):
+        await E("window.__now = %d" % (T0 + (5 + d) * DAY))
+        await E(ST_ANSWER, {"q": {"whole": 7, "a": 3, "missing": gap}, "step": "numbers"})
+    check("station-progress: in step 3, 7 with 3 aboard right first time on three days with its berth in a different place each day is secure",
+          await E(ST_STATUS, ["numbers", "7:3"]) == "secure" and await E(ST_STATUS, ["aboard", "7:3"]) == "practising" and await E(ST_STATUS, ["more", "7:3"]) == "notyet")
+    for d in range(3):
+        await E("window.__now = %d" % (T0 + (9 + d) * DAY))
+        await E(ST_ANSWER, {"q": {"whole": 6, "a": 1}, "step": "more"})
+    check("station-progress: step 2 counts the same way, on its own", await E(ST_STATUS, ["more", "6:1"]) == "secure" and await E(ST_STATUS, ["aboard", "6:1"]) == "notyet")
+    saved = await E("JSON.parse(localStorage.getItem('mimi-world'))")
+    stn = saved["games"]["station"]
+    check("station-progress: saved on the tablet in this game's own record, one list per step; MeeMee Rescue's answers untouched",
+          sorted(stn["answers"]) == ["aboard", "more", "numbers"] and saved["answers"] == rescue and "takehome" not in saved["games"], json.dumps(sorted(stn)))
+    before = json.dumps(stn, sort_keys=True)
+    await E("""(() => { MW.store.setting('answerMode', 'numbers'); MW.store.setting('check', 'auto'); MW.rescue.ask({ whole: 5, left: 2, right: 3, missing: 'right' });
+        MW.rescue.drop(MW.rescue.track().tile(3), 550, 470, false); MW.world.home(); })()""")
+    saved = await E("JSON.parse(localStorage.getItem('mimi-world'))")
+    check("station-progress: a MeeMee Rescue answer is saved with MeeMee Rescue's, and this game's progress is as it was",
+          len(saved["answers"]) == len(rescue) + 1 and json.dumps(saved["games"]["station"], sort_keys=True) == before, str(len(saved["answers"])))
+    # MeeMee Rescue's Clear (its Progress tab) leaves this game's progress alone
+    await E("MW.grownups.openPanel(); MW.grownups.show('progress')")
+    await asyncio.sleep(0.3)
+    await page.click("text=Clear this tablet's progress")
+    await page.click("text=Tap again to clear")
+    await asyncio.sleep(0.3)
+    after = await E("[MW.store.get('answers').length, MW.store.peek('station')]")
+    await E("MW.grownups.close()")
+    check("station-progress: MeeMee Rescue's 'Clear this tablet's progress' clears its answers only; this game's progress stays as it was",
+          after[0] == 0 and json.dumps(after[1], sort_keys=True) == before, str(after[0]))
+    # a tablet that has never played this game keeps nothing for it (reading its tab doesn't create it)
+    ctx2, page2, problems2 = await seeded(browser, rescue)
+    await page2.evaluate("MW.grownups.openPanel(); MW.grownups.show('station-tab')")
+    await asyncio.sleep(0.3)
+    kept = await page2.evaluate("(() => { MW.store.save(); return JSON.parse(localStorage.getItem('mimi-world')).games; })()")
+    check("station-progress: opening the Station tab on a tablet that has never played keeps nothing for the game", "station" not in kept, json.dumps(kept))
+    check("station-progress: no console errors", not (problems or problems2), "; ".join((problems + problems2)[:3]))
+    await ctx2.close()
+    await ctx.close()
+    await browser.close()
+
+
+ST_TAB = """(() => { const b = document.querySelector('.gu-body'), g = {};
+    b.querySelectorAll('.gu-grid .mw-cell').forEach(c => { g[c.textContent.trim()] = c.className.split(' ').find(x => x.startsWith('is-')); });
+    return { tabs: Array.from(document.querySelectorAll('.gu-tab')).map(x => x.textContent), on: (document.querySelector('.gu-tab.is-on') || {}).textContent,
+             h3: Array.from(b.querySelectorAll('.gu-h3')).map(h => h.textContent),
+             steps: Array.from(b.querySelectorAll('[data-step]')).map(x => [x.textContent, x.classList.contains('is-on')]),
+             views: Array.from(b.querySelectorAll('[data-view]')).map(x => [x.textContent, x.classList.contains('is-on')]),
+             wholes: Array.from(b.querySelectorAll('.station-whole-chip')).map(x => [x.textContent, x.classList.contains('is-on')]),
+             paras: Array.from(b.querySelectorAll('.gu-p')).map(x => x.textContent), lead: (b.querySelector('.gu-lead') || {}).textContent,
+             cells: Object.keys(g).length, rows: Array.from(b.querySelectorAll('.gu-grid-row')).map(r => r.querySelectorAll('.mw-cell').length), g: g,
+             legend: Array.from(b.querySelectorAll('.gu-legend .mw-cell')).map(c => c.textContent.trim()),
+             clear: Array.from(b.querySelectorAll('.gu-btn')).filter(x => /clear/i.test(x.textContent)).map(x => x.textContent) }; })()"""
+ST_EXAMPLE = [(2, 1), (3, 2), (4, 1), (4, 2), (5, 1), (5, 2), (10, 5), (10, 9)]                       # the board's secure facts
+ST_PRACTISING = [(3, 1), (5, 3), (6, 3), (7, 2), (7, 6), (8, 4)]
+ALL_TABS = ["Progress", "Settings", "Words", "Subtraction", "Station", "Checks", "Sound"]
+
+
+async def test_station_grownups(p, name, vw, vh, dpr):
+    """The game's grown-ups tab, Station (boards round14-grownups-tab and -grid): which step (a change starts with the
+    next round), wholes in play (they limit the questions), the grid for the step picked ("3 + 4" cells, 45), and
+    clearing this game's progress only."""
+    print(f"\n== MeeMee Station: the Station tab ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-gu-{name}", vw, vh, dpr, mode=None)
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    more = [{"t": T0 + d * DAY + i * 1000, "whole": w, "a": a, "missing": "right", "tries": 0, "misses": 0, "hint": False}
+            for d in range(3) for i, (w, a) in enumerate(ST_EXAMPLE)]
+    more += [{"t": T0 + 4 * DAY + i * 1000, "whole": w, "a": a, "missing": "right", "tries": 1, "misses": 0, "hint": False} for i, (w, a) in enumerate(ST_PRACTISING)]
+    await page.evaluate("""(a) => { const g = MW.store.game('station'); g.answers = { more: a }; g.step = 'more'; MW.store.save();
+        MW.store.get('answers').push({ t: 1, whole: 7, left: 3, right: 4, missing: 'right', tries: 0, misses: 0, hint: false, check: 'tap' });
+        MW.store.game('takehome').answers = { take: [{ t: 1, whole: 7, take: 4, missing: 'right', tries: 0, misses: 0, hint: false }] }; MW.store.save(); }""", more)
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('station-tab')")
+    await asyncio.sleep(0.4)
+    tab = await page.evaluate(ST_TAB)
+    check(f"station-gu ({name}): the tab 'Station' sits after Take MeeMee Home's Subtraction, before Checks and Sound", tab["tabs"] == ALL_TABS and tab["on"] == "Station", json.dumps(tab["tabs"]))
+    check(f"station-gu ({name}): in order: Which step (How many more on, as saved), Wholes in play (2 to 10, all on), Showing progress for (How many more)",
+          tab["h3"] == ["Which step", "Wholes in play", "Showing progress for"] and tab["steps"] == [["Bring them aboard", False], ["How many more", True], ["Numbers", False]]
+          and tab["wholes"] == [[str(w), True] for w in range(2, 11)] and tab["views"] == [["Bring them aboard", False], ["How many more", True], ["Numbers", False]],
+          json.dumps([tab["h3"], tab["steps"], tab["views"]]))
+    want = ["Bring them aboard (the first step): the whole shows on the station's tower and some MeeMee are already in its ten windows. Your child drags MeeMee in from the deck until the station holds the whole, then taps Scruffles. All ten windows are open, so they have to stop at the right number.",
+            "How many more: the ten frame shows the part already aboard, and the bar model under it shows the whole and that part. Your child drags a number tile into the empty part of the bar. Two wrong tries: the windows past the whole close, and the empty ones are counted together.",
+            "Numbers: the bar model alone, and the empty space can be a part or the whole.",
+            "A change starts with the next round. Each step keeps its own progress, separate from MeeMee Rescue's."]
+    check(f"station-gu ({name}): the three explanations and the note, as round 14's board words them (British English, no exclamation marks)",
+          tab["paras"][:4] == want and not any("!" in x for x in tab["paras"]), json.dumps(tab["paras"][:4]))
+    check(f"station-gu ({name}): under Wholes in play, MeeMee Rescue's note", "Questions use only the wholes switched on. Changes start with the next round." in tab["paras"], json.dumps(tab["paras"]))
+    check(f"station-gu ({name}): the summary: 'Secure: 8 of 45 facts. Practising: 6. Questions answered this step on this tablet: 30.'",
+          tab["lead"] == "Secure: 8 of 45 facts. Practising: 6. Questions answered this step on this tablet: 30.", tab["lead"])
+    check(f"station-gu ({name}): the grid: a row per whole (2 to 10), a cell per fact written 'part aboard + part to find', 45 in all; 2 + 3 secure, 3 + 3 practising, "
+          f"3 + 4 not yet; the legend; the note",
+          tab["rows"] == list(range(1, 10)) and tab["cells"] == 45 and tab["g"].get("2 + 3") == "is-secure" and tab["g"].get("3 + 3") == "is-practising"
+          and tab["g"].get("3 + 4") == "is-notyet" and tab["g"].get("1 + 2") == "is-practising" and tab["legend"] == ["Secure", "Practising", "Not yet"]
+          and tab["paras"][-1].startswith("Secure means right first time"), json.dumps(tab["g"]))
+    await st_shot(page, name, "grownups-tab")
+    await page.evaluate("(() => { const h = Array.from(document.querySelectorAll('.gu-body .gu-h3')).find(x => x.textContent === 'Showing progress for'); const b = document.querySelector('.gu-body');"
+                        " b.scrollTop += (h.getBoundingClientRect().top - b.getBoundingClientRect().top) / MW.stage.scale + 50; })()")
+    await asyncio.sleep(0.3)
+    await st_shot(page, name, "grownups-grid")
+    await page.click(".gu-body [data-view=numbers]")
+    await asyncio.sleep(0.3)
+    tab = await page.evaluate(ST_TAB)
+    wide = await page.evaluate("(() => { const g = document.querySelector('.gu-grid'); const b = g.closest('.gu-body'); return [g.scrollWidth, b.clientWidth]; })()")
+    check(f"station-gu ({name}): 'Numbers' shows step 3's grid: 45 cells, nothing answered yet (each step its own progress)",
+          tab["views"] == [["Bring them aboard", False], ["How many more", False], ["Numbers", True]] and tab["cells"] == 45 and tab["rows"] == list(range(1, 10))
+          and tab["lead"] == "No questions answered this step on this tablet yet." and tab["steps"][1][1] and wide[0] <= wide[1], json.dumps([tab["rows"], wide]))
+    await page.evaluate("MW.grownups.close()")
+    # a change of step starts with the next round
+    await page.evaluate("(() => { const g = MW.store.game('station'); g.step = 'aboard'; MW.store.save(); })()")
+    s = await st_open(t, page, None, [{"whole": 7, "a": 3}] * 5)
+    await t.tap(46, 754, 3.3)                                # the grown-ups lock
+    await page.evaluate("MW.grownups.show('station-tab')")
+    await asyncio.sleep(0.3)
+    await page.click(".gu-body [data-step=numbers]")
+    await asyncio.sleep(0.2)
+    tab = await page.evaluate(ST_TAB)
+    saved = await page.evaluate("MW.store.peek('station').step")
+    check(f"station-gu ({name}): 'Numbers' picked: saved, on, and the progress below shows its grid",
+          saved == "numbers" and tab["steps"][2][1] and tab["views"][2][1] and tab["cells"] == 45, json.dumps([saved, tab["steps"], tab["views"]]))
+    await page.click(".gu-close")
+    await asyncio.sleep(0.6)
+    s = await st_state(page)
+    check(f"station-gu ({name}): ... but the round being played carries on bringing them aboard", s["step"] == "aboard" and s["deck"] == 7 and not s["track"], json.dumps(s))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    s = await st_open(t, page, None, [{"whole": 7, "a": 3, "missing": "whole"}] * 5)
+    check(f"station-gu ({name}): the next round is Numbers", s["step"] == "numbers" and s["track"] and s["bars"][0][1], json.dumps(s))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    # wholes in play limit the questions
+    await page.evaluate("MW.grownups.openPanel(); MW.grownups.show('station-tab')")
+    await asyncio.sleep(0.3)
+    for w in (2, 4, 6, 7, 8, 9, 10):
+        await page.click(f".gu-body .station-whole-chip:nth-child({w - 1})")
+        await asyncio.sleep(0.05)
+    tab = await page.evaluate(ST_TAB)
+    on = [int(x[0]) for x in tab["wholes"] if x[1]]
+    rounds = await page.evaluate("(() => { const out = new Set(); for (let i = 0; i < 300; i++) MW.station.makeRound().forEach(q => out.add(q.whole)); return Array.from(out).sort(); })()")
+    check(f"station-gu ({name}): with only 3 and 5 in play, rounds use only 3 and 5", on == [3, 5] and await page.evaluate("MW.store.peek('station').wholes") == [3, 5]
+          and rounds == [3, 5], json.dumps([on, rounds]))
+    await page.click(".gu-body .station-whole-chip:nth-child(2)")
+    await page.click(".gu-body .station-whole-chip:nth-child(4)")
+    await asyncio.sleep(0.1)
+    check(f"station-gu ({name}): the last whole in play can't be turned off", await page.evaluate("MW.store.peek('station').wholes") == [5])
+    # clearing clears this game's progress only (its step and wholes stay; MeeMee Rescue's and Take MeeMee Home's answers stay)
+    await page.click(".gu-body .station-clear")
+    await asyncio.sleep(0.1)
+    first = await page.evaluate("[document.querySelector('.gu-body .station-clear').textContent, MW.station.answers('more').length]")
+    await page.click(".gu-body .station-clear")
+    await asyncio.sleep(0.2)
+    after = await page.evaluate("""(() => { const s = JSON.parse(localStorage.getItem('mimi-world')); return [s.games.station, s.answers.length, s.games.takehome.answers.take.length,
+        document.querySelector('.gu-body .gu-lead').textContent]; })()""")
+    check(f"station-gu ({name}): 'Clear this tablet's progress' asks first ('Tap again to clear'), then clears this game's answers only",
+          first == ["Tap again to clear", 30] and after[0] == {"step": "numbers", "wholes": [5]} and after[1] == 1 and after[2] == 1
+          and after[3] == "No questions answered this step on this tablet yet.", json.dumps([first, after]))
+    await page.evaluate("MW.grownups.close()")
+    check(f"station-gu ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+# as while "MeeMee Station!" is recorded: MW.audio.recorded stubbed (UNSTUB_PLACE_LINE undoes it); it is pending today
+STUB_ST_NAME = """(() => { if (!window.__recorded) window.__recorded = MW.audio.recorded;
+    MW.audio.recorded = id => id === 'station-name' || window.__recorded(id); })()"""
+
+
+async def test_station_map(p, name, vw, vh, dpr):
+    """0.9.0: place 4, the redrawn station (SolarMap card; board round14-map), is MeeMee Station's: lit at full colour
+    with its halo and its badge at 944, 56, no lock; tapping it (or its badge) opens the game, with its title banner
+    while "MeeMee Station!" is said once that is recorded (board round13-banner; stubbed here), straight away with no
+    banner while it is pending (as today). The rocks (3) stay locked and say their line; the other games open as before.
+    The station is drawn at 1.11, 6 px lower, its tap area 240."""
+    print(f"\n== 0.9.0: MeeMee Station on the map ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-{name}", vw, vh, dpr, mode="tap")
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await asyncio.sleep(1.0)
+    await screenshot(page, f"0.9.0/{name}-map.png")
+    await st_shot(page, name, "map")
+    lay = await page.evaluate("MW.LAYOUT.map.planets[4]")
+    check(f"station ({name}): place 4 stays at 860, 182 with its 240 tap area; its badge's place is 944, 56 and its lock 966, 96",
+          lay == {"x": 860, "y": 182, "tap": 240, "badge": {"x": 944, "y": 56, "d": 84, "pic": 56}, "lock": {"x": 966, "y": 96, "d": 56, "icon": 28}}, json.dumps(lay))
+    info = await page.evaluate(PLACES_INFO)
+    games = await page.evaluate("MW.world.games.map(g => g.planet)")
+    check(f"station ({name}): five places: the four games' places lit (MeeMee Station on the station, 4), the rocks locked", len(info) == 5 and sorted(games) == [0, 1, 2, 4]
+          and all(info[i]["game"] for i in (0, 1, 2, 4)) and place_ok(info[4], "MeeMee Station") and place_ok(info[3], None), json.dumps([info[3], info[4]]))
+    badge = await page.evaluate("""(() => { const L = MW.LAYOUT.map.planets[4]; const b = Array.from(document.querySelectorAll('#screen-map .mw-planet-badge')).find(e => e.offsetLeft === L.badge.x && e.offsetTop === L.badge.y);
+        const lock = Array.from(document.querySelectorAll('#screen-map .mw-planet-lock')).some(e => e.offsetLeft === L.lock.x && e.offsetTop === L.lock.y);
+        return b ? [b.offsetLeft, b.offsetTop, b.offsetWidth, !!b.querySelector('clipPath[id^="station-badge-c"]'), b.getAttribute('aria-label'), lock] : null; })()""")
+    check(f"station ({name}): its badge (the station in a round night window) at 944, 56, 84 across; no lock", badge == [944, 56, 84, True, "MeeMee Station", False], json.dumps(badge))
+    drawn = await page.evaluate(STATION_DRAWN)
+    check(f"station ({name}): the station is drawn as MeeMee Station, small (1.11), 6 px lower, at full colour (not dimmed): the truss, a wing at each end, "
+          f"ten modules joined by mint collars, three windows lit, the tower with its round screen, and the dish",
+          drawn == {"transform": "translate(860 188) scale(1.11)", "dimmed": False, "modules": 10, "lit": 3, "dark": 7, "wings": 4, "collars": 8, "truss": 1, "tower": 1, "dish": 1},
+          json.dumps(drawn))
+    reach = await page.evaluate(REACH_JS, [4])
+    check(f"station ({name}): a tap anywhere on the station's drawing lands on place 4 or its badge", all(reach_ok(r) for r in reach), json.dumps(reach))
+    locked = await page.evaluate(MAP_LOCKED_LINE)
+    pl3 = await page.evaluate("MW.LAYOUT.map.planets[3]")
+    said, screen = await tap_said(t, pl3["x"], pl3["y"])
+    check(f"station ({name}): the rocks (3), still to come, say the locked line ({locked}) and stay on the map", said == [locked] and screen == "screen-map", json.dumps([said, screen]))
+    await asyncio.sleep(1.2)
+    # its name is pending (today): tapping place 4 opens the game straight away, no banner (and nothing silent: no title to read)
+    rec = await page.evaluate("MW.audio.recorded('station-name')")
+    await st_set(page, "aboard", [{"whole": 7, "a": 3}] * 5)
+    await page.evaluate("window.__stq = performance.now()")
+    if not rec:
+        await t.tap(860, 182)
+        ok = await t.wait_screen("screen-station-play", 3)
+        check(f"station ({name}): with 'MeeMee Station!' pending (as today), tapping the station opens the game straight away, no banner",
+              ok and not await page.evaluate("MW.world.banner.up()")
+              and await page.evaluate("MW.events.some(e => e.type === 'banner' && e.detail === 'none for MeeMee Station (station-name not recorded yet)')"))
+        await t.tap(*HOME_BTN)
+        await t.wait_screen("screen-map", 5)
+        await asyncio.sleep(0.5)
+    # recorded (stubbed): its title banner, 'MeeMee Station' and its badge at 112, while the name is said; then the game
+    await page.evaluate(STUB_ST_NAME)
+    try:
+        await st_set(page, "aboard", [{"whole": 7, "a": 3}] * 5)
+        n0 = len(await t.said())
+        await t.tap(860, 182)
+        up = await th_until(page, "MW.world.banner.up() && document.getElementById('banner').classList.contains('is-in')", 5)
+        await asyncio.sleep(0.4)
+        bi = await page.evaluate(BANNER_INFO)
+        size = await page.evaluate("(() => { const a = document.querySelector('#banner [data-art] svg'); return a ? [a.getAttribute('width'), a.getAttribute('height')] : null; })()")
+        await st_shot(page, name, "banner")
+        check(f"station ({name}): with 'MeeMee Station!' recorded (stubbed), tapping the station shows its title banner, 'MeeMee Station' and its badge at 112, while its name is said",
+              up and bi == {"up": True, "name": "MeeMee Station", "art": ["station-badge"], "phase": "opening", "screen": "screen-map"} and size == ["112", "112"]
+              and (await t.said())[n0:][:1] == ["station-name"], json.dumps([bi, size, (await t.said())[n0:]]))
+        ok = await t.wait_screen("screen-station-play", 10)
+        gone = await page.evaluate("(() => { const g = MW.events.filter(e => e.type === 'banner' && e.detail === 'gone MeeMee Station').pop(), "
+                                   "r = MW.events.filter(e => e.type === 'round').pop(); return !!(g && r && g.t <= r.t); })()")
+        check(f"station ({name}): ... and the game starts once the banner has gone", ok and gone)
+        await t.tap(*HOME_BTN)
+        await t.wait_screen("screen-map", 5)
+        await asyncio.sleep(0.5)
+        b = await page.evaluate("MW.LAYOUT.map.planets[4].badge")
+        await t.tap(b["x"] + b["d"] / 2, b["y"] + b["d"] / 2)
+        check(f"station ({name}): its badge opens it too (with its banner)", await th_until(page, "MW.world.banner.up()", 5) and await t.wait_screen("screen-station-play", 10))
+        await t.tap(*HOME_BTN)
+        await t.wait_screen("screen-map", 5)
+        await asyncio.sleep(0.5)
+    finally:
+        await page.evaluate(UNSTUB_PLACE_LINE)
+    opened = []
+    for gid, screen, words in (("rescue", "screen-game", "map-mimi-rescue"), ("words", "screen-words-find", "words-name"), ("takehome", "screen-takehome-play", "takehome-name")):
+        pl = await page.evaluate("MW.LAYOUT.map.planets[MW.world.games.find(g => g.id === '%s').planet]" % gid)
+        if gid == "rescue":
+            await page.evaluate("MW.rescue.nextRound = %s" % json.dumps(ROUND))
+        await t.tap(pl["x"], pl["y"])
+        ok = await t.wait_screen(screen, 8)
+        opened.append([gid, ok, words in await t.said()])
+        await t.tap(*HOME_BTN)
+        await t.wait_screen("screen-map", 5)
+        await asyncio.sleep(0.5)
+    check(f"station ({name}): MeeMee Rescue, MeeMee Rockets and Take MeeMee Home open as before (each its name and banner, then its screen)",
+          all(o[1] and o[2] for o in opened), json.dumps(opened))
+    check(f"station ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_station_commander(p, name, vw, vh, dpr, reduce=False):
+    """The commander (round 15; Crew card): whoever has the job stands on the deck in step 1 (1146, 598, 108 wide) and at
+    the track's right-hand end in steps 2 and 3 (1110, 498, 124 wide), wearing its badge. On each right answer it blinks,
+    then smiles: got it 150 ms, usual 150 ms, then got it until the sentence has been said, then usual (its face log and
+    data-face). Never during a wrong try or a hint. Nothing moves, so reduce motion changes nothing. With no commander,
+    nobody stands there and the game plays the same."""
+    label = f"station-commander ({name}{', reduce motion' if reduce else ''})"
+    print(f"\n== MeeMee Station: the commander ({name}{', reduce motion' if reduce else ''}) ==")
+    browser, ctx, page, t, problems = await open_motion(p, vw, vh, dpr, reduce, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'commander'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    await t.tap(*PLAY)
+    await t.wait_screen("screen-map")
+    await page.evaluate("MW.station.ask({ whole: 6, a: 2 }, 'aboard')")
+    s = await st_state(page)
+    check(f"{label}: step 1: the commander (Snuffles here) stands on the deck, its feet on it (1146, 598, 108 wide), wearing the commander's badge, its usual face",
+          s["commander"] == ["snuffles", "usual", "commander", 1146, 598, 108], json.dumps(s["commander"]))
+    # a wrong check and the hint: no smile
+    await page.evaluate("window.__stq = performance.now(); MW.station.podTap()")
+    await n_quiet(t)
+    await page.evaluate("MW.station.podTap()")
+    await th_until(page, "MW.station.st.hinted", 5)
+    await n_quiet(t)
+    faces = await page.evaluate(ST_FACES)
+    s = await st_state(page)
+    check(f"{label}: a wrong check and the hint: the commander doesn't smile (no face changes)", faces == [] and s["hinted"] and s["commander"][1] == "usual", json.dumps(faces))
+    # the right answer: the blink and the smile, timed
+    await page.evaluate("""(() => { const R = MW.station, s = R.st; window.__seen = []; const box = document.querySelector('#screen-station-play .station-commander');
+        window.__anims = 0; const loop = () => { const c = box.querySelector('.mw-cat'); window.__seen.push([Math.round(performance.now()), c.dataset.face]);
+          window.__anims = Math.max(window.__anims, box.getAnimations({ subtree: true }).length); window.__loop = requestAnimationFrame(loop); }; loop();
+        s.counters.filter(m => m.where === 'deck').slice(0, 4).forEach(m => R.drop(m, 430, 300, false)); window.__stq = performance.now(); R.podTap(); })()""")
+    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-2 and num-mid-4 make num-end-6' && e.t > window.__stq)", 15)
+    await asyncio.sleep(0.2)
+    mid = await page.evaluate("document.querySelector('#screen-station-play .station-commander .mw-cat').dataset.face")
+    await th_until(page, "!MW.audio.speaking() && MW.station.st.commander.face() === 'usual'", 10)
+    await page.evaluate("new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")   # the watcher sees the last face too
+    await page.evaluate("cancelAnimationFrame(window.__loop)")
+    log = await page.evaluate("MW.events.filter(e => e.type === 'commander' && e.t > window.__stq).map(e => [e.t - window.__stq, e.detail])")
+    seen = await page.evaluate("window.__seen")
+    runs = []
+    for tm, f in seen:
+        if not runs or runs[-1][1] != f:
+            runs.append([tm, f])
+    said_at = await page.evaluate("(() => { const e = MW.events.filter(e => e.type === 'say' && e.detail === 'num-mid-2 and num-mid-4 make num-end-6').pop(); return e.t - window.__stq; })()")
+    check(f"{label}: on a right answer it blinks, then smiles: got it, usual after about 150 ms, got it again after about 300 ms, until the sentence has been "
+          f"said, then usual (its face log and data-face)",
+          ok and [x[1] for x in log] == ["got-it", "usual", "got-it", "usual"] and abs(log[1][0] - 150) < 80 and abs(log[2][0] - 300) < 100 and log[3][0] > said_at
+          and mid == "got-it" and [r[1] for r in runs] == ["usual", "got-it", "usual", "got-it", "usual"], json.dumps([log, runs, said_at]))
+    anims = await page.evaluate("window.__anims")
+    check(f"{label}: nothing moves while it smiles (no animation on the commander{', as with reduce motion off' if reduce else ''})", anims == 0, str(anims))
+    # steps 2 and 3: at the track's right-hand end
+    for step, q in (("more", {"whole": 7, "a": 3}), ("numbers", {"whole": 9, "a": 5, "missing": "whole"})):
+        await page.evaluate("(a) => MW.station.ask(a[0], a[1])", [q, step])
+        s = await st_state(page)
+        check(f"{label}: step {ST_STEPS.index(step) + 1}: the commander stands at the track's right-hand end (1110, 498, 124 wide)",
+              s["commander"] == ["snuffles", "usual", "commander", 1110, 498, 124], json.dumps(s["commander"]))
+    await t.drag(*tile_xy(9), *(await st_berth(page)))
+    await page.evaluate("window.__stq = performance.now()")
+    await n_check(t)
+    await th_until(page, "MW.events.filter(e => e.type === 'commander' && e.t > window.__stq).length >= 4", 15)
+    faces = await page.evaluate(ST_FACES)
+    check(f"{label}: step 3: a right answer, the same blink and smile", faces == ["got-it", "usual", "got-it", "usual"], json.dumps(faces))
+    await t.tap(*HOME)
+    await t.wait_screen("screen-map", 5)
+    # no commander: nobody stands there, and the game plays the same
+    await page.evaluate("MW.crew.save({moggles: 'lookout', snuffles: 'engineer'})")
+    s = await st_open(t, page, "aboard", [{"whole": 4, "a": 1}] * 5)
+    empty = await page.evaluate("document.querySelector('#screen-station-play .station-commander').children.length")
+    await st_shot(page, name + ("-reduce" if reduce else ""), "no-commander")
+    await st_bring(t, 3)
+    await page.evaluate("window.__stq = performance.now()")
+    await n_check(t)
+    s2 = await st_state(page)
+    ok = await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'num-mid-1 and num-mid-3 make num-end-4' && e.t > window.__stq)", 15)
+    check(f"{label}: with no commander, nobody stands on the deck, and a right answer plays the same (no face changes)",
+          s["commander"] is None and empty == 0 and s2["phase"] == "station-celebrate" and ok and await page.evaluate(ST_FACES) == [], json.dumps([s["commander"], s2["phase"]]))
+    await t.tap(*HOME)
+    check(f"{label}: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def test_station_pause(p):
+    """Hear-again; the screen going off mid-question; Home while a MeeMee is held, mid-celebration and from the end
+    screen; the grown-ups area opened mid-hint and mid-celebration; Again on the end screen."""
+    print("\n== MeeMee Station: Hear-again, pausing and Home ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, "station-pause", 1046, 653, 1.22, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    rnd = [{"whole": 7, "a": 3}, {"whole": 5, "a": 2}, {"whole": 6, "a": 3}, {"whole": 8, "a": 2}, {"whole": 4, "a": 1}]
+    await st_open(t, page, "aboard", rnd)
+    await n_quiet(t)
+    n0 = len(await t.said())
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.4)
+    check("station-pause: Hear-again says the question again", (await t.said())[n0:] == [st_prompt("aboard", rnd[0], 0)], json.dumps((await t.said())[n0:]))
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.6)
+    paused = await page.evaluate("MW.world.st.paused")
+    n0 = len(await t.said())
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.5)
+    check("station-pause: the screen going off pauses; coming back asks the question again", paused and (await t.said())[n0:][:1] == [st_prompt("aboard", rnd[0], 0)],
+          json.dumps((await t.said())[n0:]))
+    # a MeeMee held as the screen goes off goes back to the deck
+    await st_bring(t, 1)
+    await n_hold(t, *ST_ON_DECK, 600, 400, touch_id=90)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await asyncio.sleep(0.4)
+    await page.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.5)
+    s = await st_state(page)
+    check("station-pause: a MeeMee held as the screen goes off goes back to its place on the deck (the one already brought stays)",
+          s["aboard"] == [3] and s["deck"] == 6 and await st_in_order(page), json.dumps(s))
+    # Home while a MeeMee is held: nothing said after, the map
+    await n_quiet(t)
+    await n_hold(t, *ST_ON_DECK, 600, 400, touch_id=91)
+    await page.evaluate("MW.station.home()")                # Home (the other hand)
+    n0 = len(await t.said())
+    await touch(t, "touchEnd", [])
+    await asyncio.sleep(0.8)
+    s = await st_state(page)
+    check("station-pause: Home while a MeeMee is held: the map, nothing said after, the game put away", s["screen"] == "screen-map" and (await t.said())[n0:] == []
+          and s["deck"] == 0 and s["aboard"] == [] and s["fixed"] == 0, json.dumps(s))
+    # step 2: the grown-ups area opened mid-hint takes the hint away; closed, the question again; the next wrong number brings it back
+    rnd2 = [{"whole": 7, "a": 3}, {"whole": 6, "a": 1}, {"whole": 9, "a": 3}, {"whole": 5, "a": 3}, {"whole": 8, "a": 4}]
+    await st_open(t, page, "more", rnd2)
+    await n_quiet(t)
+    for n in (5, 6):
+        await t.drag(*tile_xy(n), *(await st_berth(page)))
+        await n_check(t)
+        await asyncio.sleep(0.1)
+        if n == 5:
+            await n_quiet(t)
+    await asyncio.sleep(0.5)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")
+    await asyncio.sleep(0.5)
+    s = await st_state(page)
+    check("station-pause: the grown-ups area opened mid-hint: the hint stops and is taken away (the windows open again, no ghosts, no halo)",
+          not s["hinted"] and s["ghosts"] == 0 and s["windows"] == st_windows(3, 7) and not s["bars"][2][3] and not await page.evaluate("MW.audio.speaking()"), json.dumps(s))
+    n0 = len(await t.said())
+    await page.click(".gu-close")
+    await asyncio.sleep(0.5)
+    check("station-pause: ... closed, the question is asked again", (await t.said())[n0:][:1] == [st_prompt("more", rnd2[0], 0)], json.dumps((await t.said())[n0:]))
+    await n_quiet(t)
+    await t.drag(*tile_xy(8), *(await st_berth(page)))
+    await n_check(t)
+    s = await st_state(page)
+    check("station-pause: ... and the next wrong number gives the hint again", s["hinted"] and s["ghosts"] == 4 and s["windows"] == st_windows(3, 7, "hinting"), json.dumps(s))
+    await n_quiet(t)
+    # the grown-ups area opened mid-celebration: everything waits, then carries on
+    await t.drag(*tile_xy(4), *(await st_berth(page)))
+    await n_check(t)
+    await page.evaluate("MW.world.pause('grown-ups'); MW.grownups.openPanel()")
+    n0 = len(await t.said())
+    await asyncio.sleep(2.5)
+    s = await st_state(page)
+    check("station-pause: the grown-ups area opened mid-celebration: nothing is said while it's open, the answer stays",
+          s["phase"] == "station-celebrate" and (await t.said())[n0:] == [] and s["bars"][2] == [4, False, True, False, "4"], json.dumps(s))
+    await page.click(".gu-close")
+    s = await st_wait(page, ["station-open"], 30)
+    check("station-pause: ... closed, the celebration carries on (the sentence said), then question 2",
+          s["qi"] == 1 and st_said_sentence(st_q("more", rnd2[0])) in await t.said(), json.dumps(s))
+    # Hear-again mid-celebration says nothing; Home mid-celebration: nothing more said
+    await n_quiet(t)
+    await t.drag(*tile_xy(5), *(await st_berth(page)))
+    await n_check(t)
+    n0 = len(await t.said())
+    await t.tap(*HEAR)
+    await asyncio.sleep(0.2)
+    heard = (await t.said())[n0:]
+    await t.tap(*HOME)
+    n0 = len(await t.said())
+    await asyncio.sleep(3)
+    s = await st_state(page)
+    check("station-pause: Hear-again mid-celebration says nothing new; Home mid-celebration: back on the map, nothing more said, the tiles all back",
+          not any(x.startswith("q-") for x in heard) and s["screen"] == "screen-map" and (await t.said())[n0:] == [] and s["out"] == [] and s["placed"] is None,
+          json.dumps([heard, (await t.said())[n0:], s]))
+    # the end screen: Again starts a new round; Home goes back to the map
+    await st_set(page, "aboard", [{"whole": 2, "a": 1}] * 5)
+    pl = await page.evaluate(ST_PLACE)
+    await t.tap(pl["x"], pl["y"])
+    for _ in range(5):
+        await st_wait(page, ["station-open"], 25)
+        await st_bring(t, 1)
+        await n_check(t)
+    await st_wait(page, ["station-done"], 25)
+    await th_until(page, "MW.events.some(e => e.type === 'say' && e.detail === 'station-round-another')", 15)
+    end = await page.evaluate("""(() => { const s = document.getElementById('screen-station-end'), a = document.getElementById('station-again');
+        return { again: [a.offsetLeft, a.offsetTop, a.offsetWidth], mimi: s.querySelectorAll('.station-end-mimi').length, windows: s.querySelectorAll('.station-pod').length,
+                 cats: Array.from(s.querySelectorAll('.mw-cat')).map(c => [c.dataset.who, c.dataset.job, c.parentNode.offsetLeft, c.parentNode.offsetTop, c.offsetWidth]),
+                 stars: s.querySelector('.mw-stars').offsetLeft, pod: [s.querySelector('.mw-pod').offsetLeft, s.querySelector('.mw-pod').offsetTop, s.querySelector('.mw-pod').dataset.face] }; })()""")
+    check("station-pause: the end screen (board round14-end): Again at 1080, 420; ten windows each with a MeeMee in the station along the bottom; Moggles at 70, 330 "
+          "and Snuffles at 790, 330 (240 wide) wearing their badges; the stars from 450; Scruffles's ship at 380, 110 grinning",
+          end == {"again": [1080, 420, 160], "mimi": 10, "windows": 10, "cats": [["moggles", "commander", 70, 330, 240], ["snuffles", "lookout", 790, 330, 240]],
+                  "stars": 450, "pod": [380, 110, "got-it"]}, json.dumps(end))
+    await page.evaluate("MW.station.nextRound = %s" % json.dumps(rnd))
+    await t.tap(1160, 500)                                   # Again (1080, 420, 160 across)
+    s = await st_wait(page, ["station-open"], 30)
+    check("station-pause: Again on the end screen starts a new round", s["screen"] == "screen-station-play" and s["qi"] == 0 and s["fixed"] == 3, json.dumps(s))
+    await t.tap(*HOME)
+    check("station-pause: Home goes back to the map", await t.wait_screen("screen-map", 5))
+    check("station-pause: no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+# What a moment must stay clear of on the game screen (stage boxes [x, y, w, h]): the station (its parts' boxes, from the
+# layouts: step 1 the truss, wings and modules, the tower and its antenna, the dish; step 2 the station and its masts;
+# step 3 the truss and wing), the deck's MeeMee, the hull modules and the berth, the hint's small station, the commander,
+# and the sentence while it shows
+ST_KEEP_CLEAR = """(() => { const R = MW.station, s = R.st, step = R.step(), out = [];
+    const st = { aboard: [[38, 251, 784, 254], [348, 62, 164, 226], [615, 220, 80, 62]],
+                 more: [[114, 121, 660, 198], [341, 302, 22, 74], [525, 302, 22, 74]], numbers: [[106, 176, 128, 250]] }[step];
+    st.forEach(b => out.push(['the station', b]));
+    s.counters.filter(c => c.where === 'deck').forEach(c => out.push(["the deck's MeeMee", [c.x - 36, c.y - 36, 72, 72]]));
+    const b = R.bars(); if (b) ['whole', 'left', 'right'].forEach(k => out.push([b[k] === s.berth ? 'the berth' : 'the hull modules', [b[k].x, b[k].y, b[k].w, b[k].h]]));
+    if (s.hintStation && !s.hintStation.classList.contains('is-gone')) out.push(['the small station', [289, 416, 390, 220]]);
+    if (R.equation().el.classList.contains('is-shown')) out.push(['the sentence', [180, 700, 400, 80]]);
+    const c = document.querySelector('#screen-station-play .station-commander .mw-cat');
+    if (c) { const p = c.parentNode; out.push(['the commander', [p.offsetLeft, p.offsetTop, c.offsetWidth, c.offsetHeight]]); }
+    return out; })()"""
+
+
+ST_ROOM = 20                                       # the least gap round the engineer where it moved to (steps 1 and 3), stage px
+
+
+def box_gap(a, b):
+    """The gap between two stage boxes [x, y, w, h] (0 if they touch or overlap)."""
+    dx = max(b[0] - (a[0] + a[2]), a[0] - (b[0] + b[2]), 0)
+    dy = max(b[1] - (a[1] + a[3]), a[1] - (b[1] + b[3]), 0)
+    return round((dx * dx + dy * dy) ** 0.5, 1)
+
+
+async def st_moment_clear(page, sel, peek=False):
+    """A moment's drawn box (clipped to its window, for the lookout's peek) and what it overlaps of ST_KEEP_CLEAR."""
+    box = await moment_box(page, sel)
+    if box and peek:
+        win = await page.evaluate("(sel => { const e = document.querySelector(sel); return [e.offsetLeft, e.offsetTop, e.offsetWidth, e.offsetHeight]; })(%s)" % json.dumps(sel))
+        x0, y0 = max(box[0], win[0]), max(box[1], win[1])
+        x1, y1 = min(box[0] + box[2], win[0] + win[2]), min(box[1] + box[3], win[1] + win[3])
+        box = [x0, y0, x1 - x0, y1 - y0]
+    keep = await page.evaluate(ST_KEEP_CLEAR)
+    return box, [k[0] for k in keep if box and overlap(box, k[1], 2)]
+
+
+async def test_station_moments(p, name, vw, vh, dpr):
+    """The crew's moments, at Take MeeMee Home's points, moved clear where its places would be over the station, the
+    deck's MeeMee, the hull modules, the berth, the sentence or the commander: the lookout as a round starts (step 1 from
+    the stage's foot below the station; steps 2 and 3 behind the track, left of the commander), never up with the
+    sentence; the engineer on a right answer (step 2 by the ship's left fin; steps 1 and 3 under the picture's right-hand
+    end, 110 wide, with room round it, clear of the ship and the commander too); the navigator as a star turns peach
+    (under the stars' right end). None without a job; no words."""
+    print(f"\n== MeeMee Station: the crew's moments ({name}) ==")
+    browser, ctx, page, t, problems, _ = await open_tablet(p, f"station-moments-{name}", vw, vh, dpr, mode=None)
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+    await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+    loop = """(() => { window.__both = 0; window.__seen = 0; const loop = () => { const b = document.querySelector('#screen-station-play [data-moment=lookout].is-shown');
+        const e = MW.station.equation().el; if (b) window.__seen++; if (b && e.classList.contains('is-shown')) window.__both++; window.__loop = requestAnimationFrame(loop); }; loop(); })()"""
+    for step, q in (("aboard", {"whole": 7, "a": 3}), ("more", {"whole": 7, "a": 3}), ("numbers", {"whole": 10, "a": 6, "missing": "right"})):
+        k = ST_STEPS.index(step) + 1
+        await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'lookout'})")
+        await page.evaluate(loop)
+        await st_set(page, step, [q] * 5)
+        if await page.evaluate("MW.shell.screen") == "screen-start":
+            await t.tap(*PLAY)
+            await t.wait_screen("screen-map")
+        pl = await page.evaluate(ST_PLACE)
+        await t.tap(pl["x"], pl["y"])
+        await th_until(page, "!!document.querySelector('#screen-station-play [data-moment=lookout].is-shown')", 15)
+        await asyncio.sleep(0.6)                             # its rise (450 ms)
+        look = await page.evaluate("""(() => { const b = document.querySelector('#screen-station-play [data-moment=lookout].is-shown'); if (!b) return null;
+            return { window: [b.offsetLeft, b.offsetTop, b.offsetWidth, b.offsetHeight], flip: b.classList.contains('station-peek-flip'),
+                     scale: getComputedStyle(b.querySelector('.mw-peek-inner')).scale }; })()""")
+        lb, hits = await st_moment_clear(page, "#screen-station-play [data-moment=lookout]", peek=True)
+        await st_shot(page, name, f"lookout-step{k}")
+        want = [420, 548, 250, 252] if step == "aboard" else [856, 519, 250, 175]
+        where = "rises from the stage's foot below the station, left of the deck" if step == "aboard" else "peeks up from behind the track, left of the commander"
+        check(f"station-moments ({name}): step {k}: as the round starts the lookout {where}, mirrored to face the station ({', '.join(map(str, want))}), clear of "
+              f"everything it must not cover", look is not None and look["window"] == want and look["flip"] and look["scale"] == "-1 1" and not hits, json.dumps([look, lb, hits]))
+        s = await st_wait(page, ["station-open"], 20)
+        down = await th_until(page, "!document.querySelector('#screen-station-play [data-moment=lookout]')", 10)
+        check(f"station-moments ({name}): step {k}: ... and ducks down once it has spotted the station (1.8 s into the first question)", down)
+        # the engineer on a right answer
+        await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'engineer'})")
+        if step == "aboard":
+            await st_bring(t, 4)
+        else:
+            await t.drag(*tile_xy(4), *(await st_berth(page)))
+        await n_check(t)
+        await asyncio.sleep(0.5)
+        eb, hits = await st_moment_clear(page, "#screen-station-play [data-moment=engineer]")
+        place = await page.evaluate("""(() => { const b = document.querySelector('#screen-station-play [data-moment=engineer]'), c = b.querySelector('.mw-cat');
+            return [b.offsetLeft, b.offsetTop, c.offsetWidth, getComputedStyle(c).scale]; })()""")
+        await st_shot(page, name, f"engineer-step{k}")
+        want = {"aboard": [545, 530, 110], "more": [700, 326, 140], "numbers": [700, 530, 110]}[step]
+        where = {"aboard": "under the station's right-hand end (left of the deck, above the sentence's place)", "more": "by the ship's left fin (Take MeeMee Home's place)",
+                 "numbers": "under the berth's right-hand end (left of the ship's fin)"}[step]
+        check(f"station-moments ({name}): step {k}: the engineer's moment on a right answer, {where} ({want[0]}, {want[1]}, {want[2]} wide), not mirrored, "
+              f"clear of everything it must not cover", eb is not None and place[:3] == want and place[3] in ("none", "1") and not hits, json.dumps([eb, place, hits]))
+        if step != "more":
+            # where it moved to (steps 1 and 3) is also clear of the ship's whole box, the deck and every deck slot (any may hold a MeeMee),
+            # the sentence's place (its widest) and the hint's small station (while it fades), by at least ST_ROOM px
+            ship = await moment_box(page, "#screen-station-play .mw-pod")
+            more = [["the ship", ship], ["the sentence's place", [180, 700, 400, 80]]] + [[n_, b_] for n_, b_ in (await page.evaluate(ST_KEEP_CLEAR))]
+            more += ([["the deck", [724, 642, 532, 124]]] + [["a deck slot", [x - 36, y - 36, 72, 72]] for x, y in [(772 + 80 * i, 652) for i in range(5)] + [(812 + 80 * i, 722) for i in range(4)]]
+                     if step == "aboard" else [["the hint's small station", [289, 416, 390, 220]]])
+            near = sorted((box_gap(eb, b_), n_) for n_, b_ in more)
+            check(f"station-moments ({name}): step {k}: ... with room round it: at least {ST_ROOM} px from the ship, the commander and everything else it "
+                  f"must not cover", eb is not None and near[0][0] >= ST_ROOM, json.dumps(near[:4]))
+        # the navigator as the star turns peach
+        await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: 'navigator'})")
+        n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment' && e.detail.indexOf('navigator') === 0).length")
+        await th_until(page, "MW.events.filter(e => e.type === 'moment' && e.detail.indexOf('navigator') === 0).length > %d" % n0, 15)
+        await asyncio.sleep(0.5)
+        nb, hits = await st_moment_clear(page, "#screen-station-play [data-moment=navigator]")
+        route = await page.evaluate("(() => { const r = document.querySelector('#screen-station-play .mw-route path'); return r ? r.getAttribute('d') : null; })()")
+        await st_shot(page, name, f"navigator-step{k}")
+        check(f"station-moments ({name}): step {k}: the navigator holds up the star map as the star turns peach, with a dotted route to the next star, under the stars' "
+              f"right end (784, 92), clear of everything it must not cover (the sentence is showing now)",
+              nb is not None and route is not None and "NaN" not in route and not hits and nb[1] > 72, json.dumps([nb, hits]))
+        await t.tap(*HOME)
+        await t.wait_screen("screen-map", 5)
+        both = await page.evaluate("[window.__seen, window.__both]")
+        await page.evaluate("cancelAnimationFrame(window.__loop)")
+        check(f"station-moments ({name}): step {k}: the lookout is never up while the sentence shows; Home clears every moment",
+              both[0] > 10 and both[1] == 0 and await page.evaluate("document.querySelectorAll('#screen-station-play [data-moment], #screen-station-end [data-moment]').length") == 0,
+              json.dumps(both))
+    said = await t.said()
+    check(f"station-moments ({name}): no words in the moments", not any("job-" in x or "name-" in x for x in said), json.dumps(said[-3:]))
+    # nobody with those jobs: no moments
+    await page.evaluate("MW.crew.save({moggles: 'commander', snuffles: null})")
+    n0 = await page.evaluate("MW.events.filter(e => e.type === 'moment').length")
+    s = await st_open(t, page, "aboard", [{"whole": 3, "a": 1}] * 5)
+    await st_bring(t, 2)
+    await page.evaluate("window.__stq = performance.now()")
+    await n_check(t)
+    await th_until(page, "MW.events.some(e => e.type === 'question' && e.t > window.__stq)", 20)
+    check(f"station-moments ({name}): no lookout, engineer or navigator: no moments", await page.evaluate("MW.events.filter(e => e.type === 'moment').length") == n0)
+    await t.tap(*HOME)
+    check(f"station-moments ({name}): no console errors", not problems, "; ".join(problems[:3]))
+    await browser.close()
+
+
+async def station_quick_round(t, page):
+    """MeeMee Station from the map: one question in step 1 (3 with 1 aboard), to the end screen."""
+    await st_open(t, page, "aboard", [{"whole": 3, "a": 1}])
+    await st_bring(t, 2)
+    await n_check(t)
+    return await st_wait(page, ["station-done"], 30)
+
+
+async def test_station_motion(p):
+    """Motion and reduce motion: a MeeMee snaps into its window (with reduce motion it is there at once); in step 2 the
+    rest pop into their windows (a fade with reduce motion), the track slides away (fades), the sparkles grow (fade); in
+    step 3 the hint's small station fades away either way; the windows' rings come in over 450 ms (at once)."""
+    print("\n== MeeMee Station: motion and reduce motion ==")
+    browser = await p.chromium.launch(args=["--autoplay-policy=no-user-gesture-required"])
+    for reduce in (False, True):
+        label = "reduce motion" if reduce else "motion"
+        ctx = await browser.new_context(viewport={"width": 1280, "height": 800}, has_touch=True, reduced_motion="reduce" if reduce else "no-preference")
+        page = await ctx.new_page()
+        problems = []
+        page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+        page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+        await page.goto(ORIGIN + "/")
+        await page.wait_for_load_state("load")
+        await page.wait_for_function("MW.audio.status().decoded === MW.audio.status().total", timeout=15000)
+        res = await page.evaluate("""(() => { const R = MW.station; R.ask({ whole: 6, a: 2 }, 'aboard'); const c = R.st.counters.filter(m => m.where === 'deck')[0];
+            R.drop(c, 430, 300, false); const w = R.windows()[2];
+            return { moving: c.el.classList.contains('is-moving'), transition: getComputedStyle(c.el).transitionDuration, at: [c.x === w.x, c.y === w.y],
+                     ring: getComputedStyle(w.el).transitionDuration }; })()""")
+        if reduce:
+            check(f"station ({label}): step 1: a MeeMee let go on the station is in its window at once (no snap), and the windows' rings come in at once",
+                  not res["moving"] and res["at"] == [True, True] and res["ring"] == "0s", json.dumps(res))
+        else:
+            check(f"station ({label}): step 1: a MeeMee let go on the station snaps into its window (260 ms), and the windows' rings come in over 450 ms",
+                  res["moving"] and res["at"] == [True, True] and res["transition"] == "0.26s" and res["ring"].startswith("0.45s"), json.dumps(res))
+        res = await page.evaluate("""(() => { const R = MW.station; R.ask({ whole: 7, a: 3 }, 'more'); const tr = R.track(), m = R.st.berth;
+            R.drop(tr.tile(4), m.x + m.w / 2, m.y + m.h / 2, false); R.podTap();
+            const pop = Array.from(document.querySelectorAll('#screen-station-play .mw-mimi.station-pop .mw-mimi-art')).map(x => getComputedStyle(x).animationName);
+            const ts = getComputedStyle(tr.el), sp = Array.from(document.querySelectorAll('#screen-station-play .mw-spark')).map(x => getComputedStyle(x).animationName);
+            return { pop: pop, track: [ts.transform, ts.transitionProperty], sparks: Array.from(new Set(sp)) }; })()""")
+        if reduce:
+            check(f"station ({label}): step 2's right answer: the rest fade into their windows, the track fades away, the sparkles fade",
+                  res["pop"] == ["mw-arrive"] * 4 and res["track"][0] == "none" and res["sparks"] == ["mw-spark-fade"], json.dumps(res))
+        else:
+            check(f"station ({label}): step 2's right answer: the rest pop into their windows (260 ms), the track slides away, the sparkles grow",
+                  res["pop"] == ["station-pop"] * 4 and res["track"][0] != "none" and res["sparks"] == ["mw-spark"], json.dumps(res))
+        await page.evaluate("MW.world.home()")
+        res = await page.evaluate("""(() => { const R = MW.station, s = R.st; R.ask({ whole: 9, a: 5, missing: 'right' }, 'numbers'); const tr = R.track(), m = s.berth;
+            R.drop(tr.tile(1), m.x + m.w / 2, m.y + m.h / 2, false); R.podTap(); s.talking = false;
+            R.drop(tr.tile(2), m.x + m.w / 2, m.y + m.h / 2, false); R.podTap();
+            const had = !!s.hintStation; s.talking = false; R.drop(tr.tile(4), m.x + m.w / 2, m.y + m.h / 2, false); R.podTap();
+            const h = document.querySelector('#screen-station-play .station-hint'), cs = getComputedStyle(h);
+            return [had, h.classList.contains('is-gone'), cs.transitionProperty, cs.transitionDuration]; })()""")
+        check(f"station ({label}): step 3: after the hint, a right answer: the small station fades away (300 ms), as with {'motion' if reduce else 'reduce motion'}",
+              res == [True, True, "opacity", "0.3s"], json.dumps(res))
+        await page.evaluate("MW.world.home()")
+        check(f"station ({label}): no console errors", not problems, "; ".join(problems[:3]))
+        await ctx.close()
+    await browser.close()
 
 
 async def main():
@@ -7252,6 +8692,27 @@ async def main():
         await test_station_map(p, "fire", 1046, 653, 1.22)
         await test_station_map(p, "doogee", 1280, 800, 2)
         await test_tab_row(p)
+        for step in ST_STEPS:
+            await test_station_round(p, step, "fire", 1046, 653, 1.22)
+            await test_station_round(p, step, "doogee", 1280, 800, 2)
+        await test_station_wrong_aboard(p)
+        await test_station_wrong_aboard(p, "doogee", 1280, 800, 2)
+        await test_station_wrong_more(p, "fire", 1046, 653, 1.22)
+        await test_station_wrong_more(p, "doogee", 1280, 800, 2)
+        await test_station_wrong_numbers(p, "fire", 1046, 653, 1.22)
+        await test_station_wrong_numbers(p, "doogee", 1280, 800, 2)
+        await test_station_drag(p)
+        await test_station_questions(p)
+        await test_station_progress(p)
+        await test_station_grownups(p, "fire", 1046, 653, 1.22)
+        await test_station_grownups(p, "doogee", 1280, 800, 2)
+        await test_station_commander(p, "fire", 1046, 653, 1.22)
+        await test_station_commander(p, "doogee", 1280, 800, 2)
+        await test_station_commander(p, "fire", 1046, 653, 1.22, reduce=True)
+        await test_station_pause(p)
+        await test_station_moments(p, "fire", 1046, 653, 1.22)
+        await test_station_moments(p, "doogee", 1280, 800, 2)
+        await test_station_motion(p)
     srv.shutdown()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)} of {len(RESULTS)} checks passed")
