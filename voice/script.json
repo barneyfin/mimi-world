@@ -85,8 +85,7 @@
       "game": "MeeMee World",
       "group": "Crew",
       "words": "commander.",
-      "how": "Fall at the end: the last word of the sentence (\"Moggles… is the… commander.\").",
-      "pending": true
+      "how": "Fall at the end: the last word of the sentence (\"Moggles… is the… commander.\")."
     },
     {
       "id": "num-mid-0",
@@ -1745,56 +1744,49 @@
       "game": "MeeMee Station",
       "group": "Map",
       "words": "MeeMee Station!",
-      "how": "Announcing the game's name.",
-      "pending": true
+      "how": "Announcing the game's name."
     },
     {
       "id": "station-round-ready",
       "game": "MeeMee Station",
       "group": "Rounds",
       "words": "Let's bring the MeeMee aboard!",
-      "how": "Excited, inviting.",
-      "pending": true
+      "how": "Excited, inviting."
     },
     {
       "id": "station-bring-aboard",
       "game": "MeeMee Station",
       "group": "Questions",
       "words": "Bring more MeeMee aboard.",
-      "how": "Friendly and clear, like showing someone a new game.",
-      "pending": true
+      "how": "Friendly and clear, like showing someone a new game."
     },
     {
       "id": "station-find-number",
       "game": "MeeMee Station",
       "group": "Questions",
       "words": "Find the number.",
-      "how": "Friendly and clear, as MeeMee Rescue's.",
-      "pending": true
+      "how": "Friendly and clear, as MeeMee Rescue's."
     },
     {
       "id": "station-all-aboard",
       "game": "MeeMee Station",
       "group": "Praise",
       "words": "All aboard!",
-      "how": "Pleased and warm.",
-      "pending": true
+      "how": "Pleased and warm."
     },
     {
       "id": "station-round-done",
       "game": "MeeMee Station",
       "group": "Rounds",
       "words": "All the MeeMee are aboard!",
-      "how": "Big finish: proud and happy.",
-      "pending": true
+      "how": "Big finish: proud and happy."
     },
     {
       "id": "station-round-another",
       "game": "MeeMee Station",
       "group": "Rounds",
       "words": "Another visit?",
-      "how": "Inviting.",
-      "pending": true
+      "how": "Inviting."
     }
   ]
 }

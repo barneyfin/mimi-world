@@ -517,7 +517,8 @@
 
   // A wrong check. No red, no buzzer: Scruffles's try-again face, a calm line, and the hint after the second. Too many
   // MeeMee gets its own line every time (a try, never the hint itself), as in MeeMee Rescue and Take MeeMee Home. Too
-  // few (or none, step 1) or a wrong number (steps 2 and 3): "Let's try again.". After the hint, any other wrong check
+  // few (or none, step 1): "Let's look again."; a wrong number (steps 2 and 3): "Let's try again.", as in MeeMee Rescue
+  // and Take MeeMee Home (Barney, 18 October 2026). After the hint, any other wrong check
   // only changes Scruffles's face, in every step, as in MeeMee Rescue and Take MeeMee Home (Barney, 17 October 2026).
   // (Step 1 can't have too many after the hint: the windows past the whole are shut.)
   // What Scruffles says after a check: st.talking is true from the moment it's asked for until it ends or is cut short.
@@ -536,7 +537,7 @@
     if (kind === 'too-many') { afterCheck(W.speak([['too-many']])); return; }
     if (st.tries >= 2 && !st.hinted) { hint(); return; }
     if (st.tries >= 2) return;                               // after the hint: just the face
-    afterCheck(W.speak([['again-try-again']]));
+    afterCheck(W.speak([[kind === 'number' ? 'again-try-again' : 'again-look-again']]));
   }
 
   // ---------------------------------------------------------------- the hint: count on together

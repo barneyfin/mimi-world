@@ -1,7 +1,7 @@
 // MeeMee World offline copy. Written by tools/build.py: don't edit docs/sw.js by hand.
 // VERSION changes with every build that changes a file, so tablets pick up the new copy. A tablet saves the new
 // copy in the background the next time MeeMee World opens, then switches to it at the start screen (never mid-round).
-const VERSION = 'mimi-world-v0.9.0-60e7ae50';
+const VERSION = 'mimi-world-v0.9.0-8e592625';
 const FILES = [
   "./",
   "./index.html",
@@ -21,6 +21,7 @@ const FILES = [
   "./audio/voice/crew-jobs.mp3",
   "./audio/voice/crew-ready.mp3",
   "./audio/voice/is-the.mp3",
+  "./audio/voice/job-commander.mp3",
   "./audio/voice/job-engineer.mp3",
   "./audio/voice/job-lookout.mp3",
   "./audio/voice/job-navigator.mp3",
@@ -67,6 +68,13 @@ const FILES = [
   "./audio/voice/round-another.mp3",
   "./audio/voice/round-ready.mp3",
   "./audio/voice/round-rescued-all.mp3",
+  "./audio/voice/station-all-aboard.mp3",
+  "./audio/voice/station-bring-aboard.mp3",
+  "./audio/voice/station-find-number.mp3",
+  "./audio/voice/station-name.mp3",
+  "./audio/voice/station-round-another.mp3",
+  "./audio/voice/station-round-done.mp3",
+  "./audio/voice/station-round-ready.mp3",
   "./audio/voice/takehome-are-going.mp3",
   "./audio/voice/takehome-are-staying.mp3",
   "./audio/voice/takehome-equals.mp3",

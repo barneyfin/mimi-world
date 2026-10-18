@@ -71,8 +71,7 @@
       "id": "job-commander",
       "group": "Crew",
       "words": "commander.",
-      "how": "Fall at the end: the last word of the sentence (\"Moggles… is the… commander.\").",
-      "pending": true
+      "how": "Fall at the end: the last word of the sentence (\"Moggles… is the… commander.\")."
     }
   ]
 }

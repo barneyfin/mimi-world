@@ -7146,11 +7146,19 @@ def st_answer(q):
     return q["whole"] if q["missing"] == "whole" else (q["a"] if q["missing"] == "left" else q["b"])
 
 
-def st_prompt(step, q, qi, recorded=()):
+# MeeMee Station's own lines that are recorded (not pending) in games/station/lines.json: the game asks with a pending
+# line left out, so what a question sounds like depends on which are recorded.
+ST_RECORDED = {x["id"] for x in json.loads((ROOT / "games" / "station" / "lines.json").read_text(encoding="utf-8"))["lines"]
+               if not x.get("pending")}
+
+
+def st_prompt(step, q, qi, recorded=None):
     """What Scruffles says for a question, as the say log has it: MeeMee Rescue's "Let's make… seven. We've got… three."
     (and "How many more?" in steps 2 and 3), or for a missing whole "We've got… five… and four. How many altogether?". The
     first two questions of a round add "Bring more MeeMee aboard." (step 1) or "Find the number." (steps 2 and 3) once
-    recorded (recorded: the lines stubbed as recorded), then "Tap Scruffles when you're ready."."""
+    recorded (recorded: the lines recorded; by default, those not pending in lines.json), then "Tap Scruffles when
+    you're ready."."""
+    recorded = ST_RECORDED if recorded is None else recorded
     q = st_q(step, q)
     if step == "numbers" and q["missing"] == "whole":
         p = [f"q-weve-got num-mid-{q['a']} and num-end-{q['b']}", "q-how-many-altogether"]
@@ -7414,9 +7422,9 @@ async def test_station_wrong_aboard(p, name="fire", vw=1046, vh=653, dpr=1.22):
     await asyncio.sleep(0.4)
     s = await st_state(page)
     waited = await page.evaluate("MW.events.some(e => e.type === 'check' && e.detail === 'still answering')")
-    check(f"station-wrong-aboard ({name}): Scruffles double-tapped with none brought: 'Let's try again.' once, the try-again face, one try (the second "
+    check(f"station-wrong-aboard ({name}): Scruffles double-tapped with none brought: 'Let's look again.' once (too few, as in MeeMee Rescue), the try-again face, one try (the second "
           f"tap does nothing while he is answering), no hint",
-          (await t.said())[n0:] == ["again-try-again"] and waited and s["face"] == "try-again" and s["tries"] == 1 and not s["hinted"] and s["phase"] == "station-open",
+          (await t.said())[n0:] == ["again-look-again"] and waited and s["face"] == "try-again" and s["tries"] == 1 and not s["hinted"] and s["phase"] == "station-open",
           json.dumps(s))
     await asyncio.sleep(1.8)
     s = await st_state(page)
